@@ -1,0 +1,114 @@
+# IEEE Floating Point Arithematic
+
+
+Reference: [Overton]
+
+In this lecture, we introduce the
+[IEEE Standard for Floating-Point Arithmetic](https://en.wikipedia.org/wiki/IEEE_754).
+There are many  possible ways of representing real numbers on a computer, as well as 
+the precise behaviour of operations such as addition, multiplication, etc.
+Before the 1980s each processor had potentially a different representation for 
+real numbers, as well as different behaviour for operations.  
+IEEE introduced in 1985 was a means to standardise this across
+processors so that algorithms would produce consistent and reliable results.
+
+
+Before we begin, we load a package which implements a function `printbits`
+which print the bits of floating point numbers in colour. 
+Each colour corresponds to a different part of the representation:
+the <span style="color:red">sign bit</span>, the <span style="color:green">exponent bits</span>, 
+and the <span style="color:blue">significand bits</span>.
+```julia
+using ColorBitstring
+```
+
+## Real numbers in binary
+
+Before discussing how to represent real numbers with a finite number
+of bits, we consider what one could do with an infinite number of bits,
+that is, binary expansions.
+
+We use the notation
+$$
+(1.b_1b_2b_3\ldots)_2 = 
+$$
+
+
+**Example**
+Consider the number `1/3`.  In decimal we all know:
+$$
+1/3 = 0.3333\ldots =  \sum_{k=1}^\infty {3 \over 10^k}
+$$
+We will see that in binary
+$$
+1/3 = (0.010101\ldots)_2 = \sum_{k=1}^\infty {1 \over 2^{2k}}
+$$
+Both results can be proven using the geometric series:
+$$
+\sum_{k=0}^\infty z^k = {1 \over 1 - z}
+$$
+provided $|z| < 1$. That is, with $z = 1/10$ we see the decimal case:
+$$
+3\sum_{k=1}^\infty {1 \over 10^k} = {3 \over 1 - {1 \over 10}} - 3 = {1 \over 3}
+$$
+A similar argument works for binary with $z = {1 \over 4}$:
+$$
+\sum_{k=1}^\infty {1 \over 4^k} = {1 \over 1 - 1/4} - 1 = {1 \over 3}
+$$
+
+
+
+
+## Floating point number examples
+
+`Float64` is a type representing real numbers using 64 bits, 
+that is also known as double precision.
+We can create a `Float64` by including a 
+decimal point when writing the number: 
+`1.0` is a `Float64` while `1` is an `Int`.
+We use `printbits` to see what the bits of a `Float64` 
+for a few numbers are.
+
+First, let's check an integer of type `Float64:
+```julia
+printbits(1.0)
+```
+The format is very different from what we saw before with `Int`:
+```julia
+bitstring(1)
+```
+
+Another example is `1.3`. This is representable with only two base-10 digits, 
+it requires an infinite number of base-2 digits in `Float64`, which are 
+cut off:
+```julia
+printbits(1.3)
+```
+
+`Float32` is another type representing real numbers using 32 bits, that is also known 
+as single precision.  `Float64` is now the default format for scientific computing (on the _Floating Point Unit_, FPU).  
+`Float32` is generally the default format for graphics (on the _Graphics Processing Unit_, GPU), 
+as the difference between 32 bits and 64 bits is indistinguishable to the eye in visualisation.  
+`Float16` is an important type in machine learning where one wants to maximise the amount of data
+and high accuracy is not useful. 
+
+Here we see that the format for `Float32` looks consistent with `Float64`:
+```julia
+printbits(Float32(1.3))
+```
+
+## IEEE Format
+
+
+Floats are stored in the format
+$$
+x=\pm 2^{q-S} \times (1.b_1b_2b_3\ldots b_P)_2
+$$
+where $S$ and $P$ are fixed constants that depend on the type, 
+$q$ is an unsigned integer of a fixed number bits, 
+and $b_1b_2\ldots b_P$ are binary digits, stored as $P$ bits.
+
+In the case of `Float64`, $S=1023$, $P=52$, and $q$ 
+is stored with 11 bits.
+
+Let's do an example:

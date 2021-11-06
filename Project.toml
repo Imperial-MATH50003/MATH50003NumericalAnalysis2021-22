@@ -1,0 +1,4 @@
+[deps]
+ColorBitstring = "ce91de38-7578-4b98-aebb-6a5df05791d6"
+IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
+Weave = "44d3d7a6-8a23-5bf8-98c5-b353f8df5ec9"
