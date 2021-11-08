@@ -1,7 +1,7 @@
-# IEEE Floating Point Arithematic
+# IEEE Floating Point Arithmetic
 
 
-Reference: [Overton]
+Reference: [Overton](https://cs.nyu.edu/~overton/book/)
 
 In this lecture, we introduce the
 [IEEE Standard for Floating-Point Arithmetic](https://en.wikipedia.org/wiki/IEEE_754).
