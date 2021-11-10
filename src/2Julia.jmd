@@ -1,2 +1,196 @@
 # Intro to julia
 
+Reference: [The Julia Documentation](https://docs.julialang.org)
+
+This lecture gives an overview of Julia. [The Julia–Matlab–Python Cheatsheet](https://cheatsheets.quantecon.org)
+Is a valuable resource for translating between the three languages.
+
+## Integers
+
+Julia uses a math-like syntax for manipulating integers:
+```julia
+1 + 1 # Addition
+```
+```julia
+2 * 3 # Multiplication
+```
+```julia
+x = 5; # semicolon is optional but supresses output if used in last line
+x^2 # Powers
+```
+In Julia everything has a type. This is similar in spirit to 
+a class in Python, but much more lightweight. 
+An integer defaults to type `Int`, 
+which is either 32-bit (`Int32`) or 64-bit (`Int64`) depending
+on the processor of the machine. 
+These are "primative type", instances of the type are stored in memory as 
+a fixed length sequence of bits.
+ 
+We can see the bits using the function `bitstring`:
+```julia
+bitstring(1)
+```
+The first bit is a sign bit: if it is equal to `1` the 
+integer is negative
+```julia
+bitstring(-1)
+```
+
+This may be counter-intuitive (did you expect `1000…00001`?)
+but has the nice benefit that addition behaves the same for 
+positive integers and negative integers.  
+
+`Int` follows [modular arithmetic](https://en.wikipedia.org/wiki/Modular_arithmetic),
+that is, it is equivalent to the ring of integers modulo `2^p` where `p` is `32` or `64`. 
+Thus for $p = 64$ we are interpreting
+$(2^{32} \mod 2^{64})$ through $(2^{64}-1 \mod 2^{64})$ as negative numbers but 
+they are not treated specially.
+
+
+**Example (addition)**
+Consider `(-1) + 1`. They behave like modular arithmetic so we have:
+$$
+(-1 \mod 2^p) + (1 \mod 2^p) = (2^p-1 \mod 2^p) + (1 \mod 2^p) = 2^p \mod 2^p = 0 \mod 2^p
+$$
+
+** Example (multiplication)**
+Consider `(-2) * 2`. We have:
+```julia
+(-2 \mod 2^p) * (2 \mod 2^p) = (2^p-2 \mod 2^p) * (2 \mod 2^p) = (2^(p+1)-4 \mod 2^p) = -4 \mod 2^p
+```
+
+
+
+
+We can find the largest and smallest instances of a type using `typemax` and `typemin`:
+```julia
+typemax(Int32)
+```
+```julia
+bitstring(typemax(Int32))
+```
+```julia
+typemin(Int32)
+```
+```julia
+bitstring(typemin(Int32))
+```
+Since `Int64` behaves like modulo arithmetic we do not "overflow" but rather wrap around:
+```julia
+typemax(Int64) + 1 # returns typemin(Int32)
+```
+
+
+There are other primitive integer types: `Int8` and `Int16` are like `Int32` and `Int64` but with
+fewer bits. `UInt8`, `UInt16`, `UInt32`, and `UInt64` are unsigned integers, e.g., we do not interpret
+the number as negative if the first bit is `1`. A non-primitive type is `BigInt` which allows arbitrary length
+integers, which we can create using `big`:
+```julia
+x = typemax(Int64) + big(1) # Too big to be an `Int64`
+```
+```julia
+x^100
+```
+Note the number of bits is not fixed so it is possible to run out of memory if a number is 
+astronomically large:
+```julia
+x^x
+```
+
+In addition to `+`, `-`, and `*` we have integer division `÷`, which rounds down:
+```julia
+5 ÷ 2 # equivalent to div(5,2)
+```
+Standard division `/` (or `\` for division on the right) creates a floating point number, which will be discussed in
+the next chapter:
+```julia
+5 / 2 # alternatively 2 \ 5
+```
+
+
+
+## String
+
+We have seen that `bitstring` returns a string of bits.
+Strings can be created with quotation marks
+```julia
+str="hello world 😀"
+```
+We can access characters of a string with brackets:
+```julia
+str[1],str[13]
+```
+Each character is a bit type, in this case using 32 bits/8 bytes:
+```julia
+typeof(str[6]), length(bitstring(str[6]))
+```
+Strings are not bit types, but rather point to the start of sequence 
+of `Char` in memory.  In this case, there are $32*13=416$ bits/52 
+bytes in memory
+
+## Vector
+
+We can create a vector using brackets:
+```julia
+v = [11,24,32]
+```
+Like a string, elements are accessed via brackets. Julia
+uses 1-based indexing (like Matlab and Mathematica, unlike
+Python and C which use 0-based indexing):
+```julia
+v[1],v[3]
+```
+Accessing outside the range gives an error:
+```julia
+v[4]
+```
+Vectors can be made with different types, for example, 
+here is a vector of three 8-bit integers:
+```julia
+v = [Int8(11), Int8(24), Int8(32)]
+```
+Just like strings, Vectors are not bit types, 
+but rather point to the start of sequence of the corresponding type.  
+In this last case, there are $3*8=24$ bits/3 bytes in memory.
+
+## Parsing strings
+
+We can use the command `parse` to turn a string into an integer:
+```julia
+parse(Int, "123")
+```
+We can specify base 2 as an optional argument. If we are specifying
+bits its safer to parse as a `UInt32`, otherwise the first bit
+is not recognised as a sign:
+```julia
+bts = "11110000100111111001100110001010"
+x = parse(UInt32, bts; base=2)
+```
+The function `reinterpret` allows us to reinterpret the resulting 
+sequence of 32 bits as a different type. For example, we can reinterpret
+as an `Int32` in which case the first bit is taken to be the sign bit
+and we get a negative number:
+```julia
+reinterpret(Int32, x)
+```
+We can also reinterpret as a `Char`:
+```julia
+reinterpret(Char, x)
+```
+We will use `parse` and `reinterpret` in problem sheets and the midterm exam
+as it allows one to easily manipulate bits. This is not actually how one should
+do it as it is slow.
+
+## Bitwise operations (advanced)
+
+In practice, one should manipulate bits using bitwise operations. 
+These will not be required in this course and are not examinable, but
+are valuable to know if you have a career involving high performance computing.
+The `p << k` shifts the bits of `p` to the left `k` times inserting zeros, 
+while `p >> k` shifts to the right:
+```julia
+print(bitstring(23));
+print(bitstring(23 << 2));
+print(bitstring(23 >> 2));
+```
+The operations `&`, `|` and `⊻` do bitwise and, or, and xor.
