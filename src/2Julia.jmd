@@ -43,7 +43,7 @@ positive integers and negative integers.
 `Int` follows [modular arithmetic](https://en.wikipedia.org/wiki/Modular_arithmetic),
 that is, it is equivalent to the ring of integers modulo `2^p` where `p` is `32` or `64`. 
 Thus for $p = 64$ we are interpreting
-$(2^{32} \mod 2^{64})$ through $(2^{64}-1 \mod 2^{64})$ as negative numbers but 
+$2^{32} \mod 2^{64}$ through $(2^{64}-1) \mod 2^{64}$ as negative numbers but 
 they are not treated specially.
 
 
@@ -53,11 +53,11 @@ $$
 (-1 \mod 2^p) + (1 \mod 2^p) = (2^p-1 \mod 2^p) + (1 \mod 2^p) = 2^p \mod 2^p = 0 \mod 2^p
 $$
 
-** Example (multiplication)**
+**Example (multiplication)**
 Consider `(-2) * 2`. We have:
-```julia
+$$
 (-2 \mod 2^p) * (2 \mod 2^p) = (2^p-2 \mod 2^p) * (2 \mod 2^p) = (2^(p+1)-4 \mod 2^p) = -4 \mod 2^p
-```
+$$
 
 
 
@@ -92,10 +92,7 @@ x = typemax(Int64) + big(1) # Too big to be an `Int64`
 x^100
 ```
 Note the number of bits is not fixed so it is possible to run out of memory if a number is 
-astronomically large:
-```julia
-x^x
-```
+astronomically large: go ahead and try `x^x`.
 
 In addition to `+`, `-`, and `*` we have integer division `÷`, which rounds down:
 ```julia
@@ -189,8 +186,32 @@ are valuable to know if you have a career involving high performance computing.
 The `p << k` shifts the bits of `p` to the left `k` times inserting zeros, 
 while `p >> k` shifts to the right:
 ```julia
-print(bitstring(23));
-print(bitstring(23 << 2));
-print(bitstring(23 >> 2));
+println(bitstring(23));
+println(bitstring(23 << 2));
+println(bitstring(23 >> 2));
 ```
 The operations `&`, `|` and `⊻` do bitwise and, or, and xor.
+
+
+## Types
+
+
+Julia has two different kinds of types: bittypes (like `Int64`, `Int32`, `UInt32` and `Char`) and composite types.  
+
+Here is an example of an inbuilt composite type representing complex numbers, for example, 
+$$x = 1+i$$
+
+
+```julia
+x = 1+2im
+```
+
+```julia
+```
+
+```julia
+```
+```julia
+```
+```julia
+```
