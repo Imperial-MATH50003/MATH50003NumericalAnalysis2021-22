@@ -1,0 +1,236 @@
+# Numerical Linear Algebra
+
+## Norms
+
+
+We now consider the different norms discussed in lecture:
+
+$$||\mathbf{v}||_1 = \sum_{k=1}^n |v_k|$$
+$$||\mathbf{v}||_2 = \sqrt{\sum_{k=1}^n v_k^2}$$
+$$||\mathbf{v}||_\infty = \max |{v_k}|$$
+
+ We can use the inbuilt `norm` function to calculate norms:
+ ```julia
+ norm([1,2,3]) == norm([1,2,3],2) == sqrt(1^2+2^2+3^2)
+ ```
+
+
+## Permutation matrices
+
+Permutation matrices are matrices that represent the action of permuting the entries of a vector.  
+As a very simple example, the following permutes the first and second entry:
+ ```julia
+ v=[1,2,3,4]
+P12=[0 1 0 0; 
+     1 0 0 0;
+     0 0 1 0;
+     0 0 0 1]
+P12*v  # returns v with its first two entries swapped
+ ```
+ Permutations can be defined in _Cauchy notation_:
+
+$$\begin{pmatrix}
+ 1 & 2 & 3 & \cdots & n \cr
+ \sigma_1 & \sigma_2 & \sigma_3 & \cdots & \sigma_n
+ \end{pmatrix}$$
+
+where $1,2,\ldots,n$ appear precisely once in the list $\sigma_1,\sigma_2,\ldots,\sigma_n$.  This notation denotes the permutation that sends k to $\sigma_k$.  
+
+For example, the permutation 
+
+$$\begin{pmatrix}
+ 1 & 2 & 3 & 4 \cr
+ 4 & 3 & 1 & 2
+ \end{pmatrix}$$
+ 
+sends the 1st entry to the fourth entry,  second entry to third entry, third entry to first entry and fourthe entry to second entry.  
+
+We can convert this to matrix form:
+ ```julia
+ P=[0 0 1 0;
+   0 0 0 1;
+   0 1 0 0;
+   1 0 0 0];
+ ```
+ In general, the  matrix corresponding to a permutation is given by
+
+$$P = (\mathbf{e}_{\sigma_1} | \mathbf{e}_{\sigma_2} | \cdots | \mathbf{e}_{\sigma_n} )$$
+
+The inverse of a permutation is the permutation that sends the entries back to where they came from.  This is equivalent to swapping the rows in Cauchy's notation and sorting:  the inverse of
+
+$$\begin{pmatrix}
+ 1 & 2 & 3 & 4 \cr
+ 4 & 3 & 1 & 2
+ \end{pmatrix}$$
+ 
+ is the permutation
+ 
+ $$\begin{pmatrix}
+ 1 & 2 & 3 & 4 \cr
+ 3 & 4 & 2 & 1
+ \end{pmatrix}$$
+ 
+ This is precisely the transpose of $P$, and so we have the property that
+ 
+ $$ P^\top P = I$$
+
+for all permutation matrices.
+
+## Orthogonal matrices
+
+A matrix is _orthogonal_ if its inverse is its transpose:
+
+$$Q^\top Q = I$$
+
+Orthogonal matrices have the important property that they preserve the 2-norm of vectors:
+
+$$\|Q\mathbf{v}\|^2 = (Q\mathbf{v})^\top Q \mathbf{v} = \mathbf{v}^\top Q^\top Q \mathbf{v} = \mathbf{v}^\top  \mathbf{v} = \|\mathbf{v}\|^2$$
+
+
+
+### Rotations
+
+In 2D we get some simple examples:
+
+$$\begin{pmatrix} 1 & 0 \cr 0 & 1\end{pmatrix}, \begin{pmatrix} 1 & 0 \cr 0 & -1\end{pmatrix}, \begin{pmatrix} 0 & 1 \cr 1 & 0\end{pmatrix}, \begin{pmatrix} \cos \theta & -\sin \theta \cr \sin \theta & \cos \theta \end{pmatrix}  $$
+
+The last matrix is a rotation matrix.  We can visualize this using Plots.jl, seeing that the 2-norm is preserved:
+ ```julia
+using Plots
+
+θ = 1.     # rotation angle
+Q = [cos(θ) -sin(θ);
+    sin(θ) cos(θ)]    # rotation matrix
+
+
+v = [1,1]/sqrt(2)      # point on the circle
+Qv = Q*v               # rotated vector
+x = Qv[1]     # x coordinate of the rotated vector
+y = Qv[2]     # y coordinate of the rotated vector
+
+scatter([v[1]], [v[2]]; label="original point", legend=:bottomleft)
+scatter!([x], [y]; label="rotated point")
+
+
+# now plot the circle
+grid = range(0, 2π; length=100)       # plotting grid for the circle
+plot!(cos.(grid), sin.(grid); label="norm 1")     # plot circle in red
+ ```
+
+On a computer, we don't know exactly where a point is: every point can have a small $\epsilon$ of error.  Thus to understand the robustness of an algorithm, we need to understand what happens to balls of radius $\epsilon$ around where we think of the point.  This can be used to demonstrate why rotations are preferred to lower triangular operations.
+
+In the following, we design a function that plots a circle around a point `[a,b]` of size `ε`, both before and after a matrix `L` is applied.
+Here we demonstrate that the effect of `L` is to stretch the circles: our error can be amplified:
+````julia
+using Plots
+
+
+function plotmat(a,b,ε,L)
+    t=range(0, 2π; length=100)
+    x,y = (a+ε*cos(t),b+ε*sin(t))
+    plot(x,y)
+
+    Lx = zeros(length(x))
+    Ly = zeros(length(x))
+
+    for k=1:length(x)
+        Lx[k],Ly[k] = L*[x[k],y[k]]
+    end
+    plot!(Lx,Ly)
+end
+a,b = [1.1, 1.2]
+
+L = [1    0;
+     -b/a 1]
+
+ε = 0.1
+
+plotmat(a, b, ε, L)
+```
+As `a` becomes small, this error amplification becomes greater: in the following, we go from knowing the true point with accuracy 0.1 to only knowing it with about accuracy 1:
+```julia
+a,b = [0.125,1.2]
+
+L = [1    0;
+     -b/a 1]
+
+ε = 0.1
+
+plotmat(a, b, ε, L)
+```
+Rotations perform much better: the circles are only rotated, and are not magnified at all:
+```julia
+a,b=[1.1,1.2]
+
+θ=-atan(b,a)
+Q=[cos(θ) -sin(θ);
+    sin(θ) cos(θ)]
+
+ε=0.1
+
+plotmat(a,b,ε,Q)
+plotmat(0,b,ε,Q)
+
+plotmat(2a,b,ε,Q)
+axis([-5,5,-5,5])
+```
+
+We can construct a simpler expression for `Q` as 
+$$
+{1 \over \sqrt{a^2 + b^2}}\begin{pmatrix}
+ a & b \cr -b & a
+\end{pmatrix}
+$$
+
+### Reflections
+
+Given a vector $\mathbf v$ satisfying $\|\mathbf v\|=1$, the Householder reflection is the orthogonal matrix as
+
+$$Q_{\mathbf v} \triangleq I - 2 \mathbf v \mathbf v^\top$$
+
+
+## Inverting an upper triangular matrix
+
+We now discuss why upper triangular matrices are easy to invert.  
+Consider a simple 3x3 example, which can be solved with `\`:
+ ```julia
+ U = [1.0 2.0 3.0;
+      0.0 3.0 4.0;
+      0.0 0.0 5.0]
+
+b = [5,6,7]
+
+x = U \ b
+ ```
+ Behind the seens, `\` is doing back substitution. Here is a custom implementation:
+ ```julia
+ function backsubstitution(U,b)
+    n = size(U,1)
+    
+    if length(b) != n
+        error("The system is not compatible")
+    end
+        
+    
+    x = zeros(n)  # the solution vector
+    for k = n:-1:1  # start with k=n, then k=n-1, ...
+        r = b[k]  # dummy variable
+        for j = k+1:n
+            r -= U[k,j]*x[j] # equivalent to r = r-U[k,j]*x[j]
+        end
+        x[k] = r/U[k,k]
+    end
+    x
+end
+backsubstitution(U,b)-U\b  # close to zero, the algorithms differ slightly
+ ```
+
+`triu` takes the upper triangular of a matrix.  We can check the accuracy of `backsubstitution` on a 10 x 10 random upper triangular matrix.
+
+```julia
+U = triu(rand(10,10))
+b = rand(10)
+
+x = U\b
+norm(backsubstitution(U,b)-x)
+```

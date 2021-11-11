@@ -255,14 +255,13 @@ x\oplus y={\rm round}(x+y)
 $$
 where in this formula $\oplus$ denotes the floating point definition of `+` and + denotes the mathematical definition of +.  
 
-This has some bizarre effects.  For example, 1.1+0.1 gives a different result than 1.2:
+**Example** `1.1+0.1` gives a different result than `1.2`:
 ```julia
 x=1.1
 y=0.1
 x + y - 1.2 # Not Zero?!?
 ```
 This is because ${\rm round}(1.1)\neq1+1/10$, but rather:
-
 $$
 {\rm round}(1.1) = 1 + 2^{-4}+2^{-5} + 2^{-8}+2^{-9}+\cdots + 2^{-48}+2^{-49} + 2^{-51}= {2476979795053773 \over 2251799813685248} = 1.1 +2^{-51} - 2^{-52} - 2^{-53} - 2^{-56} - 2^{-57} - \cdots
 $$
