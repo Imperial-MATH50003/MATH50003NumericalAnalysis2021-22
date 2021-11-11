@@ -2,4 +2,5 @@
 ColorBitstring = "ce91de38-7578-4b98-aebb-6a5df05791d6"
 IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+SetRounding = "3cc68bcd-71a2-5612-b932-767ffbe40ab0"
 Weave = "44d3d7a6-8a23-5bf8-98c5-b353f8df5ec9"

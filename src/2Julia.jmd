@@ -2,7 +2,7 @@
 
 $\def\I{{\rm i}}$
 
-Reference: [The Julia Documentation](https://docs.julialang.org)
+Reference: [The Julia Documentation](https://docs.julialang.org).
 
 This lecture gives an overview of Julia. [The Julia–Matlab–Python Cheatsheet](https://cheatsheets.quantecon.org)
 Is a valuable resource for translating between the three languages.
@@ -25,8 +25,12 @@ a class in Python, but much more lightweight.
 An integer defaults to type `Int`,
 which is either 32-bit (`Int32`) or 64-bit (`Int64`) depending
 on the processor of the machine.
-These are "primative type", instances of the type are stored in memory as
+These are "primitive type", instances of the type are stored in memory as
 a fixed length sequence of bits.
+We can find the type using the function `typeof`:
+```julia
+typeof(x)
+```
 
 We can see the bits using the function `bitstring`:
 ```julia
@@ -38,15 +42,17 @@ integer is negative
 bitstring(-1)
 ```
 
-This may be counter-intuitive (did you expect `1000…00001`?)
+This format is known as [2's complemement](https://epubs.siam.org/doi/abs/10.1137/1.9780898718072.ch3).
+It may be counter-intuitive (did you expect `1000…00001`?)
 but has the nice benefit that addition behaves the same for
-positive integers and negative integers.
+positive integers and negative integers. 
 
 `Int` follows [modular arithmetic](https://en.wikipedia.org/wiki/Modular_arithmetic),
 that is, it is equivalent to the ring of integers modulo `2^p` where `p` is `32` or `64`.
 Thus for $p = 64$ we are interpreting
 $2^{32} \mod 2^{64}$ through $(2^{64}-1) \mod 2^{64}$ as negative numbers but
-they are not treated specially.
+they are not treated specially. That is, the bits for a negative integer $-y$ are the same
+as the binary representation of $2^p - y$.
 
 
 **Example (addition)**
@@ -54,12 +60,15 @@ Consider `(-1) + 1`. They behave like modular arithmetic so we have:
 $$
 (-1 \mod 2^p) + (1 \mod 2^p) = (2^p-1 \mod 2^p) + (1 \mod 2^p) = 2^p \mod 2^p = 0 \mod 2^p
 $$
+In other words, the bits of this addition are all 0.
 
 **Example (multiplication)**
 Consider `(-2) * 2`. We have:
 $$
-(-2 \mod 2^p) * (2 \mod 2^p) = (2^p-2 \mod 2^p) * (2 \mod 2^p) = (2^(p+1)-4 \mod 2^p) = -4 \mod 2^p
+(-2 \mod 2^p) * (2 \mod 2^p) = (2^p-2 \mod 2^p) * (2 \mod 2^p) = (2^{p+1}-4 \mod 2^p) = -4 \mod 2^p
 $$
+In other words, the bits are the same as the binary representation of $2^{p+1} - 4$, which
+we interpret as $-4$.
 
 
 
@@ -68,12 +77,15 @@ We can find the largest and smallest instances of a type using `typemax` and `ty
 ```julia
 typemax(Int32)
 ```
+This is the largest positive number, that is, the sign bit is zero and all other bits are 1:
 ```julia
 bitstring(typemax(Int32))
 ```
+Similarly, the smallest integer is:
 ```julia
 typemin(Int32)
 ```
+It has sign bit `1` but all other bits are zero:
 ```julia
 bitstring(typemin(Int32))
 ```
@@ -303,6 +315,34 @@ a' * b
 
 One important note: a vector is not the same as an `n x 1` matrix.
 
+### Accessing and altering subsections of arrays 
+
+We will use the following notation to get at the columns and rows of matrices:
+```julia
+A[a:b,k]    # returns the a-th through b-th rows of the k-th column of A as a Vector of length (b-a+1)
+A[k,a:b]    # returns the ath through bth columns of the k-th row of A as a 1 x (b-a+1) Matrix
+A[:,k]      # returns all rows of the k-th column of A as a Vector of length size(A,1)
+A[k,:]      # returns all columns of the k-th row of A as a 1 x size(A,2) Matrix
+A[a:b,c:d]  # returns the a-th through b-th rows and c-th through d-th columns of A 
+            # as a (b-a+1) x (d-c+1) Matrix
+```
+ The ranges `a:b` and `c:d` can be replaced by any `AbstractVector{Int}`.  For example:
+```julia
+A[[1,3,4],2]  # returns the 1st, 3rd and 4th rows of the 2nd column of A
+```
+The function `vec` turns a matrix into a vector:
+```julia
+vec(A[k,:])  # returns all columns of the k-th row of A as a size(A,2) Vector
+```
+
+**Exercise**  Can you guess what `A[2,[1,3,4]]` returns, using the definition of `A` as above?  What about `A[1:2,[1,3]]`?  And `A[1,B[1:2,1]]`?  And `vec(A[1,B[1:2,1]])`?
+
+We can also use this notation to modify entries of the matrix.  For example, we can set the `1:2` x `2:3` subblock of A to `[1 2; 3 4]` as follows:
+```julia
+A[1:2,2:3] = [1 2; 3 4]
+A
+```
+
 ### Broadcasting
 
 It often is necessary to apply a function to every entry of a vector.
@@ -503,6 +543,11 @@ function sq(x)
 end
 sq(2),sq(3)
 ```
+There is also a convenient syntax for defining functions on
+one line, e.g., we can also write
+```julia
+sq(x) = x^2
+```
 
 Multiple arguments to the function can be included with `,`.  
 Here's a function that takes in 3 arguments and returns the average.  (We write it on 3 lines only to show that functions can take multiple lines.)
@@ -554,7 +599,7 @@ Julia has an inbuilt `sum` command that we can use to check our code:
 sum([1,5,2,3,8,2])/6
 ```
 
-## Functions with type signatures
+### Functions with type signatures
 
 functions can be defined only for specific types using `::` after the variable name.  The same function name can be used with different type signatures.  
 
@@ -612,6 +657,20 @@ mydot([1,2,3,4],[5,6,7,8])
 mydot([1,2,3,4],[5,6,7])
 ```
 
+### Anonymous (lambda) functions
+
+Just like Python it is possible to make anonymous functions,
+with two variants on syntax:
+```julia
+f = x -> x^2
+g = function(x)
+    x^2
+end
+```
+There is not much difference between named and anonymous functions,
+both are compiled in the same manner. One can essentially think of
+named functions as "global constant anonymous functions".
+
 ## Tuples
 
 `Tuples` are similar to vectors but written with the notation `(x,y,z)` instead of `[x,y,z]`.  They allow the storage of _different types_.  For example:
@@ -646,13 +705,16 @@ x,y = mytuplereturn(5)
 
 Julia, like Python, has modules and packages.
 For example to load support for linear algebra functionality
-like `norm`, we need to load the `LinearAlgebra` module:
+like `norm` and `det`, we need to load the `LinearAlgebra` module:
 ```julia
 using LinearAlgebra
 norm([1,2,3])
 ```
-It is easy to create ones own modules and packages, however,
-we will not use this functionality.
+```julia
+det([1 2; 3 4])
+```
+It is fairly straightword to create ones own modules and packages, however,
+we will not need modules in this....module.
 
 ### Plotting
 
@@ -676,7 +738,5 @@ plot(x, y)
 
 If you choose to use Julia on your own machine, you may need to install
 packages. This can be done by typing the following, either in Jupyter or in the REPL:
-```julia
-] add Plots
-```
+`] add Plots`.
 
