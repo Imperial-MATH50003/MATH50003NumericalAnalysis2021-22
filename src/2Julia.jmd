@@ -1,5 +1,7 @@
 # Intro to julia
 
+$\def\I{{\rm i}}$
+
 Reference: [The Julia Documentation](https://docs.julialang.org)
 
 This lecture gives an overview of Julia. [The Julia–Matlab–Python Cheatsheet](https://cheatsheets.quantecon.org)
@@ -88,11 +90,13 @@ integers, which we can create using `big`:
 ```julia
 x = typemax(Int64) + big(1) # Too big to be an `Int64`
 ```
+Note in this case it automatically promotes an `Int64` to a `BigInt`. 
+We can create very large numbers using `BigInt`:
 ```julia
 x^100
 ```
 Note the number of bits is not fixed so it is possible to run out of memory if a number is 
-astronomically large: go ahead and try `x^x`.
+astronomically large: go ahead and try `x^x` (at your own risk).
 
 In addition to `+`, `-`, and `*` we have integer division `÷`, which rounds down:
 ```julia
@@ -104,7 +108,16 @@ the next chapter:
 5 / 2 # alternatively 2 \ 5
 ```
 
-
+We can also create rational numbers using `//`:
+```julia
+(1//2) + (3//4)
+```
+Rational arithmetic often leads to overflow so it
+is often best to combine `big` with rationals:
+```julia
+102324//132413023 + 23434545//4243061 + 23434545//42430534435
+big(102324)//132413023 + 23434545//4243061 + 23434545//42430534435
+```
 
 ## String
 
@@ -123,32 +136,14 @@ typeof(str[6]), length(bitstring(str[6]))
 ```
 Strings are not bit types, but rather point to the start of sequence 
 of `Char` in memory.  In this case, there are $32*13=416$ bits/52 
-bytes in memory
+bytes in memory.
 
-## Vector
+Strings are _immutable_: once created they cannot be changed.
+But a new string can be created that modifies an existing string:
+```julia
 
-We can create a vector using brackets:
-```julia
-v = [11,24,32]
 ```
-Like a string, elements are accessed via brackets. Julia
-uses 1-based indexing (like Matlab and Mathematica, unlike
-Python and C which use 0-based indexing):
-```julia
-v[1],v[3]
-```
-Accessing outside the range gives an error:
-```julia
-v[4]
-```
-Vectors can be made with different types, for example, 
-here is a vector of three 8-bit integers:
-```julia
-v = [Int8(11), Int8(24), Int8(32)]
-```
-Just like strings, Vectors are not bit types, 
-but rather point to the start of sequence of the corresponding type.  
-In this last case, there are $3*8=24$ bits/3 bytes in memory.
+
 
 ## Parsing strings
 
@@ -192,6 +187,120 @@ println(bitstring(23 >> 2));
 ```
 The operations `&`, `|` and `⊻` do bitwise and, or, and xor.
 
+## Vectors, Matrices, and Arrays
+
+We can create a vector using brackets:
+```julia
+v = [11, 24, 32]
+```
+Like a string, elements are accessed via brackets. Julia
+uses 1-based indexing (like Matlab and Mathematica, unlike
+Python and C which use 0-based indexing):
+```julia
+v[1], v[3]
+```
+Accessing outside the range gives an error:
+```julia
+v[4]
+```
+Vectors can be made with different types, for example, 
+here is a vector of three 8-bit integers:
+```julia
+v = [Int8(11), Int8(24), Int8(32)]
+```
+Just like strings, Vectors are not bit types, 
+but rather point to the start of sequence of the corresponding type.  
+In this last case, there are $3*8=24$ bits/3 bytes in memory.
+
+The easiest way to create a vector is to use `zeros` to create a zero `Vector` 
+and then modify its entries:
+```julia
+v=zeros(Int, 5)
+v[2]=3
+v
+```
+Note: we can't assign a floating point number to an integer vector:
+```julia
+v[2] = 3.5
+```
+We can also create vectors with `ones` (a vector of all ones), `rand` (a vector of random numbers between `0` and `1`)
+and `randn` (a vector of samples of normal distributed quasi-random numbers).
+
+When the elements are of different types, they are mapped to a type that can represent every entry.  
+For example, here we input a list of one `Int32` followed by three `Int64`s, which are automatically converted to `Int64`: 
+```julia
+[Int32(1), 2, 3, 4]
+```
+In the event that the types cannot automatically be converted, it defaults to an `Any` vector.  
+This is bad performancewise as it does not know how many bits each element will need, so should be avoided.
+```julia
+[1.0,1,"1"]
+```
+We can also specify the type of the Vector explicitly by writing the desired type before the first bracket:
+```julia
+Int32[1,2,3]
+```
+We can also create an array using brackets, a formula and a `for` command:
+```julia
+[k^2 for k=1:5]
+```
+
+
+Matrices are created similar to vectors, but by specifying two dimensions instead of one.  
+Again, the simplest way is to `zeros` to create a matrix of all zeros:
+```julia
+zeros(Int, 5, 5) # creates a 5x5 matrix of Int zeros
+```
+We can also create matrices by hand.  Here, spaces delimit the columns and semicolons delimit the rows:
+```julia
+[1 2; 3 4; 5 6]
+```
+We can also create matrices using brackets, a formula, and a `for` command:
+```julia
+[k^2+j for k=1:5, j=1:5]
+```
+Matrices are really Vectors in disguise.  They are still stored in memory in a sequence of addresses.  
+We can see the underlying vector using the `vec` command:
+```julia
+M = [1 2; 3 4; 5 6]
+vec(M)
+```
+The only difference between matrices and vectors from the computers perspective is that they have a `size` which changes the interpretation of whats stored in memory:
+```julia
+size(M)
+```
+Matrices can be manipulated easily on a computer.  We can easily take determinants:
+```julia
+det(M)
+```
+Or multiply:
+```julia
+[1 2; 3 4] * [4 5; 6 7]
+```
+If you use `.*`, it does entrywise multiplication:
+```julia
+[1 2; 3 4] .* [4 5; 6 7]
+```
+Vectors are thought of as column vectors, and so `*` is not defined:
+```julia
+a = [1, 2, 3]
+b = [4, 5, 6]
+a*b
+```
+Whereas entry-wise multiplication with `.*` works fine (try it!).
+
+Transposing a Vector gives a row vector, which is represented by a `1 x n` matrix:
+```julia
+a'
+```
+Thus we can do dot products as follows:
+```julia
+a' * b
+```
+
+One important note: a vector is not the same as an `n x 1` matrix.
+
+
 
 ## Types
 
@@ -199,7 +308,7 @@ The operations `&`, `|` and `⊻` do bitwise and, or, and xor.
 Julia has two different kinds of types: bittypes (like `Int64`, `Int32`, `UInt32` and `Char`) and composite types.  
 
 Here is an example of an inbuilt composite type representing complex numbers, for example, 
-$$x = 1+i$$
+$$x = 1+\I$$
 
 
 ```julia
