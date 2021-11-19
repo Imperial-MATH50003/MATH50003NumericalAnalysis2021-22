@@ -1,0 +1,38 @@
+# Differentiation
+
+## Dual numbers (Forward-mode automatic differentiation)
+
+## Adjoints (Reverse-mode automatic differentiation)
+
+## Finite-differences
+
+The definition 
+$$
+f'(x) = \lim_{h \rightarrow 0} {f(x+h) - f(x) \over h}
+$$
+tells us that
+$$
+f'(x) \approx {f(x+h) - f(x) \over h}
+$$
+provided that $h$ is sufficiently small.
+
+Let's try differentiating `sin(x)` at zero:
+```julia
+h = 0.000001
+y = abs(sin(h)./h - 1)
+```
+We can do a plot to see how fast the error goes down as we let $h$ become small. 
+
+Here, we use the notation `x:st:y` to denote a range of numbers from `x` to `y` in steps of size `st`.  So `0:-1:-10` is code for `0,-1,-2,…,-10`.  Similarly, 1:2:4 is code for `1,3`.
+
+```julia
+h=10.0.^(0:-1:-10)  # [1,0.1,0.01,…,1E-10]
+y = abs(sin(h)./h - 1)
+plot(y; yscale=:log10)
+```
+So far so good, but now let's try $\exp(x)$:
+```julia
+y=abs((exp(h)-1)./h-1)
+plot(y; yscale=:log10)
+```
+This phenomenon is caused by the effect of rounding when subtracting off two numbers that are close in magnitude, and will be investigated in a future lab.
