@@ -35,4 +35,4 @@ So far so good, but now let's try $\exp(x)$:
 y=abs((exp(h)-1)./h-1)
 plot(y; yscale=:log10)
 ```
-This phenomenon is caused by the effect of rounding when subtracting off two numbers that are close in magnitude, and will be investigated in a future lab.
+This phenomenon is caused by the effect of rounding when subtracting off two numbers that are close in magnitude.

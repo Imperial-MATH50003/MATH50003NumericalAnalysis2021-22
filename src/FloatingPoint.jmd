@@ -153,6 +153,8 @@ mn = floatmin(Float64)
 printbits(mn)
 ```
 
+
+
 # Subnormal numbers
 
 Whenever $q = 0$, this is called a subnormal number, so does not follow the same interpretation of the bits.  Instead, if $q = 0$ the number is represented as
@@ -249,7 +251,7 @@ end
 
 A real number can have an infinite number of digits to represent exactly.  Define the operation that takes a real number to its `Float64` representation as `round`.
 
-The Arithmetic operations '+', '-', '*', '/' are defined by the property that they are exact up to rounding.  That is, if `x` and `y` are `Float64`, we have
+The Arithmetic operations '+', '-', '*', '/', `^`, and `sqrt` are defined by the property that they are exact up to rounding.  That is, if `x` and `y` are `Float64`, we have
 $$
 x\oplus y={\rm round}(x+y)
 $$
@@ -265,3 +267,39 @@ This is because ${\rm round}(1.1)\neq1+1/10$, but rather:
 $$
 {\rm round}(1.1) = 1 + 2^{-4}+2^{-5} + 2^{-8}+2^{-9}+\cdots + 2^{-48}+2^{-49} + 2^{-51}= {2476979795053773 \over 2251799813685248} = 1.1 +2^{-51} - 2^{-52} - 2^{-53} - 2^{-56} - 2^{-57} - \cdots
 $$
+
+A very important number in numerical analysis is machine epsilon,
+$\epsilon_{\rm machine} := 2^{-P}$. This corresponds to the _relative error_ introduced
+by changing the last bit of a normal floating point number. 
+ This allows us to bound any basic arithmetic operation, e.g.,
+$$
+(x + y) (1 - \epsilon_{\rm machine}) \geq x \oplus y \leq (x+y) (1 + \epsilon_{\rm machine})
+$$
+
+## Special functions
+
+Other special functions like `cos`, `sin`, `exp`, etc. are _not_ part of the IEEE standard.
+Instead, they are implemented by composing the basic arithmetic operations, which accumulate
+errors. Fortunately they are all designed to have relative accuracy, that is, there exists
+reasonably small $c > 0$ such that, for `s = sin(x)` (that is, the Julia implementation of $sin(x)$) satisfies
+$$
+(1 - c \epsilon_{\rm machine}) \sin(x) \geq s \leq sin(x) (1 + c\epsilon_{\rm machine}) \sin(x))
+$$
+Note these special functions are written in (advanced) Julia code, for example, [sine](https://github.com/JuliaLang/julia/blob/d08b05df6f01cf4ec6e4c28ad94cedda76cc62e8/base/special/trig.jl#L76).
+
+
+**WARNING** This is an etremely misleading statement for large `x`. Consider
+the following demonstration of the statement:
+```julia
+ε = eps() # machine epsilon, 2^(-52)
+x = 2*10.0^100
+abs(sin(x) - sin(big(x)))  ≤  abs(sin(big(x))) * ε
+```
+But if we instead compute `10^100` using `BigFloat` we get a completely different
+answer that even has the wrong sign!
+```julia
+x̃ = 2*big(10.0)^100
+sin(x), sin(x̃)
+```
+This is because we commit an error on the order of roughly $2 * 10^100 * \epsilon_{\machine} \approx 4.44 * 10^(84)$
+when we round $2*10^100$ to the nearest float. 
