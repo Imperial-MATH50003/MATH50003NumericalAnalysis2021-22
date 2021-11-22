@@ -1,13 +1,28 @@
-# Intro to julia
-
-$\def\I{{\rm i}}$
+# Introduction to Julia
 
 Reference: [The Julia Documentation](https://docs.julialang.org).
 
 This lecture gives an overview of Julia. [The Julia–Matlab–Python Cheatsheet](https://cheatsheets.quantecon.org)
 Is a valuable resource for translating between the three languages.
 
-## Integers
+In these notes we focus on the aspects of Julia and computing that are essential to Numerical computing:
+
+1. Integers: how does a computer represent an integer?
+2. Strings and parsing: how do we manipulate strings in Julia? How can we convert a string of bits to an Integer?
+3. Vectors and matrices: how do we represent vectors and matrices on a computer? 
+4. Types: how can we make our own types, for example, to represent complex numbers or rationals?
+5. Loops and branches: how do we write `if`, `for`, `while` loops in Julia?
+6. Functions: how do we define functions in Julia? Note Julia allows overloading functions for different types. 
+E.g. a function may have a different definition for complex numbers than for integers.
+7. Modules, Packages, and Plotting: how do we load external packages, for example for plotting?
+
+Note some subsections are labeled *advanced*, these are non-examinable and will not be necessary in 
+problem sheets or exams. 
+
+
+
+
+## 1. Integers
 
 Julia uses a math-like syntax for manipulating integers:
 ```julia
@@ -17,27 +32,25 @@ Julia uses a math-like syntax for manipulating integers:
 2 * 3 # Multiplication
 ```
 ```julia
-x = 5; # semicolon is optional but supresses output if used in last line
+x = 5; # semicolon is optional but supresses output if used in the last line
 x^2 # Powers
 ```
 In Julia everything has a type. This is similar in spirit to
 a class in Python, but much more lightweight.
-An integer defaults to type `Int`,
+An integer defaults to a type `Int`,
 which is either 32-bit (`Int32`) or 64-bit (`Int64`) depending
 on the processor of the machine.
 These are "primitive type", instances of the type are stored in memory as
 a fixed length sequence of bits.
-We can find the type using the function `typeof`:
+We can find the type of a variable as follows:
 ```julia
 typeof(x)
 ```
-
-We can see the bits using the function `bitstring`:
+For a primitive type we can see the bits using the function `bitstring`:
 ```julia
 bitstring(1)
 ```
-The first bit is a sign bit: if it is equal to `1` the
-integer is negative
+Negative numbers may be surprising:
 ```julia
 bitstring(-1)
 ```
@@ -52,7 +65,10 @@ that is, it is equivalent to the ring of integers modulo `2^p` where `p` is `32`
 Thus for $p = 64$ we are interpreting
 $2^{32} \mod 2^{64}$ through $(2^{64}-1) \mod 2^{64}$ as negative numbers but
 they are not treated specially. That is, the bits for a negative integer $-y$ are the same
-as the binary representation of $2^p - y$.
+as the binary representation of $2^p - y$. In particular,  an integer is negative if and only if 
+the first bit (corresponding to
+the $2^p$ place) is `1`.
+
 
 
 **Example (addition)**
@@ -131,7 +147,7 @@ is often best to combine `big` with rationals:
 big(102324)//132413023 + 23434545//4243061 + 23434545//42430534435
 ```
 
-## String
+## 2. Strings and parsing
 
 We have seen that `bitstring` returns a string of bits.
 Strings can be created with quotation marks
@@ -164,7 +180,7 @@ str[1:end-1] * "😂"
 ```
 
 
-## Parsing strings
+### Parsing strings
 
 We can use the command `parse` to turn a string into an integer:
 ```julia
@@ -192,7 +208,7 @@ We will use `parse` and `reinterpret` in problem sheets and the midterm exam
 as it allows one to easily manipulate bits. This is not actually how one should
 do it as it is slow.
 
-## Bitwise operations (advanced)
+### Bitwise operations (advanced)
 
 In practice, one should manipulate bits using bitwise operations.
 These will not be required in this course and are not examinable, but
@@ -206,7 +222,7 @@ println(bitstring(23 >> 2));
 ```
 The operations `&`, `|` and `⊻` do bitwise and, or, and xor.
 
-## Vectors, Matrices, and Arrays
+## 3. Vectors, Matrices, and Arrays
 
 We can create a vector using brackets:
 ```julia
@@ -318,7 +334,7 @@ One important note: a vector is not the same as an `n x 1` matrix.
 ### Accessing and altering subsections of arrays 
 
 We will use the following notation to get at the columns and rows of matrices:
-```julia
+```
 A[a:b,k]    # returns the a-th through b-th rows of the k-th column of A as a Vector of length (b-a+1)
 A[k,a:b]    # returns the ath through bth columns of the k-th row of A as a 1 x (b-a+1) Matrix
 A[:,k]      # returns all rows of the k-th column of A as a Vector of length size(A,1)
@@ -367,7 +383,7 @@ above is equivalent to:
 [1 1; 2 2; 3 3] .* [4 5; 4 5; 4 5]
 ```
 
-## Types
+## 4. Types
 
 
 Julia has two different kinds of types: bittypes (like `Int64`, `Int32`, `UInt32` and `Char`) and composite types.
@@ -517,7 +533,7 @@ For stack-allocated instances, the compiler may even go a step further
 and compile a function so
 that an instance of a type only lives on the cache or even in registers.
 
-## Loops and branches
+## 5. Loops and branches
 
 For loops work essentially the same as in Python. The one
 caveat is to remember we are using 1-based indexing, e.g.,
@@ -528,7 +544,7 @@ for k = 1:5
 end
 ```
 
-## Functions
+## 6. Functions
 
 Functions are created in a number of ways.
 The most standard way is using the keyword `function`, 
@@ -671,7 +687,7 @@ There is not much difference between named and anonymous functions,
 both are compiled in the same manner. One can essentially think of
 named functions as "global constant anonymous functions".
 
-## Tuples
+### Tuples
 
 `Tuples` are similar to vectors but written with the notation `(x,y,z)` instead of `[x,y,z]`.  They allow the storage of _different types_.  For example:
 ```julia
