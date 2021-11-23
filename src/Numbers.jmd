@@ -1,7 +1,7 @@
-# IEEE Floating Point Arithmetic
+# numbers_
 
 
-Reference: [Overton](https://cs.nyu.edu/~overton/book/) Chapter 4.
+Reference: [Overton](https://cs.nyu.edu/~overton/book/)
 
 In this lecture, we introduce the
 [IEEE Standard for Floating-Point Arithmetic](https://en.wikipedia.org/wiki/IEEE_754).
@@ -29,179 +29,48 @@ the <span style="color:red">sign bit</span>, the <span style="color:green">expon
 and the <span style="color:blue">significand bits</span> which we shall learn about shortly.
 ```julia
 using SetRounding, ColorBitstring
-printbits(1.0)
 ```
 
 In this chapter we discuss the following:
 
-1. Integers:  There are multiple ways of representing integers on a computer. Here we discuss the 
+1. Binary representation: Any real number can be represented in binary, that is,
+by an infinite sequence of 0s and 1s (bits). Here we review  binary representation.
+2. Integers:  There are multiple ways of representing integers on a computer. Here we discuss the 
 the different types of integers and their representation as bits, and how arithmetic operations behave 
 like modular arithmetic.
-2. Binary representation of real numbers: Any real number can be represented by an infinite sequence of bits. 
 2. Floating point numbers: we discuss how real numbers are stored on a computer with a finite number of bits.
 3. Arithmetic: we discuss how arithmetic operations in floating point are exact up to rounding, and how the
 rounding mode can be set. This allows for precise error bounds in computations.
 4. High-precision floating point numbers: we discuss how the precision of floating point arithmetic can be increased arbitrary
 using `BigFloat`.
 
-## 1. Integers
 
-Julia uses a math-like syntax for manipulating integers:
-```julia
-1 + 1 # Addition
-```
-```julia
-2 * 3 # Multiplication
-```
-```julia
-x = 5; # semicolon is optional but supresses output if used in the last line
-x^2 # Powers
-```
-In Julia everything has a type. This is similar in spirit to
-a class in Python, but much more lightweight.
-An integer defaults to a type `Int`,
-which is either 32-bit (`Int32`) or 64-bit (`Int64`) depending
-on the processor of the machine. There are also 8-bit (`Int8`), 16-bit (`Int16`), 
-and 128-bit (`Int128`) integer types, which
-we can construct by converting an `Int`, e.g. `Int8(3)`.
 
-These are all "primitive types", instances of the type are stored in memory as
-a fixed length sequence of bits.
-We can find the type of a variable as follows:
-```julia
-typeof(x)
-```
-For a primitive type we can see the bits using the function `bitstring`:
-```julia
-bitstring(Int8(1))
-```
-Negative numbers may be surprising:
-```julia
-bitstring(-Int8(1))
-```
+## 1.  Binary representation
 
-This format is known as [2's complemement](https://epubs.siam.org/doi/abs/10.1137/1.9780898718072.ch3).
-It may be counter-intuitive (did you expect `10000001`?)
-but has the nice benefit that addition behaves the same for
-positive integers and negative integers. 
-
-`Int` follows [modular arithmetic](https://en.wikipedia.org/wiki/Modular_arithmetic),
-that is, it is equivalent to ${\mathbb Z}_{2^p}$, 
-the ring of integers modulo `2^p` (where `p` is `8`, `16`, `32` or `64`).
-Thus for $p = 8$ we are interpreting
-$2^4 \mod 2^8$ through $(2^8-1) \mod 2^8$ as negative numbers but
-they are not treated specially. That is, the bits for a negative integer $-y$ are the same
-as the binary representation of $2^p - y$. In particular,  an integer is negative if and only if 
-the first bit (corresponding to the $2^{p-1}$ place) is `1`.
-
-**Example (converting bits to integers)** 
-What 8-bit number has the bits `01001001`? Adding the corresponding decimal places we get:
-```julia
-2^0 + 2^3 + 2^6
-```
-What 8-bit number has the bits `11001001`? Because the first bit is `1` we know it's a negative 
-number, hence we need to sum the bits but then subtract `2^p`:
-```julia
-2^0 + 2^3 + 2^6 + 2^7 - 2^8
-```
-We can check the results using `bitstring`:
-```julia
-bitstring(Int8(73)), bitstring(-Int8(55))
-```
-
-**Example (addition)**
-Consider `(-1) + 1`. They behave like modular arithmetic so we have:
+Any integer can be presented in binary format, that is, a sequence of $0$s and $1$s.
+**Definition**
+For $B_0,\ldots,B_p \in \{0,1\}$ denote a non-negative integer in _binary format_ by:
 $$
-(-1 \mod 2^p) + (1 \mod 2^p) = (2^p-1 \mod 2^p) + (1 \mod 2^p) = 2^p \mod 2^p = 0 \mod 2^p
+(B_p\ldots B_1B_0)_2 := 2^pB_p + \cdots + 2B_1 + B_0
 $$
-In other words, the bits of this addition are all 0.
-
-**Example (multiplication)**
-Consider `(-2) * 2`. We have:
+For $b_1,b_2,\ldots \in \{0,1\}$, Denote a non-negative real number in _binary format_ by:
 $$
-(-2 \mod 2^p) * (2 \mod 2^p) = (2^p-2 \mod 2^p) * (2 \mod 2^p) = (2^{p+1}-4 \mod 2^p) = -4 \mod 2^p
+(B_\ldots B_0.b_1Qb_2b_3\ldots)_2 = (B_Q\ldots B_0)_2 + {b_1 \over 2} + {b_2 \over 2^2} + {b_3 \over 2^3} + \cdots
 $$
-In other words, the bits are the same as the binary representation of $2^{p+1} - 4$, which
-we interpret as $-4$.
 
 
 
-
-We can find the largest and smallest instances of a type using `typemax` and `typemin`:
-```julia
-typemax(Int8)
-```
-This is the largest positive number, that is, the sign bit is zero and all other bits are 1:
-```julia
-bitstring(typemax(Int8))
-```
-Similarly, the smallest integer is:
-```julia
-typemin(Int8)
-```
-It has sign bit `1` but all other bits are zero:
-```julia
-bitstring(typemin(Int8))
-```
-Since `Int64` behaves like modulo arithmetic we do not "overflow" but rather wrap around:
-```julia
-typemax(Int8) + Int8(1) # returns typemin(Int8)
-```
-
-
-There are other primitive integer types:  `UInt8`, `UInt16`, `UInt32`, and `UInt64` are unsigned integers, 
-e.g., we do not interpret
-the number as negative if the first bit is `1`. A non-primitive type is `BigInt` which allows arbitrary length
-integers, which we can create using `big`:
-```julia
-x = typemax(Int64) + big(1) # Too big to be an `Int64`
-```
-Note in this case it automatically promotes an `Int64` to a `BigInt`.
-We can create very large numbers using `BigInt`:
-```julia
-x^100
-```
-Note the number of bits is not fixed, the larger the number the more bits are needed 
-to represent it, so it is possible to run out of memory if a number is
-astronomically large: go ahead and try `x^x` (at your own risk).
-
-In addition to `+`, `-`, and `*` we have integer division `÷`, which rounds down:
-```julia
-5 ÷ 2 # equivalent to div(5,2)
-```
-Standard division `/` (or `\` for division on the right) creates a floating point number, which will be discussed in
-the next chapter:
-```julia
-5 / 2 # alternatively 2 \ 5
-```
-
-We can also create rational numbers using `//`:
-```julia
-(1//2) + (3//4)
-```
-**Remark** Rational arithmetic often leads to overflow so it
-is often best to combine `big` with rationals:
-```julia
-102324//132413023 + 23434545//4243061 + 23434545//42430534435
-big(102324)//132413023 + 23434545//4243061 + 23434545//42430534435
-```
-
-
-## 1.  Binary representation of real numbers
-
-Before discussing how to represent real numbers with a finite number
-of bits, we consider what one could do with an infinite number of bits,
-that is, binary expansions.
-
-We use the notation:
-$$
-(b_0.b_1b_2b_3\ldots)_2 = b_0 + {b_1 \over 2} + {b_2 \over 2^2} + {b_3 \over 2^3} + \cdots
-$$
-where $b_k$ are either 0 or 1. Every number $0 \leq x < 1$ has a binary representation in this form.
 First we show some examples of verifying a numbers binary representation:
 
 **Example**
-Consider the number `1/3`.  In decimal we all know:
+A simple integer example is
+$
+5 = 2^2 + 2^0 = (101)_2.
+$
+
+**Example**
+Consider the number `1/3`.  In decimal recall that:
 $$
 1/3 = 0.3333\ldots =  \sum_{k=1}^\infty {3 \over 10^k}
 $$
@@ -222,38 +91,154 @@ $$
 \sum_{k=1}^\infty {1 \over 4^k} = {1 \over 1 - 1/4} - 1 = {1 \over 3}
 $$
 
-The extension to numbers outside the range $0 \leq x < 1$ is clear, e.g.
+
+
+## 2. Integers
+
+
+On a computer one typically represents integers by a finite number of $p$ bits,
+with $2^p$ possible combinations of 0s and 1s. For _unsigned integers_, that is,
+non-negative integers these bits are just the first $p$ binary digits, that is,
+$(B_p\ldots B_1B_0)_2$.
+ 
+Integers follows [modular arithmetic](https://en.wikipedia.org/wiki/Modular_arithmetic),
+that is, $p$-bit numbers on a computer represent elements of ${\mathbb Z}_{2^p}$, 
+the ring of integers modulo `2^p`, and arithmetic follows accordingly.
+
+**Example (addition of 8-bit unsigned integers)** Consider the addition of
+two 8-bit numbers:
 $$
-(-101.010101\ldots)_2 = -(5 + 1/3)
+255 + 1 = (11111111)_2 + (00000001)_2 = (100000000)_2 = 256
 $$
-But for floating point numbers we handle the integer part differently so
-we will not use this.
+The result is impossible to store in just 8-bits! It is way too slow
+for a computer to increase the number of bits, or to throw an error (checks are slow).
+So instead it treats the integers as elements of ${\mathbb Z}_{256}$:
+$$
+(255 + 1) \mod 256 = (00000000)_2 \mod 256 = 0 \mod 256
+$$
+We can see this in Julia:
+```julia
+x = UInt8(255)
+y = UInt8(1)
+printbits(x); println(" + "); printbits(y); println(" = ")
+printbits(x + y)
+```
+
+
+**Example (multiplication of 8-bit unsigned integers)** 
+Multiplication works similarly: for example,
+$$
+254 * 2 \mod 256 = 252 = (11111100)_2
+$$
+and we have
+```julia
+x = UInt8(254)
+y = UInt8(2)
+printbits(x); println(" * "); printbits(y); println(" = ")
+printbits(x * y)
+```
+
+Signed integers use the [2's complemement](https://epubs.siam.org/doi/abs/10.1137/1.9780898718072.ch3)
+convention. The convention is if the first bit is 1 then the number is negative: the number $2^p - y$
+is interpreted as $-y$.
+Thus for $p = 8$ we are interpreting
+$2^7$ through $2^8-1$ as negative numbers. 
+
+**Example (converting bits to signed integers)** 
+What 8-bit integer has the bits `01001001`? Adding the corresponding decimal places we get:
+```julia
+2^0 + 2^3 + 2^6
+```
+What 8-bit (signed) integer has the bits `11001001`? Because the first bit is `1` we know it's a negative 
+number, hence we need to sum the bits but then subtract `2^p`:
+```julia
+2^0 + 2^3 + 2^6 + 2^7 - 2^8
+```
+We can check the results using `printbits`:
+```julia
+printlnbits(Int8(73))
+printbits(-Int8(55))
+```
+
+Arithmetic works precisely
+the same for signed and unsigned integers.
+
+**Example (addition of 8-bit integers)**
+Consider `(-1) + 1` in 8-bit arithmetic. The number $-1$ has the same bits as
+$2^8 - 1 = 255$. Thus this is equivalent to the previous question and we get the correct
+result of `0`. In other words:
+$$
+(-1 \mod 2^p) + (1 \mod 2^p) = (2^p-1 \mod 2^p) + (1 \mod 2^p) = 2^p \mod 2^p = 0 \mod 2^p
+$$
+
+
+**Example (multiplication of 8-bit integers)**
+Consider `(-2) * 2`. $-2$ has the same bits as $2^{256} - 2 = 254$ and $-4$ has the
+same bits as $2^{256}-4 = 252$, and hence from the previous example we get the correct result of `-4`.
+In other words:
+$$
+(-2 \mod 2^p) * (2 \mod 2^p) = (2^p-2 \mod 2^p) * (2 \mod 2^p) = (2^{p+1}-4 \mod 2^p) = -4 \mod 2^p
+$$
 
 
 
+
+
+We can find the largest and smallest instances of a type using `typemax` and `typemin`:
+```julia
+printlnbits(typemax(Int8)) # 2^7-1 = 127
+printbits(typemin(Int8)) # -2^7 = -128
+```
+As explained, due to modular arithmetic, when we add `1` to the largest 8-bit integer we get the smallest:
+```julia
+typemax(Int8) + Int8(1) # returns typemin(Int8)
+```
+
+
+
+In addition to `+`, `-`, and `*` we have integer division `÷`, which rounds down:
+```julia
+5 ÷ 2 # equivalent to div(5,2)
+```
+Standard division `/` (or `\` for division on the right) creates a floating point number, which will be discussed shortly:
+```julia
+5 / 2 # alternatively 2 \ 5
+```
+
+**Remark (advanced)** We can also create rational numbers using `//`:
+```julia
+(1//2) + (3//4)
+```
+Rational arithmetic often leads to overflow so it
+is often best to combine `big` with rationals:
+```julia
+big(102324)//132413023 + 23434545//4243061 + 23434545//42430534435
+```
+See the [Introduction to Julia](Julia.ipynb) for details on `big`,
+which creates a `BigInt`, which allows for an arbitrary number of bits.
 
 ## 2. Floating point numbers
 
-Floating point numbers are how a computer typically approximates
-a real number. 
+Floating point numbers are a subset of real numbers that are representable using
+a fixed number of bits.
 
-**Definition** The _floating point numbers_ are
+**Definition**  _Floating point numbers_ are divided into _normal_, _sub-normal_, and _special_ numbers:
 $$
-F_{S,Q,P} := F^{\rm normal}_{S,Q,P} \cup F^{\rm sub-normal}_{S,Q,P} \cup F^{\rm special}.
+F_{S,Q,P} := F^{\rm normal}_{S,Q,P} \cup F^{\rm sub}_{S,Q,P} \cup F^{\rm special}.
 $$
-The _normal floating point numbers_
+The _normal numbers_
 $F^{\rm normal}_{S,Q,P} \subset {\mathbb R}$ are defined by
 $$
 F^{\rm normal}_{S,Q,P} = \{\pm 2^{q-S} \times (1.b_1b_2b_3\ldots b_P)_2 : 1 \leq q < 2^Q-1 \}.
 $$
-The _sub-normal numbers_ $F^{\rm sub-normal}_{S,Q,P} \subset {\mathbb R}$ are defined as
+The _sub-normal numbers_ $F^{\rm sub}_{S,Q,P} \subset {\mathbb R}$ are defined as
 $$
-F^{\rm sub-normal}_{S,Q,P} = \{\pm 2^{1-S} \times (0.b_1b_2b_3\ldots b_P)_2\}.
+F^{\rm sub}_{S,Q,P} = \{\pm 2^{1-S} \times (0.b_1b_2b_3\ldots b_P)_2\}.
 $$
 The _special numbers_ $F^{\rm special} \not\subset {\mathbb R}$ are defined later.
 
 Note this set of real numbers has no nice algebraic structure: it is not closed under addition, subtraction, etc.
-and the normal floating point numbers does not include $0$. We will therefore need to define approximate versions of algebraic operations later.
+We will therefore need to define approximate versions of algebraic operations later.
 
 Floating point numbers are stored in $1 + Q + P$ total number of bits, in the format
 $$
@@ -280,7 +265,7 @@ later.
 
 ### IEEE floating point numbers
 
-**Definition** IEEE has 3 standard floating point numbers: 16-bit (half precision), 32-bit (single precision) and
+**Definition** IEEE has 3 standard floating point formats: 16-bit (half precision), 32-bit (single precision) and
 64-bit (double precision) defined by:
 $$
 \begin{align*}
@@ -299,7 +284,7 @@ decimal point when writing the number:
 scientific computing (on the _Floating Point Unit_, FPU).  
 2. `Float32` is a type representing $F_{32}$.  We can create a `Float32` by including a 
 `f0` when writing the number: 
-`1f0` is a `Float32`. is generally the default format for graphics (on the _Graphics Processing Unit_, GPU), 
+`1f0` is a `Float32`. `Float32` is generally the default format for graphics (on the _Graphics Processing Unit_, GPU), 
 as the difference between 32 bits and 64 bits is indistinguishable to the eye in visualisation,
 and more data can be fit into a GPU's limitted memory.
 3.  `Float16` is a type representing $F_{16}$.
@@ -312,15 +297,16 @@ Recall that
 $$
 1/3 = (0.010101\ldots)_2 = 2^{-2} (1.0101\ldots)_2 = 2^{125-127} (1.0101\ldots)_2
 $$
-Since
-$$
+and since $
 125 = (1111101)_2
-$$
-For the significand we round the last bit to the nearest (this is explained in detail in
+$  the <span style="color:green">exponent bits</span> are `1111101`.
+. 
+For the significand we round the last bit to the nearest element of $F_{32}$, (this is explained in detail in
 the section on rounding), so we have
 $$
-1.010101010101010101010101\ldots \approx 1.01010101010101010101011 
+1.010101010101010101010101\ldots \approx 1.01010101010101010101011 \in F_{32} 
 $$
+and the <span style="color:blue">significand bits</span> are `01010101010101010101011`.
 Thus the `Float32` bits for $1/3$ are:
 ```julia
 printbits(1f0/3)
@@ -335,16 +321,17 @@ Unlike integers, we also have a negative zero:
 ```julia
 printbits(-0.0)
 ```
-This is treated as identical to `0.0`, except for with regards to special numbers.
+This is treated as identical to `0.0` (except for degenerate operations as explained in special numbers).
 
 
 If we divide the smallest normal number by two, we get a subnormal number: 
 ```julia
+mn = floatmin(Float32) # smallest normal Float32
 printbits(mn/2)
 ```
 Can you explain the bits?
 
-### Important normal numbers
+### Special normal numbers
 
 When dealing with normal numbers there are some important constants that we will use
 to bound errors.
@@ -354,7 +341,6 @@ $$
 \epsilon_{{\rm m},P} := 2^{-P}.
 $$
 When $P$ is implied by context we use the notation $\epsilon_{\rm m}$.
-
 The _smallest positive normal number_ is $q = 1$ and $b_k$ all zero:
 $$
 \min |F_{S,P,Q}^{\rm normal}| = 2^{1-S}.
@@ -363,6 +349,8 @@ The _largest (positive) normal number_ is
 $$
 \max F_{S,P,Q}^{\rm normal} = 2^{2^Q-2-S} (1.11\ldots1)_2 = 2^{2^Q-2-S} (2-\epsilon_{\rm m})
 $$
+
+
 We confirm the simple bit representations:
 ```julia
 S,P,Q = 127,23,8 # Float32
@@ -370,8 +358,6 @@ S,P,Q = 127,23,8 # Float32
 printlnbits(Float32(2.0^(1-S))) # smallest positive Float32
 printlnbits(Float32(2.0^(2^Q-2-S) * (2-εₘ))) # largest Float32
 ```
-
-
 For a given floating point type, we can find these constants using the following functions:
 ```julia
 eps(Float32),floatmin(Float32),floatmax(Float32)
@@ -384,20 +370,22 @@ eps(Float32),floatmin(Float32),floatmax(Float32)
 The special numbers extend the real line by adding $\pm \infty$ but also a notion of "not-a-number".
 
 **Definition**
-Denote ${\rm NaN} := \{\}$ and define
+Let ${\rm NaN}$ represent "not a number" and define
 $$
 F^{\rm special} := \{\infty, -\infty, {\rm NaN}\}
 $$
 
 Whenever the bits of $q$ of a floating point number are all 1 then they represent an element of $F^{\rm special}$.
-If all $b_k=0$, then the number represents either $\pm\infty$, called `Inf` and `-Inf`:
+If all $b_k=0$, then the number represents either $\pm\infty$, called `Inf` and `-Inf` for 64-bit floating point numbers (or `Inf16`, `Inf32`
+for 16-bit and 32-bit, respectively):
 ```julia
-printlnbits(Inf)
-printbits(-Inf)
+printlnbits(Inf16)
+printbits(-Inf16)
 ```
-All other special floating point numbers represent `NaN`: `NaN` is stored with $q=(11111111111)_2$ and at least one of the $b_k =1$:
+All other special floating point numbers represent ${\rm NaN}$. One particular representation of ${\rm NaN}$ 
+is denoted by `NaN` for 64-bit floating point numbers (or `NaN16`, `NaN32` for 16-bit and 32-bit, respectively):
 ```julia
-printbits(NaN)
+printbits(NaN16)
 ```
 These are needed for undefined algebraic operations such as:
 ```julia
@@ -408,17 +396,17 @@ These are needed for undefined algebraic operations such as:
 **Example** What happens if we change some other $b_k$ to be nonzero?
 We can create bits as a string and see:
 ```julia
-i=parse(UInt64, "1111111111110000000000000000000010000001000000000010000000000000"; base=2)
-reinterpret(Float64,i)
+i = parse(UInt16, "0111110000010001"; base=2)
+reinterpret(Float16, i)
 ```
-Thus, there are more than one `NaN`s on a computer.  Can you figure out how many there are?
+Thus, there are more than one `NaN`s on a computer.  
 
 
 ## 3. Arithmetic
 
 
 Arithmetic operations are done exactly _up to rounding_.
-There are three basic rounding strategies: round up/down/towards zero/nearest.
+There are three basic rounding strategies: round up/down/nearest.
 Mathematically we introduce the function ${\rm round}$:
 
 **Definition** ${\rm round}^{\rm up}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
@@ -433,8 +421,8 @@ with ${\rm round}^{\rm nearest}$ being the default rounding mode.
 
 
 
-In Julia, the rounding mode is specified by tags `RoundUp`, `RoundDown`, `RoundToZero`, and
-`RoundNearest`. (There are also more exotic rounding strategies `RoundNearestTiesAway` and
+In Julia, the rounding mode is specified by tags `RoundUp`, `RoundDown`, and
+`RoundNearest`. (There are also more exotic rounding strategies `RoundToZero`, `RoundNearestTiesAway` and
 `RoundNearestTiesUp` that we won't use.)
  Note that these rounding modes are part
 of the FPU instruction set so will be (roughly) equally fast as the default, `RoundNearest`.
@@ -489,27 +477,20 @@ We can bound basic arithmetic operations in terms of:
 is the subset of real numbers that lies
 between the smallest and largest normal floating point number:
 $$
-{\cal N}_{S,Q,P} := \{x : 2^{1-S} \leq |x| \leq \}
+{\cal N}_{S,Q,P} := \{x : \min |F_{S,Q,P}| \leq |x| \leq \max F_{S,Q,P} \}
 $$
-When $S,Q,P$ are implied by context we use the notation ${\rm N}$.
+When $S,Q,P$ are implied by context we use the notation ${\cal N}$.
 
-This corresponds to the _relative error_ introduced
-by changing the last bit of a normal floating point number. 
+We can use machine epsilon to determine bounds on rounding:
 
-**Proposition** Let $m$ and $M$ denote the smallest and largest positive element of
-$F_{S,Q,P}^{\rm normal}$. If $m \leq x \leq M$ then for any rounding mode we have:
-$$
-|{\rm round}(x) - x|  \leq |x| (1 + \epsilon_{\rm m})
-$$
-
-**Lemma**
-For any rounding mode we have:
+**Proposition** For any rounding mode,
 $$
 \begin{align*}
-|x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm m} \\
-|x \ominus y - (x - y)| \leq |x-y| \epsilon_{\rm m} \\
-|x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm m} \\
-|x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm m}.
+x \in {\cal N} &\Rightarrow |{\rm round}(x) - x|  \leq |x| \epsilon_{\rm m} \\
+x + y \in {\cal N} &\Rightarrow |x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm m} \\
+x - y \in {\cal N} &\Rightarrow |x \ominus y - (x - y)| \leq |x-y| \epsilon_{\rm m} \\
+x y \in {\cal N} &\Rightarrow |x \otimes y - x y| \leq |xy| \epsilon_{\rm m} \\
+x/y \in {|cal N} &\Rightarrow |x \odiv y - (x + y)| \leq |x/y| \epsilon_{\rm m}.
 \end{align*}
 $$
 
@@ -573,5 +554,5 @@ sin(x), sin(x̃)
 This is because we commit an error on the order of roughly $2 * 10^100 * \epsilon_{\machine} \approx 4.44 * 10^(84)$
 when we round $2*10^100$ to the nearest float. 
 
-## 4. High-precision floating point numbers (*advanced*)
+## 4. High-precision floating point numbers (advanced)
 
