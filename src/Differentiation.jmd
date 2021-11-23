@@ -1,10 +1,29 @@
 # Differentiation
 
-## Dual numbers (Forward-mode automatic differentiation)
+We now get to our first computational problem: given a function, how can we approximate its derivative at a
+point?
+We consider three possible scenarios:
 
-## Adjoints (Reverse-mode automatic differentiation)
+1. The function is a "black-box": we can only evaluate it on, say, `Float64` inputs. This is the situation
+if we have a function that relies on C code.
+2. The function is a piece of code, and we can evaluate it on arbitrary types, including
+ones we create. This is the case if we have a function defined in Julia that does not call any
+C libraries.
+3. The function is built by composing different basic "kernels" with known differentiability properties.
+We won't consider this situation in this module, though it is the model used by Python machine learning toolbox's
+like [PyTorch](https://pytorch.org) and [TensorFlow](http://tensorflow.org).
 
-## Finite-differences
+We discuss the following techniques:
+
+1. Finite-differences: this uses the definition of a derivative that one learns in calculus to approximate its value.
+2. Dual numbers and forward-mode automatic differentiation: we define a special type that when applied to a function
+computes its derivative. This unsafe_store! _dual numbers_, which is analoguous to complex numbers.
+3. Adjoints and reverse-mode automatic differentiation: this is similar to applying the "chain rule" by building up
+a tape of operations. It's outside the scope of this module but is important for machine learning.
+4. Interpolation and differentiation: this will be discussed later in the module.
+
+
+## 1. Finite-differences
 
 The definition 
 $$
@@ -14,25 +33,125 @@ tells us that
 $$
 f'(x) \approx {f(x+h) - f(x) \over h}
 $$
-provided that $h$ is sufficiently small.
+provided that $h$ is sufficiently small. 
 
-Let's try differentiating `sin(x)` at zero:
+It's important to note that approximation uses only the _black-box_
+notion of a function but to obtain bounds we need more.
+
+If we know a bound on $f''(x)$ then Taylor's theorem tells us a precise bound:
+
+**Proposition**
+The error in approximating the derivative using finite differences is
+$$
+\left|f'(x) - {f(x+h) - f(x) \over h}\right| \leq {\sup_{x \leq t \leq x+h} f''(t) \over 2 h}
+$$
+
+**Proof**
+Follows immediately from Taylor's theorem:
+$$
+f(x+h) = f(x) + f'(x) h + {f''(\chi) \over 2} h^2
+$$
+for some $x < \chi < x+h$.
+
+◼️
+
+
+Note this is assuming _real arithmetic_, the answer is drastically
+different with _floating point arithmetic_.
+
+
+### Does finite-differences work with floating point arithmetic?
+
+
+Let's try differentiating two simple polynomials $f(x) = x + x^2$ and $g(x) = 1 + x + x^2$:
 ```julia
+f = x -> x + x^2     # we treat `f` as a black-box
+g = x -> 1 + x + x^2
 h = 0.000001
-y = abs(sin(h)./h - 1)
+(f(h)-f(0))/h, (g(h)-g(0))/h
 ```
+Both seem to roughly approximate the true derivatives (both 1).
 We can do a plot to see how fast the error goes down as we let $h$ become small. 
-
-Here, we use the notation `x:st:y` to denote a range of numbers from `x` to `y` in steps of size `st`.  So `0:-1:-10` is code for `0,-1,-2,…,-10`.  Similarly, 1:2:4 is code for `1,3`.
-
 ```julia
-h=10.0.^(0:-1:-10)  # [1,0.1,0.01,…,1E-10]
-y = abs(sin(h)./h - 1)
-plot(y; yscale=:log10)
+using Plots
+h = 10.0 .^ (0:-1:-16)  # [1,0.1,0.01,…,1E-7]
+plot(abs.((f.(h) .- f(0)) ./ h .- 1); yscale=:log10, title="convergence of derivatives", label="f", legend=:bottomleft)
+plot!(abs.((g.(h) .- g(0)) ./ h .- 1); yscale=:log10, label = "g")
 ```
-So far so good, but now let's try $\exp(x)$:
-```julia
-y=abs((exp(h)-1)./h-1)
-plot(y; yscale=:log10)
-```
-This phenomenon is caused by the effect of rounding when subtracting off two numbers that are close in magnitude.
+
+
+
+
+In the case of $f$ it is a success: we approximate the true derivative to roughly machine precision,
+which is the best one can really hope for given round-off error.
+by letting $h$ be sufficiently small.
+But for $g$ it is a huge failure: the approximation starts to converge, but then diverges exponentially fast!
+
+We can bound the error using the bounds on floating point arithmetic. For simplicity we ignore the
+$x^2$ term: when $h$ is small, $h^2$ gets lost in the rounding. Then we have
+$$
+\left|((1 \oplus h) \ominus h) - 1 \odiv h -1\right| \leq ((1+h)*(1+\epsilon_{\rm machine}) - 1)*(1+\epsilon_{\rm machine}) = h + h \epsilon_{\rm machine} + O(h^2)
+$$
+Thus we see that the bound grows like $\epsilon_{\rm machine}/h$. However, a bad upper bound is not the same
+as a proof that something grows, and establishing a lower bound on the error is more challenging. In fact,
+it depends on the precise bits of $h$. 
+
+## 2. Dual numbers (Forward-mode automatic differentiation)
+
+Automatic differentiation consists of applying functions to special types that determine the derivatives.
+Here we do so via _dual numbers_.
+
+**Definition (Dual numbers)** Dual numbers are a commutative ring over the reals 
+generated by $1$ and $\epsilon$ such that $\epsilon^2 = 0$.
+Dual numbers are typically written as $a + b \epsilon$ where $a$ and $b$ are real.
+
+This is very much analoguous to complex numbers, which are a field generated by $1$ and ${\rm i}$ such that
+${\rm i}^2 = -1$. Compare multiplication of each number typer:
+$$
+\begin{align*}
+(a + b {\rm i}) (c + d {\rm i}) &= ac + (bc + ad) {\rm i} + bd {\rm i}^2 = ac -bd + (bc + ad) {\rm i} \\
+(a + b \epsilon) (c + d \epsilon) &= ac + (bc + ad) \epsilon + bd \epsilon^2 = ac  + (bc + ad) \epsilon 
+\end{align*}
+$$
+
+
+### Matrix representations
+
+Complex numbers can be thought of as $2 \times 2$ matrices, that is, $a + b {\rm i}$ is equivalent to
+$$
+a \underbrace_{\rm representation of 1}{I} + b \underbrace_{\rm representation of n$}{\begin{pmatrix}0 &1 \\-1 & 0\end{pmatrix}} = \begin{pmatrix}a & b \\ -b & a \end{pmatrix}
+$$
+Similarly, for dual numbers we have
+$$
+a \underbrace_{\rm representation of 1}{I} + b \underbrace_{\rm representation of \epsilon}{\begin{pmatrix}0 &1 \\0 & 0\end{pmatrix}} = \begin{pmatrix}a & b \\ 0 & a \end{pmatrix}
+$$
+That is, the representation of $\epsilon$ is a simple 2 × 2 nilpotent matrix.
+
+### Connection with differentiation
+
+Applying a polynomial to a dual number $a + b \epsilon$ tells us the derivative at $a$:
+
+**Lemma** Suppose $p$ is a polynomial. Then
+$$
+p(a + b \epsilon) = p(a) + b p'(a) \epsilon
+$$
+
+**Proof**
+
+It suffices to consider $p(x) = x^n$ for $n \geq 1$ as other polynomials follow from linearity. We proceed by induction:
+The case $n = 1$ is trivial. For $n > 1$ we have 
+$$
+(a + b \epsilon)^n = (a + b \epsilon) (a + b \epsilon)^{n-1} = (a + b \epsilon) (a^{n-1} + (n-1) b a^{n-2} \epsilon) = a^n + b n a^{n-1} \epsilon.
+$$
+
+∎
+
+We can extend this to other differential functions by definition, that is, if $f$ is differentiable at $a$ we define
+$$
+f(a + b \epsilon) := f(a) + b f'(a) \epsilon
+$$
+
+
+
+
+### Implementation in Julia

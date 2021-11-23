@@ -74,14 +74,14 @@ Thus for $p = 8$ we are interpreting
 $2^4 \mod 2^8$ through $(2^8-1) \mod 2^8$ as negative numbers but
 they are not treated specially. That is, the bits for a negative integer $-y$ are the same
 as the binary representation of $2^p - y$. In particular,  an integer is negative if and only if 
-the first bit (corresponding to the $2^p$ place) is `1`.
+the first bit (corresponding to the $2^{p-1}$ place) is `1`.
 
 **Example (converting bits to integers)** 
-What 8-bit number has the bits "01001001"? Adding the corresponding decimal places we get:
+What 8-bit number has the bits `01001001`? Adding the corresponding decimal places we get:
 ```julia
 2^0 + 2^3 + 2^6
 ```
-What 8-bit number has the bits "11001001"? Because the first bit is `1` we know it's a negative 
+What 8-bit number has the bits `11001001`? Because the first bit is `1` we know it's a negative 
 number, hence we need to sum the bits but then subtract `2^p`:
 ```julia
 2^0 + 2^3 + 2^6 + 2^7 - 2^8
@@ -413,6 +413,30 @@ f = (x,y) -> cos(x + 2y)
 f.([1,2,3], [4,5]')
 ```
 
+### Ranges
+
+We have already seen that we can represent a range of integers via `a:b`. Note we can
+convert it to a `Vector` as follows:
+```julia
+Vector(2:6)
+```
+We can also specify a step:
+```julia
+Vector(2:2:6), Vector(6:-1:2)
+```
+Finally, the `range` function gives more functionality, for example, we can create 4 evenly
+spaced points between `-1` and `1`:
+```julia
+Vector(range(-1, 1; length=4))
+```
+Note that `Vector` is mutable but a range is not:
+```julia
+r = 2:6
+r[2] = 3   # Not allowed
+```
+
+
+
 ## 4. Types
 
 
@@ -488,24 +512,6 @@ An abstract type also has a super type:
 ```julia
 supertype(Real)
 ```
-
-### Abstract types and vectors
-
-There are many different types that represent vectors.  
-This property is captured using `AbstractVector`.  
-For example, the command `rand(5)` returns a `Vector{Float64}`.
-On the other hand, the syntax `a:b` returns a range,
-which is an `AbstractVector` but not a `Vector`.
-Any `AbstractVector` can be converted to a `Vector` using the function `Vector`:
-```julia
-Vector(2:6)
-```
-Note that `Vector` is mutable but a range is not:
-```julia
-r = 2:6
-r[2] = 3   # Not allowed
-```
-
 
 ### Type annotation and templating
 

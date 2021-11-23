@@ -12,6 +12,13 @@ real numbers, as well as different behaviour for operations.
 IEEE introduced in 1985 was a means to standardise this across
 processors so that algorithms would produce consistent and reliable results.
 
+This chapter may seem very low level for a mathematics course but there are
+two important reasons to understand the behaviour of floating point numbers:
+1. Floating point arithematic is very precisely defined, and can even be used
+in rigorous computations as we shall see in the problem sheets.
+2. Failure to understand floating point arithmetic can cause many errors
+in practice, with the extreme example being the [explosion of the Ariane 5 rocket](https://youtu.be/N6PWATvLQCY?t=86).
+
 
 Before we begin, we load two external packages. SetRounding.jl allows us 
 to set the rounding mode of floating point arithmetic. ColorBitstring.jl
@@ -25,17 +32,19 @@ using SetRounding, ColorBitstring
 printbits(1.0)
 ```
 
+
 ## Real numbers in binary
 
 Before discussing how to represent real numbers with a finite number
 of bits, we consider what one could do with an infinite number of bits,
 that is, binary expansions.
 
-We use the notation
+We use the notation:
 $$
-(1.b_1b_2b_3\ldots)_2 = 
+(b_0.b_1b_2b_3\ldots)_2 = b_0 + {b_1 \over 2} + {b_2 \over 2^2} + {b_3 \over 2^3} + \cdots
 $$
-
+where $b_k$ are either 0 or 1. Every number $0 \leq x < 1$ has a binary representation in this form.
+First we show some examples of verifying a numbers binary representation:
 
 **Example**
 Consider the number `1/3`.  In decimal we all know:
@@ -62,69 +71,62 @@ $$
 
 
 
-## Floating point number examples
+## IEEE numbers
 
-`Float64` is a type representing real numbers using 64 bits, 
+Floating point numbers are how a computer typically approximates
+a real number. In Julia there are four types of floating point numbers:
+
+1. `Float64` is a type representing real numbers using 64 bits, 
 that is also known as double precision.
 We can create a `Float64` by including a 
 decimal point when writing the number: 
-`1.0` is a `Float64` while `1` is an `Int`.
-We use `printbits` to see what the bits of a `Float64` 
-for a few numbers are.
-
-First, let's check an integer of type `Float64:
-```julia
-printbits(1.0)
-```
-The format is very different from what we saw before with `Int`:
-```julia
-bitstring(1)
-```
-
-Another example is `1.3`. This is representable with only two base-10 digits, 
-it requires an infinite number of base-2 digits in `Float64`, which are 
-cut off:
-```julia
-printbits(1.3)
-```
-
-`Float32` is another type representing real numbers using 32 bits, that is also known 
-as single precision.  `Float64` is now the default format for scientific computing (on the _Floating Point Unit_, FPU).  
-`Float32` is generally the default format for graphics (on the _Graphics Processing Unit_, GPU), 
-as the difference between 32 bits and 64 bits is indistinguishable to the eye in visualisation.  
-`Float16` is an important type in machine learning where one wants to maximise the amount of data
+`1.0` is a `Float64`. `Float64` is the default format for 
+scientific computing (on the _Floating Point Unit_, FPU).  
+2. `Float32` is a type representing real numbers using 32 bits, that is also known 
+as single precision.  We can create a `Float32` by including a 
+`f0` when writing the number: 
+`1f0` is a `Float32`. is generally the default format for graphics (on the _Graphics Processing Unit_, GPU), 
+as the difference between 32 bits and 64 bits is indistinguishable to the eye in visualisation,
+and more data can be fit into a GPU's limitted memory.
+3.  `Float16` is a type representing real numbers using 316 bits.
+It is important in machine learning where one wants to maximise the amount of data
 and high accuracy is not necessarily helpful. 
 
-Here we see that the format for `Float32` looks consistent with `Float64`:
+Here we see what the bits of `1/3` approximated by a `Float16` are:
 ```julia
-printbits(Float32(1.3))
+printbits(Float16(1)/3)
 ```
-
-## Standard IEEE numbers
-
+we shall now explain the format.
 
 The bits of floats are stored in the format
 $$
 sq_1\ldots q_Q b_1 \ldots b_P
 $$
-which (provided $q_k$ are not all zero and not all one) 
-represents the real number
+where $1 + Q + P$ is the total number of bits, and $Q$ and $P$
+vary depending on the type:
+1. For `Float16`, ...
+2. For `Float32`, $S = 127$, $Q = 8$, and $P = 23$,
+for a total of $1 + 8 + 23 = 32$ bits.
+3. For `Float64`, $S = 1023$, $Q = 11$, and $P = 52$,
+for a total of $1 + 11 + 52 = 64$ bits.
+
+The first bit ($s$) is the <span style="color:red">sign bit</span>: 0 means positive and 1 means
+negative. The bits $q_1\ldots q_Q$ are the <span style="color:green">exponent bits</span>.
+Provided they are not all 0 and not all 1
+we have a _normal number_; if they are all 1 it is a _special number_
+and if they are all 0 it is a _sub-normal number_. 
+Finally, the bits $b_1\ldots b_P$ are the <span style="color:blue">significand bits</span>,
+whose interpretation depends on whether the number is normal, sub-normal, or special.
+
+We begin with normal numbers. The bits represent
 $$
 x=\pm 2^{q-S} \times (1.b_1b_2b_3\ldots b_P)_2
 $$
-where $\sign x = isone(s) ? 1 : -1$, 
-$S$ and $P$ are fixed constants, 
+where $\sign x = 1-2s$ and
 $q = (q_1q_2\ldots q_Q)_2$ is an unsigned  integer satisfying
 $$
 0 < q < 2^Q-1.
 $$
-
-
-In the case of `Float32`, $S = 127$, $Q = 8$, and $P = 23$,
-for a total of $1 + 8 + 23 = 32$ bits.
-
-In the case of `Float64`, $S = 1023$, $Q = 11$, and $P = 52$,
-for a total of $1 + 11 + 52 = 64$ bits.
 
 **Example** How is the number $1/3$ stored in `Float32`?
 Recall that
@@ -144,7 +146,8 @@ Thus the `Float32` bits for $1/3$ are:
 printbits(1f0/3)
 ```
 
-The smallest normal number is $q = 1$ and $b_k$ all zero.  
+The smallest positive normal number is $q = 1$ and $b_k$ all zero:
+$2^{1-S}$.
 For a given floating point type, it can be found using `floatmin`:
 ```julia
 mn = floatmin(Float64)
@@ -157,11 +160,12 @@ printbits(mn)
 
 # Subnormal numbers
 
-Whenever $q = 0$, this is called a subnormal number, so does not follow the same interpretation of the bits.  Instead, if $q = 0$ the number is represented as
+Whenever $q = 0$, this is called a subnormal number, so does not follow the same interpretation of the bits.  
+Instead, if $q = 0$ the number is represented as
 $$
     x = \pm 2^{1-S}*(0.b_0b_1b_2\ldots b_P)_2
 $$
-That is, the significand is now we have $0 + b_0/2 + \cdots$ instead of $1 + b_0/2 + \cdots$.
+That is, the significand is  $0 + b_0/2 + \cdots$ instead of $1 + b_0/2 + \cdots$.
 
 The simplest example is zero, which has $q=0$ and all significand bits zero:
 ```julia
@@ -180,7 +184,8 @@ Can you explain the bits?
 
 # Special numbers
 
-Whenever the bits of $q$ are all 1, that is, for `Float64` $q=2^{11}-1=2047=(11111111111)_2$, the number is treated differently.  If all $b_k=0$, then the number is interpreted as either $\pm\infty$, called `Inf`:
+Whenever the bits of $q$ are all 1, that is, for `Float64` $q=2^{11}-1=2047=(11111111111)_2$, 
+the number is treated differently.  If all $b_k=0$, then the number is interpreted as either $\pm\infty$, called `Inf`:
 ```julia
 printbits(Inf)
 printbits(-Inf)
@@ -249,9 +254,11 @@ end
 
 ## Arithmetic
 
-A real number can have an infinite number of digits to represent exactly.  Define the operation that takes a real number to its `Float64` representation as `round`.
+A real number can have an infinite number of digits to represent exactly.  Define the operation that takes a real number 
+to its `Float64` representation as ${\rm round}$.
 
-The Arithmetic operations '+', '-', '*', '/', `^`, and `sqrt` are defined by the property that they are exact up to rounding.  That is, if `x` and `y` are `Float64`, we have
+The Arithmetic operations '+', '-', '*', '/', `^`, and `sqrt` are defined by the property that they are exact up to 
+rounding.  That is, if `x` and `y` are `Float64`, we have
 $$
 x\oplus y={\rm round}(x+y)
 $$
@@ -273,7 +280,7 @@ $\epsilon_{\rm machine} := 2^{-P}$. This corresponds to the _relative error_ int
 by changing the last bit of a normal floating point number. 
  This allows us to bound any basic arithmetic operation, e.g.,
 $$
-(x + y) (1 - \epsilon_{\rm machine}) \geq x \oplus y \leq (x+y) (1 + \epsilon_{\rm machine})
+|x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm machine}
 $$
 
 ## Special functions
@@ -283,12 +290,13 @@ Instead, they are implemented by composing the basic arithmetic operations, whic
 errors. Fortunately they are all designed to have relative accuracy, that is, there exists
 reasonably small $c > 0$ such that, for `s = sin(x)` (that is, the Julia implementation of $sin(x)$) satisfies
 $$
-(1 - c \epsilon_{\rm machine}) \sin(x) \geq s \leq sin(x) (1 + c\epsilon_{\rm machine}) \sin(x))
+|s - \sin x| \leq |sin(x)| c\epsilon_{\rm machine}
 $$
-Note these special functions are written in (advanced) Julia code, for example, [sine](https://github.com/JuliaLang/julia/blob/d08b05df6f01cf4ec6e4c28ad94cedda76cc62e8/base/special/trig.jl#L76).
+Note these special functions are written in (advanced) Julia code, for example, 
+[sin](https://github.com/JuliaLang/julia/blob/d08b05df6f01cf4ec6e4c28ad94cedda76cc62e8/base/special/trig.jl#L76).
 
 
-**WARNING** This is an etremely misleading statement for large `x`. Consider
+**WARNING** This is an extremely misleading statement for large `x`. Consider
 the following demonstration of the statement:
 ```julia
 ε = eps() # machine epsilon, 2^(-52)
