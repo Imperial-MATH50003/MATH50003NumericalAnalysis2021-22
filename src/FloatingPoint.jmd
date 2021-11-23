@@ -181,16 +181,6 @@ Thus the `Float32` bits for $1/3$ are:
 printbits(1f0/3)
 ```
 
-The smallest positive normal number is $q = 1$ and $b_k$ all zero:
-$2^{1-S}$.
-For a given floating point type, it can be found using `floatmin`:
-```julia
-mn = floatmin(Float64)
-```
-```julia
-printbits(mn)
-```
-
 
 For sub-normal numbers, the simplest example is zero, which has $q=0$ and all significand bits zero:
 ```julia
@@ -208,6 +198,40 @@ If we divide the smallest normal number by two, we get a subnormal number:
 printbits(mn/2)
 ```
 Can you explain the bits?
+
+### Important normal numbers
+
+When dealing with normal numbers there are some important constants that we will use
+to bound errors.
+
+**Definition** _Machine epsilon_ is denoted
+$$
+\epsilon_{{\rm m},P} := 2^{-P}.
+$$
+When $P$ is implied by context we use the notation $\epsilon_{\rm m}$.
+
+The _smallest positive normal number_ is $q = 1$ and $b_k$ all zero:
+$$
+\min |F_{S,P,Q}^{\rm normal}| = 2^{1-S}.
+$$ 
+The _largest (positive) normal number_ is 
+$$
+\max F_{S,P,Q}^{\rm normal} = 2^{2^Q-2-S} (1.11\ldots1)_2 = 2^{2^Q-2-S} (2-\epsilon_{\rm m})
+$$
+We confirm the simple bit representations:
+```julia
+S,P,Q = 127,23,8 # Float32
+εₘ = 2.0^(-P)
+printlnbits(Float32(2.0^(1-S))) # smallest positive Float32
+printlnbits(Float32(2.0^(2^Q-2-S) * (2-εₘ))) # largest Float32
+```
+
+
+For a given floating point type, we can find these constants using the following functions:
+```julia
+eps(Float32),floatmin(Float32),floatmax(Float32)
+```
+
 
 
 ### Special numbers
@@ -316,8 +340,13 @@ $$
 
 We can bound basic arithmetic operations in terms of:
 
-**Definition** _Machine epsilon_ is denoted $\epsilon_{\rm machine,P} := 2^{-P}$. 
-When $P$ is implied by context we use the notation $\epsilon_{\rm machine}$. 
+**Definition** The _normalized range_ ${\cal N}_{S,Q,P} \subset {\mathbb R}$
+is the subset of real numbers that lies
+between the smallest and largest normal floating point number:
+$$
+{\cal N}_{S,Q,P} := \{x : 2^{1-S} \leq |x| \leq \}
+$$
+When $S,Q,P$ are implied by context we use the notation ${\rm N}$.
 
 This corresponds to the _relative error_ introduced
 by changing the last bit of a normal floating point number. 
@@ -325,17 +354,17 @@ by changing the last bit of a normal floating point number.
 **Proposition** Let $m$ and $M$ denote the smallest and largest positive element of
 $F_{S,Q,P}^{\rm normal}$. If $m \leq x \leq M$ then for any rounding mode we have:
 $$
-|{\rm round}(x) - x|  \leq |x| (1 + \epsilon_{\rm machine})
+|{\rm round}(x) - x|  \leq |x| (1 + \epsilon_{\rm m})
 $$
 
 **Lemma**
 For any rounding mode we have:
 $$
 \begin{align*}
-|x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm machine} \\
-|x \ominus y - (x - y)| \leq |x-y| \epsilon_{\rm machine} \\
-|x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm machine} \\
-|x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm machine}.
+|x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm m} \\
+|x \ominus y - (x - y)| \leq |x-y| \epsilon_{\rm m} \\
+|x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm m} \\
+|x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm m}.
 \end{align*}
 $$
 
@@ -377,7 +406,7 @@ Instead, they are implemented by composing the basic arithmetic operations, whic
 errors. Fortunately they are all designed to have relative accuracy, that is, there exists
 reasonably small $c > 0$ such that, for `s = sin(x)` (that is, the Julia implementation of $sin(x)$) satisfies
 $$
-|s - \sin x| \leq |sin(x)| c\epsilon_{\rm machine}
+|s - \sin x| \leq |sin(x)| c\epsilon_{\rm m}
 $$
 Note these special functions are written in (advanced) Julia code, for example, 
 [sin](https://github.com/JuliaLang/julia/blob/d08b05df6f01cf4ec6e4c28ad94cedda76cc62e8/base/special/trig.jl#L76).
