@@ -44,21 +44,11 @@ computations. Note that there are many computer-assisted proofs that do not fall
 they do not involve errors in computations or approximation or involve discrete problems, for 
 example, the proof the [Four Colour Theorem](https://en.wikipedia.org/wiki/Four_color_theorem).
 
-In this course we will use the programming language [Julia](https://julialang.org). This is a modern, compiled, high-level,
-open-source language developed at MIT. It is becoming increasingly important in high-performance computing and
-AI, including by Astrazeneca and Pfizer in drug development, IBM for medical diagnosis, and MIT for robot
-locomotion.
-
-It is ideal for a course on numerical analysis because it both allows
-_fast_ implementation of algorithms but also has support for _fast_ automatic-differentiation, a feature 
-that is of increasing importance in machine learning. It also is low level enough that we can
-really understand what the computer is doing. As a bonus, it is easy-to-read and fun to write. 
-
 A rough overview of the course is as follows:
 
-1. [Introduction to Julia](notebooks/Julia.ipynb): we introduce the basic features of the Julia language.
-2. [Floating point arithmetic](notebooks/FloatingPoint.ipynb): we discuss how computers approximate and manipulate real numbers.
-3. [Differentiation](notebooks/Differentiation.ipynb): we discuss ways of approximating derivatives, including automatic differentiation, 
+
+1. [Numbers](notebooks/Numbers.ipynb): we discuss how computers represent integers and real numbers, as well as their arithmetic operations.
+2. [Differentiation](notebooks/Differentiation.ipynb): we discuss ways of approximating derivatives, including automatic differentiation, 
 which is essential to stochastic gradient descent and machine learning.
 3. [Numerical Linear Algebra](notebooks/NumericalLinearAlgebra.ipynb): we discuss algorithms for solving linear systems.
 5. [Orthogonal Polynomials](notebooks/OrthogonalPolynomials.ipynb): we discuss orthogonal polynomial—polynomials orthogonal 
@@ -67,4 +57,21 @@ with respect to a proscribed weight—and their usage in numerical computations.
 7. [Differential Equations](notebooks/DifferentialEquations.ipynb): we discuss the numerical solution of differential equations, 
 including both time-dependent ordinary differential equations, boundary value problems, and (time-permitting) partial differential equations.
 
-Note some readers may wish to start with Chapter 2 and pick up the information about Julia in Chapter 1 along the way.
+In this course we will use the programming language [Julia](https://julialang.org). This is a modern, compiled, high-level,
+open-source language developed at MIT. It is becoming increasingly important in high-performance computing and
+AI, including by Astrazeneca and Pfizer in drug development, IBM for medical diagnosis, and MIT for robot
+locomotion.
+
+It is ideal for a course on numerical analysis because it both allows
+_fast_ implementation of algorithms but also has support for _fast_ automatic-differentiation, a feature 
+that is of increasing importance in machine learning. It also is low level enough that we can
+really understand what the computer is doing. As a bonus, it is easy-to-read and fun to write. We also provide an introduction to Julia:
+
+1. [Introduction to Julia](notebooks/Julia.ipynb): we introduce the basic features of the Julia language.
+
+Note that the assessment will primarily be on mathematical ideas, not programming, however, 
+the mid-term exam will be computer-based: in order to understand numerical analysis
+it is essential that one actually implements the methods and ideas on a computer
+and a computer-based exam is an effective way to measure this. So while the
+details of the Introduction to Julia chapter are non-examinable, it is essential
+to understand the basics (loops, branching, functions, types). The forthcoming practice mid-term should give a clear idea what is expected.
