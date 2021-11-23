@@ -14,7 +14,7 @@ processors so that algorithms would produce consistent and reliable results.
 
 This chapter may seem very low level for a mathematics course but there are
 two important reasons to understand the behaviour of floating point numbers:
-1. Floating point arithematic is very precisely defined, and can even be used
+1. Floating point arithmetic is very precisely defined, and can even be used
 in rigorous computations as we shall see in the problem sheets.
 2. Failure to understand floating point arithmetic can cause many errors
 in practice, with the extreme example being the [explosion of the Ariane 5 rocket](https://youtu.be/N6PWATvLQCY?t=86).
@@ -32,8 +32,17 @@ using SetRounding, ColorBitstring
 printbits(1.0)
 ```
 
+In this chapter we discuss the following:
 
-## Real numbers in binary
+1. Binary representation of real numbers: Any real number can be represented by an infinite sequence of bits. 
+2. Floating point numbers: we discuss how real numbers are stored on a computer with a finite number of bits.
+3. Arithmetic: we discuss how arithmetic operations in floating point are exact up to rounding, and how the
+rounding mode can be set. This allows for precise error bounds in computations.
+4. High-precision floating point numbers: we discuss how the precision of floating point arithmetic can be increased arbitrary
+using `BigFloat`.
+
+
+## 1.  Binary representation of real numbers
 
 Before discussing how to represent real numbers with a finite number
 of bits, we consider what one could do with an infinite number of bits,
@@ -68,65 +77,90 @@ $$
 \sum_{k=1}^\infty {1 \over 4^k} = {1 \over 1 - 1/4} - 1 = {1 \over 3}
 $$
 
+The extension to numbers outside the range $0 \leq x < 1$ is clear, e.g.
+$$
+(-101.010101\ldots)_2 = -(5 + 1/3)
+$$
+But for floating point numbers we handle the integer part differently so
+we will not use this.
 
 
 
-## IEEE numbers
+
+## 2. Floating point numbers
 
 Floating point numbers are how a computer typically approximates
-a real number. In Julia there are four types of floating point numbers:
+a real number. 
 
-1. `Float64` is a type representing real numbers using 64 bits, 
-that is also known as double precision.
+**Definition** The _floating point numbers_ are
+$$
+F_{S,Q,P} := F^{\rm normal}_{S,Q,P} \cup F^{\rm sub-normal}_{S,Q,P} \cup F^{\rm special}.
+$$
+The _normal floating point numbers_
+$F^{\rm normal}_{S,Q,P} \subset {\mathbb R}$ are defined by
+$$
+F^{\rm normal}_{S,Q,P} = \{\pm 2^{q-S} \times (1.b_1b_2b_3\ldots b_P)_2 : 1 \leq q < 2^Q-1 \}.
+$$
+The _sub-normal numbers_ $F^{\rm sub-normal}_{S,Q,P} \subset {\mathbb R}$ are defined as
+$$
+F^{\rm sub-normal}_{S,Q,P} = \{\pm 2^{1-S} \times (0.b_1b_2b_3\ldots b_P)_2\}.
+$$
+The _special numbers_ $F^{\rm special} \not\subset {\mathbb R}$ are defined later.
+
+Note this set of real numbers has no nice algebraic structure: it is not closed under addition, subtraction, etc.
+and the normal floating point numbers does not include $0$. We will therefore need to define approximate versions of algebraic operations later.
+
+Floating point numbers are stored in $1 + Q + P$ total number of bits, in the format
+$$
+sq_1\ldots q_Q b_1 \ldots b_P
+$$
+The first bit ($s$) is the <span style="color:red">sign bit</span>: 0 means positive and 1 means
+negative. The bits $q_1\ldots q_Q$ are the <span style="color:green">exponent bits</span>:
+they are the binary digits of the unsigned integer $q$: 
+$$
+q = (q_1\ldots q_Q)_2.
+$$
+Finally, the bits $b_1\ldots b_P$ are the <span style="color:blue">significand bits</span>.
+If $1 \leq q < 2^Q-1$ then the bits represent the normal number
+$$
+x = \pm 2^{q-S} \times (1.b_1b_2b_3\ldots b_P)_2.
+$$
+If $q = 0$ (i.e. all bits are 0) then the bits represent the sub-normal number
+$$
+x = \pm 2^{1-S} \times (0.b_1b_2b_3\ldots b_P)_2.
+$$
+If $q = 2^Q-1$  (i.e. all bits are 1) then the bits represent a special number, discussed
+later.
+
+
+### IEEE floating point numbers
+
+**Definition** IEEE has 3 standard floating point numbers: 16-bit (half precision), 32-bit (single precision) and
+64-bit (double precision) defined by:
+$$
+\begin{align*}
+F_{16} &:= F_{15,5,10} \\
+F_{32} &:= F_{127,8,23} \\
+F_{64} &:= F_{1023,11,52}
+\end{align*}
+$$
+
+In Julia these correspond to 3 different floating point types:
+
+1.  `Float64` is a type representing $F_{64}$.
 We can create a `Float64` by including a 
 decimal point when writing the number: 
 `1.0` is a `Float64`. `Float64` is the default format for 
 scientific computing (on the _Floating Point Unit_, FPU).  
-2. `Float32` is a type representing real numbers using 32 bits, that is also known 
-as single precision.  We can create a `Float32` by including a 
+2. `Float32` is a type representing $F_{32}$.  We can create a `Float32` by including a 
 `f0` when writing the number: 
 `1f0` is a `Float32`. is generally the default format for graphics (on the _Graphics Processing Unit_, GPU), 
 as the difference between 32 bits and 64 bits is indistinguishable to the eye in visualisation,
 and more data can be fit into a GPU's limitted memory.
-3.  `Float16` is a type representing real numbers using 316 bits.
+3.  `Float16` is a type representing $F_{16}$.
 It is important in machine learning where one wants to maximise the amount of data
 and high accuracy is not necessarily helpful. 
 
-Here we see what the bits of `1/3` approximated by a `Float16` are:
-```julia
-printbits(Float16(1)/3)
-```
-we shall now explain the format.
-
-The bits of floats are stored in the format
-$$
-sq_1\ldots q_Q b_1 \ldots b_P
-$$
-where $1 + Q + P$ is the total number of bits, and $Q$ and $P$
-vary depending on the type:
-1. For `Float16`, ...
-2. For `Float32`, $S = 127$, $Q = 8$, and $P = 23$,
-for a total of $1 + 8 + 23 = 32$ bits.
-3. For `Float64`, $S = 1023$, $Q = 11$, and $P = 52$,
-for a total of $1 + 11 + 52 = 64$ bits.
-
-The first bit ($s$) is the <span style="color:red">sign bit</span>: 0 means positive and 1 means
-negative. The bits $q_1\ldots q_Q$ are the <span style="color:green">exponent bits</span>.
-Provided they are not all 0 and not all 1
-we have a _normal number_; if they are all 1 it is a _special number_
-and if they are all 0 it is a _sub-normal number_. 
-Finally, the bits $b_1\ldots b_P$ are the <span style="color:blue">significand bits</span>,
-whose interpretation depends on whether the number is normal, sub-normal, or special.
-
-We begin with normal numbers. The bits represent
-$$
-x=\pm 2^{q-S} \times (1.b_1b_2b_3\ldots b_P)_2
-$$
-where $\sign x = 1-2s$ and
-$q = (q_1q_2\ldots q_Q)_2$ is an unsigned  integer satisfying
-$$
-0 < q < 2^Q-1.
-$$
 
 **Example** How is the number $1/3$ stored in `Float32`?
 Recall that
@@ -137,7 +171,8 @@ Since
 $$
 125 = (1111101)_2
 $$
-For the significand we round the last bit to the nearest, so we have
+For the significand we round the last bit to the nearest (this is explained in detail in
+the section on rounding), so we have
 $$
 1.010101010101010101010101\ldots \approx 1.01010101010101010101011 
 $$
@@ -157,17 +192,7 @@ printbits(mn)
 ```
 
 
-
-# Subnormal numbers
-
-Whenever $q = 0$, this is called a subnormal number, so does not follow the same interpretation of the bits.  
-Instead, if $q = 0$ the number is represented as
-$$
-    x = \pm 2^{1-S}*(0.b_0b_1b_2\ldots b_P)_2
-$$
-That is, the significand is  $0 + b_0/2 + \cdots$ instead of $1 + b_0/2 + \cdots$.
-
-The simplest example is zero, which has $q=0$ and all significand bits zero:
+For sub-normal numbers, the simplest example is zero, which has $q=0$ and all significand bits zero:
 ```julia
 printbits(0.0)
 ```
@@ -175,6 +200,9 @@ Unlike integers, we also have a negative zero:
 ```julia
 printbits(-0.0)
 ```
+This is treated as identical to `0.0`, except for with regards to special numbers.
+
+
 If we divide the smallest normal number by two, we get a subnormal number: 
 ```julia
 printbits(mn/2)
@@ -182,22 +210,31 @@ printbits(mn/2)
 Can you explain the bits?
 
 
-# Special numbers
+### Special numbers
 
-Whenever the bits of $q$ are all 1, that is, for `Float64` $q=2^{11}-1=2047=(11111111111)_2$, 
-the number is treated differently.  If all $b_k=0$, then the number is interpreted as either $\pm\infty$, called `Inf`:
+The special numbers extend the real line by adding $\pm \infty$ but also a notion of "not-a-number".
+
+**Definition**
+Denote ${\rm NaN} := \{\}$ and define
+$$
+F^{\rm special} := \{\infty, -\infty, {\rm NaN}\}
+$$
+
+Whenever the bits of $q$ of a floating point number are all 1 then they represent an element of $F^{\rm special}$.
+If all $b_k=0$, then the number represents either $\pm\infty$, called `Inf` and `-Inf`:
 ```julia
-printbits(Inf)
+printlnbits(Inf)
 printbits(-Inf)
 ```
-Another special number is `NaN`, which represents _not a number_. For example, `0/0` is not defined, so returns `NaN`:
-```julia
-0/0
-```
-`NaN` is stored with $q=(11111111111)_2$ and at least one of the $b_k =1$:
+All other special floating point numbers represent `NaN`: `NaN` is stored with $q=(11111111111)_2$ and at least one of the $b_k =1$:
 ```julia
 printbits(NaN)
 ```
+These are needed for undefined algebraic operations such as:
+```julia
+0/0
+```
+
 
 **Example** What happens if we change some other $b_k$ to be nonzero?
 We can create bits as a string and see:
@@ -207,28 +244,27 @@ reinterpret(Float64,i)
 ```
 Thus, there are more than one `NaN`s on a computer.  Can you figure out how many there are?
 
-Arithmetic works differently on `Inf` and `NaN`:
-```julia
-Inf*0      # NaN
-Inf+5      # Inf
-(-1)*Inf   # -Inf
-1/Inf      # 0
-1/(-Inf)   # -0
-Inf-Inf    # NaN
-Inf == Inf   # true
-Inf == -Inf  # false
 
-NaN*0      # NaN
-NaN+5
-1/NaN
-NaN == NaN    # false
-NaN != NaN    #true
-```
+## 3. Arithmetic
 
-## Rounding
 
+Arithmetic operations are done exactly _up to rounding_.
 There are three basic rounding strategies: round up/down/towards zero/nearest.
-These are specified by tags `RoundUp`, `RoundDown`, `RoundToZero`, and
+Mathematically we introduce the function ${\rm round}$:
+
+**Definition** ${\rm round}^{\rm up}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
+the function that rounds a real number up to the nearest floating point number that is greater or equal.
+${\rm round}^{\rm down}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
+the function that rounds a real number down to the nearest floating point number that is greater or equal.
+${\rm round}^{\rm nearest}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
+the function that rounds a real number to the nearest floating point number. In case of a tie, the
+it returns the floating point number whose least significant bit is equal to zero.
+We use the notation ${\rm round}$ when $S,Q,P$ and the rounding mode are implied by context,
+with ${\rm round}^{\rm nearest}$ being the default rounding mode.
+
+
+
+In Julia, the rounding mode is specified by tags `RoundUp`, `RoundDown`, `RoundToZero`, and
 `RoundNearest`. (There are also more exotic rounding strategies `RoundNearestTiesAway` and
 `RoundNearestTiesUp` that we won't use.)
  Note that these rounding modes are part
@@ -252,17 +288,19 @@ setrounding(Float32, RoundDown) do
 end
 ```
 
-## Arithmetic
-
-A real number can have an infinite number of digits to represent exactly.  Define the operation that takes a real number 
-to its `Float64` representation as ${\rm round}$.
-
-The Arithmetic operations '+', '-', '*', '/', `^`, and `sqrt` are defined by the property that they are exact up to 
-rounding.  That is, if `x` and `y` are `Float64`, we have
+In IEEE arithmetic, the arithmetic operations `+`, `-`, `*`, `/` are defined by the property that they are exact up to 
+rounding.  Mathematically we denote these operations as follows:
 $$
-x\oplus y={\rm round}(x+y)
+x\oplus y &:= {\rm round}(x+y) \\
+x\ominus y &:= {\rm round}(x - y) \\
+x\otimes y &:= {\rm round}(x * y) \\
+x\odiv y &:= {\rm round}(x / y)
 $$
-where in this formula $\oplus$ denotes the floating point definition of `+` and + denotes the mathematical definition of +.  
+Note also that  `^` and `sqrt` are similarly exact up to rounding.
+
+**WARNING** These operations are not associative! E.g. $(x \oplus y) \oplus z$ is not necessarily equal to $x \oplus (y \oplus z)$. 
+Commutativity is preserved at least.
+
 
 **Example** `1.1+0.1` gives a different result than `1.2`:
 ```julia
@@ -270,20 +308,69 @@ x=1.1
 y=0.1
 x + y - 1.2 # Not Zero?!?
 ```
-This is because ${\rm round}(1.1)\neq1+1/10$, but rather:
+This is because ${\rm round}(1.1) \neq 1+1/10$, but rather:
 $$
 {\rm round}(1.1) = 1 + 2^{-4}+2^{-5} + 2^{-8}+2^{-9}+\cdots + 2^{-48}+2^{-49} + 2^{-51}= {2476979795053773 \over 2251799813685248} = 1.1 +2^{-51} - 2^{-52} - 2^{-53} - 2^{-56} - 2^{-57} - \cdots
 $$
 
-A very important number in numerical analysis is machine epsilon,
-$\epsilon_{\rm machine} := 2^{-P}$. This corresponds to the _relative error_ introduced
+
+We can bound basic arithmetic operations in terms of:
+
+**Definition** _Machine epsilon_ is denoted $\epsilon_{\rm machine,P} := 2^{-P}$. 
+When $P$ is implied by context we use the notation $\epsilon_{\rm machine}$. 
+
+This corresponds to the _relative error_ introduced
 by changing the last bit of a normal floating point number. 
- This allows us to bound any basic arithmetic operation, e.g.,
+
+**Proposition** Let $m$ and $M$ denote the smallest and largest positive element of
+$F_{S,Q,P}^{\rm normal}$. If $m \leq x \leq M$ then for any rounding mode we have:
 $$
-|x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm machine}
+|{\rm round}(x) - x|  \leq |x| (1 + \epsilon_{\rm machine})
 $$
 
-## Special functions
+**Lemma**
+For any rounding mode we have:
+$$
+\begin{align*}
+|x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm machine} \\
+|x \ominus y - (x - y)| \leq |x-y| \epsilon_{\rm machine} \\
+|x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm machine} \\
+|x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm machine}.
+\end{align*}
+$$
+
+
+### Arithmetic and special numbers
+
+Arithmetic works differently on `Inf` and `NaN`. In particular we have:
+$$
+\begin{align*}
+x \odiv 0 &:= \begin{cases}
+    (\sign x) \infty & x \neq 0 \\
+    {\rm NaN} & {\rm otherwise}\\
+\end{\align*}
+$$
+
+
+```julia
+Inf*0      # NaN
+Inf+5      # Inf
+(-1)*Inf   # -Inf
+1/Inf      # 0
+1/(-Inf)   # -0
+Inf-Inf    # NaN
+Inf == Inf   # true
+Inf == -Inf  # false
+
+NaN*0      # NaN
+NaN+5      # NaN
+1/NaN      # NaN
+NaN == NaN    # false
+NaN != NaN    #true
+```
+
+
+### Special functions
 
 Other special functions like `cos`, `sin`, `exp`, etc. are _not_ part of the IEEE standard.
 Instead, they are implemented by composing the basic arithmetic operations, which accumulate
@@ -311,3 +398,6 @@ sin(x), sin(x̃)
 ```
 This is because we commit an error on the order of roughly $2 * 10^100 * \epsilon_{\machine} \approx 4.44 * 10^(84)$
 when we round $2*10^100$ to the nearest float. 
+
+## 4. High-precision floating point numbers (*advanced*)
+
