@@ -420,17 +420,17 @@ Thus, there are more than one `NaN`s on a computer.
 
 Arithmetic operations are done exactly _up to rounding_.
 There are three basic rounding strategies: round up/down/nearest.
-Mathematically we introduce the function ${\rm round}$:
+Mathematically we introduce a function to capture the notion of rounding:
 
-**Definition (round)** ${\rm round}^{\rm up}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
+**Definition (round)** ${\rm fl}^{\rm up}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
 the function that rounds a real number up to the nearest floating point number that is greater or equal.
-${\rm round}^{\rm down}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
+${\rm fl}^{\rm down}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
 the function that rounds a real number down to the nearest floating point number that is greater or equal.
-${\rm round}^{\rm nearest}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
+${\rm fl}^{\rm nearest}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
 the function that rounds a real number to the nearest floating point number. In case of a tie, the
 it returns the floating point number whose least significant bit is equal to zero.
-We use the notation ${\rm round}$ when $S,Q,P$ and the rounding mode are implied by context,
-with ${\rm round}^{\rm nearest}$ being the default rounding mode.
+We use the notation ${\rm fl}$ when $S,Q,P$ and the rounding mode are implied by context,
+with ${\rm fl}^{\rm nearest}$ being the default rounding mode.
 
 
 
@@ -461,10 +461,10 @@ end
 In IEEE arithmetic, the arithmetic operations `+`, `-`, `*`, `/` are defined by the property that they are exact up to 
 rounding.  Mathematically we denote these operations as follows:
 $$
-x\oplus y &:= {\rm round}(x+y) \\
-x\ominus y &:= {\rm round}(x - y) \\
-x\otimes y &:= {\rm round}(x * y) \\
-x\oslash y &:= {\rm round}(x / y)
+x\oplus y &:= {\rm fl}(x+y) \\
+x\ominus y &:= {\rm fl}(x - y) \\
+x\otimes y &:= {\rm fl}(x * y) \\
+x\oslash y &:= {\rm fl}(x / y)
 $$
 Note also that  `^` and `sqrt` are similarly exact up to rounding.
 
@@ -478,9 +478,9 @@ x=1.1
 y=0.1
 x + y - 1.2 # Not Zero?!?
 ```
-This is because ${\rm round}(1.1) \neq 1+1/10$, but rather:
+This is because ${\rm fl}(1.1) \neq 1+1/10$, but rather:
 $$
-{\rm round}(1.1) = 1 + 2^{-4}+2^{-5} + 2^{-8}+2^{-9}+\cdots + 2^{-48}+2^{-49} + 2^{-51}= {2476979795053773 \over 2251799813685248} = 1.1 +2^{-51} - 2^{-52} - 2^{-53} - 2^{-56} - 2^{-57} - \cdots
+{\rm fl}(1.1) = 1 + 2^{-4}+2^{-5} + 2^{-8}+2^{-9}+\cdots + 2^{-48}+2^{-49} + 2^{-51}= {2476979795053773 \over 2251799813685248} = 1.1 +2^{-51} - 2^{-52} - 2^{-53} - 2^{-56} - 2^{-57} - \cdots
 $$
 
 
@@ -499,7 +499,7 @@ We can use machine epsilon to determine bounds on rounding:
 **Proposition (rounding arithmetic)** For any rounding mode,
 $$
 \begin{align*}
-x \in {\cal N} &\Rightarrow |{\rm round}(x) - x|  \leq |x| \epsilon_{\rm m} \\
+x \in {\cal N} &\Rightarrow |{\rm fl}(x) - x|  \leq |x| \epsilon_{\rm m} \\
 x + y \in {\cal N} &\Rightarrow |x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm m} \\
 x - y \in {\cal N} &\Rightarrow |x \ominus y - (x - y)| \leq |x-y| \epsilon_{\rm m} \\
 x y \in {\cal N} &\Rightarrow |x \otimes y - x y| \leq |xy| \epsilon_{\rm m} \\

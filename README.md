@@ -57,7 +57,7 @@ A rough overview of the course is as follows:
 1. [Numbers](notebooks/Numbers.ipynb): we discuss how computers represent integers and real numbers, as well as their arithmetic operations.
 2. [Differentiation](notebooks/Differentiation.ipynb): we discuss ways of approximating derivatives, including automatic differentiation, 
 which is essential to stochastic gradient descent and machine learning.
-3. [Numerical Linear Algebra](notebooks/NumericalLinearAlgebra.ipynb): we discuss algorithms for solving linear systems.
+3. [Linear Algebra](notebooks/LinearAlgebra.ipynb): we discuss algorithms for solving linear systems.
 5. [Orthogonal Polynomials](notebooks/OrthogonalPolynomials.ipynb): we discuss orthogonal polynomial—polynomials orthogonal 
 with respect to a proscribed weight—and their usage in numerical computations.
 6. [Integration](notebooks/Integration.ipynb): we discuss ways to approximate integrals, both definite and indefinite, using orthogonal polynomials.
