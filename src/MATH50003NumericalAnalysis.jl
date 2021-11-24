@@ -4,3 +4,4 @@ kwds = (out_path="notebooks/", jupyter_path="$(homedir())/.julia/conda/3/bin/jup
 
 notebook("src/Julia.jmd"; kwds...)
 notebook("src/Numbers.jmd"; kwds...)
+notebook("src/Differentiation.jmd"; kwds...)

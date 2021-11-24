@@ -1,9 +1,10 @@
-# numbers_
+# Numbers
 
 
 Reference: [Overton](https://cs.nyu.edu/~overton/book/)
 
-In this lecture, we introduce the
+In this chapter, we introduce the [Two's-complement](https://en.wikipedia.org/wiki/Two's_complement)
+storage for integers and the 
 [IEEE Standard for Floating-Point Arithmetic](https://en.wikipedia.org/wiki/IEEE_754).
 There are many  possible ways of representing real numbers on a computer, as well as 
 the precise behaviour of operations such as addition, multiplication, etc.
@@ -13,20 +14,20 @@ IEEE introduced in 1985 was a means to standardise this across
 processors so that algorithms would produce consistent and reliable results.
 
 This chapter may seem very low level for a mathematics course but there are
-two important reasons to understand the behaviour of floating point numbers:
-1. Floating point arithmetic is very precisely defined, and can even be used
+two important reasons to understand the behaviour of integers and floating point numbers:
+1. Integer arithmetic can suddenly start giving wrong negative answers when numbers
+become large.
+2. Floating point arithmetic is very precisely defined, and can even be used
 in rigorous computations as we shall see in the problem sheets.
-2. Failure to understand floating point arithmetic can cause many errors
-in practice, with the extreme example being the [explosion of the Ariane 5 rocket](https://youtu.be/N6PWATvLQCY?t=86).
+3. Failure to understand floating point arithmetic can cause catastrophic issues
+in practice, with the extreme example being the 
+[explosion of the Ariane 5 rocket](https://youtu.be/N6PWATvLQCY?t=86).
 
 
 Before we begin, we load two external packages. SetRounding.jl allows us 
 to set the rounding mode of floating point arithmetic. ColorBitstring.jl
-  implements a function `printbits`
-which print the bits of floating point numbers in colour. 
-Each colour corresponds to a different part of the representation:
-the <span style="color:red">sign bit</span>, the <span style="color:green">exponent bits</span>, 
-and the <span style="color:blue">significand bits</span> which we shall learn about shortly.
+  implements functions `printbits` and `printlnbits`
+which print the bits of floating point numbers in colour.
 ```julia
 using SetRounding, ColorBitstring
 ```
@@ -48,7 +49,8 @@ using `BigFloat`.
 
 ## 1.  Binary representation
 
-Any integer can be presented in binary format, that is, a sequence of $0$s and $1$s.
+Any integer can be presented in binary format, that is, a sequence of `0`s and `1`s.
+
 **Definition**
 For $B_0,\ldots,B_p \in \{0,1\}$ denote a non-negative integer in _binary format_ by:
 $$
@@ -63,13 +65,13 @@ $$
 
 First we show some examples of verifying a numbers binary representation:
 
-**Example**
+**Example (integer in binary)**
 A simple integer example is
 $
 5 = 2^2 + 2^0 = (101)_2.
 $
 
-**Example**
+**Example (rational in binary)**
 Consider the number `1/3`.  In decimal recall that:
 $$
 1/3 = 0.3333\ldots =  \sum_{k=1}^\infty {3 \over 10^k}
@@ -101,9 +103,16 @@ with $2^p$ possible combinations of 0s and 1s. For _unsigned integers_, that is,
 non-negative integers these bits are just the first $p$ binary digits, that is,
 $(B_p\ldots B_1B_0)_2$.
  
-Integers follows [modular arithmetic](https://en.wikipedia.org/wiki/Modular_arithmetic),
-that is, $p$-bit numbers on a computer represent elements of ${\mathbb Z}_{2^p}$, 
-the ring of integers modulo `2^p`, and arithmetic follows accordingly.
+Integers on a computer follow [modular arithmetic](https://en.wikipedia.org/wiki/Modular_arithmetic):
+
+**Definition (ring of integers modulo $m$)** Denote the ring
+$$
+{\mathbb Z}_{m} := \{0 \mod m, 1 \mod m, \ldots, m-1 \mod m \}
+$$
+
+That is, $p$-bit numbers on a computer represent elements of ${\mathbb Z}_{2^p}$, 
+the ring of integers modulo $2^p$, and integer arithmetic on a computer is 
+equivalent to arithmetic modulo $2^p$.
 
 **Example (addition of 8-bit unsigned integers)** Consider the addition of
 two 8-bit numbers:
@@ -222,7 +231,10 @@ which creates a `BigInt`, which allows for an arbitrary number of bits.
 Floating point numbers are a subset of real numbers that are representable using
 a fixed number of bits.
 
-**Definition**  _Floating point numbers_ are divided into _normal_, _sub-normal_, and _special_ numbers:
+**Definition (floating point numbers)**
+Given integers $S$ (the "exponential shift") $Q$ (the number of exponent bits) and 
+$P$ (the precision), define the set of
+_Floating point numbers_ by dividing into _normal_, _sub-normal_, and _special number_ subsets:
 $$
 F_{S,Q,P} := F^{\rm normal}_{S,Q,P} \cup F^{\rm sub}_{S,Q,P} \cup F^{\rm special}.
 $$
@@ -265,7 +277,8 @@ later.
 
 ### IEEE floating point numbers
 
-**Definition** IEEE has 3 standard floating point formats: 16-bit (half precision), 32-bit (single precision) and
+**Definition (IEEE floating point numbers)** 
+IEEE has 3 standard floating point formats: 16-bit (half precision), 32-bit (single precision) and
 64-bit (double precision) defined by:
 $$
 \begin{align*}
@@ -292,7 +305,7 @@ It is important in machine learning where one wants to maximise the amount of da
 and high accuracy is not necessarily helpful. 
 
 
-**Example** How is the number $1/3$ stored in `Float32`?
+**Example (rational in `Float32`)** How is the number $1/3$ stored in `Float32`?
 Recall that
 $$
 1/3 = (0.010101\ldots)_2 = 2^{-2} (1.0101\ldots)_2 = 2^{125-127} (1.0101\ldots)_2
@@ -336,7 +349,7 @@ Can you explain the bits?
 When dealing with normal numbers there are some important constants that we will use
 to bound errors.
 
-**Definition** _Machine epsilon_ is denoted
+**Definition (machine epsilon)** _Machine epsilon_ is denoted
 $$
 \epsilon_{{\rm m},P} := 2^{-P}.
 $$
@@ -369,7 +382,7 @@ eps(Float32),floatmin(Float32),floatmax(Float32)
 
 The special numbers extend the real line by adding $\pm \infty$ but also a notion of "not-a-number".
 
-**Definition**
+**Definition (not a number)**
 Let ${\rm NaN}$ represent "not a number" and define
 $$
 F^{\rm special} := \{\infty, -\infty, {\rm NaN}\}
@@ -393,7 +406,7 @@ These are needed for undefined algebraic operations such as:
 ```
 
 
-**Example** What happens if we change some other $b_k$ to be nonzero?
+**Example (many `NaN`s)** What happens if we change some other $b_k$ to be nonzero?
 We can create bits as a string and see:
 ```julia
 i = parse(UInt16, "0111110000010001"; base=2)
@@ -409,7 +422,7 @@ Arithmetic operations are done exactly _up to rounding_.
 There are three basic rounding strategies: round up/down/nearest.
 Mathematically we introduce the function ${\rm round}$:
 
-**Definition** ${\rm round}^{\rm up}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
+**Definition (round)** ${\rm round}^{\rm up}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
 the function that rounds a real number up to the nearest floating point number that is greater or equal.
 ${\rm round}^{\rm down}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
 the function that rounds a real number down to the nearest floating point number that is greater or equal.
@@ -451,7 +464,7 @@ $$
 x\oplus y &:= {\rm round}(x+y) \\
 x\ominus y &:= {\rm round}(x - y) \\
 x\otimes y &:= {\rm round}(x * y) \\
-x\odiv y &:= {\rm round}(x / y)
+x\oslash y &:= {\rm round}(x / y)
 $$
 Note also that  `^` and `sqrt` are similarly exact up to rounding.
 
@@ -473,7 +486,7 @@ $$
 
 We can bound basic arithmetic operations in terms of:
 
-**Definition** The _normalized range_ ${\cal N}_{S,Q,P} \subset {\mathbb R}$
+**Definition (normalised range)** The _normalised range_ ${\cal N}_{S,Q,P} \subset {\mathbb R}$
 is the subset of real numbers that lies
 between the smallest and largest normal floating point number:
 $$
@@ -483,14 +496,14 @@ When $S,Q,P$ are implied by context we use the notation ${\cal N}$.
 
 We can use machine epsilon to determine bounds on rounding:
 
-**Proposition** For any rounding mode,
+**Proposition (rounding arithmetic)** For any rounding mode,
 $$
 \begin{align*}
 x \in {\cal N} &\Rightarrow |{\rm round}(x) - x|  \leq |x| \epsilon_{\rm m} \\
 x + y \in {\cal N} &\Rightarrow |x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm m} \\
 x - y \in {\cal N} &\Rightarrow |x \ominus y - (x - y)| \leq |x-y| \epsilon_{\rm m} \\
 x y \in {\cal N} &\Rightarrow |x \otimes y - x y| \leq |xy| \epsilon_{\rm m} \\
-x/y \in {|cal N} &\Rightarrow |x \odiv y - (x + y)| \leq |x/y| \epsilon_{\rm m}.
+x/y \in {|cal N} &\Rightarrow |x \oslash y - (x + y)| \leq |x/y| \epsilon_{\rm m}.
 \end{align*}
 $$
 
@@ -500,7 +513,7 @@ $$
 Arithmetic works differently on `Inf` and `NaN`. In particular we have:
 $$
 \begin{align*}
-x \odiv 0 &:= \begin{cases}
+x \oslash 0 &:= \begin{cases}
     (\sign x) \infty & x \neq 0 \\
     {\rm NaN} & {\rm otherwise}\\
 \end{\align*}
@@ -532,7 +545,7 @@ Instead, they are implemented by composing the basic arithmetic operations, whic
 errors. Fortunately they are all designed to have relative accuracy, that is, there exists
 reasonably small $c > 0$ such that, for `s = sin(x)` (that is, the Julia implementation of $sin(x)$) satisfies
 $$
-|s - \sin x| \leq |sin(x)| c\epsilon_{\rm m}
+|s - \sin x| \leq |\sin x| c\epsilon_{\rm m}
 $$
 Note these special functions are written in (advanced) Julia code, for example, 
 [sin](https://github.com/JuliaLang/julia/blob/d08b05df6f01cf4ec6e4c28ad94cedda76cc62e8/base/special/trig.jl#L76).
@@ -551,8 +564,42 @@ answer that even has the wrong sign!
 x̃ = 2*big(10.0)^100
 sin(x), sin(x̃)
 ```
-This is because we commit an error on the order of roughly $2 * 10^100 * \epsilon_{\machine} \approx 4.44 * 10^(84)$
+This is because we commit an error on the order of roughl
+$$
+2 * 10^100 * \epsilon_{\rm m} \approx 4.44 * 10^(84)
+$$
 when we round $2*10^100$ to the nearest float. 
 
 ## 4. High-precision floating point numbers (advanced)
 
+It is possible to set the precision of a floating point number
+using the `BigFloat` type, which results from the usage of `big`
+when the result is not an integer.
+For example, here is an approximation of 1/3 accurate
+to 77 decimal digits:
+```julia
+big(1)/3
+```
+Note we can set the rounding mode as in `Float64`, e.g., 
+this gives (rigorous) bounds on
+`1/3`:
+```julia
+setrounding(BigFloat, RoundDown) do
+  big(1)/3
+end, setrounding(BigFloat, RoundUp) do
+  big(1)/3
+end
+```
+We can also increase the precision, e.g., this finds bounds on `1/3` accurate to 
+more than 1000 decimal places:
+```julia
+setprecision(4_000) do # 4000 bit precision
+  setrounding(BigFloat, RoundDown) do
+    big(1)/3
+  end, setrounding(BigFloat, RoundUp) do
+    big(1)/3
+  end
+end
+```
+In the problem sheet we shall see how this can be used to rigorously bound ${\rm e}$,
+accurate to 1000 digits. 
