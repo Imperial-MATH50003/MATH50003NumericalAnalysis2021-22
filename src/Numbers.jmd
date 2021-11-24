@@ -524,9 +524,9 @@ $$
 x \oplus y = (x+y) (1 + \delta_{x+y})
 $$
 where
-$$
-|\delta_{x+y}| \leq {\epsilon_{\rm m} \over 2}
-$$
+$
+|\delta_{x+y}| \leq {\epsilon_{\rm m}/ 2}.
+$
 
 **Example** We show how to bound the error in computing
 $$
@@ -534,8 +534,8 @@ $$
 $$
 using floating point arithmetic. We have
 $$
-(1.1 \oplus 1.2) \oplus 1.3 = \br[(1.1 + 1.2)*(1 + \delta_1)] \oplus 1.3 =
-((1.1 + 1.2)*(1 + \delta_1) + 1.3)*(1 + \delta_2) = 
+(1.1 \oplus 1.2) \oplus 1.3 = [(1.1 + 1.2)(1 + \delta_1)] \oplus 1.3 =
+((1.1 + 1.2)(1 + \delta_1) + 1.3)(1 + \delta_2) = 
 3.6 + 2.3 \delta_1 + 3.6 \delta_2 + 2.3 \delta_1 \delta_2
 $$
 Thus the error is less than
@@ -578,11 +578,11 @@ NaN != NaN   #  true
 
 Other special functions like `cos`, `sin`, `exp`, etc. are _not_ part of the IEEE standard.
 Instead, they are implemented by composing the basic arithmetic operations, which accumulate
-errors. Fortunately they are all designed to have relative accuracy, that is, there exists
-reasonably small $c > 0$ such that, for `s = sin(x)` (that is, the Julia implementation of $sin(x)$) satisfies
+errors. Fortunately they are  designed to have relative accuracy, that is, `s = sin(x)` (that is, the Julia implementation of $sin(x)$) satisfies
 $$
-|s - \sin x| \leq |\sin x| c\epsilon_{\rm m}
+s = \sin x ( 1 + \delta)
 $$
+where $|\delta < c\epsilon_{\rm m}|$ for a reasonably small $c > 0$.
 Note these special functions are written in (advanced) Julia code, for example, 
 [sin](https://github.com/JuliaLang/julia/blob/d08b05df6f01cf4ec6e4c28ad94cedda76cc62e8/base/special/trig.jl#L76).
 
@@ -600,7 +600,7 @@ answer that even has the wrong sign!
 x̃ = 2*big(10.0)^100
 sin(x), sin(x̃)
 ```
-This is because we commit an error on the order of roughl
+This is because we commit an error on the order of roughly
 $$
 2 * 10^100 * \epsilon_{\rm m} \approx 4.44 * 10^(84)
 $$
