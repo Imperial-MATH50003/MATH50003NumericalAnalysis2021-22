@@ -422,7 +422,7 @@ Arithmetic operations are done exactly _up to rounding_.
 There are three basic rounding strategies: round up/down/nearest.
 Mathematically we introduce a function to capture the notion of rounding:
 
-**Definition (round)** ${\rm fl}^{\rm up}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
+**Definition (rounding)** ${\rm fl}^{\rm up}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
 the function that rounds a real number up to the nearest floating point number that is greater or equal.
 ${\rm fl}^{\rm down}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
 the function that rounds a real number down to the nearest floating point number that is greater or equal.
@@ -461,21 +461,20 @@ end
 In IEEE arithmetic, the arithmetic operations `+`, `-`, `*`, `/` are defined by the property that they are exact up to 
 rounding.  Mathematically we denote these operations as follows:
 $$
+\begin{align*}
 x\oplus y &:= {\rm fl}(x+y) \\
 x\ominus y &:= {\rm fl}(x - y) \\
 x\otimes y &:= {\rm fl}(x * y) \\
 x\oslash y &:= {\rm fl}(x / y)
+\end{align*}
 $$
 Note also that  `^` and `sqrt` are similarly exact up to rounding.
 
-**WARNING** These operations are not associative! E.g. $(x \oplus y) \oplus z$ is not necessarily equal to $x \oplus (y \oplus z)$. 
-Commutativity is preserved at least.
 
-
-**Example** `1.1+0.1` gives a different result than `1.2`:
+**Example (decimal is not exact)** `1.1+0.1` gives a different result than `1.2`:
 ```julia
-x=1.1
-y=0.1
+x = 1.1
+y = 0.1
 x + y - 1.2 # Not Zero?!?
 ```
 This is because ${\rm fl}(1.1) \neq 1+1/10$, but rather:
@@ -483,8 +482,19 @@ $$
 {\rm fl}(1.1) = 1 + 2^{-4}+2^{-5} + 2^{-8}+2^{-9}+\cdots + 2^{-48}+2^{-49} + 2^{-51}= {2476979795053773 \over 2251799813685248} = 1.1 +2^{-51} - 2^{-52} - 2^{-53} - 2^{-56} - 2^{-57} - \cdots
 $$
 
+**WARNING** These operations are not associative! E.g. $(x \oplus y) \oplus z$ is not necessarily equal to $x \oplus (y \oplus z)$. 
+Commutativity is preserved at least.
 
-We can bound basic arithmetic operations in terms of:
+**Example (non-associative)**
+Here is a surprising result:
+```julia
+(1.1 + 1.2) + 1.3, 1.1 + (1.2 + 1.3)
+```
+Can you explain this in terms of bits?
+
+
+We can bound basic arithmetic operations in terms of machine epsilon, provided
+a real number is close to a normal number:
 
 **Definition (normalised range)** The _normalised range_ ${\cal N}_{S,Q,P} \subset {\mathbb R}$
 is the subset of real numbers that lies
@@ -496,45 +506,71 @@ When $S,Q,P$ are implied by context we use the notation ${\cal N}$.
 
 We can use machine epsilon to determine bounds on rounding:
 
-**Proposition (rounding arithmetic)** For any rounding mode,
+**Proposition (rounding arithmetic)**
+If $x \in {\cal N}$ then 
 $$
-\begin{align*}
-x \in {\cal N} &\Rightarrow |{\rm fl}(x) - x|  \leq |x| \epsilon_{\rm m} \\
-x + y \in {\cal N} &\Rightarrow |x \oplus y - (x + y)| \leq |x+y| \epsilon_{\rm m} \\
-x - y \in {\cal N} &\Rightarrow |x \ominus y - (x - y)| \leq |x-y| \epsilon_{\rm m} \\
-x y \in {\cal N} &\Rightarrow |x \otimes y - x y| \leq |xy| \epsilon_{\rm m} \\
-x/y \in {|cal N} &\Rightarrow |x \oslash y - (x + y)| \leq |x/y| \epsilon_{\rm m}.
-\end{align*}
+{\rm fl}(x) = x (1 + \delta_x)
 $$
+where
+$$
+|\delta_x| \leq {\epsilon_{\rm m} \over 2}
+$$
+
+
+This immediately implies bounds on all IEEE arithmetic operations, e.g., 
+if $x+y \in {\cal N}$ then
+we have
+$$
+x \oplus y = (x+y) (1 + \delta_{x+y})
+$$
+where
+$$
+|\delta_{x+y}| \leq {\epsilon_{\rm m} \over 2}
+$$
+
+**Example** We show how to bound the error in computing
+$$
+(1.1 + 1.2) + 1.3
+$$
+using floating point arithmetic. We have
+$$
+(1.1 \oplus 1.2) \oplus 1.3 = \br[(1.1 + 1.2)*(1 + \delta_1)] \oplus 1.3 =
+((1.1 + 1.2)*(1 + \delta_1) + 1.3)*(1 + \delta_2) = 
+3.6 + 2.3 \delta_1 + 3.6 \delta_2 + 2.3 \delta_1 \delta_2
+$$
+Thus the error is less than
+$$
+5.9 \epsilon_{\rm m}/2 +2.3 \epsilon_{\rm m}^2/4 < 5.91 \epsilon_{\rm m}/2
+$$
+Indeed this bounds is fairly precise:
+```julia
+3.6 - (1.1+1.2+1.3), 5.91eps()/2
+```
 
 
 ### Arithmetic and special numbers
 
-Arithmetic works differently on `Inf` and `NaN`. In particular we have:
-$$
-\begin{align*}
-x \oslash 0 &:= \begin{cases}
-    (\sign x) \infty & x \neq 0 \\
-    {\rm NaN} & {\rm otherwise}\\
-\end{\align*}
-$$
-
-
+Arithmetic works differently on `Inf` and `NaN` and for undefined operations. 
+In particular we have:
 ```julia
-Inf*0      # NaN
-Inf+5      # Inf
-(-1)*Inf   # -Inf
-1/Inf      # 0
-1/(-Inf)   # -0
-Inf-Inf    # NaN
-Inf == Inf   # true
-Inf == -Inf  # false
+1/0.0        #  Inf
+1/(-0.0)     # -Inf
+0.0/0.0      #  NaN
+  
+Inf*0        #  NaN
+Inf+5        #  Inf
+(-1)*Inf     # -Inf
+1/Inf        #  0.0
+1/(-Inf)     # -0.0
+Inf - Inf    #  NaN
+Inf ==  Inf  #  true
+Inf == -Inf  #  false
 
-NaN*0      # NaN
-NaN+5      # NaN
-1/NaN      # NaN
-NaN == NaN    # false
-NaN != NaN    #true
+NaN*0        #  NaN
+NaN+5        #  NaN
+1/NaN        #  NaN
+NaN == NaN   #  false
+NaN != NaN   #  true
 ```
 
 

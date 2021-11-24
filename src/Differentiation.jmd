@@ -209,3 +209,9 @@ A simple corollary is that any function defined in terms of addition, multiplica
 of functions that are extended to dual numbers will be differentiable via dual numbers.
 
 ### Implementation in Julia
+
+We now consider a simple implementation of dual numbers
+
+
+What makes dual numbers so effective is that, unlike finite differences, they are not
+prone to disasterous growth due to round-off errors. 

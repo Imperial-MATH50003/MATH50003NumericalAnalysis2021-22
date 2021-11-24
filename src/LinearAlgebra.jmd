@@ -78,7 +78,7 @@ for all permutation matrices.
 
 ## Orthogonal matrices
 
-A matrix is _orthogonal_ if its inverse is its transpose:
+**Definition (orthogonal matrix)** A matrix is _orthogonal_ if its inverse is its transpose:
 
 $$Q^\top Q = I$$
 
@@ -234,3 +234,4 @@ b = rand(10)
 x = U\b
 norm(backsubstitution(U,b)-x)
 ```
+
