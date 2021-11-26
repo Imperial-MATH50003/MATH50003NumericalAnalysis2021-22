@@ -14,23 +14,15 @@ IEEE introduced in 1985 was a means to standardise this across
 processors so that algorithms would produce consistent and reliable results.
 
 This chapter may seem very low level for a mathematics course but there are
-two important reasons to understand the behaviour of integers and floating point numbers:
+two important reasons to understand the behaviour of integers and floating-point numbers:
 1. Integer arithmetic can suddenly start giving wrong negative answers when numbers
 become large.
 2. Floating point arithmetic is very precisely defined, and can even be used
 in rigorous computations as we shall see in the problem sheets.
-3. Failure to understand floating point arithmetic can cause catastrophic issues
+3. Failure to understand floating-point arithmetic can cause catastrophic issues
 in practice, with the extreme example being the 
 [explosion of the Ariane 5 rocket](https://youtu.be/N6PWATvLQCY?t=86).
 
-
-Before we begin, we load two external packages. SetRounding.jl allows us 
-to set the rounding mode of floating point arithmetic. ColorBitstring.jl
-  implements functions `printbits` and `printlnbits`
-which print the bits of floating point numbers in colour.
-```julia
-using SetRounding, ColorBitstring
-```
 
 In this chapter we discuss the following:
 
@@ -40,10 +32,18 @@ by an infinite sequence of 0s and 1s (bits). Here we review  binary representati
 the different types of integers and their representation as bits, and how arithmetic operations behave 
 like modular arithmetic.
 2. Floating point numbers: we discuss how real numbers are stored on a computer with a finite number of bits.
-3. Arithmetic: we discuss how arithmetic operations in floating point are exact up to rounding, and how the
+3. Arithmetic: we discuss how arithmetic operations in floating-point are exact up to rounding, and how the
 rounding mode can be set. This allows for precise error bounds in computations.
-4. High-precision floating point numbers: we discuss how the precision of floating point arithmetic can be increased arbitrary
-using `BigFloat`.
+4. High-precision floating-point numbers: we discuss how the precision of floating-point arithmetic can be increased arbitrary
+using `BigFloat`. This is an advanced topic that is non-examinable.
+
+Before we begin, we load two external packages. SetRounding.jl allows us 
+to set the rounding mode of floating-point arithmetic. ColorBitstring.jl
+  implements functions `printbits` and `printlnbits`
+which print the bits of floating-point numbers in colour.
+```julia
+using SetRounding, ColorBitstring
+```
 
 
 
@@ -58,7 +58,7 @@ $$
 $$
 For $b_1,b_2,\ldots \in \{0,1\}$, Denote a non-negative real number in _binary format_ by:
 $$
-(B_\ldots B_0.b_1Qb_2b_3\ldots)_2 = (B_Q\ldots B_0)_2 + {b_1 \over 2} + {b_2 \over 2^2} + {b_3 \over 2^3} + \cdots
+(B_p \ldots B_0.b_1b_2b_3\ldots)_2 = (B_p \ldots B_0)_2 + {b_1 \over 2} + {b_2 \over 2^2} + {b_3 \over 2^3} + \cdots
 $$
 
 
@@ -66,10 +66,7 @@ $$
 First we show some examples of verifying a numbers binary representation:
 
 **Example (integer in binary)**
-A simple integer example is
-$
-5 = 2^2 + 2^0 = (101)_2.
-$
+A simple integer example is $5 = 2^2 + 2^0 = (101)_2$.
 
 **Example (rational in binary)**
 Consider the number `1/3`.  In decimal recall that:
@@ -84,14 +81,11 @@ Both results can be proven using the geometric series:
 $$
 \sum_{k=0}^\infty z^k = {1 \over 1 - z}
 $$
-provided $|z| < 1$. That is, with $z = 1/10$ we see the decimal case:
-$$
-3\sum_{k=1}^\infty {1 \over 10^k} = {3 \over 1 - {1 \over 10}} - 3 = {1 \over 3}
-$$
-A similar argument works for binary with $z = {1 \over 4}$:
+provided $|z| < 1$. That is, with $z = {1 \over 4}$ we verify the binary expansion:
 $$
 \sum_{k=1}^\infty {1 \over 4^k} = {1 \over 1 - 1/4} - 1 = {1 \over 3}
 $$
+A similar argument with $z = 1/10$ shows the decimal case.
 
 
 
@@ -99,19 +93,18 @@ $$
 
 
 On a computer one typically represents integers by a finite number of $p$ bits,
-with $2^p$ possible combinations of 0s and 1s. For _unsigned integers_, that is,
-non-negative integers these bits are just the first $p$ binary digits, that is,
-$(B_p\ldots B_1B_0)_2$.
+with $2^p$ possible combinations of 0s and 1s. For _unsigned integers_ (non-negative integers) 
+these bits are just the first $p$ binary digits: $(B_{p-1}\ldots B_1B_0)_2$.
  
 Integers on a computer follow [modular arithmetic](https://en.wikipedia.org/wiki/Modular_arithmetic):
 
 **Definition (ring of integers modulo $m$)** Denote the ring
 $$
-{\mathbb Z}_{m} := \{0 \mod m, 1 \mod m, \ldots, m-1 \mod m \}
+{\mathbb Z}_{m} := \{0 \ ({\rm mod}\ m), 1 \ ({\rm mod}\ m), \ldots, m-1 \ ({\rm mod}\ m) \}
 $$
 
-That is, $p$-bit numbers on a computer represent elements of ${\mathbb Z}_{2^p}$, 
-the ring of integers modulo $2^p$, and integer arithmetic on a computer is 
+Integers represented with $p$-bits on a computer actually 
+represent elements of ${\mathbb Z}_{2^p}$ and integer arithmetic on a computer is 
 equivalent to arithmetic modulo $2^p$.
 
 **Example (addition of 8-bit unsigned integers)** Consider the addition of
@@ -123,7 +116,7 @@ The result is impossible to store in just 8-bits! It is way too slow
 for a computer to increase the number of bits, or to throw an error (checks are slow).
 So instead it treats the integers as elements of ${\mathbb Z}_{256}$:
 $$
-(255 + 1) \mod 256 = (00000000)_2 \mod 256 = 0 \mod 256
+255 + 1 \ ({\rm mod}\ 256) = (00000000)_2 \ ({\rm mod}\ 256) = 0 \ ({\rm mod}\ 256)
 $$
 We can see this in Julia:
 ```julia
@@ -137,12 +130,12 @@ printbits(x + y)
 **Example (multiplication of 8-bit unsigned integers)** 
 Multiplication works similarly: for example,
 $$
-254 * 2 \mod 256 = 252 = (11111100)_2
+254 * 2 \ ({\rm mod}\ 256) = 252 \ ({\rm mod}\ 256) = (11111100)_2 \ ({\rm mod}\ 256)
 $$
-and we have
+We can see this behaviour in code by printing the bits:
 ```julia
-x = UInt8(254)
-y = UInt8(2)
+x = UInt8(254) # 254 represented in 8-bits as an unsigned integer
+y = UInt8(2)   #   2 represented in 8-bits as an unsigned integer
 printbits(x); println(" * "); printbits(y); println(" = ")
 printbits(x * y)
 ```
@@ -177,7 +170,7 @@ Consider `(-1) + 1` in 8-bit arithmetic. The number $-1$ has the same bits as
 $2^8 - 1 = 255$. Thus this is equivalent to the previous question and we get the correct
 result of `0`. In other words:
 $$
-(-1 \mod 2^p) + (1 \mod 2^p) = (2^p-1 \mod 2^p) + (1 \mod 2^p) = 2^p \mod 2^p = 0 \mod 2^p
+-1 + 1 \ ({\rm mod}\ 2^p) = 2^p-1  + 1 \ ({\rm mod}\ 2^p) = 2^p \ ({\rm mod}\ 2^p) = 0 \ ({\rm mod}\ 2^p)
 $$
 
 
@@ -186,7 +179,7 @@ Consider `(-2) * 2`. $-2$ has the same bits as $2^{256} - 2 = 254$ and $-4$ has 
 same bits as $2^{256}-4 = 252$, and hence from the previous example we get the correct result of `-4`.
 In other words:
 $$
-(-2 \mod 2^p) * (2 \mod 2^p) = (2^p-2 \mod 2^p) * (2 \mod 2^p) = (2^{p+1}-4 \mod 2^p) = -4 \mod 2^p
+(-2) * 2 \ ({\rm mod}\ 2^p) = (2^p-2) * 2 \ ({\rm mod}\ 2^p) = 2^{p+1}-4 \ ({\rm mod}\ 2^p) = -4 \ ({\rm mod}\ 2^p)
 $$
 
 
@@ -209,7 +202,7 @@ In addition to `+`, `-`, and `*` we have integer division `÷`, which rounds dow
 ```julia
 5 ÷ 2 # equivalent to div(5,2)
 ```
-Standard division `/` (or `\` for division on the right) creates a floating point number, which will be discussed shortly:
+Standard division `/` (or `\` for division on the right) creates a floating-point number, which will be discussed shortly:
 ```julia
 5 / 2 # alternatively 2 \ 5
 ```
@@ -231,7 +224,7 @@ which creates a `BigInt`, which allows for an arbitrary number of bits.
 Floating point numbers are a subset of real numbers that are representable using
 a fixed number of bits.
 
-**Definition (floating point numbers)**
+**Definition (floating-point numbers)**
 Given integers $S$ (the "exponential shift") $Q$ (the number of exponent bits) and 
 $P$ (the precision), define the set of
 _Floating point numbers_ by dividing into _normal_, _sub-normal_, and _special number_ subsets:
@@ -275,10 +268,10 @@ If $q = 2^Q-1$  (i.e. all bits are 1) then the bits represent a special number, 
 later.
 
 
-### IEEE floating point numbers
+### IEEE floating-point numbers
 
-**Definition (IEEE floating point numbers)** 
-IEEE has 3 standard floating point formats: 16-bit (half precision), 32-bit (single precision) and
+**Definition (IEEE floating-point numbers)** 
+IEEE has 3 standard floating-point formats: 16-bit (half precision), 32-bit (single precision) and
 64-bit (double precision) defined by:
 $$
 \begin{align*}
@@ -288,7 +281,7 @@ F_{64} &:= F_{1023,11,52}
 \end{align*}
 $$
 
-In Julia these correspond to 3 different floating point types:
+In Julia these correspond to 3 different floating-point types:
 
 1.  `Float64` is a type representing $F_{64}$.
 We can create a `Float64` by including a 
@@ -371,7 +364,7 @@ S,P,Q = 127,23,8 # Float32
 printlnbits(Float32(2.0^(1-S))) # smallest positive Float32
 printlnbits(Float32(2.0^(2^Q-2-S) * (2-εₘ))) # largest Float32
 ```
-For a given floating point type, we can find these constants using the following functions:
+For a given floating-point type, we can find these constants using the following functions:
 ```julia
 eps(Float32),floatmin(Float32),floatmax(Float32)
 ```
@@ -388,15 +381,15 @@ $$
 F^{\rm special} := \{\infty, -\infty, {\rm NaN}\}
 $$
 
-Whenever the bits of $q$ of a floating point number are all 1 then they represent an element of $F^{\rm special}$.
-If all $b_k=0$, then the number represents either $\pm\infty$, called `Inf` and `-Inf` for 64-bit floating point numbers (or `Inf16`, `Inf32`
+Whenever the bits of $q$ of a floating-point number are all 1 then they represent an element of $F^{\rm special}$.
+If all $b_k=0$, then the number represents either $\pm\infty$, called `Inf` and `-Inf` for 64-bit floating-point numbers (or `Inf16`, `Inf32`
 for 16-bit and 32-bit, respectively):
 ```julia
 printlnbits(Inf16)
 printbits(-Inf16)
 ```
-All other special floating point numbers represent ${\rm NaN}$. One particular representation of ${\rm NaN}$ 
-is denoted by `NaN` for 64-bit floating point numbers (or `NaN16`, `NaN32` for 16-bit and 32-bit, respectively):
+All other special floating-point numbers represent ${\rm NaN}$. One particular representation of ${\rm NaN}$ 
+is denoted by `NaN` for 64-bit floating-point numbers (or `NaN16`, `NaN32` for 16-bit and 32-bit, respectively):
 ```julia
 printbits(NaN16)
 ```
@@ -423,12 +416,12 @@ There are three basic rounding strategies: round up/down/nearest.
 Mathematically we introduce a function to capture the notion of rounding:
 
 **Definition (rounding)** ${\rm fl}^{\rm up}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
-the function that rounds a real number up to the nearest floating point number that is greater or equal.
+the function that rounds a real number up to the nearest floating-point number that is greater or equal.
 ${\rm fl}^{\rm down}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
-the function that rounds a real number down to the nearest floating point number that is greater or equal.
+the function that rounds a real number down to the nearest floating-point number that is greater or equal.
 ${\rm fl}^{\rm nearest}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
-the function that rounds a real number to the nearest floating point number. In case of a tie, the
-it returns the floating point number whose least significant bit is equal to zero.
+the function that rounds a real number to the nearest floating-point number. In case of a tie, the
+it returns the floating-point number whose least significant bit is equal to zero.
 We use the notation ${\rm fl}$ when $S,Q,P$ and the rounding mode are implied by context,
 with ${\rm fl}^{\rm nearest}$ being the default rounding mode.
 
@@ -498,7 +491,7 @@ a real number is close to a normal number:
 
 **Definition (normalised range)** The _normalised range_ ${\cal N}_{S,Q,P} \subset {\mathbb R}$
 is the subset of real numbers that lies
-between the smallest and largest normal floating point number:
+between the smallest and largest normal floating-point number:
 $$
 {\cal N}_{S,Q,P} := \{x : \min |F_{S,Q,P}| \leq |x| \leq \max F_{S,Q,P} \}
 $$
@@ -532,7 +525,7 @@ $
 $$
 (1.1 + 1.2) + 1.3
 $$
-using floating point arithmetic. We have
+using floating-point arithmetic. We have
 $$
 (1.1 \oplus 1.2) \oplus 1.3 = [(1.1 + 1.2)(1 + \delta_1)] \oplus 1.3 =
 ((1.1 + 1.2)(1 + \delta_1) + 1.3)(1 + \delta_2) = 
@@ -606,9 +599,9 @@ $$
 $$
 when we round $2*10^100$ to the nearest float. 
 
-## 4. High-precision floating point numbers (advanced)
+## 4. High-precision floating-point numbers (advanced)
 
-It is possible to set the precision of a floating point number
+It is possible to set the precision of a floating-point number
 using the `BigFloat` type, which results from the usage of `big`
 when the result is not an integer.
 For example, here is an approximation of 1/3 accurate

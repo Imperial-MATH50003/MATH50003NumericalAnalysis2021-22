@@ -54,14 +54,14 @@ example, the proof the [Four Colour Theorem](https://en.wikipedia.org/wiki/Four_
 A rough overview of the course is as follows:
 
 
-1. [Numbers](notebooks/Numbers.ipynb): we discuss how computers represent integers and real numbers, as well as their arithmetic operations.
-2. [Differentiation](notebooks/Differentiation.ipynb): we discuss ways of approximating derivatives, including automatic differentiation, 
+1. [Numbers](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Numbers.ipynb): we discuss how computers represent integers and real numbers, as well as their arithmetic operations.
+2. [Differentiation](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Differentiation.ipynb): we discuss ways of approximating derivatives, including automatic differentiation, 
 which is essential to stochastic gradient descent and machine learning.
-3. [Linear Algebra](notebooks/LinearAlgebra.ipynb): we discuss algorithms for solving linear systems.
-5. [Orthogonal Polynomials](notebooks/OrthogonalPolynomials.ipynb): we discuss orthogonal polynomial—polynomials orthogonal 
+3. [Linear Algebra](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/LinearAlgebra.ipynb): we discuss algorithms for solving linear systems.
+5. [Orthogonal Polynomials](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/OrthogonalPolynomials.ipynb): we discuss orthogonal polynomial—polynomials orthogonal 
 with respect to a proscribed weight—and their usage in numerical computations.
-6. [Integration](notebooks/Integration.ipynb): we discuss ways to approximate integrals, both definite and indefinite, using orthogonal polynomials.
-7. [Differential Equations](notebooks/DifferentialEquations.ipynb): we discuss the numerical solution of differential equations, 
+6. [Integration](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Integration.ipynb): we discuss ways to approximate integrals, both definite and indefinite, using orthogonal polynomials.
+7. [Differential Equations](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/DifferentialEquations.ipynb): we discuss the numerical solution of differential equations, 
 including both time-dependent ordinary differential equations, boundary value problems, and  partial differential equations.
 
 In this course we will use the programming language [Julia](https://julialang.org). This is a modern, compiled, high-level,
