@@ -61,18 +61,8 @@ This is explained in detail in Chapter [Numbers](Numbers.ipynb)
 There are other primitive integer types:  `UInt8`, `UInt16`, `UInt32`, and `UInt64` are unsigned integers, 
 e.g., we do not interpret
 the number as negative if the first bit is `1`. A non-primitive type is `BigInt` which allows arbitrary length
-integers, which we can create using `big`:
-```julia
-x = typemax(Int64) + big(1) # Too big to be an `Int64`
-```
-Note in this case it automatically promotes an `Int64` to a `BigInt`.
-We can create very large numbers using `BigInt`:
-```julia
-x^100
-```
-Note the number of bits is not fixed, the larger the number the more bits are needed 
-to represent it, so it is possible to run out of memory if a number is
-astronomically large: go ahead and try `x^x` (at your own risk).
+integers.
+
 
 
 ## 2. Strings and parsing

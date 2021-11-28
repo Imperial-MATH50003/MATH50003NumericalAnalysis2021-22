@@ -30,7 +30,7 @@ In this chapter we discuss the following:
 by an infinite sequence of 0s and 1s (bits). Here we review  binary representation.
 2. Integers:  There are multiple ways of representing integers on a computer. Here we discuss the 
 the different types of integers and their representation as bits, and how arithmetic operations behave 
-like modular arithmetic.
+like modular arithmetic. As an advanced topic we discuss `BigInt`, which uses variable bit length storage.
 2. Floating point numbers: we discuss how real numbers are stored on a computer with a finite number of bits.
 3. Arithmetic: we discuss how arithmetic operations in floating-point are exact up to rounding, and how the
 rounding mode can be set. This allows for precise error bounds in computations.
@@ -39,8 +39,8 @@ using `BigFloat`. This is an advanced topic that is non-examinable.
 
 Before we begin, we load two external packages. SetRounding.jl allows us 
 to set the rounding mode of floating-point arithmetic. ColorBitstring.jl
-  implements functions `printbits` and `printlnbits`
-which print the bits of floating-point numbers in colour.
+  implements functions `printbits` (and `printlnbits`)
+which print the bits (and with a newline) of floating-point numbers in colour.
 ```julia
 using SetRounding, ColorBitstring
 ```
@@ -140,7 +140,7 @@ printbits(x); println(" * "); printbits(y); println(" = ")
 printbits(x * y)
 ```
 
-Signed integers use the [2's complemement](https://epubs.siam.org/doi/abs/10.1137/1.9780898718072.ch3)
+Signed integers use the [Two's complemement](https://epubs.siam.org/doi/abs/10.1137/1.9780898718072.ch3)
 convention. The convention is if the first bit is 1 then the number is negative: the number $2^p - y$
 is interpreted as $-y$.
 Thus for $p = 8$ we are interpreting
@@ -186,7 +186,7 @@ $$
 
 
 
-We can find the largest and smallest instances of a type using `typemax` and `typemin`:
+**Example (overflow)** We can find the largest and smallest instances of a type using `typemax` and `typemin`:
 ```julia
 printlnbits(typemax(Int8)) # 2^7-1 = 127
 printbits(typemin(Int8)) # -2^7 = -128
@@ -195,19 +195,41 @@ As explained, due to modular arithmetic, when we add `1` to the largest 8-bit in
 ```julia
 typemax(Int8) + Int8(1) # returns typemin(Int8)
 ```
+This behaviour is often not desired and is known as _overflow_, and one must be wary
+of using integers close to their largest value.
 
 
 
-In addition to `+`, `-`, and `*` we have integer division `÷`, which rounds down:
+**Example (division)** In addition to `+`, `-`, and `*` we have integer division `÷`, which rounds down:
 ```julia
 5 ÷ 2 # equivalent to div(5,2)
 ```
-Standard division `/` (or `\` for division on the right) creates a floating-point number, which will be discussed shortly:
+Standard division `/` (or `\` for division on the right) creates a floating-point number,
+which will be discussed shortly:
 ```julia
 5 / 2 # alternatively 2 \ 5
 ```
 
-**Remark (advanced)** We can also create rational numbers using `//`:
+### Variable bit representation (**advanced**)
+
+An alternative representation for integers uses a variable number of bits,
+with the advantage of avoiding overflow but with the disadvantage of a substantial
+speed penalty. In Julia these are `BigInt`s, which we can create by calling `big` on an
+integer:
+```julia
+x = typemax(Int64) + big(1) # Too big to be an `Int64`
+```
+Note in this case addition automatically promotes an `Int64` to a `BigInt`.
+We can create very large numbers using `BigInt`:
+```julia
+x^100
+```
+Note the number of bits is not fixed, the larger the number the more bits are needed 
+to represent it, so while overflow is impossible, it is possible to run out of memory if a number is
+astronomically large: go ahead and try `x^x` (at your own risk).
+
+
+**Remark** We can also create rational numbers using `//`:
 ```julia
 (1//2) + (3//4)
 ```
@@ -216,8 +238,6 @@ is often best to combine `big` with rationals:
 ```julia
 big(102324)//132413023 + 23434545//4243061 + 23434545//42430534435
 ```
-See the [Introduction to Julia](Julia.ipynb) for details on `big`,
-which creates a `BigInt`, which allows for an arbitrary number of bits.
 
 ## 2. Floating point numbers
 
