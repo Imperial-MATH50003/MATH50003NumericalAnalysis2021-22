@@ -17,8 +17,9 @@ This chapter may seem very low level for a mathematics course but there are
 two important reasons to understand the behaviour of integers and floating-point numbers:
 1. Integer arithmetic can suddenly start giving wrong negative answers when numbers
 become large.
-2. Floating point arithmetic is very precisely defined, and can even be used
-in rigorous computations as we shall see in the problem sheets.
+2. Floating-point arithmetic is very precisely defined, and can even be used
+in rigorous computations as we shall see in the problem sheets. But it is not exact
+and its important to understand how errors in computations can accumulate.
 3. Failure to understand floating-point arithmetic can cause catastrophic issues
 in practice, with the extreme example being the 
 [explosion of the Ariane 5 rocket](https://youtu.be/N6PWATvLQCY?t=86).
@@ -27,15 +28,16 @@ in practice, with the extreme example being the
 In this chapter we discuss the following:
 
 1. Binary representation: Any real number can be represented in binary, that is,
-by an infinite sequence of 0s and 1s (bits). Here we review  binary representation.
-2. Integers:  There are multiple ways of representing integers on a computer. Here we discuss the 
+by an infinite sequence of 0s and 1s (bits). We review  binary representation.
+2. Integers:  There are multiple ways of representing integers on a computer. We discuss the 
 the different types of integers and their representation as bits, and how arithmetic operations behave 
 like modular arithmetic. As an advanced topic we discuss `BigInt`, which uses variable bit length storage.
-2. Floating point numbers: we discuss how real numbers are stored on a computer with a finite number of bits.
-3. Arithmetic: we discuss how arithmetic operations in floating-point are exact up to rounding, and how the
-rounding mode can be set. This allows for precise error bounds in computations.
-4. High-precision floating-point numbers: we discuss how the precision of floating-point arithmetic can be increased arbitrary
-using `BigFloat`. This is an advanced topic that is non-examinable.
+2. Floating-point numbers: Real numbers are stored on a computer with a finite number of bits. 
+There are three types of floating-point numbers: _normal numbers_, _subnormal numbers_, and _special numbers_.
+3. Arithmetic: Arithmetic operations in floating-point are exact up to rounding, and how the
+rounding mode can be set. This allows us to bound  errors computations.
+4. High-precision floating-point numbers: As an advanced topic, we discuss how the precision of floating-point arithmetic can be increased arbitrary
+using `BigFloat`. 
 
 Before we begin, we load two external packages. SetRounding.jl allows us 
 to set the rounding mode of floating-point arithmetic. ColorBitstring.jl
@@ -140,6 +142,8 @@ printbits(x); println(" * "); printbits(y); println(" = ")
 printbits(x * y)
 ```
 
+### Signed integer
+
 Signed integers use the [Two's complemement](https://epubs.siam.org/doi/abs/10.1137/1.9780898718072.ch3)
 convention. The convention is if the first bit is 1 then the number is negative: the number $2^p - y$
 is interpreted as $-y$.
@@ -199,17 +203,6 @@ This behaviour is often not desired and is known as _overflow_, and one must be 
 of using integers close to their largest value.
 
 
-
-**Example (division)** In addition to `+`, `-`, and `*` we have integer division `÷`, which rounds down:
-```julia
-5 ÷ 2 # equivalent to div(5,2)
-```
-Standard division `/` (or `\` for division on the right) creates a floating-point number,
-which will be discussed shortly:
-```julia
-5 / 2 # alternatively 2 \ 5
-```
-
 ### Variable bit representation (**advanced**)
 
 An alternative representation for integers uses a variable number of bits,
@@ -224,12 +217,24 @@ We can create very large numbers using `BigInt`:
 ```julia
 x^100
 ```
-Note the number of bits is not fixed, the larger the number the more bits are needed 
+Note the number of bits is not fixed, the larger the number, the more bits required 
 to represent it, so while overflow is impossible, it is possible to run out of memory if a number is
 astronomically large: go ahead and try `x^x` (at your own risk).
 
 
-**Remark** We can also create rational numbers using `//`:
+## Division
+
+ In addition to `+`, `-`, and `*` we have integer division `÷`, which rounds down:
+```julia
+5 ÷ 2 # equivalent to div(5,2)
+```
+Standard division `/` (or `\` for division on the right) creates a floating-point number,
+which will be discussed shortly:
+```julia
+5 / 2 # alternatively 2 \ 5
+```
+
+ We can also create rational numbers using `//`:
 ```julia
 (1//2) + (3//4)
 ```
@@ -239,15 +244,15 @@ is often best to combine `big` with rationals:
 big(102324)//132413023 + 23434545//4243061 + 23434545//42430534435
 ```
 
-## 2. Floating point numbers
+## 3. Floating-point numbers
 
-Floating point numbers are a subset of real numbers that are representable using
+Floating-point numbers are a subset of real numbers that are representable using
 a fixed number of bits.
 
 **Definition (floating-point numbers)**
 Given integers $S$ (the "exponential shift") $Q$ (the number of exponent bits) and 
 $P$ (the precision), define the set of
-_Floating point numbers_ by dividing into _normal_, _sub-normal_, and _special number_ subsets:
+_Floating-point numbers_ by dividing into _normal_, _sub-normal_, and _special number_ subsets:
 $$
 F_{S,Q,P} := F^{\rm normal}_{S,Q,P} \cup F^{\rm sub}_{S,Q,P} \cup F^{\rm special}.
 $$
@@ -265,15 +270,15 @@ The _special numbers_ $F^{\rm special} \not\subset {\mathbb R}$ are defined late
 Note this set of real numbers has no nice algebraic structure: it is not closed under addition, subtraction, etc.
 We will therefore need to define approximate versions of algebraic operations later.
 
-Floating point numbers are stored in $1 + Q + P$ total number of bits, in the format
+Floating-point numbers are stored in $1 + Q + P$ total number of bits, in the format
 $$
-sq_1\ldots q_Q b_1 \ldots b_P
+sq_{Q-1}\ldots q_0 b_1 \ldots b_P
 $$
 The first bit ($s$) is the <span style="color:red">sign bit</span>: 0 means positive and 1 means
-negative. The bits $q_1\ldots q_Q$ are the <span style="color:green">exponent bits</span>:
+negative. The bits $q_{Q-1}\ldots q_0$ are the <span style="color:green">exponent bits</span>:
 they are the binary digits of the unsigned integer $q$: 
 $$
-q = (q_1\ldots q_Q)_2.
+q = (q_{Q-1}\ldots q_0)_2.
 $$
 Finally, the bits $b_1\ldots b_P$ are the <span style="color:blue">significand bits</span>.
 If $1 \leq q < 2^Q-1$ then the bits represent the normal number
@@ -303,17 +308,17 @@ $$
 
 In Julia these correspond to 3 different floating-point types:
 
-1.  `Float64` is a type representing $F_{64}$.
+1.  `Float64` is a type representing double precision ($F_{64}$).
 We can create a `Float64` by including a 
 decimal point when writing the number: 
 `1.0` is a `Float64`. `Float64` is the default format for 
-scientific computing (on the _Floating Point Unit_, FPU).  
-2. `Float32` is a type representing $F_{32}$.  We can create a `Float32` by including a 
+scientific computing (on the _Floating-Point Unit_, FPU).  
+2. `Float32` is a type representing single precision ($F_{32}$).  We can create a `Float32` by including a 
 `f0` when writing the number: 
 `1f0` is a `Float32`. `Float32` is generally the default format for graphics (on the _Graphics Processing Unit_, GPU), 
 as the difference between 32 bits and 64 bits is indistinguishable to the eye in visualisation,
 and more data can be fit into a GPU's limitted memory.
-3.  `Float16` is a type representing $F_{16}$.
+3.  `Float16` is a type representing half-precision ($F_{16}$).
 It is important in machine learning where one wants to maximise the amount of data
 and high accuracy is not necessarily helpful. 
 
@@ -325,7 +330,7 @@ $$
 $$
 and since $
 125 = (1111101)_2
-$  the <span style="color:green">exponent bits</span> are `1111101`.
+$  the <span style="color:green">exponent bits</span> are `01111101`.
 . 
 For the significand we round the last bit to the nearest element of $F_{32}$, (this is explained in detail in
 the section on rounding), so we have
@@ -350,12 +355,6 @@ printbits(-0.0)
 This is treated as identical to `0.0` (except for degenerate operations as explained in special numbers).
 
 
-If we divide the smallest normal number by two, we get a subnormal number: 
-```julia
-mn = floatmin(Float32) # smallest normal Float32
-printbits(mn/2)
-```
-Can you explain the bits?
 
 ### Special normal numbers
 
@@ -369,8 +368,9 @@ $$
 When $P$ is implied by context we use the notation $\epsilon_{\rm m}$.
 The _smallest positive normal number_ is $q = 1$ and $b_k$ all zero:
 $$
-\min |F_{S,P,Q}^{\rm normal}| = 2^{1-S}.
+\min |F_{S,P,Q}^{\rm normal}| = 2^{1-S}
 $$ 
+where $|A| := $\{|x| : x \in A \}$.
 The _largest (positive) normal number_ is 
 $$
 \max F_{S,P,Q}^{\rm normal} = 2^{2^Q-2-S} (1.11\ldots1)_2 = 2^{2^Q-2-S} (2-\epsilon_{\rm m})
@@ -388,6 +388,15 @@ For a given floating-point type, we can find these constants using the following
 ```julia
 eps(Float32),floatmin(Float32),floatmax(Float32)
 ```
+
+**Example (creating a sub-normal number)** If we divide the smallest normal number by two, we get a subnormal number: 
+```julia
+mn = floatmin(Float32) # smallest normal Float32
+printlnbits(mn)
+printbits(mn/2)
+```
+Can you explain the bits?
+
 
 
 
@@ -428,10 +437,10 @@ reinterpret(Float16, i)
 Thus, there are more than one `NaN`s on a computer.  
 
 
-## 3. Arithmetic
+## 4. Arithmetic
 
 
-Arithmetic operations are done exactly _up to rounding_.
+Arithmetic operations on floating-point numbers are  _exact up to rounding_.
 There are three basic rounding strategies: round up/down/nearest.
 Mathematically we introduce a function to capture the notion of rounding:
 
@@ -440,7 +449,7 @@ the function that rounds a real number up to the nearest floating-point number t
 ${\rm fl}^{\rm down}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
 the function that rounds a real number down to the nearest floating-point number that is greater or equal.
 ${\rm fl}^{\rm nearest}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
-the function that rounds a real number to the nearest floating-point number. In case of a tie, the
+the function that rounds a real number to the nearest floating-point number. In case of a tie,
 it returns the floating-point number whose least significant bit is equal to zero.
 We use the notation ${\rm fl}$ when $S,Q,P$ and the rounding mode are implied by context,
 with ${\rm fl}^{\rm nearest}$ being the default rounding mode.
@@ -456,7 +465,7 @@ of the FPU instruction set so will be (roughly) equally fast as the default, `Ro
 Let's try rounding a `Float64` to a `Float32`.
 
 ```julia
-printbits(1/3)  # 64 bits
+printlnbits(1/3)  # 64 bits
 printbits(Float32(1/3))  # round to nearest 32-bit
 ```
 The default rounding mode can be changed:
@@ -464,15 +473,23 @@ The default rounding mode can be changed:
 printbits(Float32(1/3,RoundDown) )
 ```
 Or alternatively we can change the rounding mode for a chunk of code
-using `setrounding`. The following changes `/` to round down:
+using `setrounding`. The following computes upper and lower bounds for `/`:
 ```julia
+x = 1f0
 setrounding(Float32, RoundDown) do
-    1f0/3
+    x/3
+end,
+setrounding(Float32, RoundUp) do
+    x/3
 end
 ```
 
-In IEEE arithmetic, the arithmetic operations `+`, `-`, `*`, `/` are defined by the property that they are exact up to 
-rounding.  Mathematically we denote these operations as follows:
+**WARNING (advanced)**: Why did we first create a variable `x` instead of typing `1f0/3`?
+This is due to a very subtle issue where the compiler is _too smart_: it recognises `1f0/3`
+can be computed at compile time (before the rounding mode is actually set). 
+
+In IEEE arithmetic, the arithmetic operations `+`, `-`, `*`, `/` are defined by the property
+that they are exact up to rounding.  Mathematically we denote these operations as follows:
 $$
 \begin{align*}
 x\oplus y &:= {\rm fl}(x+y) \\
@@ -496,10 +513,10 @@ $$
 $$
 
 **WARNING** These operations are not associative! E.g. $(x \oplus y) \oplus z$ is not necessarily equal to $x \oplus (y \oplus z)$. 
-Commutativity is preserved at least.
+Commutativity is preserved, at least.
 
 **Example (non-associative)**
-Here is a surprising result:
+Here is a surprising example of non-associativity:
 ```julia
 (1.1 + 1.2) + 1.3, 1.1 + (1.2 + 1.3)
 ```
@@ -553,9 +570,9 @@ $$
 $$
 Thus the error is less than
 $$
-5.9 \epsilon_{\rm m}/2 +2.3 \epsilon_{\rm m}^2/4 < 5.91 \epsilon_{\rm m}/2
+5.9 {\epsilon_{\rm m} \over 2} +2.3 {\epsilon_{\rm m}^2 \over 4} < 5.91 {\epsilon_{\rm m} \over 2}
 $$
-Indeed this bounds is fairly precise:
+Indeed this bounds is fairly close:
 ```julia
 3.6 - (1.1+1.2+1.3), 5.91eps()/2
 ```
@@ -591,11 +608,12 @@ NaN != NaN   #  true
 
 Other special functions like `cos`, `sin`, `exp`, etc. are _not_ part of the IEEE standard.
 Instead, they are implemented by composing the basic arithmetic operations, which accumulate
-errors. Fortunately they are  designed to have relative accuracy, that is, `s = sin(x)` (that is, the Julia implementation of $sin(x)$) satisfies
+errors. Fortunately they are  designed to have relative accuracy, that is, `s = sin(x)` 
+(that is, the Julia implementation of $\sin x$) satisfies
 $$
-s = \sin x ( 1 + \delta)
+{\tt s} = (\sin x) ( 1 + \delta)
 $$
-where $|\delta < c\epsilon_{\rm m}|$ for a reasonably small $c > 0$.
+where $|\delta| < c\epsilon_{\rm m}$ for a reasonably small $c > 0$.
 Note these special functions are written in (advanced) Julia code, for example, 
 [sin](https://github.com/JuliaLang/julia/blob/d08b05df6f01cf4ec6e4c28ad94cedda76cc62e8/base/special/trig.jl#L76).
 
@@ -617,9 +635,9 @@ This is because we commit an error on the order of roughly
 $$
 2 * 10^100 * \epsilon_{\rm m} \approx 4.44 * 10^(84)
 $$
-when we round $2*10^100$ to the nearest float. 
+when we round $2*10^{100}$ to the nearest float. 
 
-## 4. High-precision floating-point numbers (advanced)
+## 5. High-precision floating-point numbers (advanced)
 
 It is possible to set the precision of a floating-point number
 using the `BigFloat` type, which results from the usage of `big`
