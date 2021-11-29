@@ -459,8 +459,15 @@ with ${\rm fl}^{\rm nearest}$ being the default rounding mode.
 In Julia, the rounding mode is specified by tags `RoundUp`, `RoundDown`, and
 `RoundNearest`. (There are also more exotic rounding strategies `RoundToZero`, `RoundNearestTiesAway` and
 `RoundNearestTiesUp` that we won't use.)
- Note that these rounding modes are part
+
+
+
+**WARNING (rounding performance, advanced)** These rounding modes are part
 of the FPU instruction set so will be (roughly) equally fast as the default, `RoundNearest`.
+Unfortunately, changing the rounding mode is expensive, and is not thread-safe.
+
+
+
 
 Let's try rounding a `Float64` to a `Float32`.
 
@@ -484,9 +491,10 @@ setrounding(Float32, RoundUp) do
 end
 ```
 
-**WARNING (advanced)**: Why did we first create a variable `x` instead of typing `1f0/3`?
-This is due to a very subtle issue where the compiler is _too smart_: it recognises `1f0/3`
-can be computed at compile time (before the rounding mode is actually set). 
+**WARNING (compiled constants, advanced)**: Why did we first create a variable `x` instead of typing `1f0/3`?
+This is due to a very subtle issue where the compiler is _too clever for it's own good_: 
+it recognises `1f0/3` can be computed at compile time, but failed to recognise the rounding mode
+was changed. 
 
 In IEEE arithmetic, the arithmetic operations `+`, `-`, `*`, `/` are defined by the property
 that they are exact up to rounding.  Mathematically we denote these operations as follows:
@@ -509,13 +517,11 @@ x + y - 1.2 # Not Zero?!?
 ```
 This is because ${\rm fl}(1.1) \neq 1+1/10$, but rather:
 $$
-{\rm fl}(1.1) = 1 + 2^{-4}+2^{-5} + 2^{-8}+2^{-9}+\cdots + 2^{-48}+2^{-49} + 2^{-51}= {2476979795053773 \over 2251799813685248} = 1.1 +2^{-51} - 2^{-52} - 2^{-53} - 2^{-56} - 2^{-57} - \cdots
+{\rm fl}(1.1) = 1 + 2^{-4}+2^{-5} + 2^{-8}+2^{-9}+\cdots + 2^{-48}+2^{-49} + 2^{-51}
 $$
 
-**WARNING** These operations are not associative! E.g. $(x \oplus y) \oplus z$ is not necessarily equal to $x \oplus (y \oplus z)$. 
+**WARNING (non-associative)** These operations are not associative! E.g. $(x \oplus y) \oplus z$ is not necessarily equal to $x \oplus (y \oplus z)$. 
 Commutativity is preserved, at least.
-
-**Example (non-associative)**
 Here is a surprising example of non-associativity:
 ```julia
 (1.1 + 1.2) + 1.3, 1.1 + (1.2 + 1.3)
@@ -618,7 +624,7 @@ Note these special functions are written in (advanced) Julia code, for example,
 [sin](https://github.com/JuliaLang/julia/blob/d08b05df6f01cf4ec6e4c28ad94cedda76cc62e8/base/special/trig.jl#L76).
 
 
-**WARNING** This is an extremely misleading statement for large `x`. Consider
+**WARNING (sin with large floats)** This is an extremely misleading statement for large `x`. Consider
 the following demonstration of the statement:
 ```julia
 ε = eps() # machine epsilon, 2^(-52)
