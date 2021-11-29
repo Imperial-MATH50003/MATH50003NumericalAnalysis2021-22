@@ -57,10 +57,11 @@ A rough overview of the course is as follows:
 1. [Numbers](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Numbers.ipynb): we discuss how computers represent integers and real numbers, as well as their arithmetic operations.
 2. [Differentiation](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Differentiation.ipynb): we discuss ways of approximating derivatives, including automatic differentiation, 
 which is essential to stochastic gradient descent and machine learning.
-3. [Linear Algebra](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/LinearAlgebra.ipynb): we discuss algorithms for solving linear systems.
+3. [Structured Matrices](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/StructuredMatrices.ipynb): we discuss types of structured matrices (permutations, orthogonal matrices, triangular).
+3. [Decompositions](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Decompositions.ipynb): we discuss algorithms for computing matrix decompositions (QR and PLU decompositions) and solving linear systems.
 5. [Orthogonal Polynomials](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/OrthogonalPolynomials.ipynb): we discuss orthogonal polynomial—polynomials orthogonal 
 with respect to a proscribed weight—and their usage in numerical computations.
-6. [Integration](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Integration.ipynb): we discuss ways to approximate integrals, both definite and indefinite, using orthogonal polynomials.
+6. [Integration](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Integration.ipynb): we discuss ways to approximate integrals, both definite and indefinite, using orthogonal polynomials and interpolation.
 7. [Differential Equations](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/DifferentialEquations.ipynb): we discuss the numerical solution of differential equations, 
 including both time-dependent ordinary differential equations, boundary value problems, and  partial differential equations.
 

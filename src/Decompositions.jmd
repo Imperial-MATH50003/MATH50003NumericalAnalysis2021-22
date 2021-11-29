@@ -1,0 +1,53 @@
+# Decompositions
+
+
+
+
+In this lecture, we look at several factorizations of a matrix:
+
+$$ A = LU$$
+
+where $L$ is lower triangular and $U$ is upper triangular,
+
+$$ A = PLU$$
+
+where $P$ is a permutation matrix, $L$ is lower triangular and $U$ is upper triangular, and
+
+$$ A = QR$$
+
+where $Q$ is an orthogonal matrix and $R$ is upper triangular.
+
+The importance of these decomposition is that their component pieces are easy to invert on a computer:  
+
+$$ A = LU \Rightarrow A^{-1} = U^{-1} L^{-1}$$
+$$ A = PLU \Rightarrow A^{-1} = U^{-1} L^{-1} P^\top$$
+$$ A = QR \Rightarrow A^{-1} = R^{-1} Q^\top$$
+
+and we saw last lecture that triangular matrices are easy to invert.
+
+First we run some setup code:
+
+## QR Decomposition
+
+A QR decomposition decomposes a matrix into an orthogonal matrix $Q$ times an upper triangular matrix $R$.  Again, if $A=QR$ then $A^{-1} = R^{-1} Q^\top$ is computable on a computer.
+
+We can obtain the QR decompostion by calling `qr`:
+
+
+
+## PLU Decomposition
+
+PLU always exists, and is much better accuracy wise.  The matrix $P$ is given by a single vector.  For example, if the permutation is given in Cauchy's notation as
+
+$$\begin{pmatrix}
+   1 & 2 & \cdots & n\cr
+   \sigma_1 & \sigma_2 & \cdots & \sigma_n
+\end{pmatrix}$$
+
+then Julia returns a vector `p` containing $[\sigma_1,\sigma_2,\ldots,\sigma_n]$. 
+
+We can convert this to a permutation matrix via
+
+$$P = [\mathbf e_{\sigma_1}| \cdots | \mathbf e_{\sigma_n}].$$
+
+In Julia, this can be done by creating a zero matrix `P`, and putting a 1 in the `P`$[\sigma_k,k]$ entry:

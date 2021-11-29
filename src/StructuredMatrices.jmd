@@ -1,21 +1,29 @@
 # Numerical Linear Algebra
 
-## Norms
+1. Norms: 
+
+## 1. Norms
 
 
 We now consider the different norms discussed in lecture:
 
-$$||\mathbf{v}||_1 = \sum_{k=1}^n |v_k|$$
-$$||\mathbf{v}||_2 = \sqrt{\sum_{k=1}^n v_k^2}$$
-$$||\mathbf{v}||_\infty = \max |{v_k}|$$
+$$
+\begin{align*}
+||\mathbf{v}||_1 &= \sum_{k=1}^n |v_k| \\
+$$||\mathbf{v}||_2 &= \sqrt{\sum_{k=1}^n v_k^2} \\
+$$||\mathbf{v}||_\infty &= \max |{v_k}|
+\end{align*}
+$$
 
- We can use the inbuilt `norm` function to calculate norms:
+ In Julia can use the inbuilt `norm` function to calculate norms:
  ```julia
- norm([1,2,3]) == norm([1,2,3],2) == sqrt(1^2+2^2+3^2)
+ norm([1,-2,3]) == norm([1,-2,3],2) == sqrt(1^2+2^2+3^2);
+ norm([1,-2,3],1) == sqrt(1 + 2 +3)
  ```
 
 
-## Permutation matrices
+
+## 2. Permutation matrices
 
 Permutation matrices are matrices that represent the action of permuting the entries of a vector.  
 As a very simple example, the following permutes the first and second entry:
@@ -76,7 +84,7 @@ $$\begin{pmatrix}
 
 for all permutation matrices.
 
-## Orthogonal matrices
+## 3. Orthogonal matrices
 
 **Definition (orthogonal matrix)** A matrix is _orthogonal_ if its inverse is its transpose:
 
