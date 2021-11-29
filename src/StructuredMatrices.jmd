@@ -1,25 +1,6 @@
-# Numerical Linear Algebra
-
-1. Norms: 
-
-## 1. Norms
+# Structured Matrices
 
 
-We now consider the different norms discussed in lecture:
-
-$$
-\begin{align*}
-||\mathbf{v}||_1 &= \sum_{k=1}^n |v_k| \\
-$$||\mathbf{v}||_2 &= \sqrt{\sum_{k=1}^n v_k^2} \\
-$$||\mathbf{v}||_\infty &= \max |{v_k}|
-\end{align*}
-$$
-
- In Julia can use the inbuilt `norm` function to calculate norms:
- ```julia
- norm([1,-2,3]) == norm([1,-2,3],2) == sqrt(1^2+2^2+3^2);
- norm([1,-2,3],1) == sqrt(1 + 2 +3)
- ```
 
 
 
