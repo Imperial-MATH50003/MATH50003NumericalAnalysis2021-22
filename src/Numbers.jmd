@@ -361,7 +361,7 @@ This is treated as identical to `0.0` (except for degenerate operations as expla
 When dealing with normal numbers there are some important constants that we will use
 to bound errors.
 
-**Definition (machine epsilon)** _Machine epsilon_ is denoted
+**Definition (machine epsilon/smallest positive normal number/largest normal number)** _Machine epsilon_ is denoted
 $$
 \epsilon_{{\rm m},P} := 2^{-P}.
 $$
@@ -614,18 +614,27 @@ NaN != NaN   #  true
 
 Other special functions like `cos`, `sin`, `exp`, etc. are _not_ part of the IEEE standard.
 Instead, they are implemented by composing the basic arithmetic operations, which accumulate
-errors. Fortunately they are  designed to have relative accuracy, that is, `s = sin(x)` 
+errors. Fortunately many are  designed to have _relative accuracy_, that is, `s = sin(x)` 
 (that is, the Julia implementation of $\sin x$) satisfies
 $$
 {\tt s} = (\sin x) ( 1 + \delta)
 $$
-where $|\delta| < c\epsilon_{\rm m}$ for a reasonably small $c > 0$.
+where $|\delta| < c\epsilon_{\rm m}$ for a reasonably small $c > 0$,
+_provided_ that $x \in {\rm F}^{\rm normal}$.
 Note these special functions are written in (advanced) Julia code, for example, 
 [sin](https://github.com/JuliaLang/julia/blob/d08b05df6f01cf4ec6e4c28ad94cedda76cc62e8/base/special/trig.jl#L76).
 
 
-**WARNING (sin with large floats)** This is an extremely misleading statement for large `x`. Consider
-the following demonstration of the statement:
+**WARNING (sin(fl(x)) is not always close to sin(x))** This is possibly a misleading statement
+when one thinks of $x$ as a real number. Consider $x = \pi$ so that $\sin x = 0$.
+However, as ${\rm fl}(\pi) \neq \pi$. Thus we only have relative accuracy compared
+to the floating point approximation:
+```julia
+π₆₄ = Float64(π)
+πᵦ = big(π₆₄) # Convert 64-bit approximation of π to higher precision. Note its the same number.
+abs(sin(π₆₄)), abs(sin(π₆₄) - sin(πᵦ)) # only has relative accuracy compared to sin(πᵦ), not sin(π)
+```
+Another issue is when $x$ is very large:
 ```julia
 ε = eps() # machine epsilon, 2^(-52)
 x = 2*10.0^100
@@ -639,9 +648,36 @@ sin(x), sin(x̃)
 ```
 This is because we commit an error on the order of roughly
 $$
-2 * 10^100 * \epsilon_{\rm m} \approx 4.44 * 10^(84)
+2 * 10^{100} * \epsilon_{\rm m} \approx 4.44 * 10^{84}
 $$
 when we round $2*10^{100}$ to the nearest float. 
+
+
+**Example (polynomial near root)** 
+For general functions we do not generally have relative accuracy. 
+For example, consider a simple
+polynomial $1 + 4x + x^2$ which has a root at $\sqrt 3 - 2$. But
+```julia
+f = x -> 1 + 4x + x^2
+x = sqrt(3) - 2
+abserr = abs(f(big(x)) - f(x))
+relerr = abserr/abs(f(x))
+abserr, relerr # very large relative error
+```
+We can see this in the error bound (note that $4x$ is exact for floating point numbers
+and adding $1$ is exact for this particular $x$):
+$$
+(x \otimes x \oplus 4x) + 1 = (x^2 (1 + \delta_1) + 4x)(1+\delta_2) + 1 = x^2 + 4x + 1 + \delta_1 x^2 + 4x \delta_2 + x^2 \delta_1 \delta_2
+$$
+Using a simple bound $|x| < 1$ we get a (pessimistic) bound on the absolute error of
+$3 ϵ_{\rm m}$. Here `f(x)` itself is less than $2 ϵ_{\rm m}$ so this does not imply
+relative accuracy. (Of course, a bad upper bound is not the same as a proof of inaccuracy,
+but here we observe the inaccuracy in practice.)
+
+
+
+
+
 
 ## 5. High-precision floating-point numbers (advanced)
 

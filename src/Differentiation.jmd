@@ -117,7 +117,7 @@ it depends on the precise bits of $h$.
 **Theorem (bound on finite-difference with floating-point)** Suppose $f : \mathbb R \rightarrow \mathbb R$ is differentiable.
 Assume for $x \in F^{\rm normal}$ that
 $$
-f^{\rm FP}(x) = f(x)(1 + \delta_f).
+f^{\rm FP}(x) = f(x) + \delta_f).
 $$
 where $|\delta_f| \leq c ϵ_m$. Provided $x \oplus h \in F^{\rm normal}$,
 $$
