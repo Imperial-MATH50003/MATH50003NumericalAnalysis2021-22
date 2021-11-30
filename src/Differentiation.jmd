@@ -1,15 +1,21 @@
 # Differentiation
 
 We now get to our first computational problem: given a function, how can we approximate its derivative at a
-point?
-We consider three possible scenarios:
+point? Before we begin, we must be clear what a "function" is. Consider three possible scenarios:
 
-1. The function is a "black-box": we can only evaluate it on, say, `Float64` inputs. This is the situation
-if we have a function that relies on C code.
-2. The function is a piece of code, and we can evaluate it on arbitrary types, including
-ones we create. This is the case if we have a function defined in Julia that does not call any
-C libraries.
-3. The function is built by composing different basic "kernels" with known differentiability properties.
+1. _Black-box function_: Consider a function $f^{\rm FP} : F_{p} \rightarrow F_{p}$
+(that is, we are given a double precision function that takes in a `Float64` and returns another `Float64`)
+which we only know _pointwise_. This is the situation if we have a function that relies on a compiled C library.
+Since $F_{64}$ is a discrete set such an $f^{\rm FP}$ cannot be differentiable in a rigorous way,
+therefore we need to assume that $f^{\rm FP}$ approximates a differentiable function $f$ with controlled
+error in order to state anything precise.
+2. _Generic function_: Consider a function that is a piece of code that we can evaluate it on arbitrary types, including
+custom types that we create. This is the case if we have a function defined in Julia that does not call any
+C libraries. For analysis we typically consider both a differentiable function $f : {\mathbb R} \rightarrow {\mathbb R}$,
+which would be what one would have if we could evaluate a function exactly using real arithmetic, and 
+$f^{\rm FP} : F_{p} \rightarrow F_{p}$, which is what we actually compute when evaluating the function using 
+floating point arithmetic.
+3. _Graph function_: The function is built by composing different basic "kernels" with known differentiability properties.
 We won't consider this situation in this module, though it is the model used by Python machine learning toolbox's
 like [PyTorch](https://pytorch.org) and [TensorFlow](http://tensorflow.org).
 
@@ -20,7 +26,8 @@ We discuss the following techniques:
 computes its derivative. This unsafe_store! _dual numbers_, which is analoguous to complex numbers.
 3. Adjoints and reverse-mode automatic differentiation: this is similar to applying the "chain rule" by building up
 a tape of operations. It's outside the scope of this module but is important for machine learning.
-4. Interpolation and differentiation: this will be discussed later in the module.
+4. Interpolation and differentiation: we can also differentiate functions _globally_, that is, in an interval instead of
+only a single point, which will be discussed later in the module.
 
 
 ## 1. Finite-differences
@@ -43,7 +50,7 @@ If we know a bound on $f''(x)$ then Taylor's theorem tells us a precise bound:
 **Proposition**
 The error in approximating the derivative using finite differences is
 $$
-\left|f'(x) - {f(x+h) - f(x) \over h}\right| \leq {\sup_{x \leq t \leq x+h} f''(t) \over 2 h}
+\left|f'(x) - {f(x+h) - f(x) \over h}\right| \leq {\sup_{x \leq t \leq x+h} |f''(t)| \over 2 h}
 $$
 
 **Proof**
@@ -56,8 +63,7 @@ for some $x < \chi < x+h$.
 ◼️
 
 
-Note this is assuming _real arithmetic_, the answer is drastically
-different with _floating point arithmetic_.
+
 
 There are also alternative versions of finite differences. Leftside finite-differences:
 $$
@@ -67,13 +73,19 @@ and central differences:
 $$
 f'(x) ≈ {f(x + h/2) - f(x - h/2) \over h}
 $$
+Composing these approximations is useful for higher-order derivatives as we 
+discuss in the problem sheet.
 
 
 
 ### Does finite-differences work with floating point arithmetic?
 
+Note this is assuming _real arithmetic_, the answer is drastically
+different with _floating point arithmetic_.
 
-Let's try differentiating two simple polynomials $f(x) = x + x^2$ and $g(x) = 1 + x + x^2$:
+Let's try differentiating two simple polynomials $f(x) = x + x^2$ and $g(x) = 1 + x + x^2$
+by applying the finite-difference approximation to their floating point implementations
+$f^{\rm FP}$ and $g^{\rm FP}$:
 ```julia
 f = x -> x + x^2     # we treat f and g as black-boxs
 g = x -> 1 + x + x^2
@@ -89,30 +101,50 @@ plot(abs.((f.(h) .- f(0)) ./ h .- 1); yscale=:log10, title="convergence of deriv
 plot!(abs.((g.(h) .- g(0)) ./ h .- 1); yscale=:log10, label = "g")
 ```
 In the case of $f$ it is a success: we approximate the true derivative to roughly machine precision,
-which is the best one can really hope for given round-off error (i.e., as the algebraic manipulation gets
-the last bit wrong) by letting $h$ be sufficiently small.
+which is the best one can really hope for given round-off error (as the algebraic manipulation gets
+the last bit will be wrong) by letting $h$ be sufficiently small.
 But for $g$ it is a huge failure: the approximation starts to converge, but then diverges exponentially fast!
 
 We can bound the error using the bounds on floating point arithmetic. For simplicity we ignore the
 $x^2$ term: when $h$ is small, $h^2$ gets lost in the rounding. Then we have
 $$
-\left|((1 \oplus h) \ominus h) - 1 \odiv h -1\right| \leq ((1+h)*(1+\epsilon_{\rm machine}) - 1)*(1+\epsilon_{\rm machine}) = h + h \epsilon_{\rm machine} + O(h^2)
+\left|((1 \oplus h) \ominus h) - 1 \oslash h -1\right| \leq ((1+h)*(1+\epsilon_{\rm machine}) - 1)*(1+\epsilon_{\rm machine}) = h + h \epsilon_{\rm machine} + O(h^2)
 $$
 Thus we see that the bound grows like $\epsilon_{\rm machine}/h$. However, a bad upper bound is not the same
 as a proof that something grows, and establishing a lower bound on the error is more challenging. In fact,
 it depends on the precise bits of $h$. 
 
-**Theorem** Suppose $f : \mathbb R \rightarrow \mathbb R$ and $f^{\rm fp}$ is its implementation in floating
-point arithmetic. Assume for $x \in F^{\rm normal}$ that
+**Theorem (bound on finite-difference with floating-point)** Suppose $f : \mathbb R \rightarrow \mathbb R$ is differentiable.
+Assume for $x \in F^{\rm normal}$ that
 $$
-|f^{\rm fp}(x) - f(x)| \leq |f(x)| (1 + c \epsilon_{\rm m}).
+f^{\rm FP}(x) = f(x)(1 + \delta_f).
 $$
-Then 
+where $|\delta_f| \leq c ϵ_m$. Provided $x \oplus h \in F^{\rm normal}$,
 $$
-\left|f'(x) - {(f^{\rm fp}(x+h) \ominus f^{\rm fp}(x)) \oslash h} \right| \leq |f'(x)|
+{(f^{\rm FP}(x\oplus h) \ominus f^{\rm FP}(x)) \oslash h}= f'(x) + \delta_{f'}
+$$
+where 
+$$
+|\delta_{f'}| \leq 
 $$
 
-Note a bad upper bound is not the same as a proof that an approximation is bad. And indeed, for our example
+**Proof**
+Note for a differentiable function we can write
+$$
+f(x + h) = f(x) + f'(\xi) h = f(x) (1 + f'(\xi) / f(x) h)
+$$
+We have
+$$
+{(f^{\rm FP}(x\oplus h)} = f^{\rm FP}((x + h)(1 + \delta_1)) = f((x + h)(1+\delta_1))(1 + \delta_2) = [f(x+h) + f'(\xi_1) \delta_1 (x + h)] (1 + \delta_2) 
+= f(x+h) (1 + \delta_3)
+$$
+where 
+
+∎
+
+What this shows is that the best upper-bound is achieved at $h ≈ \sqrt{ϵ_{\rm m}}$. For $h$ smaller
+round-off error _may_ dominate, as we observed in practice.
+But a bad upper bound is not the same as a proof that an approximation is bad. And indeed, for our example
 taking a step-size of $h = 2^q$ delivers much better results, and in fact gets the _exact_ answer for sufficiently
 small `h`, down to the last bit!
 ```julia
@@ -149,11 +181,11 @@ $$
 
 Complex numbers can be thought of as $2 \times 2$ matrices, that is, $a + b {\rm i}$ is equivalent to
 $$
-a \underbrace_{\rm representation of 1}{I} + b \underbrace_{\rm representation of n$}{\begin{pmatrix}0 &1 \\-1 & 0\end{pmatrix}} = \begin{pmatrix}a & b \\ -b & a \end{pmatrix}
+a \underbrace{\begin{pmatrix}1 \\ & 1 \end{pmatrix}}_{\hbox{representation of 1}} + b \underbrace{\begin{pmatrix}0 &1 \\-1 & 0\end{pmatrix}}_{\hbox{representation of $\rm i$}} = \begin{pmatrix}a & b \\ -b & a \end{pmatrix}
 $$
 Similarly, for dual numbers we have
 $$
-a \underbrace_{\rm representation of 1}{I} + b \underbrace_{\rm representation of \epsilon}{\begin{pmatrix}0 &1 \\0 & 0\end{pmatrix}} = \begin{pmatrix}a & b \\ 0 & a \end{pmatrix}
+a \underbrace{\begin{pmatrix}1 \\ & 1 \end{pmatrix}}_{\hbox{representation of 1}} + b \underbrace{\begin{pmatrix}0 &1 \\0 & 0\end{pmatrix}}_{\hbox{representation of $\epsilon$}} = \begin{pmatrix}a & b \\ 0 & a \end{pmatrix}
 $$
 That is, the representation of $\epsilon$ is a simple 2 × 2 nilpotent matrix.
 
@@ -161,7 +193,7 @@ That is, the representation of $\epsilon$ is a simple 2 × 2 nilpotent matrix.
 
 Applying a polynomial to a dual number $a + b \epsilon$ tells us the derivative at $a$:
 
-**Lemma** Suppose $p$ is a polynomial. Then
+**Lemma (polynomials and dual numbers)** Suppose $p$ is a polynomial. Then
 $$
 p(a + b \epsilon) = p(a) + b p'(a) \epsilon
 $$
@@ -188,8 +220,8 @@ is differentiable at $a$, and extended to ${\mathbb D}$ as above. Then $q(x) := 
 $r(x) := f(x) g(x)$ satisfy:
 $$
 \begin{align*}
-h(a+b \epsilon) &= h(a) + b h'(b) \epsion \\
-r(a+b \epsilon) &= r(a) + b r'(b) \epsion
+h(a+b \epsilon) &= h(a) + b h'(b) \epsilon \\
+r(a+b \epsilon) &= r(a) + b r'(b) \epsilon
 \end{align*}
 $$
 
@@ -210,8 +242,77 @@ of functions that are extended to dual numbers will be differentiable via dual n
 
 ### Implementation in Julia
 
-We now consider a simple implementation of dual numbers
+We now consider a simple implementation of dual numbers that works on polynomials:
 
+```julia
+struct Dual{T}
+    a::T
+    b::T
+end
+
+Dual(a::Real) = Dual(a, zero(a)) # for real numbers we use a + 0ϵ
+
+import Base: +, *, -, /, ^, zero
+
+# support polynomials like 1 + x, x - 1, 2x or x*2 by reducing to Dual
++(x::Real, y::Dual) = Dual(x) + y
++(x::Dual, y::Real) = x + Dual(y)
+-(x::Real, y::Dual) = Dual(x) - y
+-(x::Dual, y::Real) = x - Dual(y)
+*(x::Real, y::Dual) = Dual(x) * y
+*(x::Dual, y::Real) = x * Dual(y)
+
+# support x/2 (but not yet division of duals
+/(x::Dual, k::Real) = Dual(x.a/k, x.b/k)
+# a simple recursive function to support x^2, etc.
+function ^(x::Dual, k::Integer)
+    if k < 0
+        error("Not implemented")
+    elseif k == 1
+        x
+    else
+        x^(k-1) * x
+    end
+end
+
+-(x::Dual) = Dual(-x.a, -x.b)
++(x::Dual, y::Dual) = Dual(x.a + y.a, x.b + y.b)
+-(x::Dual, y::Dual) = Dual(x.a - y.a, x.b - y.b)
+*(x::Dual, y::Dual) = Dual(x.a*y.a, x.a*y.b + x.b*y.a)
+```
+We can now try it on an arbitrary polynomial:
+```julia
+f = x -> 1 + 1.3x + 2.1x^2 + 3.1x^3
+f(Dual(0.5,1.0)).b - 5.725
+```
+It's exact up apart from small rounding errors.
+
+Now consider the polynomial $1 + … + x^n$. How does the error grow with $n$ evaluating
+the derivative at $x = 0.5$ and $x = 1$?
+```julia
+function g(n, x)
+    ret = 1 + x # first two terms
+    for k = 2:n
+        ret += x^k
+    end
+    ret
+end
+
+# "exact" derivative of g
+function g′(n, x)
+    ret = 1 + 2x # first two terms
+    for k = 3:n
+        ret += k*x^(k-1)
+    end
+    ret
+end
+
+g′(10, 0.1) - g(10, Dual(0.1,1.0)).b
+```
+It's exact!
 
 What makes dual numbers so effective is that, unlike finite differences, they are not
 prone to disasterous growth due to round-off errors. 
+
+
+In the problem sheet we will explore implementation of other functions like `/` and `exp`.
