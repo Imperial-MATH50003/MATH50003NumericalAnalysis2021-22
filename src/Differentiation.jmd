@@ -114,37 +114,32 @@ Thus we see that the bound grows like $\epsilon_{\rm machine}/h$. However, a bad
 as a proof that something grows, and establishing a lower bound on the error is more challenging. In fact,
 it depends on the precise bits of $h$. 
 
-**Theorem (bound on finite-difference with floating-point)** Suppose $f : \mathbb R \rightarrow \mathbb R$ is differentiable.
-Assume for $x \in F^{\rm normal}$ that
-$$
-f^{\rm FP}(x) = f(x) + \delta_f).
-$$
-where $|\delta_f| \leq c ϵ_m$. Provided $x \oplus h \in F^{\rm normal}$,
-$$
-{(f^{\rm FP}(x\oplus h) \ominus f^{\rm FP}(x)) \oslash h}= f'(x) + \delta_{f'}
-$$
-where 
-$$
-|\delta_{f'}| \leq 
-$$
+Nevertheless, we can use this bound to obtain a _heuristic_ on how to choose $h$:
 
-**Proof**
-Note for a differentiable function we can write
+**Heuristic (finite-difference with floating-point step)** Choose $h$ proportional to $\sqrt{\epsilon_{\rm m}}$
+in finite-differences.
+
+**Sketch of argument**
+Consider $x = 0$ assume $f(x) = f^{\rm FP}(0) = 0$ for simplicity, and suppose we have relative accuracy
 $$
-f(x + h) = f(x) + f'(\xi) h = f(x) (1 + f'(\xi) / f(x) h)
+f^{\rm FP}(x) = f(x) + \delta
 $$
-We have
+where $|\delta| < c ϵ_{\rm m}$. Note that
 $$
-{(f^{\rm FP}(x\oplus h)} = f^{\rm FP}((x + h)(1 + \delta_1)) = f((x + h)(1+\delta_1))(1 + \delta_2) = [f(x+h) + f'(\xi_1) \delta_1 (x + h)] (1 + \delta_2) 
-= f(x+h) (1 + \delta_3)
+\begin{align*}
+{f^{\rm FP}(h) \over h} &= {f(h) \over h} + {\delta \over h} = f'(0) + {h f''(0) \over 2} + {\delta \over h}  + O(h^2)
+\end{align*}
 $$
-where 
+Choosing $h$ proportional to $\sqrt{ϵ_{\rm m}}$ tells us the error is proportional to $\sqrt{\epsilon_{\rm m}}$.
 
 ∎
 
-What this shows is that the best upper-bound is achieved at $h ≈ \sqrt{ϵ_{\rm m}}$. For $h$ smaller
-round-off error _may_ dominate, as we observed in practice.
-But a bad upper bound is not the same as a proof that an approximation is bad. And indeed, for our example
+In the case of double precision $\sqrt{ϵ_{\rm m}} ≈ 1.5\times 10^{-8}$, which is close to when the error begins to increase.
+
+
+**Example (some functions do better than heuristic)** 
+This heuristic is based on balancing terms in an upper bound, but a bad upper bound is not the same as a proof that an approximation is bad. 
+And indeed, for our example
 taking a step-size of $h = 2^q$ delivers much better results, and in fact gets the _exact_ answer for sufficiently
 small `h`, down to the last bit!
 ```julia
@@ -175,6 +170,8 @@ $$
 (a + b \epsilon) (c + d \epsilon) &= ac + (bc + ad) \epsilon + bd \epsilon^2 = ac  + (bc + ad) \epsilon 
 \end{align*}
 $$
+And just as we view ${\mathbb R} \subset {\mathbb C}$ by equating $a \in {\mathbb R}$ with $a + 0{\rm i} \in {\mathbb C}$,
+we can view ${\mathbb R} \subset {\mathbb D}$ by equating $a \in {\mathbb R}$ with $a + 0{\rm \epsilon} \in {\mathbb D}$.
 
 
 ### Matrix representations
@@ -208,27 +205,32 @@ $$
 
 ∎
 
-We can extend this to other differential functions by definition, that is, if $f$ is differentiable at $a$ we define
+We can extend real-valued differentiable functions to dual numbers in a similar manner.
+
+**Definition (compatible extension)** Suppose a real-valued function $f$
+is differentiable at $a$. If
 $$
-f(a + b \epsilon) := f(a) + b f'(a) \epsilon
+f(a + b \epsilon) = f(a) + b f'(a) \epsilon
 $$
+then we say that is a _compatible extension at $a$_.
+
 Note this definition immediately implies the product and chain rule:
 
 **Lemma (product and chain rule)**
-Suppose $f$ is differentiable at $g(a)$ and $g$
-is differentiable at $a$, and extended to ${\mathbb D}$ as above. Then $q(x) := f(g(x))$ and 
-$r(x) := f(x) g(x)$ satisfy:
+Suppose $f$ is a compatible extension at $g(a)$ and $g$
+is a compatible extension at $a$. Then $q(x) := f(g(x))$ and 
+$r(x) := f(x) g(x)$ are compatible extensions at $a$, that is:
 $$
 \begin{align*}
-h(a+b \epsilon) &= h(a) + b h'(b) \epsilon \\
+q(a+b \epsilon) &= q(a) + b q'(b) \epsilon \\
 r(a+b \epsilon) &= r(a) + b r'(b) \epsilon
 \end{align*}
 $$
 
 **Proof**
-For $h$ it follows immediately:
+For $q$ it follows immediately:
 $$
-h(a + b \epsilon) = f(g(a + b \epsilon)) = f(g(a) + b g'(a) \epsilon) = f(g(a)) + b g'(a) f'(g(a))\epsilon = h(a) + b h'(a) \epsilon
+q(a + b \epsilon) = f(g(a + b \epsilon)) = f(g(a) + b g'(a) \epsilon) = f(g(a)) + b g'(a) f'(g(a))\epsilon = q(a) + b q'(a) \epsilon
 $$
 For $r$ we have
 $$
@@ -238,7 +240,7 @@ $$
 ∎
 
 A simple corollary is that any function defined in terms of addition, multiplication, composition, etc.
-of functions that are extended to dual numbers will be differentiable via dual numbers.
+of functions that are compatible with differentiation will be differentiable via dual numbers.
 
 ### Implementation in Julia
 

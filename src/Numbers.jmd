@@ -610,7 +610,7 @@ NaN != NaN   #  true
 ```
 
 
-### Special functions
+### Special functions (advanced)
 
 Other special functions like `cos`, `sin`, `exp`, etc. are _not_ part of the IEEE standard.
 Instead, they are implemented by composing the basic arithmetic operations, which accumulate
