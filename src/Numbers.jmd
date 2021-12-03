@@ -250,29 +250,29 @@ Floating-point numbers are a subset of real numbers that are representable using
 a fixed number of bits.
 
 **Definition (floating-point numbers)**
-Given integers $S$ (the "exponential shift") $Q$ (the number of exponent bits) and 
-$P$ (the precision), define the set of
+Given integers $σ$ (the "exponential shift") $Q$ (the number of exponent bits) and 
+$S$ (the precision), define the set of
 _Floating-point numbers_ by dividing into _normal_, _sub-normal_, and _special number_ subsets:
 $$
-F_{S,Q,P} := F^{\rm normal}_{S,Q,P} \cup F^{\rm sub}_{S,Q,P} \cup F^{\rm special}.
+F_{σ,Q,S} := F^{\rm normal}_{σ,Q,S} \cup F^{\rm sub}_{σ,Q,S} \cup F^{\rm special}.
 $$
 The _normal numbers_
-$F^{\rm normal}_{S,Q,P} \subset {\mathbb R}$ are defined by
+$F^{\rm normal}_{σ,Q,S} \subset {\mathbb R}$ are defined by
 $$
-F^{\rm normal}_{S,Q,P} = \{\pm 2^{q-S} \times (1.b_1b_2b_3\ldots b_P)_2 : 1 \leq q < 2^Q-1 \}.
+F^{\rm normal}_{σ,Q,S} = \{\pm 2^{q-σ} \times (1.b_1b_2b_3\ldots b_S)_2 : 1 \leq q < 2^Q-1 \}.
 $$
-The _sub-normal numbers_ $F^{\rm sub}_{S,Q,P} \subset {\mathbb R}$ are defined as
+The _sub-normal numbers_ $F^{\rm sub}_{σ,Q,S} \subset {\mathbb R}$ are defined as
 $$
-F^{\rm sub}_{S,Q,P} = \{\pm 2^{1-S} \times (0.b_1b_2b_3\ldots b_P)_2\}.
+F^{\rm sub}_{σ,Q,S} = \{\pm 2^{1-σ} \times (0.b_1b_2b_3\ldots b_S)_2\}.
 $$
 The _special numbers_ $F^{\rm special} \not\subset {\mathbb R}$ are defined later.
 
 Note this set of real numbers has no nice algebraic structure: it is not closed under addition, subtraction, etc.
 We will therefore need to define approximate versions of algebraic operations later.
 
-Floating-point numbers are stored in $1 + Q + P$ total number of bits, in the format
+Floating-point numbers are stored in $1 + Q + S$ total number of bits, in the format
 $$
-sq_{Q-1}\ldots q_0 b_1 \ldots b_P
+sq_{Q-1}\ldots q_0 b_1 \ldots b_S
 $$
 The first bit ($s$) is the <span style="color:red">sign bit</span>: 0 means positive and 1 means
 negative. The bits $q_{Q-1}\ldots q_0$ are the <span style="color:green">exponent bits</span>:
@@ -280,14 +280,14 @@ they are the binary digits of the unsigned integer $q$:
 $$
 q = (q_{Q-1}\ldots q_0)_2.
 $$
-Finally, the bits $b_1\ldots b_P$ are the <span style="color:blue">significand bits</span>.
+Finally, the bits $b_1\ldots b_S$ are the <span style="color:blue">significand bits</span>.
 If $1 \leq q < 2^Q-1$ then the bits represent the normal number
 $$
-x = \pm 2^{q-S} \times (1.b_1b_2b_3\ldots b_P)_2.
+x = \pm 2^{q-σ} \times (1.b_1b_2b_3\ldots b_S)_2.
 $$
 If $q = 0$ (i.e. all bits are 0) then the bits represent the sub-normal number
 $$
-x = \pm 2^{1-S} \times (0.b_1b_2b_3\ldots b_P)_2.
+x = \pm 2^{1-σ} \times (0.b_1b_2b_3\ldots b_S)_2.
 $$
 If $q = 2^Q-1$  (i.e. all bits are 1) then the bits represent a special number, discussed
 later.
@@ -363,26 +363,26 @@ to bound errors.
 
 **Definition (machine epsilon/smallest positive normal number/largest normal number)** _Machine epsilon_ is denoted
 $$
-\epsilon_{{\rm m},P} := 2^{-P}.
+ϵ_{{\rm m},S} := 2^{-S}.
 $$
-When $P$ is implied by context we use the notation $\epsilon_{\rm m}$.
+When $S$ is implied by context we use the notation $ϵ_{\rm m}$.
 The _smallest positive normal number_ is $q = 1$ and $b_k$ all zero:
 $$
-\min |F_{S,P,Q}^{\rm normal}| = 2^{1-S}
+\min |F_{σ,Q,S}^{\rm normal}| = 2^{1-σ}
 $$ 
 where $|A| := $\{|x| : x \in A \}$.
 The _largest (positive) normal number_ is 
 $$
-\max F_{S,P,Q}^{\rm normal} = 2^{2^Q-2-S} (1.11\ldots1)_2 = 2^{2^Q-2-S} (2-\epsilon_{\rm m})
+\max F_{σ,Q,S}^{\rm normal} = 2^{2^Q-2-σ} (1.11\ldots1)_2 = 2^{2^Q-2-σ} (2-ϵ_{\rm m})
 $$
 
 
 We confirm the simple bit representations:
 ```julia
-S,P,Q = 127,23,8 # Float32
-εₘ = 2.0^(-P)
-printlnbits(Float32(2.0^(1-S))) # smallest positive Float32
-printlnbits(Float32(2.0^(2^Q-2-S) * (2-εₘ))) # largest Float32
+σ,Q,S = 127,23,8 # Float32
+εₘ = 2.0^(-S)
+printlnbits(Float32(2.0^(1-σ))) # smallest positive Float32
+printlnbits(Float32(2.0^(2^Q-2-σ) * (2-εₘ))) # largest Float32
 ```
 For a given floating-point type, we can find these constants using the following functions:
 ```julia
@@ -444,14 +444,14 @@ Arithmetic operations on floating-point numbers are  _exact up to rounding_.
 There are three basic rounding strategies: round up/down/nearest.
 Mathematically we introduce a function to capture the notion of rounding:
 
-**Definition (rounding)** ${\rm fl}^{\rm up}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
+**Definition (rounding)** ${\rm fl}^{\rm up}_{σ,Q,S} : \mathbb R \rightarrow F_{σ,Q,S}$ denotes 
 the function that rounds a real number up to the nearest floating-point number that is greater or equal.
-${\rm fl}^{\rm down}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
+${\rm fl}^{\rm down}_{σ,Q,S} : \mathbb R \rightarrow F_{σ,Q,S}$ denotes 
 the function that rounds a real number down to the nearest floating-point number that is greater or equal.
-${\rm fl}^{\rm nearest}_{S,Q,P} : \mathbb R \rightarrow F_{S,Q,P}$ denotes 
+${\rm fl}^{\rm nearest}_{σ,Q,S} : \mathbb R \rightarrow F_{σ,Q,S}$ denotes 
 the function that rounds a real number to the nearest floating-point number. In case of a tie,
 it returns the floating-point number whose least significant bit is equal to zero.
-We use the notation ${\rm fl}$ when $S,Q,P$ and the rounding mode are implied by context,
+We use the notation ${\rm fl}$ when $σ,Q,S$ and the rounding mode are implied by context,
 with ${\rm fl}^{\rm nearest}$ being the default rounding mode.
 
 
@@ -529,27 +529,31 @@ Here is a surprising example of non-associativity:
 Can you explain this in terms of bits?
 
 
+### Bounds on floating point arithmetic
+
 We can bound basic arithmetic operations in terms of machine epsilon, provided
 a real number is close to a normal number:
 
-**Definition (normalised range)** The _normalised range_ ${\cal N}_{S,Q,P} \subset {\mathbb R}$
+**Definition (normalised range)** The _normalised range_ ${\cal N}_{σ,Q,S} \subset {\mathbb R}$
 is the subset of real numbers that lies
 between the smallest and largest normal floating-point number:
 $$
-{\cal N}_{S,Q,P} := \{x : \min |F_{S,Q,P}| \leq |x| \leq \max F_{S,Q,P} \}
+{\cal N}_{σ,Q,S} := \{x : \min |F_{σ,Q,S}| \leq |x| \leq \max F_{σ,Q,S} \}
 $$
-When $S,Q,P$ are implied by context we use the notation ${\cal N}$.
+When $σ,Q,S$ are implied by context we use the notation ${\cal N}$.
 
 We can use machine epsilon to determine bounds on rounding:
 
 **Proposition (rounding arithmetic)**
 If $x \in {\cal N}$ then 
 $$
-{\rm fl}(x) = x (1 + \delta_x)
+{\rm fl}^{mode}(x) = x (1 + \delta_x^{mode})
 $$
 where
 $$
-|\delta_x| \leq {\epsilon_{\rm m} \over 2}
+\begin{align*}
+|\delta_x^{\rm nearest}| &\leq {ϵ_{\rm m} \over 2} \\
+|\delta_x^{\rm up/down}| &< {ϵ_{\rm m}}.
 $$
 
 
@@ -559,28 +563,41 @@ we have
 $$
 x \oplus y = (x+y) (1 + \delta_{x+y})
 $$
-where
+where (assuming the default nearest rounding)
 $
-|\delta_{x+y}| \leq {\epsilon_{\rm m}/ 2}.
+|\delta_{x+y}| \leq {ϵ_{\rm m}/ 2}.
 $
 
-**Example** We show how to bound the error in computing
+**Example (bounding a simple computation)** We show how to bound the error in computing
 $$
 (1.1 + 1.2) + 1.3
 $$
-using floating-point arithmetic. We have
+using floating-point arithmetic. First note that `1.1` on a computer is in
+fact ${\rm fl}(1.1)$. Thus this computation becomes
 $$
-(1.1 \oplus 1.2) \oplus 1.3 = [(1.1 + 1.2)(1 + \delta_1)] \oplus 1.3 =
-((1.1 + 1.2)(1 + \delta_1) + 1.3)(1 + \delta_2) = 
-3.6 + 2.3 \delta_1 + 3.6 \delta_2 + 2.3 \delta_1 \delta_2
+({\rm fl}(1.1) \oplus {\rm fl}(1.2)) \oplus {\rm fl}(1.3)
 $$
-Thus the error is less than
+First we find
 $$
-5.9 {\epsilon_{\rm m} \over 2} +2.3 {\epsilon_{\rm m}^2 \over 4} < 5.91 {\epsilon_{\rm m} \over 2}
+({\rm fl}(1.1) \oplus {\rm fl}(1.2)) = (1.1(1 + δ_1) + 1.2 (1+δ_2))(1 + δ_3)
+ = 2.3 + 1.1 δ_1 + 1.2 δ_2 + 2.3 δ_3 + 1.1 δ_1 δ_3 + 1.2 δ_2 δ_3
+ = 2.3 + δ_4
+ $$
+where (note $δ_1 δ_3$ and $δ_2 δ_3$ are tiny so we just round up our bound to the nearest decimal)
 $$
-Indeed this bounds is fairly close:
+|δ_4| \leq 2.3 ϵ_{\rm m}
+$$
+Thus the total error is
+$$
+((2.3 + δ_4) + 1.3 (1 + δ_5)) (1 + δ_6) = 3.6 + δ_4 + 1.3 δ_5 + 3.6 δ_6 + δ_4 δ_6  + 1.3 δ_5 δ_6 = 3.6 + δ_7
+$$
+where
+$$
+|δ_7| \leq 4.8 ϵ_{\rm m}
+$$
+Indeed, this bound is bigger than the observed error:
 ```julia
-3.6 - (1.1+1.2+1.3), 5.91eps()/2
+abs(3.6 - (1.1+1.2+1.3)), 4.8eps()
 ```
 
 
@@ -619,7 +636,7 @@ errors. Fortunately many are  designed to have _relative accuracy_, that is, `s 
 $$
 {\tt s} = (\sin x) ( 1 + \delta)
 $$
-where $|\delta| < c\epsilon_{\rm m}$ for a reasonably small $c > 0$,
+where $|\delta| < cϵ_{\rm m}$ for a reasonably small $c > 0$,
 _provided_ that $x \in {\rm F}^{\rm normal}$.
 Note these special functions are written in (advanced) Julia code, for example, 
 [sin](https://github.com/JuliaLang/julia/blob/d08b05df6f01cf4ec6e4c28ad94cedda76cc62e8/base/special/trig.jl#L76).
@@ -648,7 +665,7 @@ sin(x), sin(x̃)
 ```
 This is because we commit an error on the order of roughly
 $$
-2 * 10^{100} * \epsilon_{\rm m} \approx 4.44 * 10^{84}
+2 * 10^{100} * ϵ_{\rm m} \approx 4.44 * 10^{84}
 $$
 when we round $2*10^{100}$ to the nearest float. 
 
