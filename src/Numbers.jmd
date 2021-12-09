@@ -547,13 +547,14 @@ We can use machine epsilon to determine bounds on rounding:
 **Proposition (rounding arithmetic)**
 If $x \in {\cal N}$ then 
 $$
-{\rm fl}^{mode}(x) = x (1 + \delta_x^{mode})
+{\rm fl}^{\rm mode}(x) = x (1 + \delta_x^{\rm mode})
 $$
 where
 $$
 \begin{align*}
 |\delta_x^{\rm nearest}| &\leq {ϵ_{\rm m} \over 2} \\
 |\delta_x^{\rm up/down}| &< {ϵ_{\rm m}}.
+\end{align*}
 $$
 
 
@@ -561,11 +562,11 @@ This immediately implies bounds on all IEEE arithmetic operations, e.g.,
 if $x+y \in {\cal N}$ then
 we have
 $$
-x \oplus y = (x+y) (1 + \delta_{x+y})
+x \oplus y = (x+y) (1 + \delta_1)
 $$
 where (assuming the default nearest rounding)
 $
-|\delta_{x+y}| \leq {ϵ_{\rm m}/ 2}.
+|\delta_1| \leq {ϵ_{\rm m} \over 2}.
 $
 
 **Example (bounding a simple computation)** We show how to bound the error in computing
