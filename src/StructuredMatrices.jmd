@@ -1,8 +1,73 @@
 # Structured Matrices
 
 
+## 1. Dense vectors and matrices
 
 
+## 2. Triangular matrices
+
+## Inverting an upper triangular matrix
+
+We now discuss why upper triangular matrices are easy to invert.  
+Consider a simple 3x3 example, which can be solved with `\`:
+ ```julia
+ U = [1.0 2.0 3.0;
+      0.0 3.0 4.0;
+      0.0 0.0 5.0]
+
+b = [5,6,7]
+
+x = U \ b
+ ```
+ Behind the seens, `\` is doing back substitution. Here is a custom implementation:
+ ```julia
+ function backsubstitution(U,b)
+    n = size(U,1)
+    
+    if length(b) != n
+        error("The system is not compatible")
+    end
+        
+    
+    x = zeros(n)  # the solution vector
+    for k = n:-1:1  # start with k=n, then k=n-1, ...
+        r = b[k]  # dummy variable
+        for j = k+1:n
+            r -= U[k,j]*x[j] # equivalent to r = r-U[k,j]*x[j]
+        end
+        x[k] = r/U[k,k]
+    end
+    x
+end
+backsubstitution(U,b)-U\b  # close to zero, the algorithms differ slightly
+ ```
+
+`triu` takes the upper triangular of a matrix.  We can check the accuracy of `backsubstitution` on a 10 x 10 random upper triangular matrix.
+
+```julia
+U = triu(rand(10,10))
+b = rand(10)
+
+x = U\b
+norm(backsubstitution(U,b)-x)
+```
+
+
+
+### Bidiagonal
+
+Sometimes its useful to not store zero entries of a matrix when a matrix has many zeros,
+which we refer to as _sparse_. A simple but important case is a triangular matrix where only
+two bands are nonzero, i.e.,
+```julia
+
+```
+
+
+
+**Example (finite differences)** Suppose 
+
+**Example (inverse finite differences)**
 
 ## 2. Permutation matrices
 
@@ -177,50 +242,4 @@ Given a vector $\mathbf v$ satisfying $\|\mathbf v\|=1$, the Householder reflect
 
 $$Q_{\mathbf v} \triangleq I - 2 \mathbf v \mathbf v^\top$$
 
-
-## Inverting an upper triangular matrix
-
-We now discuss why upper triangular matrices are easy to invert.  
-Consider a simple 3x3 example, which can be solved with `\`:
- ```julia
- U = [1.0 2.0 3.0;
-      0.0 3.0 4.0;
-      0.0 0.0 5.0]
-
-b = [5,6,7]
-
-x = U \ b
- ```
- Behind the seens, `\` is doing back substitution. Here is a custom implementation:
- ```julia
- function backsubstitution(U,b)
-    n = size(U,1)
-    
-    if length(b) != n
-        error("The system is not compatible")
-    end
-        
-    
-    x = zeros(n)  # the solution vector
-    for k = n:-1:1  # start with k=n, then k=n-1, ...
-        r = b[k]  # dummy variable
-        for j = k+1:n
-            r -= U[k,j]*x[j] # equivalent to r = r-U[k,j]*x[j]
-        end
-        x[k] = r/U[k,k]
-    end
-    x
-end
-backsubstitution(U,b)-U\b  # close to zero, the algorithms differ slightly
- ```
-
-`triu` takes the upper triangular of a matrix.  We can check the accuracy of `backsubstitution` on a 10 x 10 random upper triangular matrix.
-
-```julia
-U = triu(rand(10,10))
-b = rand(10)
-
-x = U\b
-norm(backsubstitution(U,b)-x)
-```
 
