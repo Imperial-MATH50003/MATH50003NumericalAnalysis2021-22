@@ -531,7 +531,13 @@ Can you explain this in terms of bits?
 
 ### Bounds on floating point arithmetic
 
-We can bound basic arithmetic operations in terms of machine epsilon, provided
+Before we dicuss bounds on errors, we need to talk about the two notions of errors:
+
+**Definition (absolute/relative error)** If $\tilde x = x + δ_{rm a} = x (1 + δ_{\rm r})$ then 
+$|δ_{\rm a}|$ is called the _absolute error_ and $|δ_{\rm r}|$ is called the 
+_relative error_ in approximating $x$ by $\tilde x$.
+
+We can bound the error of basic arithmetic operations in terms of machine epsilon, provided
 a real number is close to a normal number:
 
 **Definition (normalised range)** The _normalised range_ ${\cal N}_{σ,Q,S} \subset {\mathbb R}$
@@ -549,7 +555,7 @@ If $x \in {\cal N}$ then
 $$
 {\rm fl}^{\rm mode}(x) = x (1 + \delta_x^{\rm mode})
 $$
-where
+where the _relative error_ is
 $$
 \begin{align*}
 |\delta_x^{\rm nearest}| &\leq {ϵ_{\rm m} \over 2} \\
@@ -558,7 +564,7 @@ $$
 $$
 
 
-This immediately implies bounds on all IEEE arithmetic operations, e.g., 
+This immediately implies relative error bounds on all IEEE arithmetic operations, e.g., 
 if $x+y \in {\cal N}$ then
 we have
 $$
@@ -588,11 +594,11 @@ where (note $δ_1 δ_3$ and $δ_2 δ_3$ are tiny so we just round up our bound t
 $$
 |δ_4| \leq 2.3 ϵ_{\rm m}
 $$
-Thus the total error is
+Thus the computation becomes
 $$
 ((2.3 + δ_4) + 1.3 (1 + δ_5)) (1 + δ_6) = 3.6 + δ_4 + 1.3 δ_5 + 3.6 δ_6 + δ_4 δ_6  + 1.3 δ_5 δ_6 = 3.6 + δ_7
 $$
-where
+where the _absolute error_ is
 $$
 |δ_7| \leq 4.8 ϵ_{\rm m}
 $$
