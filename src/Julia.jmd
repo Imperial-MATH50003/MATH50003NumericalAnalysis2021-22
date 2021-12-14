@@ -31,6 +31,9 @@ Julia uses a math-like syntax for manipulating integers:
 2 * 3 # Multiplication
 ```
 ```julia
+2 / 3 # Division
+```
+```julia
 x = 5; # semicolon is optional but supresses output if used in the last line
 x^2 # Powers
 ```
@@ -60,7 +63,15 @@ This is explained in detail in Chapter [Numbers](Numbers.ipynb)
 
 There are other primitive integer types:  `UInt8`, `UInt16`, `UInt32`, and `UInt64` are unsigned integers, 
 e.g., we do not interpret
-the number as negative if the first bit is `1`. A non-primitive type is `BigInt` which allows arbitrary length
+the number as negative if the first bit is `1`. As they tend to be used to represent
+bit sequences they are displayed in hexadecimal, that is base-16, using digits 0-9a-c,
+e.g., $12 = (c)_{16}$:
+```julia
+UInt16(12)
+```
+
+
+A non-primitive type is `BigInt` which allows arbitrary length
 integers.
 
 
@@ -70,17 +81,17 @@ integers.
 We have seen that `bitstring` returns a string of bits.
 Strings can be created with quotation marks
 ```julia
-str="hello world 😀"
+str = "hello world 😀"
 ```
 We can access characters of a string with brackets:
 ```julia
-str[1],str[13]
+str[1], str[13]
 ```
-Each character is a bit type, in this case using 32 bits/8 bytes:
+Each character is a primitive type, in this case using 32 bits/8 bytes:
 ```julia
 typeof(str[6]), length(bitstring(str[6]))
 ```
-Strings are not bit types, but rather point to the start of a sequence
+Strings are not primitive types, but rather point to the start of a sequence
 of `Char`s in memory.  In this case, there are $32*13=416$ bits/52
 bytes in memory.
 
@@ -91,8 +102,8 @@ The simplest example is `*`, which concatenates two strings:
 "hi" * "bye"
 ```
 (Why `*`? Because concatenation is non-commutive.)
-We can combine this with indexing to, for example, change
-the last character of a string:
+We can combine this with indexing to, for example, create a new string
+with a different last character:
 ```julia
 str[1:end-1] * "😂"
 ```
@@ -104,7 +115,11 @@ We can use the command `parse` to turn a string into an integer:
 ```julia
 parse(Int, "123")
 ```
-We can specify base 2 as an optional argument. If we are specifying
+We can specify base 2 as an optional argument:
+```julia
+parse(Int, "-101"; base=2)
+```
+ If we are specifying
 bits its safer to parse as an `UInt32`, otherwise the first bit
 is not recognised as a sign:
 ```julia
@@ -122,8 +137,8 @@ We can also reinterpret as a `Char`:
 ```julia
 reinterpret(Char, x)
 ```
-We will use `parse` and `reinterpret` in problem sheets and the midterm exam
-as it allows one to easily manipulate bits. This is not actually how one should
+We will use `parse` and `reinterpret` as it allows one to easily manipulate bits. 
+This is not actually how one should
 do it as it is slow.
 
 ### Bitwise operations (advanced)
@@ -161,7 +176,7 @@ here is a vector of three 8-bit integers:
 ```julia
 v = [Int8(11), Int8(24), Int8(32)]
 ```
-Just like strings, Vectors are not bit types,
+Just like strings, Vectors are not primitive types,
 but rather point to the start of sequence of bits in memory 
 that are interpreted in the corresponding type.
 In this last case, there are $3*8=24$ bits/3 bytes in memory.
