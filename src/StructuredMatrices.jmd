@@ -1,12 +1,29 @@
 # Structured Matrices
 
+We have seen how algebraic operations (`+`, `-`, `*`, `/`) are
+well-defined for floating point numbers. Now we see how this allows us
+to do (approximate) linear algebra operations on structured matrices. That is,
+we consider the following structures:
+
+
+1. _Dense_: this can be considered unstructured, where we need to store all entries in a
+vector or matrix. Matrix multiplication reduces directly to standard algebraic operations.
+2. _Triangular_: If a matrix is upper or lower triangular, we can immediately invert using
+back-substitution. In practice we store a dense matrix and ignore the upper/lower entries.
+3. _Banded_: If a matrix is zero apart from entries a fixed distance from  the diagonal it is
+called banded and this allows for more efficient algorithms. We discuss tridiagonal and bidiagonal
+matrices.
+3. _Permutation_: A permutation matrix represents the action of interchanging entries of a vector.
+We can use Cauchy notation to store a permutation as a vector.
+4. _Rotations and reflections_:  Rotations and reflections are examples of orthogonal matrices that
+are particularly easy to construct. 
 
 ## 1. Dense vectors and matrices
 
 
 ## 2. Triangular matrices
 
-## Inverting an upper triangular matrix
+### Inverting an upper triangular matrix
 
 We now discuss why upper triangular matrices are easy to invert.  
 Consider a simple 3x3 example, which can be solved with `\`:
@@ -54,6 +71,9 @@ norm(backsubstitution(U,b)-x)
 
 
 
+## 3. Banded matrices
+
+
 ### Bidiagonal
 
 Sometimes its useful to not store zero entries of a matrix when a matrix has many zeros,
@@ -62,12 +82,6 @@ two bands are nonzero, i.e.,
 ```julia
 
 ```
-
-
-
-**Example (finite differences)** Suppose 
-
-**Example (inverse finite differences)**
 
 ## 2. Permutation matrices
 

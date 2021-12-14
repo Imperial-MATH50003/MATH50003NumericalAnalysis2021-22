@@ -53,13 +53,13 @@ example, the proof the [Four Colour Theorem](https://en.wikipedia.org/wiki/Four_
 
 A rough overview of the course is as follows:
 
-Part I: Computing with numbers
+**Part I: Computing with numbers**
 
 1. [Numbers](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Numbers.ipynb): we discuss how computers represent integers and real numbers, as well as their arithmetic operations.
 2. [Differentiation (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Differentiation.ipynb): we discuss ways of approximating derivatives, including automatic differentiation, 
 which is essential to stochastic gradient descent and machine learning.
 
-Part II: Numerical linear algebra
+**Part II: Numerical linear algebra**
 
 1. [Structured Matrices (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/StructuredMatrices.ipynb): we discuss types of structured matrices (permutations, orthogonal matrices, triangular, banded).
 3. [Decompositions (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Decompositions.ipynb): we discuss algorithms for computing matrix decompositions (QR and PLU decompositions) and their use in solving linear systems.
@@ -68,7 +68,7 @@ including both time-dependent ordinary differential equations and boundary value
 3. [Norms and condition numbers (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Norms.ipynb): we discuss vector and
 matrix norms, and condition numbers for matrices, and the singular value decomposition.
 
-Part III: Computing with functions
+**Part III: Computing with functions**
 
 1. [Interpolation and least squares regression (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Interpolation.ipynb): We discuss the use of polynomials to approximate
 functions from samples. 
