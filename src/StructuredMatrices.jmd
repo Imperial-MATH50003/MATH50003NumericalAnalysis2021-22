@@ -11,17 +11,71 @@ vector or matrix. Matrix multiplication reduces directly to standard algebraic o
 2. _Triangular_: If a matrix is upper or lower triangular, we can immediately invert using
 back-substitution. In practice we store a dense matrix and ignore the upper/lower entries.
 3. _Banded_: If a matrix is zero apart from entries a fixed distance from  the diagonal it is
-called banded and this allows for more efficient algorithms. We discuss tridiagonal and bidiagonal
+called banded and this allows for more efficient algorithms. We discuss diagonal, 
+tridiagonal and bidiagonal
 matrices.
-3. _Permutation_: A permutation matrix represents the action of interchanging entries of a vector.
-We can use Cauchy notation to store a permutation as a vector.
-4. _Rotations and reflections_:  Rotations and reflections are examples of orthogonal matrices that
-are particularly easy to construct. 
+4. _Orthogonal_: An orthogonal matrix $Q$ satisfies $Q^\top Q = I$, in other words, they are
+very easy to invert. We discuss special cases includion permutations, rotations and reflections.
+
 
 ## 1. Dense vectors and matrices
 
+A `Vector` of a primitive type (like `Int` or `Float64`) is stored
+consecutively in memory. E.g. if we have `Vector{Int8}` of length
+`n` then it is stored as `8n` bits (`n` bytes) in a row.
+A  `Matrix` is stored consecutively in memory, going down column-by-
+column. That is,
+```julia
+A = [1 2; 3 4; 5 6]
+```
+Is actually stored equivalently to a length `6` vector:
+```julia
+vec(A)
+```
+Note that transposing `A` is done lazyily and so `A'`
+stores the entries by row.
+
+
+Matrix-vector multiplication works as expected:
+```julia
+x = [7; 8]
+A*x
+```
+It is easy to implement such an algorithm:
+```julia
+c = zeros(Int, 3)
+for j = 1:size(A,2), k = 1:size(A,1)
+    c[k] += A[k, j] * x[j]
+end
+c
+```
+
+**Remark (advanced)** 
+This accesses the entries of `A` going down the column,
+which happens to be faster than accessing by row.
+
+Note matrix-multiplication is exact for integers, but
+using modular arithemtic:
+```julia
+Int8[2^7-1 1] * Int8[1,1]
+```
+
+
+Solving a linear system is done using `\`:
+```julia
+b = [9; 10; 11]
+A \ b
+```
+Here we see that we needed to use floating point arithmetic,
+but it is "accurate to 16-digits". 
+The way solving a linear system works is we first write `A` as a
+product of simpler matrices, e.g., a product of triangular matrices, 
+as described in the next notes. 
+
 
 ## 2. Triangular matrices
+
+
 
 ### Inverting an upper triangular matrix
 
@@ -56,7 +110,7 @@ x = U \ b
     end
     x
 end
-backsubstitution(U,b)-U\b  # close to zero, the algorithms differ slightly
+backsubstitution(U,b) - U\b  # close to zero, the algorithms differ slightly
  ```
 
 `triu` takes the upper triangular of a matrix.  We can check the accuracy of `backsubstitution` on a 10 x 10 random upper triangular matrix.
@@ -74,6 +128,15 @@ norm(backsubstitution(U,b)-x)
 ## 3. Banded matrices
 
 
+### Diagonal
+
+Diagonal matrices in Julia are represented by a vector:
+```julia
+x = [1,2,3]
+D = Diagonal(x)
+```
+It is clear that they can multiply and efficiently in $O(n)$ operations.
+
 ### Bidiagonal
 
 Sometimes its useful to not store zero entries of a matrix when a matrix has many zeros,
@@ -83,19 +146,31 @@ two bands are nonzero, i.e.,
 
 ```
 
-## 2. Permutation matrices
+## 4. Orthogonal matrices
+
+**Definition (orthogonal matrix)** A matrix is _orthogonal_ if its inverse is its transpose:
+
+$$Q^\top Q = I$$
+
+Orthogonal matrices have the important property that they preserve the 2-norm of vectors:
+$$
+\|Q\mathbf{v}\|^2 = (Q\mathbf{v})^\top Q \mathbf{v} = \mathbf{v}^\top Q^\top Q \mathbf{v} = \mathbf{v}^\top  \mathbf{v} = \|\mathbf{v}\|^2
+$$
+Here we discuss three important cases: permutations, simple rotations and reflections.
+
+### Permutations
 
 Permutation matrices are matrices that represent the action of permuting the entries of a vector.  
 As a very simple example, the following permutes the first and second entry:
  ```julia
- v=[1,2,3,4]
-P12=[0 1 0 0; 
-     1 0 0 0;
-     0 0 1 0;
-     0 0 0 1]
-P12*v  # returns v with its first two entries swapped
+v = [1,2,3,4]
+P₁₂ = [0 1 0 0; 
+       1 0 0 0;
+       0 0 1 0;
+       0 0 0 1]
+P₁₂*v  # returns v with its first two entries swapped
  ```
- Permutations can be defined in _Cauchy notation_:
+Permutations can be defined in _Cauchy notation_:
 
 $$\begin{pmatrix}
  1 & 2 & 3 & \cdots & n \cr
@@ -133,10 +208,12 @@ $$\begin{pmatrix}
  
  is the permutation
  
- $$\begin{pmatrix}
+ $$
+ \begin{pmatrix}
  1 & 2 & 3 & 4 \cr
  3 & 4 & 2 & 1
- \end{pmatrix}$$
+ \end{pmatrix}
+ $$
  
  This is precisely the transpose of $P$, and so we have the property that
  
@@ -144,19 +221,9 @@ $$\begin{pmatrix}
 
 for all permutation matrices.
 
-## 3. Orthogonal matrices
-
-**Definition (orthogonal matrix)** A matrix is _orthogonal_ if its inverse is its transpose:
-
-$$Q^\top Q = I$$
-
-Orthogonal matrices have the important property that they preserve the 2-norm of vectors:
-
-$$\|Q\mathbf{v}\|^2 = (Q\mathbf{v})^\top Q \mathbf{v} = \mathbf{v}^\top Q^\top Q \mathbf{v} = \mathbf{v}^\top  \mathbf{v} = \|\mathbf{v}\|^2$$
 
 
-
-### Rotations
+### Simple rotations
 
 In 2D we get some simple examples:
 
@@ -185,16 +252,17 @@ grid = range(0, 2π; length=100)       # plotting grid for the circle
 plot!(cos.(grid), sin.(grid); label="norm 1")     # plot circle in red
  ```
 
-On a computer, we don't know exactly where a point is: every point can have a small $\epsilon$ of error.  Thus to understand the robustness of an algorithm, we need to understand what happens to balls of radius $\epsilon$ around where we think of the point.  This can be used to demonstrate why rotations are preferred to lower triangular operations.
+On a computer, we don't know exactly where a point is: every point can have a small $\epsilon$ of error.  
+Thus to understand the robustness of an algorithm, we need to understand what happens to balls of radius 
+$\epsilon$ around where we think of the point.  
+This can be used to demonstrate why rotations are preferred to lower triangular operations.
 
 In the following, we design a function that plots a circle around a point `[a,b]` of size `ε`, both before and after a matrix `L` is applied.
 Here we demonstrate that the effect of `L` is to stretch the circles: our error can be amplified:
 ````julia
 using Plots
-
-
 function plotmat(a,b,ε,L)
-    t=range(0, 2π; length=100)
+    t = range(0, 2π; length=100)
     x,y = (a+ε*cos(t),b+ε*sin(t))
     plot(x,y)
 
@@ -215,7 +283,8 @@ L = [1    0;
 
 plotmat(a, b, ε, L)
 ```
-As `a` becomes small, this error amplification becomes greater: in the following, we go from knowing the true point with accuracy 0.1 to only knowing it with about accuracy 1:
+As `a` becomes small, this error amplification becomes greater: in the following, we go from 
+knowing the true point with accuracy 0.1 to only knowing it with about accuracy 1:
 ```julia
 a,b = [0.125,1.2]
 
@@ -252,8 +321,42 @@ $$
 
 ### Reflections
 
-Given a vector $\mathbf v$ satisfying $\|\mathbf v\|=1$, the Householder reflection is the orthogonal matrix as
+**Definition (reflection matrix)** 
+Given a vector $\mathbf v$ satisfying $\|\mathbf v\|=1$, the reflection matrix is the orthogonal matrix as
+$$
+Q_{\mathbf v} \triangleq I - 2 \mathbf v \mathbf v^\top
+$$
 
-$$Q_{\mathbf v} \triangleq I - 2 \mathbf v \mathbf v^\top$$
+**Proposition** $Q_{\mathbf v}$ satisfies:
+1. Symmetry
+2. Orthogonality
+2. ${\mathbf v}$ is an eigenvector of $Q_{\mathbf v}$ with eigenvalue $-1$
+4. It is a rank-1 perturbation of $I$
+3. $\det Q_{\mathbf v} = -1$
+
+
+**Proof**
+
+Property 1 follows immediately. Property 2 follows from
+$$
+Q_{\mathbf v}^\top Q_{\mathbf v} = Q_{\mathbf v}^2 = I - 4 \mathbf v \mathbf v^\top + 4 \mathbf v \mathbf v^\top \mathbf v \mathbf v^\top = I
+$$
+Property 3 follows since
+$$
+Q_{\mathbf v} {\mathbf v} = -{\mathbf v}
+$$
+Property 4 follows since $\mathbf v \mathbf v^\top$ is a rank-1 matrix as all rows are linear combinations of each other.
+To see property 5, note there is a dimension $n-1$ space $W$ orthogonal to ${\mathbf v}$.
+For $\mathbf w \in W$ we have
+$$
+Q_{\mathbf v} \mathbf w = \mathbf w
+$$
+In other words, $1$ is an eigenvalue with multiplicity $n-1$ and $-1$ is an eigenvalue with multiplicity 1,
+and thus the product of the eigenvalues is $-1$.
+
+∎
+
+
+
 
 
