@@ -3,7 +3,7 @@
 We now get to our first computational problem: given a function, how can we approximate its derivative at a
 point? Before we begin, we must be clear what a "function" is. Consider three possible scenarios:
 
-1. _Black-box function_: Consider a function $f^{\rm FP} : D \rightarrow F$ where 
+1. _Black-box function_: Consider a floating-point valued function $f^{\rm FP} : D \rightarrow F$ where 
 $D \subset F \equiv F_{\sigma,Q,S}$
 (e.g., we are given a double precision function that takes in a `Float64` and returns another `Float64`)
 which we only know _pointwise_. This is the situation if we have a function that relies on a compiled C library,
@@ -72,15 +72,16 @@ If we know a bound on $f''(x)$ then Taylor's theorem tells us a precise bound:
 **Proposition**
 The error in approximating the derivative using finite differences is
 $$
-\left|f'(x) - {f(x+h) - f(x) \over h}\right| \leq {\sup_{x \leq t \leq x+h} |f''(t)| \over 2} h
+\left|f'(x) - {f(x+h) - f(x) \over h}\right| \leq {M \over 2} h
 $$
+where $M = \sup_{x \leq t \leq x+h} |f''(t)|$.
 
 **Proof**
 Follows immediately from Taylor's theorem:
 $$
-f(x+h) = f(x) + f'(x) h + {f''(\chi) \over 2} h^2
+f(x+h) = f(x) + f'(x) h + {f''(t) \over 2} h^2
 $$
-for some $x < \chi < x+h$.
+for some $x ≤ t ≤ x+h$.
 
 ◼️
 
@@ -119,8 +120,8 @@ We can do a plot to see how fast the error goes down as we let $h$ become small.
 ```julia
 using Plots
 h = 2.0 .^ (0:-1:-60)  # [1,1/2,1/4,…]
-filter = x -> iszero(x) ? NaN : x # avoid 0's in log scale plot
-plot(filter.(abs.((f.(h) .- f(0)) ./ h .- 1)); yscale=:log10, title="convergence of derivatives, h = 2^(-n)", label="f", legend=:bottomleft)
+nanabs = x -> iszero(x) ? NaN : abs(x) # avoid 0's in log scale plot
+plot(nanabs.((f.(h) .- f(0)) ./ h .- 1); yscale=:log10, title="convergence of derivatives, h = 2^(-n)", label="f", legend=:bottomleft)
 plot!(abs.((g.(h) .- g(0)) ./ h .- 1/3); yscale=:log10, label = "g")
 ```
 In the case of $f$ it is a success: we approximate the true derivative _exactly_ provided we take $h = 2^{-n}$
@@ -131,7 +132,6 @@ It is clear that $f$ is extremely special. Most functions will behave like $g$, 
 $h$ to be a power of two we also see divergence for differentiating $f$: 
 ```julia
 h = 10.0 .^ (0:-1:-16)  # [1,1/2,1/4,…]
-filter = x -> iszero(x) ? NaN : x # avoid 0's in log scale plot
 plot(abs.((f.(h) .- f(0)) ./ h .- 1); yscale=:log10, title="convergence of derivatives, h = 10^(-n)", label="f", legend=:bottomleft)
 plot!(abs.((g.(h) .- g(0)) ./ h .- 1/3); yscale=:log10, label = "g")
 ```
@@ -139,85 +139,136 @@ For these two simple
 examples, we can understand why we see very different behaviour.
 
 
-**Example (convergence of finite difference)** Consider differentiating $f(x) = 1 + x + x^2$ at 0 with $h = 2^{-n}$
-and assume $S/2 < n \leq S$ where $S$ is the number of significand bits. Note that $f^{\rm FP}(0) = f(0) = 1$.
-We have
+**Example (convergence(?) of finite difference)** Consider differentiating $f(x) = 1 + x + x^2$ at 0 with $h = 2^{-n}$.
+We consider 3 different cases with different behaviour, where $S$ is the number of significand bits: 
+
+1. $0 ≤ n ≤ S/2$
+2. $S/2 < n ≤ S$
+3. $S ≤ n$
+
+Note that $f^{\rm FP}(0) = f(0) = 1$. Thus we wish to understand the error in approximating $f'(0) = 1$ by
 $$
-f^{\rm FP}(h) = (1 ⊕ h) ⊕ h^2 = 1 + h
+(f^{\rm FP}(h) ⊖ 1) ⊘ h\qquad\hbox{where}\qquad f^{\rm FP}(x) = 1 ⊕ x ⊕ x ⊗ x.
 $$
-i.e. the absolute error is $h^2$. Then
+
+_Case 1_ ($0 ≤ n ≤ S/2$): note that $f^{\rm FP}(h) = f(h) = 1 + 2^{-n} + 2^{-2n}$
+as each computation is precisely a floating point number (hence no rounding). We can see this in half-precision,
+with $n = 3$ we have a 1 in the 3rd and 6th decimal place:
+```julia
+S = 10 # 10 significant bits
+n = 3  # 3 ≤ S/2 = 5
+h = Float16(2)^(-n)
+printbits(f(h))
+```
+Subtracting 1 and dividing by $h$ will also be exact, hence we get
+$$
+(f^{\rm FP}(h) ⊖ 1) ⊘ h = 1 + 2^{-n}
+$$
+which shows exponential convergence.
+
+_Case 2_ ($S/2 < n ≤ S$): Now we have (using round-to-nearest)
+$$
+f^{\rm FP}(h) = (1 + 2^{-n}) ⊕ 2^{-2n} = 1 + 2^{-n}
+$$
+Then
 $$
 (f^{\rm FP}(h) ⊖ 1) ⊘ h = 1 = f'(0)
 $$
-However, if we take $n$ too large, $n > S$, then we have $f^{\rm FP}(h) = 1$ and 
+We have actually performed better than true real arithmetic and converged without a limit!
+
+_Case 3_ ($n > S$): If we take $n$ too large, then $1 ⊕ h = 1$ and we have $f^{\rm FP}(h) = 1$, that is and 
 $$
 (f^{\rm FP}(h) ⊖ 1) ⊘ h = 0 \neq f'(0)
 $$
 
-**Example (divergence of finite difference)** Consider differentiating $f(x) = 1 + x/3 + x^2$ at 0 with $h = 2^{-n}$
-and assume $S/2 < n \leq S$ where $S = 10$ is the number of significand bits, in half-precision, and $n$ is even. 
-Note that $f^{\rm FP}(0) = f(0) = 1$.
+**Example (divergence of finite difference)** Consider differentiating $g(x) = 1 + x/3 + x^2$ at 0 with $h = 2^{-n}$
+and assume $n$ is even for simplicity and consider half-precision with $S = 10$.
+Note that $g^{\rm FP}(0) = g(0) = 1$.
 Recall
 $$
 h ⊘ 3 = 2^{-n-2} * (1.0101010101)_2
 $$
-Note we lose two bits each time: 
+Note we lose two bits each time in the computation of $1 ⊕ (h ⊘ 3)$: 
 ```julia
-x = Float16(1)
-
-n = 0; h = Float16(2)^(-n)/3; printlnbits(x + h)
-n = 2; h = Float16(2)^(-n)/3; printlnbits(x + h)
-n = 4; h = Float16(2)^(-n)/3; printlnbits(x + h)
+n = 0; h = Float16(2)^(-n); printlnbits(1 + h/3)
+n = 2; h = Float16(2)^(-n); printlnbits(1 + h/3)
+n = 4; h = Float16(2)^(-n); printlnbits(1 + h/3)
+n = 8; h = Float16(2)^(-n); printlnbits(1 + h/3)
 ```
-It follows that
+It follows if $S/2 < n < S$ that
 $$
 1 ⊕ (h ⊘ 3) = 1 + h/3 - 2^{-10}/3
 $$
 Therefore
 $$
-(f^{\rm FP}(h) ⊖ 1) ⊘ h = 1/3 - 2^{n-10}/3
+(g^{\rm FP}(h) ⊖ 1) ⊘ h = 1/3 - 2^{n-10}/3
 $$
-Thus the error grows exponentially with $n$.
+Thus the error grows exponentially with $n$. 
+
+
+If $n ≥ S$ then $1 ⊕ (h ⊘ 3) = 1$ and we have
+$$
+(g^{\rm FP}(h) ⊖ 1) ⊘ h = 0
+$$
 
 
 ### Bounding the error
 
 
-We can bound the error using the bounds on floating point arithmetic. For simplicity we ignore the
-$x^2$ term: when $h$ is small, $h^2$ gets lost in the rounding. Then we have
-$$
-\left|((1 ⊕ h) ⊖ h) - 1 ⊘ h -1\right| \leq ((1+h)*(1+\epsilon_{\rm m}) - 1)*(1+\epsilon_{\rm machine}) = h + h \epsilon_{\rm machine} + O(h^2)
-$$
-Thus we see that the bound grows like $\epsilon_{\rm machine}/h$. However, a bad upper bound is not the same
-as a proof that something grows, and establishing a lower bound on the error is more challenging. In fact,
-it depends on the precise bits of $h$. 
+We can bound the error using the bounds on floating point arithmetic. 
 
-Nevertheless, we can use this bound to obtain a _heuristic_ on how to choose $h$:
-
-**Heuristic (finite-difference with floating-point step)** Choose $h$ proportional to $\sqrt{\epsilon_{\rm m}}$
-in finite-differences.
-
-**Sketch of argument**
-Consider $x = 0$ assume $f(x) = f^{\rm FP}(0) = 0$ for simplicity, and suppose we have relative accuracy
+**Theorem (finite-difference error bound)** Let $f$ be twice-differentiable in a neighbourhood of $x$ and assume that 
+$f^{\rm FP}(x) = f(x) + δ_x^f$ has absolute accuracy in that neighbourhood, that is:
 $$
-f^{\rm FP}(x) = f(x) + \delta
+|δ_x^f| \leq c ϵ_{\rm m}
 $$
-where $|\delta| < c ϵ_{\rm m}$. Note that
+for a fixed constant $c$. Assume for simplicity $h = 2^{-n}$ where $n \leq S$ and $|x| \leq 1$. 
+Then the finite-difference approximation satisfies
+$$
+(f^{\rm FP}(x + h) ⊖ f^{\rm FP}(x)) ⊘ h = f'(x) + δ_{x,h}^{\rm FD}
+$$
+where 
+$$
+|δ_{x,h}^{\rm FD}| \leq {|f'(x)| \over 2} ϵ_{\rm m} + M h +  {4c ϵ_{\rm m} \over h}
+$$
+for $M = \sup_{x \leq t \leq x+h} |f''(t)|$.
+
+**Proof**
+
+We have (noting by our assumptions $x ⊕ h = x + h$ and that dividing by $h$ will only change the exponent so
+is exact)
 $$
 \begin{align*}
-{f^{\rm FP}(h) \over h} &= {f(h) \over h} + {\delta \over h} = f'(0) + {h f''(0) \over 2} + {\delta \over h}  + O(h^2)
+(f^{\rm FP}(x + h) ⊖ f^{\rm FP}(x)) ⊘ h &= {f(x + h) +  δ^f_{x+h} - f(x) - δ^f_x \over h} (1 + δ_1) \\
+&= {f(x+h) - f(x) \over h} (1 + δ_1) + {δ^f_{x+h}- δ^f_x \over h} (1 + δ_1)
 \end{align*}
 $$
-Choosing $h$ proportional to $\sqrt{ϵ_{\rm m}}$ tells us the error is proportional to $\sqrt{\epsilon_{\rm m}}$.
+where $|δ_1| \leq {ϵ_{\rm m} / 2}$. Applying Taylor's theorem we get 
+$$
+(f^{\rm FP}(x + h) ⊖ f^{\rm FP}(x)) ⊘ h = f'(x) + \underbrace{f'(x) δ_1 + {f''(t) \over 2} h (1 + \delta_1) + {δ^f_{x+h}- δ^f_x \over h} (1 + δ_1)}_{δ_{x,h}^{\rm FD}}
+$$
+The bound then follows, using the very pessimistic bound $|1 + δ_1| \leq 2$.
 
 ∎
 
-In the case of double precision $\sqrt{ϵ_{\rm m}} ≈ 1.5\times 10^{-8}$, which is close to when the error begins to increase.
+The three-terms of this bound tell us a story: the first term is a fixed (small) error, the second term tends to zero
+as $h \rightarrow 0$, while the last term grows like $ϵ_{\rm m}/h$ as $h \rightarrow 0$.  Thus we observe convergence
+while the second term dominates, until the last term takes over.
+Of course, a bad upper bound is not the same as a proof that something grows, but it is a good indication of 
+what happens _in general_ and suffices to motivate the following heuristic to balance the two sources of errors:
+
+
+**Heuristic (finite-difference with floating-point step)** Choose $h$ proportional to $\sqrt{ϵ_{\rm m}}$
+in finite-differences.
+
+In the case of double precision $\sqrt{ϵ_{\rm m}} ≈ 1.5\times 10^{-8}$, which is close to when the observed error begins to increase
+in our examples.
 
 
 
-**Remark** While finite differences is of questionable utility for computing derivatives, it is extremely effective
-in building methods for solving differential equations, as we shall see later.
+**Remark** While finite differences is of debatable utility for computing derivatives, it is extremely effective
+in building methods for solving differential equations, as we shall see later. It is also very useful as a "sanity check"
+if one wants something to compare with for other numerical methods for differentiation.
 
 ## 2. Dual numbers (Forward-mode automatic differentiation)
 
@@ -225,40 +276,30 @@ Automatic differentiation consists of applying functions to special types that d
 Here we do so via _dual numbers_.
 
 **Definition (Dual numbers)** Dual numbers ${\mathbb D}$ are a commutative ring over the reals 
-generated by $1$ and $\epsilon$ such that $\epsilon^2 = 0$.
-Dual numbers are typically written as $a + b \epsilon$ where $a$ and $b$ are real.
+generated by $1$ and $ϵ$ such that $ϵ^2 = 0$.
+Dual numbers are typically written as $a + b ϵ$ where $a$ and $b$ are real.
 
 This is very much analoguous to complex numbers, which are a field generated by $1$ and ${\rm i}$ such that
 ${\rm i}^2 = -1$. Compare multiplication of each number type:
 $$
 \begin{align*}
 (a + b {\rm i}) (c + d {\rm i}) &= ac + (bc + ad) {\rm i} + bd {\rm i}^2 = ac -bd + (bc + ad) {\rm i} \\
-(a + b \epsilon) (c + d \epsilon) &= ac + (bc + ad) \epsilon + bd \epsilon^2 = ac  + (bc + ad) \epsilon 
+(a + b ϵ) (c + d ϵ) &= ac + (bc + ad) ϵ + bd ϵ^2 = ac  + (bc + ad) ϵ 
 \end{align*}
 $$
 And just as we view ${\mathbb R} \subset {\mathbb C}$ by equating $a \in {\mathbb R}$ with $a + 0{\rm i} \in {\mathbb C}$,
-we can view ${\mathbb R} \subset {\mathbb D}$ by equating $a \in {\mathbb R}$ with $a + 0{\rm \epsilon} \in {\mathbb D}$.
+we can view ${\mathbb R} \subset {\mathbb D}$ by equating $a \in {\mathbb R}$ with $a + 0{\rm ϵ} \in {\mathbb D}$.
 
 
-### Matrix representations
 
-Complex numbers can be thought of as $2 \times 2$ matrices, that is, $a + b {\rm i}$ is equivalent to
-$$
-a \underbrace{\begin{pmatrix}1 \\ & 1 \end{pmatrix}}_{\hbox{representation of 1}} + b \underbrace{\begin{pmatrix}0 &1 \\-1 & 0\end{pmatrix}}_{\hbox{representation of $\rm i$}} = \begin{pmatrix}a & b \\ -b & a \end{pmatrix}
-$$
-Similarly, for dual numbers we have
-$$
-a \underbrace{\begin{pmatrix}1 \\ & 1 \end{pmatrix}}_{\hbox{representation of 1}} + b \underbrace{\begin{pmatrix}0 &1 \\0 & 0\end{pmatrix}}_{\hbox{representation of $\epsilon$}} = \begin{pmatrix}a & b \\ 0 & a \end{pmatrix}
-$$
-That is, the representation of $\epsilon$ is a simple 2 × 2 nilpotent matrix.
 
 ### Connection with differentiation
 
-Applying a polynomial to a dual number $a + b \epsilon$ tells us the derivative at $a$:
+Applying a polynomial to a dual number $a + b ϵ$ tells us the derivative at $a$:
 
 **Lemma (polynomials and dual numbers)** Suppose $p$ is a polynomial. Then
 $$
-p(a + b \epsilon) = p(a) + b p'(a) \epsilon
+p(a + b ϵ) = p(a) + b p'(a) ϵ
 $$
 
 **Proof**
@@ -266,7 +307,7 @@ $$
 It suffices to consider $p(x) = x^n$ for $n \geq 1$ as other polynomials follow from linearity. We proceed by induction:
 The case $n = 1$ is trivial. For $n > 1$ we have 
 $$
-(a + b \epsilon)^n = (a + b \epsilon) (a + b \epsilon)^{n-1} = (a + b \epsilon) (a^{n-1} + (n-1) b a^{n-2} \epsilon) = a^n + b n a^{n-1} \epsilon.
+(a + b ϵ)^n = (a + b ϵ) (a + b ϵ)^{n-1} = (a + b ϵ) (a^{n-1} + (n-1) b a^{n-2} ϵ) = a^n + b n a^{n-1} ϵ.
 $$
 
 ∎
@@ -276,7 +317,7 @@ We can extend real-valued differentiable functions to dual numbers in a similar 
 **Definition (compatible extension)** Suppose a real-valued function $f$
 is differentiable at $a$. If
 $$
-f(a + b \epsilon) = f(a) + b f'(a) \epsilon
+f(a + b ϵ) = f(a) + b f'(a) ϵ
 $$
 then we say that is a _compatible extension at_ $a$.
 
@@ -288,19 +329,19 @@ is a compatible extension at $a$. Then $q(x) := f(g(x))$ and
 $r(x) := f(x) g(x)$ are compatible extensions at $a$, that is:
 $$
 \begin{align*}
-q(a+b \epsilon) &= q(a) + b q'(b) \epsilon \\
-r(a+b \epsilon) &= r(a) + b r'(b) \epsilon
+q(a+b ϵ) &= q(a) + b q'(b) ϵ \\
+r(a+b ϵ) &= r(a) + b r'(b) ϵ
 \end{align*}
 $$
 
 **Proof**
 For $q$ it follows immediately:
 $$
-q(a + b \epsilon) = f(g(a + b \epsilon)) = f(g(a) + b g'(a) \epsilon) = f(g(a)) + b g'(a) f'(g(a))\epsilon = q(a) + b q'(a) \epsilon
+q(a + b ϵ) = f(g(a + b ϵ)) = f(g(a) + b g'(a) ϵ) = f(g(a)) + b g'(a) f'(g(a))ϵ = q(a) + b q'(a) ϵ
 $$
 For $r$ we have
 $$
-r(a + b \epsilon) = f(a+b \epsilon )g(a+b \epsilon )= (f(a) + b f'(a) \epsilon)(g(a) + b g'(a) \epsilon) = f(a)g(a) + b (f'(a)g(a) + f(a)g'(a)) \epsilon = r(a) +b r'(a) \epsilon
+r(a + b ϵ) = f(a+b ϵ )g(a+b ϵ )= (f(a) + b f'(a) ϵ)(g(a) + b g'(a) ϵ) = f(a)g(a) + b (f'(a)g(a) + f(a)g'(a)) ϵ = r(a) +b r'(a) ϵ
 $$
 
 ∎
@@ -323,10 +364,34 @@ $$
 f'(1) = {\rm e}^{1 + {\rm e}} (2 + {\rm e}).
 $$
 
-### Implementation in Julia
+### Matrix representations
 
-We now consider a simple implementation of dual numbers that works on polynomials:
+Complex numbers can be thought of as $2 \times 2$ matrices, that is, $a + b {\rm i}$ is equivalent to
+$$
+a \underbrace{\begin{pmatrix}1 \\ & 1 \end{pmatrix}}_{\hbox{representation of 1}} + b \underbrace{\begin{pmatrix}0 &1 \\-1 & 0\end{pmatrix}}_{\hbox{representation of $\rm i$}} = \begin{pmatrix}a & b \\ -b & a \end{pmatrix}
+$$
+Similarly, for dual numbers we have
+$$
+a \underbrace{\begin{pmatrix}1 \\ & 1 \end{pmatrix}}_{\hbox{representation of 1}} + b \underbrace{\begin{pmatrix}0 &1 \\0 & 0\end{pmatrix}}_{\hbox{representation of $ϵ$}} = \begin{pmatrix}a & b \\ 0 & a \end{pmatrix}
+$$
+That is, the representation of $ϵ$ is a simple 2 × 2 nilpotent matrix.
 
+This means for any function that works on matrices:
+```julia
+f = x -> x/3 + x^2 + x^3
+f([2 1; 0 2]) # top-right matches true derivative of 16 + 1/3
+```
+But there are limitations, for example, our `f` above fails:
+```julia
+f = x -> 1 + x + x^2
+f([2 1; 0 2])
+```
+Other examples that fail are ones that involve inequalities (e.g., `if x < 5`).
+
+### Implementation as a special type
+
+
+We now consider a simple implementation of dual numbers that works on general polynomials:
 ```julia
 # Dual(a,b) represents a + b*ϵ
 struct Dual{T}
@@ -367,7 +432,19 @@ end
 -(x::Dual, y::Dual) = Dual(x.a - y.a, x.b - y.b)
 *(x::Dual, y::Dual) = Dual(x.a*y.a, x.a*y.b + x.b*y.a)
 ```
-We can now try it on the two polynomials as above:
+Our function with a condition now works:
+```julia
+f = x -> if x < 1
+        x
+    else
+        x^2
+    end
+
+f(Dual(2,1))
+```
+
+
+We can also try it on the two polynomials as above:
 ```julia
 f = x -> 1 + x + x^2
 g = x -> 1 + x/3 + x^2
@@ -380,7 +457,7 @@ It also works for higher order polynomials:
 f = x -> 1 + 1.3x + 2.1x^2 + 3.1x^3
 f(Dual(0.5,1.0)).b - 5.725
 ```
-It is indeed "accurate to 16-digits", the best we can hope for 
+It is indeed "accurate to (roughly) 16-digits", the best we can hope for 
 using floating point.
 
 We can use this in "algorithms" as well as simple polynomials.

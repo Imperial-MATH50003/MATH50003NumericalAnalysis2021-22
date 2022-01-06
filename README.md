@@ -59,14 +59,15 @@ A rough overview of the course is as follows:
 2. [Differentiation (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Differentiation.ipynb): we discuss ways of approximating derivatives, including automatic differentiation, 
 which is essential to stochastic gradient descent and machine learning.
 
-**Part II: Numerical linear algebra**
+**Part II: Computing with matrices**
 
 1. [Structured Matrices (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/StructuredMatrices.ipynb): we discuss types of structured matrices (permutations, orthogonal matrices, triangular, banded).
 3. [Decompositions (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Decompositions.ipynb): we discuss algorithms for computing matrix decompositions (QR and PLU decompositions) and their use in solving linear systems.
-7. [Differential Equations (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/DifferentialEquations.ipynb): we discuss the numerical solution of linear differential equations, 
-including both time-dependent ordinary differential equations and boundary value problems, by reduction to linear systems.
 3. [Norms and condition numbers (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Norms.ipynb): we discuss vector and
 matrix norms, and condition numbers for matrices, and the singular value decomposition.
+7. [Differential Equations (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/DifferentialEquations.ipynb): we discuss the numerical solution of linear differential equations, 
+including both time-dependent ordinary differential equations and boundary value problems, by reduction to linear systems.
+
 
 **Part III: Computing with functions**
 

@@ -529,7 +529,7 @@ Here is a surprising example of non-associativity:
 Can you explain this in terms of bits?
 
 
-### Bounds on floating point arithmetic
+### Bounding errors in floating point arithmetic
 
 Before we dicuss bounds on errors, we need to talk about the two notions of errors:
 

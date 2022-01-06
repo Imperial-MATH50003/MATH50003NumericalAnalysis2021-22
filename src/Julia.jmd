@@ -6,6 +6,7 @@ This lecture gives an overview of Julia.
 In these notes we focus on the aspects of Julia and computing that are essential to numerical computing:
 
 
+1. Integers: We discuss briefly how to create and manipulate integers, and how to see the underlying bit representation.
 1. Strings and parsing: We discuss how to create and manipulate strings and characters, and how we can convert a string
 of 0's and 1's to an integer or other type.
 3. Vectors and matrices: We discuss how to build and manipulate vectors and matrices (which are both types of _arrays_).
@@ -256,6 +257,7 @@ If you use `.*`, it does entrywise multiplication:
 
 We can take the transpose of a real vector as follows:
 ```julia
+a = [1, 2, 3]
 a'
 ```
 Note for complex-valued vectors this is the conjugate-transpose,
@@ -263,6 +265,7 @@ and so one may need to use `transpose(a)`. Both `a'` and `transpose(a)`
 should be thought of as "dual-vectors", and so multiplcation with a
 transposed vector with a normal vector gives a constant:
 ```julia
+b = [4, 5, 6]
 a' * b
 ```
 
@@ -354,7 +357,7 @@ r[2] = 3   # Not allowed
 
 Julia has two different kinds of types: primitive types (like `Int64`, `Int32`, `UInt32` and `Char`) and composite types.
 Here is an example of an in-built composite type representing complex numbers, for example,
-$z = 1+i$:
+$z = 1+2{\rm i}$:
 ```julia
 z = 1 + 2im
 typeof(z)
@@ -366,7 +369,7 @@ Fields of a type can be accessed using the `.` notation:
 x.re, x.im
 ```
 We can make our own types.  Let's make a type to represent complex numbers in the format
-$$z=rexp(i\theta)$$
+$$z=r {\rm exp}({\rm i}\theta)$$
 That is, we want to create a type with two fields: `r` and `θ`.
 This is done using the `struct` syntax,
 followed by a list of names for the fields,
@@ -558,8 +561,8 @@ The following example shows that if we mistype the first argument as `xx`,
 then it takes on the outer scope definition `x`, which is a complex number:
 
 ```julia
-function av2(xx,y,z)
-    (x+y+z)/3
+function av2(xx, y, z)
+    (x + y + z)/3
 end
 ```
 You should almost never use this feature!!  
