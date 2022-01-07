@@ -297,7 +297,7 @@ we can view ${\mathbb R} \subset {\mathbb D}$ by equating $a \in {\mathbb R}$ wi
 
 Applying a polynomial to a dual number $a + b ϵ$ tells us the derivative at $a$:
 
-**Lemma (polynomials and dual numbers)** Suppose $p$ is a polynomial. Then
+**Theorem (polynomials on dual numbers)** Suppose $p$ is a polynomial. Then
 $$
 p(a + b ϵ) = p(a) + b p'(a) ϵ
 $$
@@ -313,55 +313,78 @@ $$
 ∎
 
 We can extend real-valued differentiable functions to dual numbers in a similar manner.
+First, consider a standard function with a Taylor series (e.g. ${\rm cos}$, ${\rm sin}$, ${\rm exp}$, etc.)
+$$
+f(x) = \sum_{k=0}^∞ f_k x^k
+$$
+so that $a$ is inside the radius of convergence. This leads naturally to a definition on dual numbers:
+$$
+\begin{align*}
+f(a + b ϵ) &= \sum_{k=0}^∞ f_k (a + b ϵ)^k = \sum_{k=0}^∞ f_k (a^k + k a^{k-1} b ϵ) = \sum_{k=0}^∞ f_k a^k +  \sum_{k=0}^∞ f_k k a^{k-1} b ϵ  \\
+  &= f(a) + b f'(a) ϵ
+\end{align*}
+$$
+More generally, given a differentiable function we can extend it to dual numbers:
 
-**Definition (compatible extension)** Suppose a real-valued function $f$
+**Definition (dual extension)** Suppose a real-valued function $f$
 is differentiable at $a$. If
 $$
 f(a + b ϵ) = f(a) + b f'(a) ϵ
 $$
-then we say that is a _compatible extension at_ $a$.
+then we say that it is a _dual extension at_ $a$.
 
-Note this definition immediately implies the product and chain rule:
-
-**Lemma (product and chain rule)**
-Suppose $f$ is a compatible extension at $g(a)$ and $g$
-is a compatible extension at $a$. Then $q(x) := f(g(x))$ and 
-$r(x) := f(x) g(x)$ are compatible extensions at $a$, that is:
+Thus, for basic functions we have natural extensions:
 $$
 \begin{align*}
-q(a+b ϵ) &= q(a) + b q'(b) ϵ \\
-r(a+b ϵ) &= r(a) + b r'(b) ϵ
+\exp(a + b ϵ) &:= \exp(a) + b \exp(a) ϵ \\
+\sin(a + b ϵ) &:= \sin(a) + b \cos(a) ϵ \\
+\cos(a + b ϵ) &:= \cos(a) - b \sin(a) ϵ \\
+\log(a + b ϵ) &:= \log(a) + {b \over a} ϵ \\
+\sqrt{a+b ϵ} &:= \sqrt{a} + {b \over 2 \sqrt{a}} ϵ \\
+|a + b ϵ| &:= |a| + b {\rm sign} a ϵ
+\end{align*}
+$$
+provided the function is differentiable at $a$. Note the last example does not have
+a convergent Taylor series (at 0) but we can still extend it where it is differentiable.
+
+Going further, we can add, multiply, and compose such functions:
+
+**Lemma (product and chain rule)**
+If $f$ is a dual extension at $g(a)$ and $g$
+is a dual extension at $a$, then $q(x) := f(g(x))$ is a dual extension at $a$.
+If $f$ and $g$ are dual extensions at $a$ then 
+$r(x) := f(x) g(x)$ is also dual extensions at $a$. In other words:
+$$
+\begin{align*}
+q(a+b ϵ) &= q(a) + b q'(a) ϵ \\
+r(a+b ϵ) &= r(a) + b r'(a) ϵ
 \end{align*}
 $$
 
 **Proof**
 For $q$ it follows immediately:
 $$
-q(a + b ϵ) = f(g(a + b ϵ)) = f(g(a) + b g'(a) ϵ) = f(g(a)) + b g'(a) f'(g(a))ϵ = q(a) + b q'(a) ϵ
+q(a + b ϵ) = f(g(a + b ϵ)) = f(g(a) + b g'(a) ϵ) = f(g(a)) + b g'(a) f'(g(a))ϵ = q(a) + b q'(a) ϵ.
 $$
 For $r$ we have
 $$
-r(a + b ϵ) = f(a+b ϵ )g(a+b ϵ )= (f(a) + b f'(a) ϵ)(g(a) + b g'(a) ϵ) = f(a)g(a) + b (f'(a)g(a) + f(a)g'(a)) ϵ = r(a) +b r'(a) ϵ
+r(a + b ϵ) = f(a+b ϵ )g(a+b ϵ )= (f(a) + b f'(a) ϵ)(g(a) + b g'(a) ϵ) = f(a)g(a) + b (f'(a)g(a) + f(a)g'(a)) ϵ = r(a) +b r'(a) ϵ.
 $$
 
 ∎
 
 A simple corollary is that any function defined in terms of addition, multiplication, composition, etc.
-of functions that are compatible with differentiation will be differentiable via dual numbers.
+of functions that are dual with differentiation will be differentiable via dual numbers.
 
 **Example (differentiating non-polynomial)**
 
-Supposee extend ${\rm e}^x$ to the duals via
+Consider $f(x) =  \exp(x^2 + {\rm e}^{x})$ by evaluating on the duals:
 $$
-{\rm e}^{a + b ϵ} := {\rm e}^a + b {\rm e}^a ϵ
-$$
-Then we can differentiate $f(x) = {\rm e}^{x^2 + {\rm e}^{x}}$ by evaluating on the duals:
-$$
-f(1 + ϵ) = {\rm e}^{1 + 2ϵ + {\rm e} + {\rm e} ϵ} =  {\rm e}^{1 + {\rm e}} + {\rm e}^{1 + {\rm e}} (2 + {\rm e}) ϵ
+f(1 + ϵ) = \exp(1 + 2ϵ + {\rm e} + {\rm e} ϵ) =  \exp(1 + {\rm e}) + \exp(1 + {\rm e}) (2 + {\rm e}) ϵ
 $$
 and therefore we deduce that
 $$
-f'(1) = {\rm e}^{1 + {\rm e}} (2 + {\rm e}).
+f'(1) = \exp(1 + {\rm e}) (2 + {\rm e}).
 $$
 
 ### Matrix representations
@@ -372,7 +395,7 @@ a \underbrace{\begin{pmatrix}1 \\ & 1 \end{pmatrix}}_{\hbox{representation of 1}
 $$
 Similarly, for dual numbers we have
 $$
-a \underbrace{\begin{pmatrix}1 \\ & 1 \end{pmatrix}}_{\hbox{representation of 1}} + b \underbrace{\begin{pmatrix}0 &1 \\0 & 0\end{pmatrix}}_{\hbox{representation of $ϵ$}} = \begin{pmatrix}a & b \\ 0 & a \end{pmatrix}
+\underbrace{\begin{pmatrix}1 \\ & 1 \end{pmatrix}}_{\hbox{representation of 1}} + b \underbrace{\begin{pmatrix}0 &1 \\0 & 0\end{pmatrix}}_{\hbox{representation of $ϵ$}} = \begin{pmatrix}a & b \\ 0 & a \end{pmatrix}
 $$
 That is, the representation of $ϵ$ is a simple 2 × 2 nilpotent matrix.
 
@@ -402,7 +425,10 @@ end
 # Dual(a) represents a + 0*ϵ
 Dual(a::Real) = Dual(a, zero(a)) # for real numbers we use a + 0ϵ
 
-import Base: +, *, -, /, ^, zero
+# Allow for a + b*ϵ syntax
+const ϵ = Dual(0, 1)
+
+import Base: +, *, -, /, ^, zero, exp
 
 # support polynomials like 1 + x, x - 1, 2x or x*2 by reducing to Dual
 +(x::Real, y::Dual) = Dual(x) + y
@@ -412,7 +438,7 @@ import Base: +, *, -, /, ^, zero
 *(x::Real, y::Dual) = Dual(x) * y
 *(x::Dual, y::Real) = x * Dual(y)
 
-# support x/2 (but not yet division of duals
+# support x/2 (but not yet division of duals)
 /(x::Dual, k::Real) = Dual(x.a/k, x.b/k)
 
 # a simple recursive function to support x^2, x^3, etc.
@@ -431,31 +457,22 @@ end
 +(x::Dual, y::Dual) = Dual(x.a + y.a, x.b + y.b)
 -(x::Dual, y::Dual) = Dual(x.a - y.a, x.b - y.b)
 *(x::Dual, y::Dual) = Dual(x.a*y.a, x.a*y.b + x.b*y.a)
-```
-Our function with a condition now works:
-```julia
-f = x -> if x < 1
-        x
-    else
-        x^2
-    end
 
-f(Dual(2,1))
+exp(x::Dual) = Dual(exp(x.a), exp(x.a) * x.b)
 ```
-
 
 We can also try it on the two polynomials as above:
 ```julia
 f = x -> 1 + x + x^2
 g = x -> 1 + x/3 + x^2
-f(Dual(0.0, 1.0)).b, g(Dual(0.0, 1.0)).b
+f(ϵ).b, g(ϵ).b
 ```
 The first example exactly computes the derivative, and the
 second example is exact up to the last bit rounding!
 It also works for higher order polynomials:
 ```julia
 f = x -> 1 + 1.3x + 2.1x^2 + 3.1x^3
-f(Dual(0.5,1.0)).b - 5.725
+f(0.5 + ϵ).b - 5.725
 ```
 It is indeed "accurate to (roughly) 16-digits", the best we can hope for 
 using floating point.
@@ -470,9 +487,15 @@ function s(n, x)
     end
     ret
 end
-s(10, Dual(0.1,1.0)).b
+s(10, 0.1 + ϵ).b
 ```
 The two match.
+
+Finally, we can try the more complicated example:
+```julia
+f = x -> exp(x^2 + exp(x))
+f(1 + ϵ)
+```
 
 What makes dual numbers so effective is that, unlike finite differences, they are not
 prone to disasterous growth due to round-off errors. 
