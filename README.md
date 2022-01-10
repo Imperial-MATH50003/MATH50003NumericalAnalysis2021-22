@@ -8,7 +8,7 @@ Lecturer: [Dr Sheehan Olver](https://www.ma.imperial.ac.uk/~solver/)
 
 **Background material**
 
-1. [Introduction to Julia](notebooks/Julia.ipynb): we introduce the basic features of the Julia language.
+1. [Introduction to Julia](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Julia.ipynb): we introduce the basic features of the Julia language.
 
 **Part I: Computing with numbers**
 
