@@ -123,7 +123,7 @@ To run Julia in a Jupyter notebook on your own machine:
 2. Open the Julia app which will launch a new window
 3. Install the needed packages by typing (`]` will change the prompt to a package manager):
 ```julia
-] add IJulia Plots
+] add IJulia Plots ColorBitstring
 ```
 3. Build Jupyter via
 ```julia
