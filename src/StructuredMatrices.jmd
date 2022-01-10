@@ -158,9 +158,78 @@ $$
 $$
 Here we discuss three important cases: permutations, simple rotations and reflections.
 
-### Permutations
+### Permutation Matrices
 
-Permutation matrices are matrices that represent the action of permuting the entries of a vector.  
+Permutation matrices are matrices that represent the action of permuting the entries of a vector,
+that is, matrix representations of the symmetric group $S_n$, acting on $ℝ^n$.
+Recall every $σ \in S_n$ is a bisection between $\{1,2,\ldots,n\}$.
+We can write a permutation $σ$ in _Cauchy notation_:
+$$
+\begin{pmatrix}
+ 1 & 2 & 3 & \cdots & n \cr
+ σ_1 & σ_2 & σ_3 & \cdots & σ_n
+ \end{pmatrix}
+$$
+where $\{σ_1,\ldots,σ_n\} = \{1,2,\ldots,n\}$ (that is, each integer appears precisely once).
+We can encode this permutation by a vector $\mathbf p = [σ_1,\ldots,σ_n]^\top$. 
+This induces an action on a vector (using indexing notation)
+$$
+\mathbf v[\mathbf p] = \begin{pmatrix}v_{σ_1}\\ \vdots \\ v_{σ_n} \end{pmatrix}
+$$
+
+**Example (permutation of a vector)** 
+Consider the permutation $σ$ given by
+\begin{pmatrix}
+ 1 & 2 & 3 & 4 & 5 \cr
+ 1 & 4 & 2 & 5 & 3
+ \end{pmatrix}
+$$
+We can apply it to a vector of the first 5 letter:
+```julia
+p = [1, 4, 2, 5, 3]
+v = [1, 2, 3, 4, 5]
+v[p]
+```
+
+
+Note that the operator
+$$
+P_σ(\mathbf v) = \mathbf v[\mathbf p]
+$$
+is linear in $\mathbf v$, therefore, we can identify it with a matrix whose action is:
+$$
+P_σ \begin{pmatrix}v_1\\ \vdots \\ v_n \end{pmatrix} = \begin{pmatrix}v_{σ_1} \\ \vdots \\ v_{σ_n}  \end{pmatrix}.
+$$
+Note this action is linear (in $\mathbf v$) so it is guaranteed that $P_σ$ can be represented as a matrix.
+The entries of this matrix are necessarily
+$$
+P_σ[k,j] = {\mathbf e}_k^\top P_σ {\mathbf e}_j = {\mathbf e}_k^\top {\mathbf e}_{σ^{-1}_j} = δ_{k,σ^{-1}_j} = δ_{σ_k,j}
+$$
+
+**Example (permutation matrix)**
+We can construct the permutation representation for $\sigma$ as above as follows:
+```julia
+P = I(5)[p,:]
+```
+And indeed:
+```julia
+P * [1,2,3,4,5]
+```
+
+**Proposition (permutation matrix inverse)** 
+Let $P_σ$ be a permutation matrix. Then
+$$
+P_σ^\top = P_{σ^{-1}} = P_σ^{-1}
+$$
+That is, $P_σ$ is _orthogonal_:
+$$
+P_σ^\top P_σ = I.
+$$
+
+
+
+
+
 As a very simple example, the following permutes the first and second entry:
  ```julia
 v = [1,2,3,4]
@@ -170,14 +239,8 @@ P₁₂ = [0 1 0 0;
        0 0 0 1]
 P₁₂*v  # returns v with its first two entries swapped
  ```
-Permutations can be defined in _Cauchy notation_:
 
-$$\begin{pmatrix}
- 1 & 2 & 3 & \cdots & n \cr
- \sigma_1 & \sigma_2 & \sigma_3 & \cdots & \sigma_n
- \end{pmatrix}$$
-
-where $1,2,\ldots,n$ appear precisely once in the list $\sigma_1,\sigma_2,\ldots,\sigma_n$.  This notation denotes the permutation that sends k to $\sigma_k$.  
+where $1,2,\ldots,n$ appear precisely once in the list $σ_1,σ_2,\ldots,σ_n$.  This notation denotes the permutation that sends k to $σ_k$.  
 
 For example, the permutation 
 
@@ -197,7 +260,7 @@ We can convert this to matrix form:
  ```
  In general, the  matrix corresponding to a permutation is given by
 
-$$P = (\mathbf{e}_{\sigma_1} | \mathbf{e}_{\sigma_2} | \cdots | \mathbf{e}_{\sigma_n} )$$
+$$P = (\mathbf{e}_{σ_1} | \mathbf{e}_{σ_2} | \cdots | \mathbf{e}_{σ_n} )$$
 
 The inverse of a permutation is the permutation that sends the entries back to where they came from.  This is equivalent to swapping the rows in Cauchy's notation and sorting:  the inverse of
 
