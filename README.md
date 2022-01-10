@@ -65,6 +65,24 @@ _fast_ implementation of algorithms but also has support for _fast_ automatic-di
 that is of increasing importance in machine learning. It also is low level enough that we can
 really understand what the computer is doing. As a bonus, it is easy-to-read and fun to write. 
 
+To run Julia in a Jupyter notebook on your own machine:
+
+1. Download [Julia v1.7.1](https://julialang.org/downloads/)
+2. Open the Julia app which will launch a new window
+3. Install the needed packages by typing (`]` will change the prompt to a package manager):
+```julia
+] add IJulia Plots
+```
+3. Build Jupyter via
+```julia
+] bulid IJulia
+```
+4. Launch Jupyter by typing
+```julia
+using IJulia
+notebook()
+```
+
 ## Course Outline
 
 **Background material**
