@@ -4,7 +4,46 @@ Notes and course material for MATH50003 Numerical Analysis
 Lecturer: [Dr Sheehan Olver](https://www.ma.imperial.ac.uk/~solver/)
 
 
-# What is numerical analysis? 
+## Course Outline
+
+**Background material**
+
+1. [Introduction to Julia](notebooks/Julia.ipynb): we introduce the basic features of the Julia language.
+
+**Part I: Computing with numbers**
+
+1. [Numbers](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Numbers.ipynb): we discuss how computers represent integers and real numbers, as well as their arithmetic operations.
+2. [Differentiation](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Differentiation.ipynb): we discuss ways of approximating derivatives, including automatic differentiation, 
+which is essential to  machine learning.
+
+**Part II: Computing with matrices**
+
+1. Structured Matrices: we discuss types of structured matrices (permutations, orthogonal matrices, triangular, banded).
+3. Decompositions: we discuss algorithms for computing matrix decompositions (QR and PLU decompositions) and their use in solving linear systems.
+3. Norms and condition numbers: we discuss vector and
+matrix norms, and condition numbers for matrices, and the singular value decomposition.
+7. Differential Equations: we discuss the numerical solution of linear differential equations, 
+including both time-dependent ordinary differential equations and boundary value problems, by reduction to linear systems.
+
+
+**Part III: Computing with functions**
+
+1. Interpolation and least squares regression: We discuss the use of polynomials to approximate
+functions from samples. 
+2. Fourier series: we discuss Fourier series and their usage in numerical computations
+via the fast Fourier transform.
+5. Orthogonal Polynomials: we discuss orthogonal polynomials—polynomials orthogonal 
+with respect to a proscribed weight—and their usage in numerical computations.
+6. Integration: we discuss ways to approximate integrals, both definite and indefinite, using orthogonal polynomials and interpolation.
+
+## Assessment
+
+1. Practice mid-term (computer-based Julia exam): 25 March 2022 (TBC)
+2. Mid-term (computer-based Julia exam): 11 March 2022 (TBC)
+3. Practice final exam (pen-and-paper): Summer Term (TBC)
+3. Final exam (pen-and-paper): Summer Term (TBC)
+
+## What is numerical analysis? 
 
 Broadly speaking, numerical analysis is the study of approximating
 solutions to _continuous problems_ in mathematics, for example, integration, differentiation, 
@@ -82,42 +121,3 @@ To run Julia in a Jupyter notebook on your own machine:
 using IJulia
 notebook()
 ```
-
-## Course Outline
-
-**Background material**
-
-1. [Introduction to Julia](notebooks/Julia.ipynb): we introduce the basic features of the Julia language.
-
-**Part I: Computing with numbers**
-
-1. [Numbers](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Numbers.ipynb): we discuss how computers represent integers and real numbers, as well as their arithmetic operations.
-2. [Differentiation](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Differentiation.ipynb): we discuss ways of approximating derivatives, including automatic differentiation, 
-which is essential to  machine learning.
-
-**Part II: Computing with matrices**
-
-1. Structured Matrices: we discuss types of structured matrices (permutations, orthogonal matrices, triangular, banded).
-3. Decompositions: we discuss algorithms for computing matrix decompositions (QR and PLU decompositions) and their use in solving linear systems.
-3. Norms and condition numbers: we discuss vector and
-matrix norms, and condition numbers for matrices, and the singular value decomposition.
-7. Differential Equations: we discuss the numerical solution of linear differential equations, 
-including both time-dependent ordinary differential equations and boundary value problems, by reduction to linear systems.
-
-
-**Part III: Computing with functions**
-
-1. Interpolation and least squares regression: We discuss the use of polynomials to approximate
-functions from samples. 
-2. Fourier series: we discuss Fourier series and their usage in numerical computations
-via the fast Fourier transform.
-5. Orthogonal Polynomials: we discuss orthogonal polynomials—polynomials orthogonal 
-with respect to a proscribed weight—and their usage in numerical computations.
-6. Integration: we discuss ways to approximate integrals, both definite and indefinite, using orthogonal polynomials and interpolation.
-
-## Assessment
-
-1. Practice mid-term (computer-based Julia exam): 25 March 2022 (TBC)
-2. Mid-term (computer-based Julia exam): 11 March 2022 (TBC)
-3. Practice final exam (pen-and-paper): Summer Term (TBC)
-3. Final exam (pen-and-paper): Summer Term (TBC)
