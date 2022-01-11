@@ -4,7 +4,61 @@ Notes and course material for MATH50003 Numerical Analysis
 Lecturer: [Dr Sheehan Olver](https://www.ma.imperial.ac.uk/~solver/)
 
 
-What is numerical analysis? Broadly speaking, numerical analysis is the study of approximating
+## Course Outline
+
+**Background material**
+
+1. [Introduction to Julia](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Julia.ipynb): we introduce the basic features of the Julia language.
+
+**Part I: Computing with numbers**
+
+1. [Numbers](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Numbers.ipynb): we discuss how computers represent integers and real numbers, as well as their arithmetic operations.
+2. [Differentiation](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Differentiation.ipynb): we discuss ways of approximating derivatives, including automatic differentiation, 
+which is essential to  machine learning.
+
+**Part II: Computing with matrices**
+
+1. Structured Matrices: we discuss types of structured matrices (permutations, orthogonal matrices, triangular, banded).
+3. Decompositions: we discuss algorithms for computing matrix decompositions (QR and PLU decompositions) and their use in solving linear systems.
+3. Norms and condition numbers: we discuss vector and
+matrix norms, and condition numbers for matrices, and the singular value decomposition.
+7. Differential Equations: we discuss the numerical solution of linear differential equations, 
+including both time-dependent ordinary differential equations and boundary value problems, by reduction to linear systems.
+
+
+**Part III: Computing with functions**
+
+1. Interpolation and least squares regression: We discuss the use of polynomials to approximate
+functions from samples. 
+2. Fourier series: we discuss Fourier series and their usage in numerical computations
+via the fast Fourier transform.
+5. Orthogonal Polynomials: we discuss orthogonal polynomials—polynomials orthogonal 
+with respect to a proscribed weight—and their usage in numerical computations.
+6. Integration: we discuss ways to approximate integrals, both definite and indefinite, using orthogonal polynomials and interpolation.
+
+## Assessment
+
+1. Practice mid-term (computer-based Julia exam): 25 March 2022 (TBC)
+2. Mid-term (computer-based Julia exam): 11 March 2022 (TBC)
+3. Practice final exam (pen-and-paper): Summer Term (TBC)
+3. Final exam (pen-and-paper): Summer Term (TBC)
+
+## Problem sheets
+
+1. Week 1: Binary representation, integers, floating point numbers, interval arithmetic
+
+## Reading List
+
+1. Michael L. Overton, [Numerical Computing with IEEE Floating Point Arithmetic](https://epubs.siam.org/doi/book/10.1137/1.9780898718072), Chapters 2–6
+2. Lloyd N. Trefethen & David Bau III, [Numerical Linear Algebra](https://my.siam.org/Store/Product/viewproduct/?ProductId=950/&ct=c257a1956367c57b599612fbf383d0d3c674af4f9181d827444b5cdaca95b0686d6d20467a7c1e3290fb5b31c310ce74f5b2ede375934b844b1171bc734358e2), Chapters 1–4
+3. Lloyd N. Trefethen, [Approximation Theory and Approximation Practice](https://people.maths.ox.ac.uk/trefethen/ATAP/ATAPfirst6chapters.pdf), Chapters 1–4, 17–19
+4. [The Julia Documentation](https://docs.julialang.org)
+5. [The Julia–Matlab–Python Cheatsheet](https://cheatsheets.quantecon.org)
+
+
+## What is numerical analysis? 
+
+Broadly speaking, numerical analysis is the study of approximating
 solutions to _continuous problems_ in mathematics, for example, integration, differentiation, 
 and solving differential equations. There are three key topics in numerical analysis:
 
@@ -12,7 +66,7 @@ and solving differential equations. There are three key topics in numerical anal
 software.
 2. Convergence of algorithms: proving under which conditions algorithms converge to the
 true solution, and the rate of convergence.
-2. Stability of algorithms: the study of robustness of algorithms to small perturbations in
+3. Stability of algorithms: the study of robustness of algorithms to small perturbations in
 data, for example, those that arise from measurement error, errors if data are themselves computed using
 algorithms, or simply errors arising from the way computers represent real numbers.
 
@@ -51,50 +105,32 @@ computations. Note that there are many computer-assisted proofs that do not fall
 they do not involve errors in computations or approximation or involve discrete problems, for 
 example, the proof the [Four Colour Theorem](https://en.wikipedia.org/wiki/Four_color_theorem).
 
-A rough overview of the course is as follows:
-
-**Part I: Computing with numbers**
-
-1. [Numbers](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Numbers.ipynb): we discuss how computers represent integers and real numbers, as well as their arithmetic operations.
-2. [Differentiation (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Differentiation.ipynb): we discuss ways of approximating derivatives, including automatic differentiation, 
-which is essential to stochastic gradient descent and machine learning.
-
-**Part II: Computing with matrices**
-
-1. [Structured Matrices (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/StructuredMatrices.ipynb): we discuss types of structured matrices (permutations, orthogonal matrices, triangular, banded).
-3. [Decompositions (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Decompositions.ipynb): we discuss algorithms for computing matrix decompositions (QR and PLU decompositions) and their use in solving linear systems.
-3. [Norms and condition numbers (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Norms.ipynb): we discuss vector and
-matrix norms, and condition numbers for matrices, and the singular value decomposition.
-7. [Differential Equations (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/DifferentialEquations.ipynb): we discuss the numerical solution of linear differential equations, 
-including both time-dependent ordinary differential equations and boundary value problems, by reduction to linear systems.
-
-
-**Part III: Computing with functions**
-
-1. [Interpolation and least squares regression (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Interpolation.ipynb): We discuss the use of polynomials to approximate
-functions from samples. 
-2. [Fourier series (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Fourier.ipynb): we discuss Fourier series and their usage in numerical computations
-via the fast Fourier transform.
-5. [Orthogonal Polynomials (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/OrthogonalPolynomials.ipynb): we discuss orthogonal polynomials—polynomials orthogonal 
-with respect to a proscribed weight—and their usage in numerical computations.
-6. [Integration (WIP)](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/notebooks/Integration.ipynb): we discuss ways to approximate integrals, both definite and indefinite, using orthogonal polynomials and interpolation.
-
+## The Julia Programming Language
 
 In this course we will use the programming language [Julia](https://julialang.org). This is a modern, compiled, high-level,
 open-source language developed at MIT. It is becoming increasingly important in high-performance computing and
-AI, including by Astrazeneca and Pfizer in drug development, IBM for medical diagnosis, and MIT for robot
-locomotion.
+AI, including by Astrazeneca, Moderna and Pfizer in drug development and clinical trial accelleration, IBM for medical diagnosis, MIT for robot
+locomotion, and elsewhere.
 
 It is ideal for a course on numerical analysis because it both allows
 _fast_ implementation of algorithms but also has support for _fast_ automatic-differentiation, a feature 
 that is of increasing importance in machine learning. It also is low level enough that we can
-really understand what the computer is doing. As a bonus, it is easy-to-read and fun to write. We also provide an introduction to Julia:
+really understand what the computer is doing. As a bonus, it is easy-to-read and fun to write. 
 
-1. [Introduction to Julia](notebooks/Julia.ipynb): we introduce the basic features of the Julia language.
+To run Julia in a Jupyter notebook on your own machine:
 
-Note that the assessment will primarily be on mathematical ideas, not programming, however, 
-the mid-term exam will be computer-based: in order to understand numerical analysis
-it is essential that one actually implements the methods and ideas on a computer
-and a computer-based exam is an effective way to measure this. So while the
-details of the Introduction to Julia chapter are non-examinable, it is essential
-to understand the basics (loops, branching, functions, types). The forthcoming practice mid-term should give a clear idea what is expected.
+1. Download [Julia v1.7.1](https://julialang.org/downloads/)
+2. Open the Julia app which will launch a new window
+3. Install the needed packages by typing (`]` will change the prompt to a package manager):
+```julia
+] add IJulia Plots ColorBitstring
+```
+3. Build Jupyter via
+```julia
+] bulid IJulia
+```
+4. Launch Jupyter by typing
+```julia
+using IJulia
+notebook()
+```
