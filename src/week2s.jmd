@@ -4,7 +4,7 @@
 
 **Problem 1.1** Use Taylor's theorem to derive the error for central differences
 $$
-{f(x + h) - f(x - h) \over h}
+f'(x) ≈ {f(x + h) - f(x - h) \over h}
 $$
 
 
@@ -15,11 +15,12 @@ Derive the error exactly for the different cases.
 
 
 
+**Problem 1.4** Consider the second order derivative approximation
+$$
+f''(x) ≈ {f(x+h) - 2f(x) + f(x-h) \over h^2}
+$$
 
 
-## 2. Second-order finite-differences
-
-**Problem** Consider the second order derivative approximation.
 
 
 ## 2. Dual numbers
@@ -53,7 +54,7 @@ $$
 ```julia
 
 
-struct Dual{T}
+struct Dual2{T}
     a::T
     b::T
     c::T

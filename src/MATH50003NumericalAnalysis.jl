@@ -10,10 +10,12 @@ kwds = (out_path = "notebooks/", jupyter_path = "$(homedir())/.julia/conda/3/bin
 notebook("src/Julia.jmd"; kwds...)
 notebook("src/Numbers.jmd"; kwds...)
 notebook("src/Differentiation.jmd"; kwds...)
+
 notebook("src/StructuredMatrices.jmd"; kwds...)
 notebook("src/Decompositions.jmd"; kwds...)
-notebook("src/DifferentialEquations.jmd"; kwds...)
 notebook("src/Norms.jmd"; kwds...)
+notebook("src/DifferentialEquations.jmd"; kwds...)
+
 notebook("src/Fourier.jmd"; kwds...)
 notebook("src/OrthogonalPolynomials.jmd"; kwds...)
 notebook("src/Interpolation.jmd"; kwds...)

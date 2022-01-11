@@ -1,3 +1,13 @@
+# 1. Dense Matrices
+
+**Problem 1.1** Use random matrices (`randn`) to show that `A*x` is not
+implemented as
+```julia
+function mul
+```
+
+# 2. Triangular Matrices
+
  function backsubstitution(U,b)
     n = size(U,1)
     

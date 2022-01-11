@@ -22,7 +22,7 @@ very easy to invert. We discuss special cases includion permutations, rotations 
 ## 1. Dense vectors and matrices
 
 A `Vector` of a primitive type (like `Int` or `Float64`) is stored
-consecutively in memory. E.g. if we have `Vector{Int8}` of length
+consecutively in memory. E.g. if we have a `Vector{Int8}` of length
 `n` then it is stored as `8n` bits (`n` bytes) in a row.
 A  `Matrix` is stored consecutively in memory, going down column-by-
 column. That is,
@@ -42,24 +42,28 @@ _row-major_ format.
 
 Matrix-vector multiplication works as expected:
 ```julia
-x = [7; 8]
+x = [7, 8]
 A*x
 ```
-It is easy to implement such an algorithm in terms of the algebraic operations 
+It is easy to implement matrix-multiplication in terms of the algebraic operations 
 we have learned, in this case just using integer arithmetic:
 ```julia
-c = zeros(Int, 3)
-for j = 1:size(A,2), k = 1:size(A,1)
-    c[k] += A[k, j] * x[j]
+function mul(A, x)
+    m,n = size(A)
+    c = zeros(Int, m)
+    for j = 1:n, k = 1:m
+        c[k] += A[k, j] * x[j]
+    end
+    c
 end
-c
+mul(A, x)
 ```
+
 
 **Remark (advanced)** 
 This accesses the entries of `A` going down the column,
 which happens to be _significantly faster_ than accessing by row due to the
 way computers access memory, but this is beyond the scope of this module.
-
 
 
 
