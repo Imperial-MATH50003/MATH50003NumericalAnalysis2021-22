@@ -1,0 +1,596 @@
+# Week 1
+
+This problem sheet tests the representation of numbers on the computer, using
+modular arithmetic. We also use floating point rounding modes to implement 
+interval arithmetic, and thereby
+produce rigorous bounds on the exponential.
+
+```julia
+using ColorBitstring, SetRounding
+```
+
+## 1. Binary representation
+
+
+**Problem 1.1** What is the binary representations of $1/5$? (Hint: use `printbits` to derive a proposed form.)
+
+**SOLUTION**
+Note that
+```julia
+printbits(1/5)
+```
+Hence we  show that
+$$
+\begin{align*}
+(0.00110011001100…)_2 &= (2^{-3} + 2^{-4})(1.00010001000…)_2 =  (2^{-3} + 2^{-4}) \sum_{k=0}^∞ {1 \over 16^k} \\
+&= {2^{-3} + 2^{-4} \over 1 - {1\over 2^4}} = {3 \over 15} = {1 \over 5}
+\end{align*}
+$$
+
+
+
+
+
+**Problem 1.2** What is $\pi$ to 5 binary places? Hint: recall that $\pi \approx  3.14$.
+
+**SOLUTION**
+Note that
+```julia
+3 + 1/8  + 1/64
+```
+which has the binary representation $(11.001001)_2$.
+Indeed:
+```julia
+printbits(Float16(π))
+```
+
+
+## 2. Integers
+
+**Problem 2.1** With 8-bit signed integers, find the bits for the following: $10, 120, -10$.
+
+**SOLUTION**
+We can find the binary digits by repeatedly subtracting the largest power of 2 less than a number
+until we reach 0, e.g. $10 -2^3 - 2 = 0$
+implies $10 = (101)_2$.
+Thus the bits are:
+```julia
+printlnbits(Int8(10))
+```
+Similarly,
+$$
+120 = 2^6 + 2^5 + 2^4 + 2^3 = (1111000)_2
+$$
+Thus the bits are:
+```julia
+printlnbits(Int8(120))
+```
+For negative numbers we perform the same trick but adding $2^p$ to make it positive, e.g.,
+$$
+-10 = 2^8 - 10 ({\rm mod 2^8}) = 246 = 2^7 + 2^6 + 2^5 + 2^4 + 2^2 + 2 = (11110110)_2
+$$
+This the bits are:
+```julia
+printlnbits(Int8(-10))
+```
+
+
+
+**Problem 2.2** What will `Int8(120) + Int8(10)` return?
+
+**SOLUTION**
+It will return
+$$
+130 ({\rm mod\ } 2^8) = -126 ({\rm mod\ } 2^8)
+$$
+```julia
+Int8(120) + Int8(10)
+```
+
+
+## 3. Floating point numbers
+
+**Problem 3.1** What are the single precision $F_{32}$ (`Float32`) floating point representations for the following: 
+$$
+2, 31, 32, 23/4, (23/4)\times 2^{100}
+$$
+Check your answers using `printbits`.
+
+
+**SOLUTION**
+Recall that we have `σ,Q,S = 127,8,23`. Thus we write
+$$
+2 = 2^{128-127} * (1.00000000000000000000000)_2
+$$
+The exponent bits are those of
+$$
+128 = 2^7 = (10000000)_2
+$$
+Hence we get
+```julia
+printlnbits(2f0)
+```
+We write
+$$
+31 = (11111)_2 = 2^{131-127} * (1.1111)_2
+$$
+And note that $131 = (10000011)_2$ Hence we have:
+```julia
+printlnbits(31f0)
+```
+On the other hand,
+$$
+32 = (100000)_2 = 2^{132-127}
+$$
+and $132 = (10000100)_2$ hence:
+```julia
+printlnbits(32f0)
+```
+Note that
+$$
+23/4 = 2^{-2} * (10111)_2 = 2^{129-127} * (1.0111)_2
+$$
+and $129 = (10000001)_2$ hence we get:
+```julia
+printlnbits(23f0/4)
+```
+Finally,
+$$
+23/4 * 2^{100} = 2^{229-127} * (1.0111)_2
+$$
+and $229 = (11100101)_2$ giving us:
+```julia
+printlnbits(23f0/4 * 2f0^100)
+```
+
+
+**Problem 3.2** Let $m(y) = \min\{x \in F_{32} : x > y \}$ be the smallest single precision number
+greater than $y$. What is $m(2) - 2$ and $m(1024) - 1024$? Check your answer using the `nextfloat`
+command.
+
+
+**SOLUTION**
+The next float after $2$ is $2 * (1 + 2^{-23})$ hence we get $2^{-22}$:
+```julia
+nextfloat(2f0) - 2, 2^(-22)
+```
+similarly, the next float after $1024 = 2^10$ is $2^{10-23} = 2^{-13}$:
+```julia
+ nextfloat(1024f0) - 1024, 2^(-13)
+```
+
+
+
+## 4. Arithmetic
+
+
+**Problem 4.1** Suppose $x = 1.25$ and consider 16-bit floating point arithmetic (`Float16`). 
+What is the error in approximating $x$ by the nearest float point number ${\rm fl}(x)$?
+What is the error in approximating $2x$, $x/2$, $x + 2$ and $x - 2$ by $2 \otimes x$, $x \oslash 2$, $x ⊕ 2$ and $x \ominus 2$?
+
+**SOLUTION**
+None of these computations have errors since they are all exactly representable as floating point numbers.
+
+**Problem 4.2** For what floating point numbers is $x \oslash 2 \neq x/2$ and $x ⊕ 2 \neq x + 2$?
+
+**SOLUTION**
+Provided $x$ is normal, $x ⊘ 2 = x/2$. Thus $x$ needs to be sub-normal, with a non-zero last bit.
+Or `NaN`.
+Here's an example:
+```julia
+x = reinterpret(Float16, parse(UInt16, "0000000000000011"; base=2))
+x/2 == Float64(x)/2 # Float64 can exactly represent x/2
+```
+
+
+
+
+**Problem 4.3** Explain why the following return `true`. What is the largest floating point number `y` such that `y + 1 ≠ y`?
+```julia
+x = 10.0^100
+x + 1 == x
+```
+
+
+**SOLUTION**
+
+Writing $10 = 2^3 (1.01)_2$ we have
+$$
+\rm{fl}(10^100) = \rm{fl}(2^{300} (1 + 2^{-4})^100) = 2^{300} (1.b_1 \ldots b_{52})_2
+$$
+where the bits $b_k$ are not relevant. We then have:
+$$
+\rm{fl}(10^100) ⊕ 1 = \rm{fl}(2^{300} [(1.b_1 \ldots b_{52})_2 + 2^{-300}]) = \rm{fl}(10^100)
+$$
+since $2^{-300}$ is below the necessary precision.
+
+The largest floating point number satisfying the condition is $y = 2^{53} - 1$, since
+$S = 52$. First note $2^{53}$ does not satisfy the condition:
+```julia
+x = 2.0^53
+x + 1 == x
+```
+We can however successfully create $2^{53} -1$ by subtracting (WHY?):
+```julia
+y = x - 1
+printlnbits(x)
+printlnbits(y)
+```
+And this satisfies:
+```julia
+y + 1 ≠ y
+```
+
+
+
+
+
+
+
+**Problem 4.4** What are the exact bits for $1/5$, $1/5 + 1$ computed
+using  half-precision arithmetic (`Float16`) (using default rounding)?
+
+**SOLUTION**
+
+We saw above that
+$$
+1/5 = 2^{-3} * (1.10011001100…)_2 ≈ 2^{-3} * (1.1001100110)_2
+$$
+where the $≈$ is rounded to the nearest 10 bits (in this case rounded down).
+We write $-3 = 12 - 15$
+hence we have $q = 12 = (01100)_2$. 
+so  we get the bits:
+```julia
+printbits(Float16(1)/5)
+```
+
+Adding `1` we get:
+$$
+1 + 2^{-3} * (1.1001100110)_2 = (1.001100110011)_2 ≈ (1.0011001101)_2 
+$$
+Here we write the exponent as $0 = 15 - 15$ where $q = 15 = (01111)_2$. 
+Thus we get:
+```julia
+printbits(1 + Float16(1)/5)
+```
+
+
+**Problem 4.5** Explain why the following does not return `1`. Can you compute the bits explicitly?
+```julia
+Float16(0.1) / (Float16(1.1) - 1)
+```
+
+
+
+**SOLUTION**
+For the last problem, note that
+$$
+{1 \over 10} = {1 \over 2} {1 \over 5} = 2^{-4} * (1.10011001100…)_2
+$$
+hence we have 
+$$
+{\rm fl}({1 \over 10}) = 2^{-4} * (1.1001100110)_2
+$$
+and
+$$
+{\rm fl}(1 + {1 \over 10}) ={\rm fl}(1.0001100110011\ldots) = (1.0001100110)_2
+$$
+Thus
+$$
+{\rm fl}(1.1) ⊖ 1 = (0.0001100110)_2 = 2^{-4} (1.1001100000)_2
+$$
+and hence we get
+$$
+{\rm fl}(0.1) ⊘ ({\rm fl}(1.1) ⊖ 1)= {\rm fl}({(1.1001100110)_2 \over (1.1001100000)_2}) \neq 1
+$$
+To compute the bits explicitly, write $y = (1.10011)_2$ and divide through to get:
+$$
+{(1.1001100110)_2 \over (1.10011)_2} = 1 + {2^{-8} \over y} + {2^{-9} \over y}
+$$
+We then have
+$$
+y^{-1} = {32 \over 51} = 0.627\ldots = (0.101\ldots)_2
+$$
+Hence
+$$
+1 + {2^{-8} \over y} + {2^{-9} \over y} = 1 + (2^{-9} + 2^{-11} + \cdots) + (2^{-10} + \cdots) = (1.00000000111…)_2
+$$
+Therefore we round up (the $…$ is not exactly zero but if it was it would be a tie and we would
+round up anyways to get a zero last bit) and get:
+```julia
+printlnbits(Float16(0.1) / (Float16(1.1) - 1))
+```
+
+
+**Problem 4.4** Find a bound on the _absolute error_ in terms of a constant times
+$ϵ_{\rm m}$ for the following computations
+$$
+\begin{align*}
+(1.1 * 1.2) &+ 1.3 \\
+(1.1 - 1) &/ 0.1 
+\end{align*}
+$$
+implemented using floating point arithmetic (with any precision). 
+
+**SOLUTION**
+
+The first problem is very similar to what we saw in lecture. Write 
+$$
+({\rm fl}(1.1)⊗ {\rm fl}(1.2)) ⊕ {\rm fl}(1.3) = ( 1.1(1 + δ_1)1.2(1+δ_2)(1+δ_3) + 1.3(1+δ_4))(1+δ_5)
+$$
+We first write
+$$
+1.1(1 + δ_1)1.2(1+δ_2)(1+δ_3) = 1.32( 1+ δ_6)
+$$
+where
+$$
+|δ_6| \leq |δ_1| + |δ_2| + |δ_3| + |δ_1| |δ_2| + |δ_1| |δ_3| + |δ_2| |δ_3|+ |δ_1| |δ_2| |δ_3| \leq 4 ϵ_{\rm m}
+$$
+Then we have
+$$
+1.32 (1 + δ_6) + 1.3 (1 + δ_4) = 2.62 + \underbrace{1.32 δ_6 + 1.3δ_4}_{δ_7}
+$$
+where
+$$
+|δ_7| ≤ 7 ϵ_{\rm m}
+$$
+Finally,
+$$
+(2.62 + δ_6)(1+δ_5) = 2.62 + \underbrace{δ_6 + 2.62δ_5 + δ_6 δ_5}_{δ_8}
+$$
+where
+$$
+|δ_8| ≤ 10 ϵ_{\rm m}
+$$
+
+
+
+For the second part, we do:
+$$
+({\rm fl}(1.1) ⊖ 1) ⊘ {\rm fl}(0.1) = {(1.1 (1 + δ_1) - 1)(1 + δ_2) \over 0.1 (1 + δ_3)} (1 + δ_4)
+$$
+Write
+$$
+{1 \over 1 + δ_3} = 1 + \underbrace{-δ_3 + δ_3^2 + \cdots}_{δ_5}
+$$
+where
+$$
+|δ_5| \leq {ϵ_{\rm m} \over 2} {1 \over 1 - ϵ_{\rm m}/2} \leq ϵ_{\rm m}
+$$
+Further write
+$$
+(1 + δ_5)(1 + δ_4) = 1 + δ_6
+$$
+where
+$$
+|δ_6| \leq |δ_5| + |δ_4| + |δ_5| |δ_4| \leq 2ϵ_{\rm m}
+$$
+We also write
+$$
+{(1.1 (1 + δ_1) - 1)(1 + δ_2) \over 0.1} = 1 + \underbrace{11δ_1 + δ_2 + 11δ_1δ_2}_{δ_7}
+$$
+where
+$$
+|δ_7| ≤ 17 ϵ_{\rm m}
+$$
+Then we get 
+$$
+({\rm fl}(1.1) ⊖ 1) ⊘ {\rm fl}(0.1) = (1 + δ_7) (1 + δ_6) =  1 + δ_7 + δ_6 + δ_6 δ_7
+$$
+and the error is bounded by:
+$$
+(17 + 2 + 34) ϵ_{\rm m} = 53 ϵ_{\rm m}
+$$
+This is quite pessimitic but still captures that we are on the order of $ϵ_{\rm m}$.
+
+
+
+
+
+
+
+## 5. Interval arithmetic
+
+
+The following problems consider implementation of interval arithmetic for
+proving precise bounds on arithmetic operations. That is recall the set operations
+$$
+A + B = \{x + y : x \in A, y \in B\}, AB = \{xy : x \in A, y \in B\}.
+$$
+
+**Problem 5.1** For intervals $A = [a,b]$ and $B = [c,d]$ such that $0 \notin A,B$
+ and integer $n \neq 0$, 
+deduce formulas for the minimum and maximum of $A/n$, $A+B$ and $AB$.
+
+**Solution**
+
+$$
+\begin{align*}
+{A \over n} &= \begin{cases}
+[a/n,b/n] & n > 0 \\
+[b/n,a/n] & n < 0
+\end{cases},\\
+A + B &= [a + c, b + d] \\
+AB &= \begin{cases}
+[cd,ab]& a,b,c,d < 0 \\
+[ad,bc]& a,b < 0 \hbox{ and } c,d >0 \\
+[bc,ad]& a,b > 0 \hbox{ and } c,d  < 0 \\
+[ab,cd]& a,b,c,d >> 0
+\end{cases}
+\end{align*}
+$$
+
+
+**Problem 5.2** 
+We want to implement floating point variants such that, for $S = [a,b] + [c,d]$
+ $P = [a,b] * [c,d]$, and $D = [a,b]/n$ for an integer $n$,
+$$
+\begin{align*}
+[a,b] ⊕ [c,d] &:= [{\rm fl}^{\rm down}(\min S), {\rm fl}^{\rm up}(\max S)] \\
+[a,b] ⊗ [c,d] &:= [{\rm fl}^{\rm down}(\min P), {\rm fl}^{\rm up}(\max P)] \\
+[a,b] ⊘ n &:= [{\rm fl}^{\rm down}(\min D), {\rm fl}^{\rm up}(\max D)]
+\end{align*}
+$$
+This guarantees $S ⊆ [a,b] ⊕ [c,d]$, $P ⊆ [a,b] ⊗ [c,d]$, and
+$D ⊆ [a,b] ⊘ n$.
+In other words, if $x \in [a,b]$ and
+$y \in [c,d]$ then $x +y \in [a,b] ⊕ [c,d]$, and we thereby have  bounds on $x + y$.
+
+Use the formulae from Problem 5.1 to complete (by replacing the `# TODO: …` comments with code)
+ the following implementation of an 
+`Interval` 
+so that `+`, `-`, and `/` implement $⊕$, $⊖$, and $⊘$ as defined above.
+
+```julia
+# Interval(a,b) represents the closed interval [a,b]
+struct Interval{T}
+    a::T
+    b::T
+end
+
+import Base: *, +, -, /, one, in
+
+# create an interval corresponding to [1,1]
+one(x::Interval) = Interval(one(x.a), one(x.b))
+
+# Support x in Interval(a,b)
+in(x, y::Interval) = y.a ≤ x ≤ y.b
+
+# Following should implement ⊕
+function +(x::Interval, y::Interval)
+    T = promote_type(typeof(x.a), typeof(x.b))
+    a = setrounding(T, RoundDown) do
+        # TODO: upper bound
+        ## SOLUTION
+        x.a + y.a
+        ## END
+    end
+    b = setrounding(T, RoundUp) do
+        # TODO: upper bound
+        ## SOLUTION
+        x.b + y.b
+        ## END
+    end
+    Interval(a, b)
+end
+
+# Following should implement ⊘
+function /(x::Interval, n::Integer)
+    T = typeof(x.a)
+    if iszero(n)
+        error("Dividing by zero not support")
+    end
+    a = setrounding(T, RoundDown) do
+        # TODO: lower bound
+        ## SOLUTION
+        if n > 0
+            x.a / n
+        else
+            x.b / n
+        end
+        ## END
+    end
+    b = setrounding(T, RoundUp) do
+        # TODO: upper bound
+        ## SOLUTION
+        if n > 0
+            x.b / n
+        else
+            x.a / n
+        end
+        ## END
+    end
+    Interval(a, b)
+end
+
+# Following should implement ⊗
+function *(x::Interval, y::Interval)
+    T = promote_type(typeof(x.a), typeof(x.b))
+    if 0 in x || 0 in y
+        error("Multiplying with intervals containing 0 not supported.")
+    end
+    a = setrounding(T, RoundDown) do
+        # TODO: lower bound
+        ## SOLUTION
+        if x.a < 0 && x.b < 0 && y.a < 0 && y.b < 0
+            y.b * x.b
+        elseif x.a < 0 && x.b < 0 && y.a > 0 && y.b > 0
+            x.a * y.b
+        elseif x.a > 0 && x.b > 0 && y.a < 0 && y.b < 0
+            x.b * y.a
+        else
+            x.a * y.a
+        end
+        ## END
+    end
+    b = setrounding(T, RoundUp) do
+        # TODO: upper bound
+        ## SOLUTION
+        if x.a < 0 && x.b < 0 && y.a < 0 && y.b < 0
+            y.a * x.a
+        elseif x.a < 0 && x.b < 0 && y.a > 0 && y.b > 0
+            x.b * y.a
+        elseif x.a > 0 && x.b > 0 && y.a < 0 && y.b < 0
+            x.a * y.b
+        else
+            x.b * y.b
+        end
+        ## END
+    end
+    Interval(a, b)
+end
+```
+
+**Problem 5.4** The following function  computes the first `n+1` terms of the Taylor series of $\exp(x)$:
+$$
+\sum_{k=0}^n {x^k \over k!}
+$$
+
+```julia
+function exp_t(x, n)
+    ret = one(x) # 1 of same type as x
+    s = one(x)
+    for k = 1:n
+        s = s/k * x
+        ret = ret + s
+    end
+    ret
+end
+```
+Bound the tail of the Taylor series for ${\rm e}^x$ assuming $|x| \leq 1$. 
+(Hint: ${\rm e}^x \leq 3$ for $x \leq 1$.)
+Use the bound
+to complete the function `exp_bound` which computes ${\rm e}^x$ with rigorous error bounds, that is
+so that when applied to an interval $[a,b]$ it returns an interval that is 
+guaranteed to contain the interval $[{\rm e}^a, {\rm e}^b]$.
+
+```julia
+function exp_bound(x::Interval, n)
+    if abs(x.a) > 1 || abs(x.b) > 1
+        error("Interval must be a subset of [-1, 1]")
+    end
+    ret = exp_t(x, n) # the code for Taylor series should work on Interval unmodified
+    f = factorial(min(20, n + 1)) # avoid overflow in computing factorial
+    T = typeof(ret.a)
+
+    # TODO: modify ret so that exp(x) is guaranteed to lie in it
+    ## SOLUTION
+    err = setrounding(T, RoundUp) do
+        3 / f
+    end
+    ret + Interval(-err,err)
+    ## END
+end
+```
+Check your result by assuring that
+the following returns true:
+```julia
+exp(big(1)) in exp_bound(Interval(1.0,1.0), 20) && exp(big(-1)) in exp_bound(Interval(-1.0,-1.0), 20)
+```
+
+**SOLUTION** From the Taylor remainder theorem we know the error is
+$$
+{f^{(k+1)}(ξ) \over (k+1)!} |x|^{k+1} \leq {3 \over (k+1)!}
+$$
+Thus by widening the computation by this error we ensure that we have
+captured the error by truncating the Taylor series.

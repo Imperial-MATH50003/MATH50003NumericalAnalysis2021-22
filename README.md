@@ -45,7 +45,7 @@ with respect to a proscribed weight—and their usage in numerical computations.
 
 ## Problem sheets
 
-1. Week 1: Binary representation, integers, floating point numbers, interval arithmetic
+1. [Week 1](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/sheets/week1.ipynb): Binary representation, integers, floating point numbers, interval arithmetic
 
 ## Reading List
 
@@ -123,7 +123,7 @@ To run Julia in a Jupyter notebook on your own machine:
 2. Open the Julia app which will launch a new window
 3. Install the needed packages by typing (`]` will change the prompt to a package manager):
 ```julia
-] add IJulia Plots ColorBitstring
+] add IJulia Plots ColorBitstring SetRounding
 ```
 3. Build Jupyter via
 ```julia
