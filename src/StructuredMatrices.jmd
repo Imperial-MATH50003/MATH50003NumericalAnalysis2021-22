@@ -50,7 +50,7 @@ we have learned, in this case just using integer arithmetic:
 ```julia
 function mul(A, x)
     m,n = size(A)
-    c = zeros(Int, m)
+    c = zeros(eltype(x), m) # eltype is the type of the elements of a vector/matrix
     for j = 1:n, k = 1:m
         c[k] += A[k, j] * x[j]
     end
@@ -67,6 +67,7 @@ way computers access memory, but this is beyond the scope of this module.
 
 
 
+
 Note that the rules of arithmetic apply here: matrix multiplication with floats
 will incur round-off error (the precise details of which are subject to the implementation):
 
@@ -75,13 +76,15 @@ A = [1.4 0.4;
      2.0 1/2]
 A * [1, -1] # First entry has round-off error, but 2nd entry is exact
 ```
-
-
-and integer arithmetic will be prone to overflow:
+And integer arithmetic will be prone to overflow:
 ```julia
 A = fill(Int8(2^6), 2, 2) # make a matrix whose entries are all equal to 2^6
 A * Int8[1,1] # we have overflowed and get a negative number -2^7
 ```
+
+**Remark (advanced)** For floating point types, `A*x` is implemented in BLAS which is generally multi-threaded
+and is not identical to `mul(A,x)`, that is, some inputs will differ in how the computations
+are rounded.
 
 Solving a linear system is done using `\`:
 ```julia
@@ -97,6 +100,9 @@ incurring rounding error.
 But it is "accurate to (roughly) 16-digits".
 As we shall see, the way solving a linear system works is we first write `A` as a
 product of simpler matrices, e.g., a product of triangular matrices.
+
+**Remark (advanced)** For floating point types, `A \ x` is implemented in LAPACK, which
+like BLAS is generally multi-threaded and in fact different machines may round differently.
 
 
 ## 2. Triangular matrices
@@ -122,8 +128,8 @@ L = LowerTriangular(A)
 If we know a matrix is triangular we can do matrix-vector multiplication in half
 the number of operations. 
 Moreover, we can easily invert matrices. 
-Consider a simple 3x3 example, which can be solved with `\`:
- ```julia
+Consider a simple 3×3 example, which can be solved with `\`:
+```julia
 b = [5,6,7]
 x = U \ b
  ```
@@ -148,35 +154,70 @@ as forward substitution for inverting lower triangular matrices.
 
 ## 3. Banded matrices
 
+A _banded matrix_ is zero off a prescribed number of diagonals. 
+We call the number of (potentially) non-zero diagonals the _bandwidths_:
+
+
+**Definition (bandwidths)** A matrix $A$ has _lower-bandwidth_ $l$ if 
+$A[k,j] = 0$ for all $k > j+l$ and _upper-bandwidth_ $u$ if
+$A[k,j] = 0$ for all $j > k+u$. We say that it has _strictly lower-bandwidth_ $l$
+if it has lower-bandwidth $l$ and there exists a $j$ such that $A[j+l,j] \neq 0$.
+We say that it has _strictly upper-bandwidth_ $u$
+if it has upper-bandwidth $u$ and there exists a $k$ such that $A[k,k+u] \neq 0$.
+
 
 ### Diagonal
 
-Diagonal matrices in Julia are represented by a vector:
+**Definition (Diagonal)** _Diagonal matrices_ are square matrices with bandwidths $l = u = 0$.
+
+
+Diagonal matrices in Julia are stored as a vector containing the diagonal entries:
 ```julia
 x = [1,2,3]
 D = Diagonal(x)
 ```
-It is clear that they can multiply and efficiently in $O(n)$ operations.
+It is clear that they can multiply and efficiently (in $O(n)$ operations).
 
 ### Bidiagonal
 
-Sometimes its useful to not store zero entries of a matrix when a matrix has many zeros,
-which we refer to as _sparse_. A simple but important case is a triangular matrix where only
-two bands are nonzero, i.e.,
+**Definition (Bidiagonal)** If a square matrix has bandwidths $(l,u) = (1,0)$ it is _lower-bidiagonal_ and
+if it has bandwidths $(l,u) = (0,1)$ it is _upper-bidiagonal_. 
+
+```julia
+
+```
+
+### Tridiagonal
+
+**Definition (Tridiagonal)** If a square matrix has bandwidths $l = u = 1$ it is _tridiagonal_.
+
+Julia has 
+
+Tridiagonal matrices will come up in second-order differential equations and orthogonal polynomials.
+In this case the matrices are symmetric, and Julia has a special type `SymTridiagonal` for representing
+symmetric-tridiagonal matrices:
 ```julia
 
 ```
 
 ## 4. Orthogonal matrices
 
-**Definition (orthogonal matrix)** A matrix is _orthogonal_ if its inverse is its transpose:
-
-$$Q^⊤ Q = I$$
-
-Orthogonal matrices have the important property that they preserve the 2-norm of vectors:
+**Definition (orthogonal matrix)** A square matrix is _orthogonal_ if its inverse is its transpose:
 $$
-\|Q\mathbf{v}\|^2 = (Q\mathbf{v})^⊤ Q \mathbf{v} = \mathbf{v}^⊤ Q^⊤ Q \mathbf{v} = \mathbf{v}^⊤  \mathbf{v} = \|\mathbf{v}\|^2
+Q^⊤ Q = QQ^⊤ = I.
 $$
+
+**Proposition (norm-preserving)** Orthogonal matrices preserve the 2-norm of vectors:
+$$
+\|Q 𝐯\|^2 = \|𝐯\|.
+$$
+
+**Proof**
+$$
+\|Q 𝐯\|^2 = (Q 𝐯)^⊤ Q 𝐯 = 𝐯^⊤ Q^⊤ Q 𝐯 = 𝐯^⊤  𝐯 = \|𝐯\|^2
+$$
+∎
+
 Here we discuss three important cases: permutations, simple rotations and reflections.
 
 ### Permutation Matrices
@@ -270,6 +311,11 @@ And indeed, we see its action is as expected:
 P * v
 ```
 
+**Remark (advanced)** Note that `P` is a special type `SparseMatrixCSC`. This is used
+to represent a matrix by storing only the non-zero entries as well as their location.
+This is an important data type in high-performance scientific computing, but we will not
+be using general sparse matrices in this module.
+
 **Proposition (permutation matrix inverse)** 
 Let $P_σ$ be a permutation matrix corresponding to the permutation $σ$. Then
 $$
@@ -296,12 +342,57 @@ Permutation matrices are examples of sparse matrices that can be very easily inv
 
 ### Simple rotations
 
-In 2D we get some simple examples:
+
+**Definition (simple rotation)**
+A 2×2 _rotation matrix_ through angle $θ$ is
 $$
-\begin{pmatrix} 1 & 0 \cr 0 & 1\end{pmatrix}, \begin{pmatrix} 1 & 0 \cr 0 & -1\end{pmatrix}, \begin{pmatrix} 0 & 1 \cr 1 & 0\end{pmatrix}, \begin{pmatrix} \cos \theta & -\sin \theta \cr \sin \theta & \cos \theta \end{pmatrix}
+Q_θ := \begin{pmatrix} \cos \theta & -\sin \theta \cr \sin \theta & \cos \theta \end{pmatrix}
 $$
 
-The last matrix is a rotation matrix.  We can visualize this using Plots.jl, seeing that the 2-norm is preserved:
+In what follows we use the following for writing the angle of a vector:
+
+**Definition (two-arg atan)** The two-argument arctan function is the angle through the point
+$[a,b]^\top$:
+$$
+{\rm atan}(b,a) := \begin{cases} {\rm atan}{b \over a} & a > 0 \\
+                            {\rm atan}{b \over a} + π & a < 0\hbox{ and }b >0 \\
+                            {\rm atan}{b \over a} + π & a < 0\hbox{ and }b < 0 \\
+                            π/2 & a = 0\hbox{ and }b >0 \\
+                            -π/2 & a = 0\hbox{ and }b < 0 
+                            \end{cases}
+$$ 
+
+This is available in Julia:
+```julia
+atan(-1,-2) # angle through [-2,-1]
+```
+
+
+We can rotate an arbitrary vector to the unit axis. Interestingly it only requires
+basic algebraic functions (no trigonometric functions):
+
+
+
+**Proposition (rotation of vector)** 
+The matrix
+$$Q = {1 \over \sqrt{a^2 + b^2}}\begin{pmatrix}
+ a & b \cr -b & a
+\end{pmatrix}
+$$
+is a rotation matrix satisfying
+$$
+Q \begin{pmatrix} a \\ b \end{pmatrix} = \sqrt{a^2 + b^2} \begin{pmatrix} 1 \\ 0 \end{pmatrix}
+$$
+
+**Proof** 
+
+The last equation is trivial so the only question is that is a a rotation matrix.
+Define $θ = {\rm atan}(b, a)$. 
+
+∎
+
+
+ We can visualize this using Plots.jl, seeing that the 2-norm is preserved:
 
 ```julia
 using Plots
@@ -323,11 +414,18 @@ grid = range(0, 2π; length=100)       # plotting grid for the circle
 plot!(cos.(grid), sin.(grid); label="norm 1")     # plot circle in red
 ```
 
-On a computer, we don't know exactly where a point is: every point can have a small $\epsilon$ of error.  
+On a computer, a point may have a small $\epsilon$ of error due to rounding.
 Thus to understand the robustness of an algorithm, we need to understand what happens to balls of radius 
-$\epsilon$ around where we think of the point.  
-This can be used to demonstrate why rotations are preferred to lower triangular operations.
+$\epsilon$ around where we think of the point. (We will make this more precise later.)
 
+
+### Rotations versus lower triangular matrices
+
+In the next lectures we will have a choice between using orthogonal and triangular matrices In
+matrix decompositions. In terms of _stability_ (robustness to noise/round-off errors) 
+decompositions built using orthogonal matrices are generally preferred. 
+
+We shall demonstrate why rotations are preferred to lower triangular operations.
 In the following, we design a function that plots a circle around a point `[a,b]` of size `ε`, both before and after a matrix `L` is applied.
 Here we demonstrate that the effect of `L` is to stretch the circles: our error can be amplified:
 
@@ -335,17 +433,18 @@ Here we demonstrate that the effect of `L` is to stretch the circles: our error 
 using Plots
 function plotmat(a,b,ε,L)
     t = range(0, 2π; length=100)
-    x,y = (a+ε*cos(t),b+ε*sin(t))
-    plot(x,y)
+    x,y = (a .+ ε*cos.(t), b .+ ε*sin.(t))
+    plot(x, y)
 
     Lx = zeros(length(x))
     Ly = zeros(length(x))
 
     for k=1:length(x)
-        Lx[k],Ly[k] = L*[x[k],y[k]]
+        Lx[k], Ly[k] = L*[x[k], y[k]]
     end
-    plot!(Lx,Ly)
+    plot!(Lx, Ly)
 end
+
 a,b = [1.1, 1.2]
 
 L = [1    0;
@@ -380,16 +479,9 @@ Q=[cos(θ) -sin(θ);
 plotmat(a,b,ε,Q)
 plotmat(0,b,ε,Q)
 
-plotmat(2a,b,ε,Q)
-axis([-5,5,-5,5])
+plotmat(2a,b,ε,Q; [-5,5,-5,5])
 ```
 
-We can construct a simpler expression for `Q` as 
-$$
-{1 \over \sqrt{a^2 + b^2}}\begin{pmatrix}
- a & b \cr -b & a
-\end{pmatrix}
-$$
 
 ### Reflections
 
@@ -423,9 +515,9 @@ Q_𝐯 𝐯 = -𝐯
 $$
 Property 4 follows since $𝐯 𝐯^⊤$ is a rank-1 matrix as all rows are linear combinations of each other.
 To see property 5, note there is a dimension $n-1$ space $W$ orthogonal to $𝐯$.
-For $\mathbf w \in W$ we have
+For $𝐰 \in W$ we have
 $$
-Q_𝐯 \mathbf w = \mathbf w
+Q_𝐯 𝐰 = 𝐰
 $$
 In other words, $1$ is an eigenvalue with multiplicity $n-1$ and $-1$ is an eigenvalue with multiplicity 1,
 and thus the product of the eigenvalues is $-1$.
@@ -434,5 +526,27 @@ and thus the product of the eigenvalues is $-1$.
 
 
 
+**Example (reflection through 2-vector)** Consider reflection through $𝐱 = [1,2]^\top$. 
+We first need to normalise $𝐱$:
+$$
+𝐯 = {𝐱 \over \|𝐱\|} = \begin{pmatrix} {1 \over \sqrt{5}} \\ {2 \over \sqrt{5}} \end{pmatrix}
+$$
+Note this indeed has unit norm:
+$$
+\|𝐯\|^2 = {1 \over 5} + {4 \over 5} = 1.
+$$
+Thus the reflection matrix is:
+$$
+Q_𝐯 = I - 2 𝐯 𝐯^⊤ = \begin{pmatrix}1 \\ & 1 \end{pmatrix} - {2 \over 5} \begin{pmatrix} 1 & 2 \\ 2 & 4 \end{pmatrix}
+ =  {1 \over 5} \begin{pmatrix} 3 & -4 \\ -4 & -3 \end{pmatrix}
+$$
+Indeed it is symmetric, and orthogonal. It sends $𝐱$ to $-𝐱$:
+$$
+Q_𝐯 𝐱 = {1 \over 5} \begin{pmatrix}3 - 8 \\ -4 - 6 \end{pmatrix} = -𝐱
+$$
+Ant vector orthogonal to $𝐱$, like $𝐲 = [-2,1]^\top$, is left fixed:
+$$
+Q_𝐯 𝐲 = {1 \over 5} \begin{pmatrix}-6 -4 \\ 8 - 3 \end{pmatrix} = 𝐲
+$$
 
 

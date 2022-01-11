@@ -1,13 +1,17 @@
-# 1. Dense Matrices
+## 1. Dense Matrices
 
-**Problem 1.1** Use random matrices (`randn`) to show that `A*x` is not
-implemented as
+**Problem 1.1** Show that `A*x` is not
+implemented as `mul(A, x)` from the lecture notes
+by finding a `Float64` example  where the bits do not match.
+
+
+
+
+## 2. Triangular Matrices
+
+**Problem 2.1** Complete the following function for performing
+back-substitution with an upper-triangular matrix:
 ```julia
-function mul
-```
-
-# 2. Triangular Matrices
-
  function backsubstitution(U,b)
     n = size(U,1)
     
@@ -19,9 +23,20 @@ function mul
     for k = n:-1:1  # start with k=n, then k=n-1, ...
         r = b[k]  # dummy variable
         for j = k+1:n
+            ## TODO: update r using U[k,j] 
             r -= U[k,j]*x[j] # equivalent to r = r-U[k,j]*x[j]
         end
+        ## TODO: Write to x[k]
         x[k] = r/U[k,k]
     end
     x
 end
+```
+
+**Problem 2.2** Write a function `forwardsubstition` for performing
+forward-substitution with a lower-triangular matrix:
+
+
+## 3. Banded matrices
+
+## 4. Orthogonal matrices
