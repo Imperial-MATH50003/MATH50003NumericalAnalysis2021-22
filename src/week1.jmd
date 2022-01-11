@@ -11,14 +11,42 @@ using ColorBitstring, SetRounding
 
 ## 1. Binary representation
 
-**Problem 1.1** Like decimal representation, all rational numbers have repeating sequence of binary digits,
-that is, $b_k = b_{k+r}$ for fixed integers $r$ and $K$ and all $k \geq K$. Use the geometric series
-to determine the corresponding real number, and thence prove that a repeating sequence of binary digits
-implies that a number is rational.
 
-**Problem 1.2** What are the binary representations of $1/5$ and $1/100$? 
-What is $\pi$ to 5 binary decimal places? Hint: recall that $\pi \approx  3.14$.
+**Problem 1.1** What is the binary representations of $1/5$?
 
+**SOLUTION**
+
+Note that
+```julia
+printbits(1/5)
+```
+Hence we  show that
+$$
+\begin{align*}
+(0.00110011001100…)_2 &= (2^{-3} + 2^{-4})(1.00010001000…)_2 =  (2^{-3} + 2^{-4}) \sum_{k=0}^∞ {1 \over 16^k} \\
+&= {2^{-3} + 2^{-4} \over 1 - {1\over 2^4}} = {3 \over 15} = {1 \over 5}
+\end{align*}
+$$
+
+
+
+
+
+**Problem 1.2** What is $\pi$ to 5 binary places? Hint: recall that $\pi \approx  3.14$.
+
+**SOLUTION**
+Note that
+```julia
+3 + 1/8  + 1/64
+```
+which has the binary representation
+$$
+(11.001001)_2
+$$
+Indeed:
+```julia
+printbits(Float16(π))
+```
 
 ## 2. Integers
 
@@ -135,6 +163,10 @@ What is the largest floating point number such that `x + 1 ≠ x`?
 using  half-precision (`Float16`) (using
 default rounding)?
 
+**SOLUTION**
+
+
+
 **Problem 4.4** Find a bound on the floating point error for the following
 $$
 \begin{align*}
@@ -146,7 +178,7 @@ How does your bound compare with the true error?
 
 
 
-## 5. Implementation
+## 5. Interval arithmetic
 
 
 
@@ -344,40 +376,3 @@ $$
 Thus by widening the computation by this error we ensure that we have
 captured the error by truncating the Taylor series.
 
-
-**Problem 5.4 (advanced)**  Compute the first 1000 (decimal) digits of ℯ, with rigorous error bounds.
-Check your result versus `exp(big(1.0))`.
-
-**SOLUTION**
-The tricky part of this problem is that we need to fix the bound on `factorial(n)` above
-as otherwise we won't get the necessary accuracy. We can do this as follows:
-as follows:
-```julia
-function exp_bound(x::Interval, n)
-    if abs(x.a) > 1 || abs(x.b) > 1
-        error("Interval must be a subset of [-1, 1]")
-    end
-    ret = exp_t(x, n) # the code for Taylor series should work on Interval unmodified
-    T = typeof(ret.a)
-    err = setrounding(T, RoundUp) do
-        err_i = 3one(T)
-        for k = 1:n+1
-            err_i = err_i/k
-        end
-        err_i
-    end
-    ret + Interval(-err,err)
-end
-setprecision(5000) do 
-    x = Interval(big(1.0),big(1.0))
-    exp_bound(x, 600).a
-end
-```
-The precision and number of Taylor series were increased until the
-bounsa matched `exp(big(1.0))` to over 1000 digits:
-```julia
-setprecision(5000) do 
-    x = Interval(big(1.0),big(1.0))
-    max(exp(big(1.0)) - exp_bound(x, 600).a, exp_bound(x, 600).b - exp(big(1.0)))
-end
-```
