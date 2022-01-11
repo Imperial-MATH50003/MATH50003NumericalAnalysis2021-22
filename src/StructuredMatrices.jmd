@@ -7,7 +7,8 @@ we consider the following structures:
 
 
 1. _Dense_: this can be considered unstructured, where we need to store all entries in a
-vector or matrix. Matrix multiplication reduces directly to standard algebraic operations.
+vector or matrix. Matrix multiplication reduces directly to standard algebraic operations. 
+Solving linear systems with dense matrices will be discussed later.
 2. _Triangular_: If a matrix is upper or lower triangular, we can immediately invert using
 back-substitution. In practice we store a dense matrix and ignore the upper/lower entries.
 3. _Banded_: If a matrix is zero apart from entries a fixed distance from  the diagonal it is
@@ -32,8 +33,11 @@ Is actually stored equivalently to a length `6` vector:
 ```julia
 vec(A)
 ```
-Note that transposing `A` is done lazyily and so `A'`
-stores the entries by row.
+This is known as _column-major_ format.
+
+**Remark** Note that transposing `A` is done lazyily and so `A'`
+stores the entries by row. That is, `A'` is stored in 
+_row-major_ format.
 
 
 Matrix-vector multiplication works as expected:
@@ -41,7 +45,8 @@ Matrix-vector multiplication works as expected:
 x = [7; 8]
 A*x
 ```
-It is easy to implement such an algorithm:
+It is easy to implement such an algorithm in terms of the algebraic operations 
+we have learned, in this case just using integer arithmetic:
 ```julia
 c = zeros(Int, 3)
 for j = 1:size(A,2), k = 1:size(A,1)
@@ -52,77 +57,89 @@ c
 
 **Remark (advanced)** 
 This accesses the entries of `A` going down the column,
-which happens to be faster than accessing by row.
+which happens to be _significantly faster_ than accessing by row due to the
+way computers access memory, but this is beyond the scope of this module.
 
-Note matrix-multiplication is exact for integers, but
-using modular arithemtic:
+
+
+
+Note that the rules of arithmetic apply here: matrix multiplication with floats
+will incur round-off error (the precise details of which are subject to the implementation):
+
 ```julia
-Int8[2^7-1 1] * Int8[1,1]
+A = [1.4 0.4;
+     2.0 1/2]
+A * [1, -1] # First entry has round-off error, but 2nd entry is exact
 ```
 
+
+and integer arithmetic will be prone to overflow:
+```julia
+A = fill(Int8(2^6), 2, 2) # make a matrix whose entries are all equal to 2^6
+A * Int8[1,1] # we have overflowed and get a negative number -2^7
+```
 
 Solving a linear system is done using `\`:
 ```julia
-b = [9; 10; 11]
+A = [1 2 3;
+     1 2 4;
+     3 7 8]
+b = [10; 11; 12]
 A \ b
 ```
-Here we see that we needed to use floating point arithmetic,
-but it is "accurate to 16-digits". 
-The way solving a linear system works is we first write `A` as a
-product of simpler matrices, e.g., a product of triangular matrices, 
-as described in the next notes. 
+Despite the answer being integer-valued, 
+here we see that it resorted to using floating point arithmetic,
+incurring rounding error. 
+But it is "accurate to (roughly) 16-digits".
+As we shall see, the way solving a linear system works is we first write `A` as a
+product of simpler matrices, e.g., a product of triangular matrices.
 
 
 ## 2. Triangular matrices
 
-
-
-### Inverting an upper triangular matrix
-
-We now discuss why upper triangular matrices are easy to invert.  
-Consider a simple 3x3 example, which can be solved with `\`:
- ```julia
- U = [1.0 2.0 3.0;
-      0.0 3.0 4.0;
-      0.0 0.0 5.0]
-
-b = [5,6,7]
-
-x = U \ b
- ```
- Behind the seens, `\` is doing back substitution. Here is a custom implementation:
- ```julia
- function backsubstitution(U,b)
-    n = size(U,1)
-    
-    if length(b) != n
-        error("The system is not compatible")
-    end
-        
-    
-    x = zeros(n)  # the solution vector
-    for k = n:-1:1  # start with k=n, then k=n-1, ...
-        r = b[k]  # dummy variable
-        for j = k+1:n
-            r -= U[k,j]*x[j] # equivalent to r = r-U[k,j]*x[j]
-        end
-        x[k] = r/U[k,k]
-    end
-    x
-end
-backsubstitution(U,b) - U\b  # close to zero, the algorithms differ slightly
- ```
-
-`triu` takes the upper triangular of a matrix.  We can check the accuracy of `backsubstitution` on a 10 x 10 random upper triangular matrix.
-
+Triangular matrices are represented by dense square matrices where the entries below the
+diagonal
+are ignored:
 ```julia
-U = triu(rand(10,10))
-b = rand(10)
-
-x = U\b
-norm(backsubstitution(U,b)-x)
+A = [1 2 3;
+     4 5 6;
+     7 8 9]
+U = UpperTriangular(A)
+```
+We can see that `U` is storing all the entries of `A`:
+```julia
+U.data
+```
+Similarly we can create a lower triangular matrix by ignoring the entries above the diagonal:
+```julia
+L = LowerTriangular(A)
 ```
 
+If we know a matrix is triangular we can do matrix-vector multiplication in half
+the number of operations. 
+Moreover, we can easily invert matrices. 
+Consider a simple 3x3 example, which can be solved with `\`:
+ ```julia
+b = [5,6,7]
+x = U \ b
+ ```
+Behind the seens, `\` is doing back-substitution: considering the last row, we have all
+zeros apart from the last column so we know that `x[3]` must be equal to:
+```julia
+b[3] / U[3,3]
+```
+Once we know `x[3]`, the second row states `U[2,2]*x[2] + U[2,3]*x[3] == b[2]`, rearranging
+we get that `x[2]` must be:
+```julia
+(b[2] - U[2,3]*x[3])/U[2,2]
+```
+Finally, the first row states `U[1,1]*x[1] + U[1,2]*x[2] + U[1,3]*x[3] == b[1]` i.e.
+`x[1]` is equal to
+```julia
+(b[1] - U[1,2]*x[2] - U[1,3]*x[3])/U[1,1]
+```
+The problem sheet will explore implementing this for general triangular matrices, as well
+as forward substitution for inverting lower triangular matrices.
 
 
 ## 3. Banded matrices

@@ -1,0 +1,17 @@
+ function backsubstitution(U,b)
+    n = size(U,1)
+    
+    if length(b) != n
+        error("The system is not compatible")
+    end
+        
+    x = zeros(n)  # the solution vector
+    for k = n:-1:1  # start with k=n, then k=n-1, ...
+        r = b[k]  # dummy variable
+        for j = k+1:n
+            r -= U[k,j]*x[j] # equivalent to r = r-U[k,j]*x[j]
+        end
+        x[k] = r/U[k,k]
+    end
+    x
+end
