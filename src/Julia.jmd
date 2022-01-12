@@ -88,7 +88,7 @@ We can access characters of a string with brackets:
 ```julia
 str[1], str[13]
 ```
-Each character is a primitive type, in this case using 32 bits/8 bytes:
+Each character is a primitive type, in this case using 32 bits/4 bytes:
 ```julia
 typeof(str[6]), length(bitstring(str[6]))
 ```
@@ -366,7 +366,7 @@ A complex number consists of two fields: a real part (denoted `re`)
 and an imaginary part (denoted `im`).
 Fields of a type can be accessed using the `.` notation:
 ```julia
-x.re, x.im
+z.re, z.im
 ```
 We can make our own types.  Let's make a type to represent complex numbers in the format
 $$z=r {\rm exp}({\rm i}\theta)$$
