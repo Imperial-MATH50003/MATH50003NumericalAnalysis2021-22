@@ -33,7 +33,7 @@ functions from samples.
 2. Fourier series: we discuss Fourier series and their usage in numerical computations
 via the fast Fourier transform.
 5. Orthogonal Polynomials: we discuss orthogonal polynomials—polynomials orthogonal 
-with respect to a proscribed weight—and their usage in numerical computations.
+with respect to a prescribed weight—and their usage in numerical computations.
 6. Integration: we discuss ways to approximate integrals, both definite and indefinite, using orthogonal polynomials and interpolation.
 
 ## Assessment
