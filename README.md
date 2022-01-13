@@ -3,6 +3,13 @@ Notes and course material for MATH50003 Numerical Analysis
 
 Lecturer: [Dr Sheehan Olver](https://www.ma.imperial.ac.uk/~solver/)
 
+Problem Classes: 2–4pm Thursdays, Huxley 340–342
+
+Overview lecture: 10–11am Fridays, Clore
+
+Q&A: 9:50–10:30 Mondays, 10:40–11:20 Tuesdays on Teams
+
+
 
 ## Course Outline
 

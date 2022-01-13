@@ -196,11 +196,11 @@ x + 1 == x
 
 Writing $10 = 2^3 (1.01)_2$ we have
 $$
-\rm{fl}(10^100) = \rm{fl}(2^{300} (1 + 2^{-4})^100) = 2^{300} (1.b_1 \ldots b_{52})_2
+\rm{fl}(10^{100}) = \rm{fl}(2^{300} (1 + 2^{-4})^{100}) = 2^{300} (1.b_1 \ldots b_{52})_2
 $$
 where the bits $b_k$ are not relevant. We then have:
 $$
-\rm{fl}(10^100) ⊕ 1 = \rm{fl}(2^{300} [(1.b_1 \ldots b_{52})_2 + 2^{-300}]) = \rm{fl}(10^100)
+\rm{fl}(10^{100}) ⊕ 1 = \rm{fl}(2^{300} [(1.b_1 \ldots b_{52})_2 + 2^{-300}]) = \rm{fl}(10^{100})
 $$
 since $2^{-300}$ is below the necessary precision.
 
