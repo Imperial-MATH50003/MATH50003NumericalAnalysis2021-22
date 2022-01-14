@@ -541,7 +541,7 @@ function *(x::Interval, y::Interval)
 end
 ```
 
-**Problem 5.4** The following function  computes the first `n+1` terms of the Taylor series of $\exp(x)$:
+**Problem 5.3** The following function  computes the first `n+1` terms of the Taylor series of $\exp(x)$:
 $$
 \sum_{k=0}^n {x^k \over k!}
 $$
