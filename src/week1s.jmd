@@ -381,7 +381,7 @@ and the error is bounded by:
 $$
 (17 + 2 + 34) ϵ_{\rm m} = 53 ϵ_{\rm m}
 $$
-This is quite pessimitic but still captures that we are on the order of $ϵ_{\rm m}$.
+This is quite pessimistic but still captures that we are on the order of $ϵ_{\rm m}$.
 
 
 
