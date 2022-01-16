@@ -41,7 +41,7 @@ where $|δ_x| \leq c ϵ_{\rm m}$.
 derivatives to the following functions:
 at the point $x = 0.1$:
 $$
-\exp(\exp x \cos x + \sin x), \prod_{k=1}^{1000} \left({x \over k}-1\right), f^{\rm s}_{1000}(x)
+\exp(\exp x \cos x + \sin x), \prod_{k=1}^{1000} \left({x \over k}-1\right), \hbox{ and } f^{\rm s}_{1000}(x)
 $$
 where $f^{\rm s}_n(x)$ corresponds to $n$-terms of the following continued fraction:
 $$
@@ -50,9 +50,9 @@ $$
 e.g.:
 $$
 \begin{align*}
-f^{\rm s}_1(x) = 1 + {x-1 \over 2} \\
-f^{\rm s}_2(x) = 1 + {x-1 \over 2 + {x -1 \over 2}} \\
-f^{\rm s}_3(x) = 1 + {x-1 \over 2 + {x -1 \over 2 + {x-1 \over 2}}}
+f^{\rm s}_1(x) &= 1 + {x-1 \over 2} \\
+f^{\rm s}_2(x) &= 1 + {x-1 \over 2 + {x -1 \over 2}} \\
+f^{\rm s}_3(x) &= 1 + {x-1 \over 2 + {x -1 \over 2 + {x-1 \over 2}}}
 \end{align*}
 $$
 
@@ -79,18 +79,18 @@ h = sqrt(eps())
 ## 2. Dual numbers
 
 **Problem 2.1⋆** 
-Show that dual numbers $𝔻$ are a _commutative ring_, that is, for $a,b,c ∈ 𝔻$:
+Show that dual numbers $𝔻$ are a _commutative ring_, that is, for all $a,b,c ∈ 𝔻$ the following are satisfied:
 1. _additive associativity_: $(a + b) + c = a + (b + c)$
 2. _additive commutativity_: $a + b = b + a$
 3. _additive identity_: There exists $0 ∈ 𝔻$ such that $a + 0 = a$.
-4. _additive inverse_: There exists $ã$ such that $ã + a = 0$.
+4. _additive inverse_: There exists $-a$ such that $(-a) + a = 0$.
 5. _multiplicative associativity_: $(ab)c = a(bc)$
 6. _multiplictive commutativity_: $ab = ba$
 7. _multiplictive identity_: There exists $1 ∈ 𝔻$ such that $1a= a$.
 8. _distributive_: $a(b+c) = ab + ac$
 
 **Problem 2.2⋆** A _field_ is a commutative ring such that $0 ≠ 1$ and all nonzero elements have a multiplicative inverse, i.e.,
-there exists $ã$ such that $a ã = 1$. Why isn't $𝔻$ a field?
+there exists $a^{-1}$ such that $a a^{-1} = 1$. Why isn't $𝔻$ a field?
 
 **Problem 2.3⋆** A _matrix representation_ of a ring/field are maps from a group/ring/field to matrices such that matrix addition and multiplication
 behaves exactly like addition and multiplication that of the ring/field. Show that the following are matrix representations of complex numbers and
@@ -109,7 +109,7 @@ $$
 $$
 for what choice of $s$ and $t$? Use dual numbers to compute the derivative of the following functions at $x = 0.1$:
 $$
-\exp(\exp x \cos x + \sin x), \prod_{k=1}^3 \left({x \over k}-1\right), f^{\rm s}_2(x) = {1 + {x - 1 \over 2 + {x-1 \over 2}}}
+\exp(\exp x \cos x + \sin x), \prod_{k=1}^3 \left({x \over k}-1\right),\hbox{ and } f^{\rm s}_2(x) = {1 + {x - 1 \over 2 + {x-1 \over 2}}}
 $$
 
 
@@ -172,6 +172,11 @@ function /(x::Dual, y::Dual)
 end
 ```
 
+**Problem 2.6** Use dual numbers to compute the derivatives to
+$$
+\exp(\exp x \cos x + \sin x), \prod_{k=1}^{1000} \left({x \over k}-1\right), \hbox{ and } f^{\rm s}_{1000}(x).
+$$
+Does your answer match (to 5 digits) Problem 1.4?
 
 
 ## 3. Newton iteration
@@ -185,17 +190,17 @@ $$
 **Problem 3.1** Use `Dual` to implement the following function which returns $x_n$:
 ```julia
 function newton(f, x0, n)
-
+    ## TODO: compute x_n 
 end
 ```
 
 **Problem 3.2** Compute points $y$ such that $|f(y)| \leq 10^{-13}$ (i.e., approximate roots):
 $$
-\exp(\exp x \cos x + \sin x)-6, \prod_{k=1}^1000 \left({x \over k}-1\right) - {1 \over 2}
+\exp(\exp x \cos x + \sin x)-6\hbox{ and } \prod_{k=1}^1000 \left({x \over k}-1\right) - {1 \over 2}
 $$
 (Hint: you may need to try different `x0` and `n` to get convergence. Plotting the function should give an
 indication of a good initial guess.)
 
 **Problem 3.3** Compute points $y$ such that $|f^{\rm s}_{1000}(y) - j| \leq 10^{-13}$ for $j = 1,2,3$. 
-Make a conjecture of what $f^{\rm s}_n(x)$ converges to as $n → ∞$. Prove your conjecture.
+Make a conjecture of what $f^{\rm s}_n(x)$ converges to as $n → ∞$. (Bonus problem: Prove your conjecture.)
 
