@@ -412,10 +412,10 @@ $$
 \end{cases},\\
 A + B &= [a + c, b + d] \\
 AB &= \begin{cases}
-[cd,ab]& a,b,c,d < 0 \\
+[bd,ac]& a,b,c,d < 0 \\
 [ad,bc]& a,b < 0 \hbox{ and } c,d >0 \\
 [bc,ad]& a,b > 0 \hbox{ and } c,d  < 0 \\
-[ab,cd]& a,b,c,d >> 0
+[ac,bd]& a,b,c,d > 0
 \end{cases}
 \end{align*}
 $$
