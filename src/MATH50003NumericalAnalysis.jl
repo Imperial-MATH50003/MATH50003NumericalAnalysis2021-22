@@ -28,6 +28,7 @@ notebook("src/Integration.jmd"; kwds...)
 
 kwds = (out_path = "sheets/", jupyter_path = "$(homedir())/.julia/conda/3/bin/jupyter", nbconvert_options = "--allow-errors")
 notebook("src/week1.jmd"; kwds...)
+notebook("src/week2.jmd"; kwds...)
 
 ##
 # solutions 

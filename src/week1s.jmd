@@ -1,4 +1,4 @@
-# Week 1
+# MATH50003 Problem Sheet 1
 
 This problem sheet tests the representation of numbers on the computer, using
 modular arithmetic. We also use floating point rounding modes to implement 
@@ -582,11 +582,12 @@ function exp_bound(x::Interval, n)
     ## END
 end
 ```
-Check your result by assuring that
+Check your result for computing ${\rm ℯ}$ and ${\rm e}^{-1}$ by assuring that
 the following returns true:
 ```julia
 exp(big(1)) in exp_bound(Interval(1.0,1.0), 20) && exp(big(-1)) in exp_bound(Interval(-1.0,-1.0), 20)
 ```
+Further, ensure that the width of each returned interval is less than $10^{-14}$.
 
 **SOLUTION** From the Taylor remainder theorem we know the error is
 $$
