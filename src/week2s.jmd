@@ -177,6 +177,13 @@ end
 cos(x::Dual) = Dual(cos(x.a), -sin(x.a) * x.b)
 
 sin(x::Dual) = Dual(sin(x.a), cos(x.a) * x.b)
+
+function /(x::Dual, y::Dual)
+    if y.a == 0
+        return error("Division for dual numbers is ill-defined when denonimator real part is zero.")
+    end
+    return Dual(x.a / y.a, (y.a*x.b - x.a*y.b)/y.a^2)
+end
 ```
 
 **Problem 2.6** Use dual numbers to compute the derivatives to
@@ -261,3 +268,17 @@ f2(rootf2)
 **Problem 3.3** Compute points $y$ such that $|f^{\rm s}_{1000}(y) - j| \leq 10^{-13}$ for $j = 1,2,3$. 
 Make a conjecture of what $f^{\rm s}_n(x)$ converges to as $n → ∞$. (Bonus problem: Prove your conjecture.)
 
+**SOLUTION**
+
+```julia
+xn = newton(x->cont(1000,x)-1.,0.5,10)
+cont(1000,xn)-1.
+```
+```julia
+xn = newton(x->cont(1000,x)-2.,0.5,10)
+cont(1000,xn)-2.
+```
+```julia
+xn = newton(x->cont(1000,x)-3.,0.5,10)
+cont(1000,xn)-3.
+```
