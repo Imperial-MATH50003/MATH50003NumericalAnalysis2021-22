@@ -14,7 +14,7 @@ Questions marked with a ⋆ are meant to be completed without using a computer.
 
 **Problem 1.1⋆** Use Taylor's theorem to derive an error bound for central differences
 $$
-f'(x) ≈ {f(x + h) - f(x - h) \over h}
+f'(x) ≈ {f(x + h) - f(x - h) \over 2h}
 $$
 Find an error bound when implemented in floating point arithmetic, assuming that
 $$
