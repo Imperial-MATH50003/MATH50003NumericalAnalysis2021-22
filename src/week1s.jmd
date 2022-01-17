@@ -12,7 +12,7 @@ using ColorBitstring, SetRounding
 ## 1. Binary representation
 
 
-**Problem 1.1** What is the binary representations of $1/5$? (Hint: use `printbits` to derive a proposed form.)
+**Problem 1.1** What is the binary representation of $1/5$? (Hint: use `printbits` to derive a proposed form.)
 
 **SOLUTION**
 Note that
@@ -51,8 +51,8 @@ printbits(Float16(π))
 
 **SOLUTION**
 We can find the binary digits by repeatedly subtracting the largest power of 2 less than a number
-until we reach 0, e.g. $10 -2^3 - 2 = 0$
-implies $10 = (101)_2$.
+until we reach 0, e.g. $10 - 2^3 - 2 = 0$
+implies $10 = (1010)_2$.
 Thus the bits are:
 ```julia
 printlnbits(Int8(10))
@@ -154,7 +154,7 @@ The next float after $2$ is $2 * (1 + 2^{-23})$ hence we get $2^{-22}$:
 ```julia
 nextfloat(2f0) - 2, 2^(-22)
 ```
-similarly, the next float after $1024 = 2^10$ is $2^{10-23} = 2^{-13}$:
+similarly, the next float after $1024 = 2^{10}$ is $2^{10-23} = 2^{-13}$:
 ```julia
  nextfloat(1024f0) - 1024, 2^(-13)
 ```
@@ -381,7 +381,7 @@ and the error is bounded by:
 $$
 (17 + 2 + 34) ϵ_{\rm m} = 53 ϵ_{\rm m}
 $$
-This is quite pessimitic but still captures that we are on the order of $ϵ_{\rm m}$.
+This is quite pessimistic but still captures that we are on the order of $ϵ_{\rm m}$.
 
 
 
