@@ -75,7 +75,6 @@ h = sqrt(eps())
 (cont(1000, 0.1+h)-cont(1000, 0.1))/h
 ```
 
-
 ## 2. Dual numbers
 
 **Problem 2.1⋆** 
@@ -151,7 +150,7 @@ function ^(x::Dual, k::Integer)
     end
 end
 
-# Algebraic operationds for duals
+# Algebraic operations for duals
 -(x::Dual) = Dual(-x.a, -x.b)
 +(x::Dual, y::Dual) = Dual(x.a + y.a, x.b + y.b)
 -(x::Dual, y::Dual) = Dual(x.a - y.a, x.b - y.b)
@@ -159,17 +158,25 @@ end
 
 exp(x::Dual) = Dual(exp(x.a), exp(x.a) * x.b)
 
-function cos(x::Dual, y::Dual)
+function cos(x::Dual)
     # TODO: implement cos for Duals
 end
 
-function sin(x::Dual, y::Dual)
+function sin(x::Dual)
     # TODO: implement sin for Duals
 end
 
 function /(x::Dual, y::Dual)
     # TODO: implement division for Duals
 end
+```
+
+**SOLUTION**
+
+```julia
+cos(x::Dual) = Dual(cos(x.a), -sin(x.a) * x.b)
+
+sin(x::Dual) = Dual(sin(x.a), cos(x.a) * x.b)
 ```
 
 **Problem 2.6** Use dual numbers to compute the derivatives to
@@ -230,8 +237,25 @@ indication of a good initial guess.)
 
 First we define the functions. Note that we use Julia's broadcasting here (via ".") to compute the second function but you may also write a simple loop to compute it instead.
 ```julia
-f1(x) = exp(exp(x)*cos(x)+sin(x))-6
-f2(x) = prod(x./range(1,1000).-1)-1/2
+f1(x) = exp(exp(x)*cos(x) + sin(x)) - 6
+f2(x) = prod([x] ./ range(1,1000) .- 1) - 1/2
+```
+We can plot the functions on a few ranges to get an intuition
+```julia
+plot(f1,-2,2,color="blue")
+plot!(x->0,color="red")
+
+plot(f2,0,2,color="blue")
+plot!(x->0,color="red") 
+```
+And then use our Newton iteration to compute approximate roots
+```julia
+rootf1 = newton(f1, 1.5, 5)
+f1(rootf1)
+```
+```julia
+rootf2 = newton(f2, 0.3, 8)
+f2(rootf2)
 ```
 
 **Problem 3.3** Compute points $y$ such that $|f^{\rm s}_{1000}(y) - j| \leq 10^{-13}$ for $j = 1,2,3$. 
