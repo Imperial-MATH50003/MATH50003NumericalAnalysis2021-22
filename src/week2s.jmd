@@ -1,7 +1,7 @@
 # MATH50003 Problem Sheet 2
 
 This week we look at other variants of finite-differences, including central differences and second-order
-finite-differences. We also investigate mathematical properties of dual numbers, extend their implementation to
+finite-differences. We also investigate mathematical properties of dual numbers and extend their implementation to
 other functions. Finally, we see how dual numbers can be combined with Newton iteration for root finding.
 
 ```julia
