@@ -180,7 +180,7 @@ sin(x::Dual) = Dual(sin(x.a), cos(x.a) * x.b)
 
 function /(x::Dual, y::Dual)
     if iszero(y.a)
-        return error("Division for dual numbers is ill-defined when denonimator real part is zero.")
+        error("Division for dual numbers is ill-defined when denonimator real part is zero.")
     end
     return Dual(x.a / y.a, (y.a*x.b - x.a*y.b)/y.a^2)
 end
