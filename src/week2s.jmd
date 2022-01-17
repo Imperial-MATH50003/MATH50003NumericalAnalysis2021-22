@@ -194,12 +194,45 @@ function newton(f, x0, n)
 end
 ```
 
+**SOLUTION**
+
+```julia
+function newton(f, x0, n)
+    xk = x0
+    for k = 1:n
+        fd = f(xk+ϵ)
+        xk = xk - fd.a/fd.b
+    end
+    return xk
+end
+```
+Here is a simple test case for the above function:
+```julia
+# example
+f(x) = x^2-3
+n = 5
+x0 = 1
+# compute proposed root
+xn = newton(f,x0,n) 
+# check that obtained point is an approximate root
+f(xn)
+```
+
+
 **Problem 3.2** Compute points $y$ such that $|f(y)| \leq 10^{-13}$ (i.e., approximate roots):
 $$
-\exp(\exp x \cos x + \sin x)-6\hbox{ and } \prod_{k=1}^1000 \left({x \over k}-1\right) - {1 \over 2}
+\exp(\exp x \cos x + \sin x)-6\hbox{ and } \prod_{k=1}^{1000} \left({x \over k}-1\right) - {1 \over 2}
 $$
 (Hint: you may need to try different `x0` and `n` to get convergence. Plotting the function should give an
 indication of a good initial guess.)
+
+**SOLUTION**
+
+First we define the functions. Note that we use Julia's broadcasting here (via ".") to compute the second function but you may also write a simple loop to compute it instead.
+```julia
+f1(x) = exp(exp(x)*cos(x)+sin(x))-6
+f2(x) = prod(x./range(1,1000).-1)-1/2
+```
 
 **Problem 3.3** Compute points $y$ such that $|f^{\rm s}_{1000}(y) - j| \leq 10^{-13}$ for $j = 1,2,3$. 
 Make a conjecture of what $f^{\rm s}_n(x)$ converges to as $n → ∞$. (Bonus problem: Prove your conjecture.)
