@@ -386,18 +386,6 @@ Q^⊤ Q = QQ^⊤ = I.
 $$
 
 We have already seen an example of an orthogonal matrices (permutation matrices). 
-
-**Proposition (norm-preserving)** Orthogonal matrices preserve the 2-norm of vectors:
-$$
-\|Q 𝐯\|^2 = \|𝐯\|.
-$$
-
-**Proof**
-$$
-\|Q 𝐯\|^2 = (Q 𝐯)^⊤ Q 𝐯 = 𝐯^⊤ Q^⊤ Q 𝐯 = 𝐯^⊤  𝐯 = \|𝐯\|^2
-$$
-∎
-
 Here we discuss two important special cases: simple rotations and reflections.
 
 ### Simple rotations

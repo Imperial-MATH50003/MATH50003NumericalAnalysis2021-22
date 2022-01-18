@@ -1,53 +1,87 @@
-# Decompositions
+# Decompositions and least squares
+
+
+In this lecture, we look at several factorizations of a matrix. For a square or rectangular matrix $A ∈ ℝ^{m × n}$ with $m ≥ n$, we consider:
+1. The _QR decomposition_
+$$
+A = \underbrace{Q}_{m × m} \underbrace{R}_{m × n} = \begin{bmatrix} 𝐪_1 | \cdots 𝐪_m \end{pmatrix} \begin{bmatrix} × & \cdots & × \\ & \ddots & \vdots \\ && × \\ &&0 \\ &&\vdots \\ && 0 \end{bmatrix} 
+$$
+where $Q$ is orthogonal and $R$ is _right triangular_.
+2. The _reduced QR decomposition_
+$$
+A = \underbrace{Q̂}_{m × n} \underbrace{R̂}_{m × m} = \begin{bmatrix} 𝐪_1 | \cdots 𝐪_n \end{pmatrix} \begin{bmatrix} × & \cdots & × \\ & \ddots & \vdots \\ && ×  \end{bmatrix} 
+$$
+where $Q$ has orthogonal columns ($Q^⊤Q = I$) 
+
+For a square matrix we consider the _PLU decomposition_:
+$$
+A = P^⊤ LU
+$$
+where $P$ is a permutation matrix, $L$ is lower triangular and $U$ is upper triangular.
+
+Finally, for a square, _symmetric positive definite_ ($𝐱^⊤ A 𝐱 > 0$ for all $𝐱 ∈ ℝ^n$) 
+matrix we consider the _Cholesky decomposition_:
+$$
+A = L L^⊤
+$$
+
+The importance of these decomposition for square matrices is that their component pieces are easy to invert on a computer:
+$$
+\begin{align*}
+A = P^⊤ LU &\Rightarrow A^{-1}𝐛 = U^{-1} L^{-1} P 𝐛 \\
+A = QR &\Rightarrow A^{-1}𝐛 = R^{-1} Q^\top 𝐛 \\
+A = L L^⊤ &\Rightarrow A^{-1}𝐛 = L^{-⊤} L^{-1} 𝐛 \\
+\end{align*}
+and we saw last lecture that triangular and orthogonal matrices are easy to invert when applied to a vector $𝐛$.
+For rectangular matrices we will see that they lead to efficient solutions to the _least squares problem_: find
+$𝐱$ that minimizes the 2-norm
+$$
+\| A 𝐱 - 𝐛 \|.
+$$
+
+
+
+## 1. QR and Reduced QR Decomposition
+
+A QR decomposition decomposes a matrix into an orthogonal matrix $Q$ times a right triangular matrix $R$. 
+Note the QR decomposition contains within it the reduced QR decomposition:
+$$
+A = QR = \begin{bmatrix} Q̂ | 𝐪_{n+1} | ⋯ | 𝐪_m \end{pmatrix} \begin{bmatrix} R̂ \\  𝟎_{m-n × n} \end{pmatrix} = Q̂ R̂.
+$$
+
+### Relationship with least squares
+
+We can use it to solve a least squares problem using the norm-preserving property (see PS3) of orthogonal matrices:
+$$
+\| A 𝐱 - 𝐛 \| = \| Q R 𝐱 - 𝐛 \| = \| R 𝐱 - Q^⊤ 𝐛 \| = \left \| 
+\begin{bmatrix} R̂ \\ 𝟎_{m-n × n} \end{bmatrix} 𝐱 - \begin{bmatrix} Q̂^⊤ \\ 𝐪_{n+1}^⊤ \\ \vdots \\ 𝐪_m^⊤ \end{pmatrix}     𝐛 \right \|
+$$
+Now note that the rows $k > n$ are independent of $𝐱$ and are a fixed contribution. Thus to minimise this norm it suffices to
+drop them and minimise:
+$$
+\| R̂ 𝐱 - Q̂^⊤ 𝐛 \|
+$$
+This norm is minimisable if it is attained. Provided the column rank of $A$ is full, $R̂$ will be invertible (Exercise: why is this?).
+Thus we have the solution
+$$
+𝐱 = R̂^{-1} Q̂^⊤ 𝐛
+$$
+
+Let's look at an example. `\` does a least squares solve. 
 
 
 
 
-In this lecture, we look at several factorizations of a matrix:
 
-$$ A = LU$$
+### Gram–Schmidt and reduced QR
 
-where $L$ is lower triangular and $U$ is upper triangular,
-
-$$ A = PLU$$
-
-where $P$ is a permutation matrix, $L$ is lower triangular and $U$ is upper triangular, and
-
-$$ A = QR$$
-
-where $Q$ is an orthogonal matrix and $R$ is upper triangular.
-
-The importance of these decomposition is that their component pieces are easy to invert on a computer:  
-
-$$ A = LU \Rightarrow A^{-1} = U^{-1} L^{-1}$$
-$$ A = PLU \Rightarrow A^{-1} = U^{-1} L^{-1} P^\top$$
-$$ A = QR \Rightarrow A^{-1} = R^{-1} Q^\top$$
-
-and we saw last lecture that triangular matrices are easy to invert.
-
-First we run some setup code:
-
-## QR Decomposition
-
-A QR decomposition decomposes a matrix into an orthogonal matrix $Q$ times an upper triangular matrix $R$.  Again, if $A=QR$ then $A^{-1} = R^{-1} Q^\top$ is computable on a computer.
-
-We can obtain the QR decompostion by calling `qr`:
+### Householder reflections and QR
 
 
 
-## PLU Decomposition
 
-PLU always exists, and is much better accuracy wise.  The matrix $P$ is given by a single vector.  For example, if the permutation is given in Cauchy's notation as
 
-$$\begin{pmatrix}
-   1 & 2 & \cdots & n\cr
-   \sigma_1 & \sigma_2 & \cdots & \sigma_n
-\end{pmatrix}$$
+## 2. PLU Decomposition
 
-then Julia returns a vector `p` containing $[\sigma_1,\sigma_2,\ldots,\sigma_n]$. 
 
-We can convert this to a permutation matrix via
-
-$$P = [\mathbf e_{\sigma_1}| \cdots | \mathbf e_{\sigma_n}].$$
-
-In Julia, this can be done by creating a zero matrix `P`, and putting a 1 in the `P`$[\sigma_k,k]$ entry:
+## 3. 

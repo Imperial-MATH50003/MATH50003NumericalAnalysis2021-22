@@ -41,4 +41,28 @@ forward-substitution with a lower-triangular matrix:
 
 ## 4. Orthogonal matrices
 
+**Problem (norm-preserving)** Show that orthogonal matrices preserve the 2-norm of vectors:
+$$
+\|Q 𝐯\| = \|𝐯\|.
+$$
+
+**SOLUTION**
+$$
+\|Q 𝐯\|^2 = (Q 𝐯)^⊤ Q 𝐯 = 𝐯^⊤ Q^⊤ Q 𝐯 = 𝐯^⊤  𝐯 = \|𝐯\|^2
+$$
+∎
+
+**Theorem (eigenvalues of orthogonal matrix)** Show that the eigenvalues $λ$ of an orthogonal matrix $Q$ are
+on the unit circle: $|λ| = 1$.
+
+**SOLUTION**
+Let $𝐯$ be a unit eigenvector corresponding to $λ$: $Q 𝐯 = λ 𝐯$ with $\|𝐯\| = 1$. Then
+$$
+1 = \| 𝐯 \| = \|Q 𝐯 \| =  \| λ 𝐯 \| = |λ|.
+$$
+∎
+
+**Problem** Explain why an orthogonal matrix $Q$ must be equal to $I$ if all its eigenvalues are 1.
+
+
 Draw the Householder reflection
