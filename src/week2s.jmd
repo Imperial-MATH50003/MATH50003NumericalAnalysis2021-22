@@ -1,12 +1,8 @@
-# MATH50003 Problem Sheet 2
+# MATH50003 Numerical Analysis: Problem Sheet 2
 
 This week we look at other variants of finite-differences, including central differences and second-order
 finite-differences. We also investigate mathematical properties of dual numbers, extend their implementation to
 other functions. Finally, we see how dual numbers can be combined with Newton iteration for root finding.
-
-```julia
-using ColorBitstring, SetRounding
-```
 
 Questions marked with a ⋆ are meant to be completed without using a computer.
 
@@ -14,7 +10,7 @@ Questions marked with a ⋆ are meant to be completed without using a computer.
 
 **Problem 1.1⋆** Use Taylor's theorem to derive an error bound for central differences
 $$
-f'(x) ≈ {f(x + h) - f(x - h) \over 2h}
+f'(x) ≈ {f(x + h) - f(x - h) \over 2h}.
 $$
 Find an error bound when implemented in floating point arithmetic, assuming that
 $$
@@ -23,7 +19,7 @@ $$
 where $|δ_x| \leq c ϵ_{\rm m}$.
 
 **Problem 1.2** Implement central differences for $f(x) = 1 + x + x^2$ and $g(x) = 1 + x/3 + x^2$. 
-Plot the errors. 
+Plot the errors for `h = 2.0 .^ (0:-1:-60)` and `h = 10.0 .^ (0:-1:-16)`. 
 Derive the error exactly for the different cases to explain the observed behaviour.
 
 
@@ -38,7 +34,7 @@ $$
 where $|δ_x| \leq c ϵ_{\rm m}$.
 
 **Problem 1.4** Use finite-differences, central differences, and second-order finite-differences to approximate to 5-digits the first and second 
-derivatives to the following functions:
+derivatives to the following functions
 at the point $x = 0.1$:
 $$
 \exp(\exp x \cos x + \sin x), \prod_{k=1}^{1000} \left({x \over k}-1\right), \hbox{ and } f^{\rm s}_{1000}(x)
@@ -92,8 +88,13 @@ Show that dual numbers $𝔻$ are a _commutative ring_, that is, for all $a,b,c 
 **Problem 2.2⋆** A _field_ is a commutative ring such that $0 ≠ 1$ and all nonzero elements have a multiplicative inverse, i.e.,
 there exists $a^{-1}$ such that $a a^{-1} = 1$. Why isn't $𝔻$ a field?
 
-**Problem 2.3⋆** A _matrix representation_ of a ring/field are maps from a group/ring/field to matrices such that matrix addition and multiplication
-behaves exactly like addition and multiplication that of the ring/field. Show that the following are matrix representations of complex numbers and
+**Problem 2.3⋆** A _matrix representation_ of a ring are maps from a group/ring to matrices such that matrix addition and multiplication
+behave exactly like addition and multiplication that of the ring. 
+That is, if $A$ and $B$ are elements of the ring and $ρ$ is a representation, then
+$$
+ρ(A + B) = ρ(A) + ρ(B) \hbox{ and } ρ(AB) = ρ(A)ρ(B).
+$$
+Show that the following are matrix representations of complex numbers and
 dual numbers (respectively):
 $$
 \begin{align*}
@@ -159,11 +160,11 @@ end
 
 exp(x::Dual) = Dual(exp(x.a), exp(x.a) * x.b)
 
-function cos(x::Dual, y::Dual)
+function cos(x::Dual)
     # TODO: implement cos for Duals
 end
 
-function sin(x::Dual, y::Dual)
+function sin(x::Dual)
     # TODO: implement sin for Duals
 end
 
