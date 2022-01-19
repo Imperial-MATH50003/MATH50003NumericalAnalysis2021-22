@@ -197,7 +197,7 @@ end
 
 **Problem 3.2** Compute points $y$ such that $|f(y)| \leq 10^{-13}$ (i.e., approximate roots):
 $$
-\exp(\exp x \cos x + \sin x)-6\hbox{ and } \prod_{k=1}^1000 \left({x \over k}-1\right) - {1 \over 2}
+\exp(\exp x \cos x + \sin x)-6\hbox{ and } \prod_{k=1}^{1000} \left({x \over k}-1\right) - {1 \over 2}
 $$
 (Hint: you may need to try different `x0` and `n` to get convergence. Plotting the function should give an
 indication of a good initial guess.)
