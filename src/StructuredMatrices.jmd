@@ -270,10 +270,10 @@ that is, matrix representations of the symmetric group $S_n$, acting on $ℝ^n$.
 Recall every $σ \in S_n$ is a bisection between $\{1,2,\ldots,n\}$ and itself.
 We can write a permutation $σ$ in _Cauchy notation_:
 $$
-\begin{bmatrix}
+\begin{pmatrix}
  1 & 2 & 3 & \cdots & n \cr
  σ_1 & σ_2 & σ_3 & \cdots & σ_n
- \end{bmatrix}
+ \end{pmatrix}
 $$
 where $\{σ_1,\ldots,σ_n\} = \{1,2,\ldots,n\}$ (that is, each integer appears precisely once).
 We denote the _inverse permutation_ by $σ^{-1}$, which can be constructed by swapping the rows of
@@ -529,7 +529,7 @@ Indeed it is symmetric, and orthogonal. It sends $𝐱$ to $-𝐱$:
 $$
 Q_𝐯 𝐱 = {1 \over 5} \begin{bmatrix}3 - 8 \\ -4 - 6 \end{bmatrix} = -𝐱
 $$
-Ant vector orthogonal to $𝐱$, like $𝐲 = [-2,1]^\top$, is left fixed:
+Any vector orthogonal to $𝐱$, like $𝐲 = [-2,1]^\top$, is left fixed:
 $$
 Q_𝐯 𝐲 = {1 \over 5} \begin{bmatrix}-6 -4 \\ 8 - 3 \end{bmatrix} = 𝐲
 $$
@@ -542,7 +542,8 @@ Q_𝐯 𝐱 = 𝐱 - 2 𝐯 (𝐯^⊤ 𝐱).
 $$
 
 
-Just as rotations can be used to rotate vectors to be aligned with coordinate axis, so can reflections:
+Just as rotations can be used to rotate vectors to be aligned with coordinate axis, so can reflections,
+but in this case it works for vectors in $ℝ^n$, not just $ℝ^2$:
 
 **Lemma (Householder reflection)** Define $𝐲 = ±\|𝐱\| 𝐞_1 + 𝐱$ and $𝐰 = {𝐲 \over \|𝐲\|}$. Then
 $$
