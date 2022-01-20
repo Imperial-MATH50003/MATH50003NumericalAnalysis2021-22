@@ -16,11 +16,11 @@ called banded and this allows for more efficient algorithms. We discuss diagonal
 tridiagonal and bidiagonal matrices.
 3. _Permutation_: A permutation matrix permutes the rows of a vector. 
 4. _Orthogonal_: An orthogonal matrix $Q$ satisfies $Q^⊤ Q = I$, in other words, they are
-very easy to invert. We discuss the special casesrotations and reflections.
+very easy to invert. We discuss the special cases of simple rotations and reflections.
 
 
 ```julia
-using LinearAlgebra, Plots
+using LinearAlgebra, Plots, BenchmarkTools
 ```
 
 
@@ -32,7 +32,9 @@ consecutively in memory. E.g. if we have a `Vector{Int8}` of length
 A  `Matrix` is stored consecutively in memory, going down column-by-
 column. That is,
 ```julia
-A = [1 2; 3 4; 5 6]
+A = [1 2;
+     3 4;
+     5 6]
 ```
 Is actually stored equivalently to a length `6` vector:
 ```julia
@@ -89,9 +91,23 @@ mul_rows(A, x), mul(A, x)
 Either implementation will be $O(mn)$ operations. However, the implementation 
 `mul` accesses the entries of `A` going down the column,
 which happens to be _significantly faster_ than `mul_rows`, due to accessing
-memory of `A` in order. 
+memory of `A` in order. We can see this by measuring the time it takes using `@btime`:
+```julia
+n = 1000
+A = randn(n,n) # create n x n matrix with random normal entries
+x = randn(n) # create length n vector with random normal entries
+
+@btime mul_rows(A,x)
+@btime mul(A,x)
+@btime A*x; # built-in, high performance implementation. USE THIS in practice
+```
+Here `ms` means milliseconds (`0.001 = 10^(-3)` seconds) and `μs` means microseconds (`0.000001 = 10^(-6)` seconds).
+So we observe that `mul` is roughly 3x faster than `mul_rows`, while the optimised `*` is roughly 5x faster than `mul`.
 
 
+**Remark (advanced)** For floating point types, `A*x` is implemented in BLAS which is generally multi-threaded
+and is not identical to `mul(A,x)`, that is, some inputs will differ in how the computations
+are rounded.
 
 
 Note that the rules of arithmetic apply here: matrix multiplication with floats
@@ -108,9 +124,6 @@ A = fill(Int8(2^6), 2, 2) # make a matrix whose entries are all equal to 2^6
 A * Int8[1,1] # we have overflowed and get a negative number -2^7
 ```
 
-**Remark (advanced)** For floating point types, `A*x` is implemented in BLAS which is generally multi-threaded
-and is not identical to `mul(A,x)`, that is, some inputs will differ in how the computations
-are rounded.
 
 Solving a linear system is done using `\`:
 ```julia
@@ -236,7 +249,7 @@ Bidiagonal([1,2,3], [4,5], :U)
 ```
 
 Multiplication and solving linear systems with Bidiagonal systems is also $O(n)$ operations, using the standard
-multiplications/back-substituion algorithms but being careful in the loops to only access the non-zero entries. 
+multiplications/back-substitution algorithms but being careful in the loops to only access the non-zero entries. 
 
 
 ### Tridiagonal
@@ -254,7 +267,7 @@ We will later see how linear systems involving tridiagonal matrices can be solve
 
 Permutation matrices are matrices that represent the action of permuting the entries of a vector,
 that is, matrix representations of the symmetric group $S_n$, acting on $ℝ^n$.
-Recall every $σ \in S_n$ is a bisection between $\{1,2,\ldots,n\}$.
+Recall every $σ \in S_n$ is a bisection between $\{1,2,\ldots,n\}$ and itself.
 We can write a permutation $σ$ in _Cauchy notation_:
 $$
 \begin{bmatrix}
@@ -276,12 +289,12 @@ $$
 **Example (permutation of a vector)** 
 Consider the permutation $σ$ given by
 $$
-\begin{bmatrix}
+\begin{pmatrix}
  1 & 2 & 3 & 4 & 5 \cr
  1 & 4 & 2 & 5 & 3
- \end{bmatrix}
+ \end{pmatrix}
 $$
-We can apply it to a vector of the first 5 letter:
+We can apply it to a vector:
 ```julia
 σ = [1, 4, 2, 5, 3]
 v = [6, 7, 8, 9, 10]
@@ -290,13 +303,13 @@ v[σ] # we permutate entries of v
 Its inverse permutation $σ^{-1}$ has Cauchy notation coming from swapping the rows of
 the Cauchy notation of $σ$ and sorting:
 $$
-\begin{bmatrix}
+\begin{pmatrix}
  1 & 4 & 2 & 5 & 3 \cr
  1 & 2 & 3 & 4 & 5
- \end{bmatrix} \rightarrow \begin{bmatrix}
+ \end{pmatrix} \rightarrow \begin{pmatrix}
  1 & 2 & 4 & 3 & 5 \cr
  1 & 3 & 2 & 5 & 4
- \end{bmatrix} 
+ \end{pmatrix} 
 $$
 Julia has the function `invperm` for computing the vector that encodes
 the inverse permutation:
@@ -438,7 +451,7 @@ $$
 
 **Proof** 
 
-The last equation is trivial so the only question is that is a a rotation matrix.
+The last equation is trivial so the only question is that it is a rotation matrix.
 Define $θ = -{\rm atan}(b, a)$. By definition of the two-arg arctan we have
 $$
 \begin{bmatrix}
@@ -460,7 +473,7 @@ $$
 In addition to rotations, another type of orthognal matrix are reflections:
 
 **Definition (reflection matrix)** 
-Given a vector $𝐯$ satisfying $\|𝐯\|=1$, the reflection matrix is the orthogonal matrix as
+Given a vector $𝐯$ satisfying $\|𝐯\|=1$, the reflection matrix is the orthogonal matrix
 $$
 Q_𝐯 \triangleq I - 2 𝐯 𝐯^⊤
 $$
@@ -468,10 +481,10 @@ $$
 These are reflections in the direction of $𝐯$. We can show this as follows:
 
 **Proposition** $Q_𝐯$ satisfies:
-1. Symmetry
-2. Orthogonality
+1. Symmetry: $Q_𝐯 = Q_𝐯^⊤$
+2. Orthogonality: $Q_𝐯^⊤ Q_𝐯 = I$
 2. $𝐯$ is an eigenvector of $Q_𝐯$ with eigenvalue $-1$
-4. It is a rank-1 perturbation of $I$
+4. $Q_𝐯$ is a rank-1 perturbation of $I$
 3. $\det Q_𝐯 = -1$
 
 
@@ -486,8 +499,8 @@ $$
 Q_𝐯 𝐯 = -𝐯
 $$
 Property 4 follows since $𝐯 𝐯^⊤$ is a rank-1 matrix as all rows are linear combinations of each other.
-To see property 5, note there is a dimension $n-1$ space $W$ orthogonal to $𝐯$.
-For $𝐰 \in W$ we have
+To see property 5, note there is a dimension $n-1$ space $W$ orthogonal to $𝐯$, that is, for all
+$𝐰 \in W$ we have $𝐰^⊤ 𝐯 = 0$, which implies that
 $$
 Q_𝐯 𝐰 = 𝐰
 $$
@@ -522,17 +535,32 @@ Q_𝐯 𝐲 = {1 \over 5} \begin{bmatrix}-6 -4 \\ 8 - 3 \end{bmatrix} = 𝐲
 $$
 
 
+Note that _building_ the matrix `Q_𝐯` will be expensive ($O(n^2)$ operations), but we can apply
+$Q_𝐯$ to a vector in $O(n)$ operations using the expression:
+$$
+Q_𝐯 𝐱 = 𝐱 - 2 𝐯 (𝐯^⊤ 𝐱).
+$$
+
 
 Just as rotations can be used to rotate vectors to be aligned with coordinate axis, so can reflections:
 
-**Lemma (Householder reflection)** Define $𝐲 = ±\|𝐱\| 𝐞_1 + 𝐱$ and $𝐯 = {𝐲 \over \|𝐲\|}$. Then
+**Lemma (Householder reflection)** Define $𝐲 = ±\|𝐱\| 𝐞_1 + 𝐱$ and $𝐰 = {𝐲 \over \|𝐲\|}$. Then
 $$
-Q_𝐯 𝐱 = \|𝐱\| 𝐞_1
+Q_𝐰 𝐱 = \|𝐱\| 𝐞_1
 $$
 
 **Proof**
+Note that
 $$
-Q_𝐯 𝐱  =  (I - 2 𝐯 𝐯^⊤) 𝐱 = 𝐱 - 2 {𝐲  \|𝐱\|  \over \|𝐲\|^2} (\|𝐱\|±x_1) = 𝐱 - 𝐲 =  ∓\|𝐱\| 𝐞_1.
+\begin{align*}
+\| 𝐲 \|^2 &= 2\|𝐱\|^2 ± 2 \|𝐱\| x_1, \\
+𝐲^⊤ 𝐱 &= \|𝐱\|^2 ±  \|𝐱\| x_1
+\end{align*}
+$$
+where $x_1 = 𝐞_1^\top 𝐱$. Therefore:
+$$
+Q_𝐰 𝐱  =  (I - 2 𝐰 𝐰^⊤) 𝐱 = 𝐱 - 2 {𝐲  \|𝐱\|  \over \|𝐲\|^2} (\|𝐱\|±x_1) = 𝐱 - 𝐲 =  ∓\|𝐱\| 𝐞_1.
 $$
 
 ∎
+
