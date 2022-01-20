@@ -1,3 +1,11 @@
+
+```julia
+using LinearAlgebra
+
+# We will override these functions below
+import Base: getindex, setindex!, size, *, \
+```
+
 ## 1. Dense Matrices
 
 **Problem 1.1** Show that `A*x` is not
@@ -9,10 +17,10 @@ by finding a `Float64` example  where the bits do not match.
 
 ## 2. Triangular Matrices
 
-**Problem 2.1** Complete the following function for performing
-back-substitution with an upper-triangular matrix:
+**Problem 2.1** Complete the following functions for solving linear systems with
+triangular systems by implementing back and forward-substitution:
 ```julia
- function backsubstitution(U,b)
+function ldiv(U::UpperTriangular, b)
     n = size(U,1)
     
     if length(b) != n
@@ -20,28 +28,136 @@ back-substitution with an upper-triangular matrix:
     end
         
     x = zeros(n)  # the solution vector
+    ## TODO: populate x using back-substitution
+
+    
     for k = n:-1:1  # start with k=n, then k=n-1, ...
         r = b[k]  # dummy variable
         for j = k+1:n
-            ## TODO: update r using U[k,j] 
             r -= U[k,j]*x[j] # equivalent to r = r-U[k,j]*x[j]
         end
-        ## TODO: Write to x[k]
         x[k] = r/U[k,k]
     end
     x
 end
+
+function ldiv(U::LowerTriangular, b)
+    n = size(U,1)
+    
+    if length(b) != n
+        error("The system is not compatible")
+    end
+        
+    x = zeros(n)  # the solution vector
+    ## TODO: populate x using forward-substitution
+end
 ```
 
-**Problem 2.2** Write a function `forwardsubstition` for performing
-forward-substitution with a lower-triangular matrix:
-
+**Problem 2.2⋆** Given $𝐱 ∈ ℝ^n$, find a lower triangular matrix of the form
+$$
+L = I - 2 𝐯 𝐞_1^⊤
+$$
+such that:
+$$
+L 𝐱 = x_1 𝐞_1.
+$$
+What does $L𝐲$ equal if $𝐲  ∈ ℝ^n$ satisfies $y_1 = 𝐞_1^⊤ 𝐲 = 0$?
 
 ## 3. Banded matrices
 
-## 4. Orthogonal matrices
+**Problem 3.1** Complete the implementation of `UpperTridiagonal` which represents a banded matrix with
+bandwidths $(l,u) = (0,2)$:
+```julia
+struct UpperTridiagonal{T} <: AbstractMatrix{T}
+    d::Vector{T}   # diagonal entries
+    du::Vector{T}  # super-diagonal enries
+    du2::Vector{T} # second-super-diagonal entries
+end
 
-**Problem (norm-preserving)** Show that orthogonal matrices preserve the 2-norm of vectors:
+size(U::UpperTridiagonal) = (length(U.d),length(U.d))
+
+function getindex(U::UpperTridiagonal, k::Int, j::Int)
+    d,du,du2 = U.d,U.du,U.du2
+    # TODO: return U[k,j]
+end
+
+function setindex!(U::UpperTridiagonal, v, k::Int, j::Int)
+    d,du,du2 = U.d,U.du,U.du2
+    if j > k+2
+        error("Cannot modify off-band")
+    end
+
+    # TODO: modify d,du,du2 so that U[k,j] == v
+
+    U # by convention we return the matrix
+end
+```
+
+**Problem 3.2** Complete the following implementations of `*` and `\` for `UpperTridiagonal` so that
+they take only $O(n)$ operations.
+```julia
+function *(U::UpperTridiagonal, x::AbstractVector)
+    T = promote_type(eltype(U), eltype(x)) # make a type that contains both the element type of U and x
+    b = zeros(T, size(U,1)) # returned vector
+    # TODO: populate b so that U*x == b (up to rounding)
+end
+
+function \(U::UpperTridiagonal, b::AbstractVector)
+    T = promote_type(eltype(U), eltype(b)) # make a type that contains both the element type of U and b
+    x = zeros(T, size(U,2)) # returned vector
+    # TODO: populate x so that U*x == b (up to rounding)
+end
+```
+
+
+## 4. Permutations
+
+**Problem 4.1⋆** What are the permutation matrices corresponding to the following permutations?
+$$
+
+$$
+
+**Problem 4.2⋆** Permutations form a group under composition. A _matrix representation_ of a group is a mapping to (invertible) matrices such that the group
+action is consistent with matrix multiplication. That is, if $A$ and $B$ are elements of the group and $ρ$ is a representation, then
+$$
+ρ(AB) = ρ(A)ρ(B).
+$$
+Show that the map $σ \rightarrow P_σ$ is a matrix representation of the permutation group.
+
+**Problem 4.3 (advanced)⋆** The _generators_ of $S_3$ are the permutations that swap two consecutive entries:
+$$
+\begin{align*}
+σ_1 &= \begin{pmatrix} 1 & 2 & 3 \\  2 & 1 & 3 \end{pmatrix} \\
+σ_2 &= \begin{pmatrix} 1 & 2 & 3 \\  1 & 3 & 2 \end{pmatrix}
+$$
+Every $σ \in S_3$ can be written as products of $σ_1$ and $σ_2$. Show that $S_3$ also has a $2 \times 2$ representation
+that can be deduced from the maps
+$$
+σ_1 ↦ \begin{bmatrix} 1  \\ & -1 \end{bmatrix} \\
+σ_2 ↦ {1 \over 2} \begin{bmatrix} -1 & \sqrt 3  \\ \sqrt 3 & 1 \end{bmatrix}.
+$$
+
+**Problem 4.4** Complete the implementation of the Permutation matrices that supports `P[k,j]` and such that `*` takes $O(n)$ operations.
+Hint: the function `invperm` may be useful.
+```julia
+struct PermutationMatrix{T} <: AbstractMatrix{T}
+    p::Vector{T} # represents the permutation whose action is v[p]
+end
+
+size(P::PermutationMatrix) = (length(P.p),length(P.p))
+
+function getindex(P::PermutationMatrix, k::Int, j::Int)
+    # TODO: Return P[k,j]
+end
+
+function *(P::PermutationMatrix, x::AbstractVector)
+
+end
+```
+
+## 5. Orthogonal matrices
+
+**Problem 5.1⋆** Show that orthogonal matrices preserve the 2-norm of vectors:
 $$
 \|Q 𝐯\| = \|𝐯\|.
 $$
@@ -52,7 +168,7 @@ $$
 $$
 ∎
 
-**Theorem (eigenvalues of orthogonal matrix)** Show that the eigenvalues $λ$ of an orthogonal matrix $Q$ are
+**Problem 5.2⋆** Show that the eigenvalues $λ$ of an orthogonal matrix $Q$ are
 on the unit circle: $|λ| = 1$.
 
 **SOLUTION**
@@ -62,7 +178,7 @@ $$
 $$
 ∎
 
-**Problem** Explain why an orthogonal matrix $Q$ must be equal to $I$ if all its eigenvalues are 1.
+**Problem 5.3⋆** Explain why an orthogonal matrix $Q$ must be equal to $I$ if all its eigenvalues are 1.
 
 
-Draw the Householder reflection
+**Problem 5.4**
