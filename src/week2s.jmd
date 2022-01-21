@@ -74,18 +74,18 @@ h = sqrt(eps())
 ## 2. Dual numbers
 
 **Problem 2.1⋆** 
-Show that dual numbers $𝔻$ are a _commutative ring_, that is, for all $a,b,c ∈ 𝔻$ the following are satisfied:
+Show that dual numbers $\mathbb{D}$ are a _commutative ring_, that is, for all $a,b,c ∈ \mathbb{D}$ the following are satisfied:
 1. _additive associativity_: $(a + b) + c = a + (b + c)$
 2. _additive commutativity_: $a + b = b + a$
-3. _additive identity_: There exists $0 ∈ 𝔻$ such that $a + 0 = a$.
+3. _additive identity_: There exists $0 ∈ \mathbb{D}$ such that $a + 0 = a$.
 4. _additive inverse_: There exists $-a$ such that $(-a) + a = 0$.
 5. _multiplicative associativity_: $(ab)c = a(bc)$
 6. _multiplictive commutativity_: $ab = ba$
-7. _multiplictive identity_: There exists $1 ∈ 𝔻$ such that $1a= a$.
+7. _multiplictive identity_: There exists $1 ∈ \mathbb{D}$ such that $1a= a$.
 8. _distributive_: $a(b+c) = ab + ac$
 
 **SOLUTION**
-In what follows we write $a = a_r + a_d \epsilon$ and likewise for $b,c ∈ 𝔻$.
+In what follows we write $a = a_r + a_d \epsilon$ and likewise for $b,c ∈ \mathbb{D}$.
 
 Additive associativity and commutativity and existence of additive inverse are both immediate results of dual number addition reducing to element-wise real number addition. Furthermore, by definition of addition on $\mathbb{D}$ the dual number $0+0 \epsilon$ acts as the additive identity since $$(a_r+a_d\epsilon)+(0+0\epsilon) = (a_r+a_d\epsilon)$$. We explicitly prove multiplicative commutativity
 $$ ab = (a_r+a_d\epsilon)(b_r+b_d \epsilon) = a_r b_r+(a_r b_d+a_d b_r)\epsilon = b_r a_r+(b_r a_d+b_d a_r)\epsilon = ba.$$
@@ -98,7 +98,7 @@ $$ ab + ac = a_r b_r + (a_d b_r + a_r b_d) \epsilon + a_r c_r + (a_d c_r + a_r c
 
 
 **Problem 2.2⋆** A _field_ is a commutative ring such that $0 ≠ 1$ and all nonzero elements have a multiplicative inverse, i.e.,
-there exists $a^{-1}$ such that $a a^{-1} = 1$. Why isn't $𝔻$ a field?
+there exists $a^{-1}$ such that $a a^{-1} = 1$. Why isn't $\mathbb{D}$ a field?
 
 **SOLUTION**
 
@@ -306,3 +306,23 @@ cont(1000,xn)-2.
 xn = newton(x->cont(1000,x)-3.,0.5,10)
 cont(1000,xn)-3.
 ```
+
+By plotting the function we can conjecture that the continued fraction converges to $\sqrt{x}$:
+```julia
+using Plots
+plot(x->cont(1000,x),0,10)
+plot!(x->sqrt(x))
+```
+There are a handful of ways to prove this conjecture. Here is one - start with
+
+$$ \sqrt{x}(1+\sqrt{x}) = \sqrt{x}+x,$$
+
+then extend the RHS by $0 = +1-1$ to also obtain the factor $1+\sqrt{x}$ there, resulting in
+
+$$ \sqrt{x}(1+\sqrt{x}) = (1+\sqrt{x})+x-1.$$
+
+Dividing through $(1+\sqrt{x})$ now yields
+
+$$ \sqrt{x} = 1 + \frac{x-1}{1+\sqrt{x}}.$$
+
+Note that we can now plug this equation into itself on the right hand side to obtain a recursive continued fraction for the square root function.
