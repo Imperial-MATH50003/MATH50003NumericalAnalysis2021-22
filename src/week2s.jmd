@@ -88,11 +88,28 @@ Show that dual numbers $𝔻$ are a _commutative ring_, that is, for all $a,b,c 
 7. _multiplictive identity_: There exists $1 ∈ 𝔻$ such that $1a= a$.
 8. _distributive_: $a(b+c) = ab + ac$
 
+**SOLUTION**
+In what follows we write $a = a_r + a_d \epsilon$ and likewise for $b,c ∈ 𝔻$.
+
+Additive associativity and commutativity and existence of additive inverse are both immediate results of dual number addition reducing to element-wise real number addition. Furthermore, by definition of addition on $\mathbb{D}$ the dual number $0+0 \epsilon$ acts as the additive identity since $$(a_r+a_d\epsilon)+(0+0\epsilon) = (a_r+a_d\epsilon)$$. We explicitly prove multiplicative commutativity
+$$ ab = (a_r+a_d\epsilon)(b_r+b_d \epsilon) = a_r b_r+(a_r b_d+a_d b_r)\epsilon = b_r a_r+(b_r a_d+b_d a_r)\epsilon = ba.$$
+We also explicitly prove multiplicative associativity:
+$$(ab)c = ((a_r*b_r+(a_r*b_d+a_d*b_r)*\epsilon) c = a_r b_r c_r + ((a_r b_d+a_d b_r) c_r  + a_r b_r c_d) \epsilon = a_r b_r c_r + (a_r b_d c_r + a_d b_r c_r  + a_r b_r c_d) \epsilon$$  and $$a(bc) = a ((b_r c_r+(b_r c_d+b_d c_r) \epsilon) = a_r b_r c_r + (a_r b_d c_r + a_d b_r c_r  + a_r b_r c_d) \epsilon.$$
+The number $1+0\epsilon$ serves as the multiplicative identity. Note that for any dual number $a$, we have
+$$ (1+0\epsilon)(a_r+a_d\epsilon) = 1*a_r + (a_r*0+1*a_d)*\epsilon = a_r+a_d \epsilon = a.$$ Finally we show distributivity of multiplication:
+$$a(b+c) = a (b_r+c_r + (b_d+c_d)\epsilon) = (a_r b_r + a_r c_r) + (a_r b_d+a_r c_d+ a_d b_r + a_d c_r) \epsilon,$$
+$$ ab + ac = a_r b_r + (a_d b_r + a_r b_d) \epsilon + a_r c_r + (a_d c_r + a_r c_d) \epsilon = (a_r b_r + a_r c_r) + (a_r b_d+a_r c_d+ a_d b_r + a_d c_r) \epsilon. $$
+
+
 **Problem 2.2⋆** A _field_ is a commutative ring such that $0 ≠ 1$ and all nonzero elements have a multiplicative inverse, i.e.,
 there exists $a^{-1}$ such that $a a^{-1} = 1$. Why isn't $𝔻$ a field?
 
+**SOLUTION**
+
+Fields require that all nonzero elements have a unique multiplicative inverse. However, no dual number of the form $0+c\epsilon$ and $c \neq 0$, that is dual numbers with zero real part and non-zero dual part have multiplicative inverses as division by $0+c\epsilon$ is not well-defined.
+
 **Problem 2.3⋆** A _matrix representation_ of a ring/field are maps from a group/ring/field to matrices such that matrix addition and multiplication
-behaves exactly like addition and multiplication that of the ring/field. Show that the following are matrix representations of complex numbers and
+behaves exactly like addition and multiplication of the ring/field. Show that the following are matrix representations of complex numbers and
 dual numbers (respectively):
 $$
 \begin{align*}
@@ -110,6 +127,13 @@ for what choice of $s$ and $t$? Use dual numbers to compute the derivative of th
 $$
 \exp(\exp x \cos x + \sin x), \prod_{k=1}^3 \left({x \over k}-1\right),\hbox{ and } f^{\rm s}_2(x) = {1 + {x - 1 \over 2 + {x-1 \over 2}}}
 $$
+
+**SOLUTION**
+
+As with complex numbers, division is easiest to understand by first multiplying with the conjugate, that is:
+$$\frac{a+b\epsilon}{c+d\epsilon} &= \frac{(a+b\epsilon)(c-d\epsilon)}{(c+d\epsilon)(c-d\epsilon)}.$$
+Expanding the products and dropping terms with $\epsilon^2$ then leaves us with the definition of division for dual numbers (where the denominator must have non-zero real part):
+$$\frac{a}{c} + \frac{bc - ad}{c^2}\epsilon.$$ Thus we have $s = \frac{a}{c}$ and $t = \frac{bc - ad}{c^2}$.
 
 
 **Problem 2.5** Add support for `cos`, `sin`, and `/` to the type `Dual`:
