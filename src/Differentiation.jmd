@@ -95,7 +95,7 @@ f'(x) ≈ {f(x) - f(x-h) \over h}
 $$
 and central differences:
 $$
-f'(x) ≈ {f(x + h/2) - f(x - h/2) \over h}
+f'(x) ≈ {f(x + h) - f(x - h) \over 2h}
 $$
 Composing these approximations is useful for higher-order derivatives as we 
 discuss in the problem sheet.

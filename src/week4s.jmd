@@ -1,0 +1,27 @@
+
+**Problem** Show that there always exists a QR decomposition such that the diagonal of $R$ is non-negative.
+
+**SOLUTION**
+
+We can assume that the diagonal of $R$ is positive (otherwise multiply $Q$ and $R$ by $\diag(\sign r_{11}, \ldots, \sign r_{mm})$).
+
+∎
+
+**Problem** Show that the QR decomposition of a square invertible matrix is unique, provided that the diagonal of $R$ is positive.
+
+
+**SOLUTION**
+
+Assume there is a second decomposition also with positive diagonal
+$$
+A = QR = Q̃ R̃
+$$
+Then we know 
+$$
+Q^⊤ Q̃ = R R̃^{-1}
+$$
+Note $Q^⊤ Q̃$ is orthogonal, and $R R̃^{-1}$ has positive eigenvalues (the diagonal), hence all $m$ eigenvalues of
+$Q^⊤ Q̃$ are 1. This means that $Q^⊤ Q̃ = I$ and hence $Q̃ = Q$, which then implies $R̃ = R$.
+
+∎
+

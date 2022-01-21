@@ -15,7 +15,9 @@ Q&A: 9:50–10:30 Mondays, 10:40–11:20 Tuesdays on Teams
 
 **Background material**
 
-1. [Introduction to Julia](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/Julia.ipynb): we introduce the basic features of the Julia language.
+1. [Introduction to Julia](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/Julia.ipynb): we introduce  the basic features of the Julia language.
+2. [Asymptotics and Computational Cost](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/Asymptotics.ipynb): we review Big-O, little-o and asymptotic to notation,
+and their usage in describing computational cost.
 
 **Part I: Computing with numbers**
 
@@ -52,7 +54,9 @@ with respect to a prescribed weight—and their usage in numerical computations.
 
 ## Problem sheets
 
-1. [Week 1](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week1.ipynb): Binary representation, integers, floating point numbers, interval arithmetic
+1. [Week 1](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week1.ipynb): Binary representation, integers, floating point numbers, and interval arithmetic
+1. [Week 2](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week2.ipynb): Finite-differences, dual numbers, and Newton iteration
+
 
 ## Reading List
 

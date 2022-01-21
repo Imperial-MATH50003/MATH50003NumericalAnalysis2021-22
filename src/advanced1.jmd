@@ -1,0 +1,54 @@
+**Problem 1** Like decimal representation, all rational numbers have repeating sequence of binary digits,
+that is, $b_k = b_{k+r}$ for fixed integers $r$ and $K$ and all $k \geq K$. Use the geometric series
+to determine the corresponding real number, and thence prove that a repeating sequence of binary digits
+implies that a number is rational.
+
+**Problem 2** What are the bits of $(1/5)^2$ implemented in `Float16`?
+
+**Problem 3** What are the single precision $F_{32}$ (`Float32`) floating point representations for the following:
+$$30, 33, (23/4)\times 2^{−100}, (23/4)\times2^{−135}$$
+
+```julia
+printlnbits(23f0/4)
+printlnbits(2f0^100)
+printlnbits(23f0/4 * 2f0^(-100))
+printlnbits(23f0/4 * 2f0^(-135))
+```
+
+**Problem 4**  Modify Problem 5.4 from PS1 to compute the first 1000 (decimal) digits of ℯ, 
+with rigorous error bounds, using `BigFloat` with the `setprecision` command. Check your result versus `exp(big(1.0))`.
+
+
+**SOLUTION**
+The tricky part of this problem is that we need to fix the bound on `factorial(n)` above
+as otherwise we won't get the necessary accuracy. We can do this as follows:
+as follows:
+```julia
+function exp_bound(x::Interval, n)
+    if abs(x.a) > 1 || abs(x.b) > 1
+        error("Interval must be a subset of [-1, 1]")
+    end
+    ret = exp_t(x, n) # the code for Taylor series should work on Interval unmodified
+    T = typeof(ret.a)
+    err = setrounding(T, RoundUp) do
+        err_i = 3one(T)
+        for k = 1:n+1
+            err_i = err_i/k
+        end
+        err_i
+    end
+    ret + Interval(-err,err)
+end
+setprecision(5000) do 
+    x = Interval(big(1.0),big(1.0))
+    exp_bound(x, 600).a
+end
+```
+The precision and number of Taylor series were increased until the
+bounsa matched `exp(big(1.0))` to over 1000 digits:
+```julia
+setprecision(5000) do 
+    x = Interval(big(1.0),big(1.0))
+    max(exp(big(1.0)) - exp_bound(x, 600).a, exp_bound(x, 600).b - exp(big(1.0)))
+end
+```
