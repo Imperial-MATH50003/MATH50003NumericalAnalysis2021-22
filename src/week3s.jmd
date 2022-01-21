@@ -1,6 +1,13 @@
+# MATH50003 Numerical Analysis: Problem 3
+
+This problem sheet explores implementation of triangular solves,
+supporting a matrix with two super-diagonals, as well as
+permutation and Householder reflections that can be applied to a vector in
+$O(n)$ complexity.
+
 
 ```julia
-using LinearAlgebra
+using LinearAlgebra, Test
 
 # We will override these functions below
 import Base: getindex, setindex!, size, *, \
@@ -114,45 +121,43 @@ end
 
 **Problem 4.1⋆** What are the permutation matrices corresponding to the following permutations?
 $$
-
+\begin{pmatrix}
+1 & 2 & 3 \\
+3 & 2 & 1
+\end{pmatrix}, \begin{pmatrix}
+1 & 2 & 3 & 4 & 5 & 6\\
+2 & 1 & 4 & 3 & 6 & 5
+\end{pmatrix}.
 $$
 
-**Problem 4.2⋆** Permutations form a group under composition. A _matrix representation_ of a group is a mapping to (invertible) matrices such that the group
-action is consistent with matrix multiplication. That is, if $A$ and $B$ are elements of the group and $ρ$ is a representation, then
-$$
-ρ(AB) = ρ(A)ρ(B).
-$$
-Show that the map $σ \rightarrow P_σ$ is a matrix representation of the permutation group.
 
-**Problem 4.3 (advanced)⋆** The _generators_ of $S_3$ are the permutations that swap two consecutive entries:
-$$
-\begin{align*}
-σ_1 &= \begin{pmatrix} 1 & 2 & 3 \\  2 & 1 & 3 \end{pmatrix} \\
-σ_2 &= \begin{pmatrix} 1 & 2 & 3 \\  1 & 3 & 2 \end{pmatrix}
-$$
-Every $σ \in S_3$ can be written as products of $σ_1$ and $σ_2$. Show that $S_3$ also has a $2 \times 2$ representation
-that can be deduced from the maps
-$$
-σ_1 ↦ \begin{bmatrix} 1  \\ & -1 \end{bmatrix} \\
-σ_2 ↦ {1 \over 2} \begin{bmatrix} -1 & \sqrt 3  \\ \sqrt 3 & 1 \end{bmatrix}.
-$$
-
-**Problem 4.4** Complete the implementation of the Permutation matrices that supports `P[k,j]` and such that `*` takes $O(n)$ operations.
-Hint: the function `invperm` may be useful.
+**Problem 4.2** Complete the implementation of a type representing
+permutation matrices that supports `P[k,j]` and such that `*` takes $O(n)$ operations.
 ```julia
-struct PermutationMatrix{T} <: AbstractMatrix{T}
-    p::Vector{T} # represents the permutation whose action is v[p]
+struct PermutationMatrix <: AbstractMatrix{Int}
+    p::Vector{Int} # represents the permutation whose action is v[p]
+    function PermutationMatrix(p::Vector)
+        sort(p) == 1:length(p) || error("input is not a valid permutation")
+        new(p)
+    end
 end
 
 size(P::PermutationMatrix) = (length(P.p),length(P.p))
 
 function getindex(P::PermutationMatrix, k::Int, j::Int)
     # TODO: Return P[k,j]
+    P.p[k] == j ? 1 : 0 
 end
 
 function *(P::PermutationMatrix, x::AbstractVector)
-
+    # TODO: permute the entries of x
+    x[P.p]
 end
+
+# If your code is correct, this "unit test" will succeed
+p = [1, 4, 2, 5, 3]
+P = PermutationMatrix(p)
+@test P == I(5)[p,:]
 ```
 
 ## 5. Orthogonal matrices
@@ -181,4 +186,52 @@ $$
 **Problem 5.3⋆** Explain why an orthogonal matrix $Q$ must be equal to $I$ if all its eigenvalues are 1.
 
 
-**Problem 5.4**
+**Problem 5.4** Complete the implementation of a type representing
+reflections that supports `Q[k,j]` and such that `*` takes $O(n)$ operations.
+```julia
+# Represents I - 2v*v'
+struct Reflection{T} <: AbstractMatrix{T}
+    v::Vector{T}
+end
+
+Reflection(x::Vector{T}) where T = Reflection{T}(x/norm(x))
+
+size(Q::Reflection) = (length(Q.v),length(Q.v))
+
+function getindex(Q::Reflection, k::Int, j::Int)
+    # TODO: Return Q[k,j]
+    (k == j) - 2Q.v[k]*Q.v[j]
+end
+
+function *(P::Reflection, x::AbstractVector)
+    # TODO: permute the entries of x
+    x - 2*Q.v * dot(Q.v,x)
+end
+
+# If your code is correct, these "unit tests" will succeed
+x = randn(5)
+Q = Reflection(x)
+v = x/norm(x)
+@test Q == I-2v*v'
+@test Q*v ≈ -v
+@test Q'Q ≈ I
+```
+
+
+**Problem 5.5** Complete the following implementation of a Housholder reflection  so that the
+unit tests pass.
+
+```julia
+function householderreflection(s::Bool, x::AbstractVector)
+    # TODO: implement Householder reflection, returning a Reflection
+end
+
+x = randn(5)
+Q = householderreflection(true, x)
+@test Q isa Reflection
+@test Q*x ≈ norm(x)*[1; zeros(length(x)-1)]
+
+Q̃ = householderreflection(false, x)
+@test Q̃ isa Reflection
+@test Q̃*x ≈ -norm(x)*[1; zeros(length(x)-1)]
+```
