@@ -256,13 +256,13 @@ end
 Here is a simple test case for the above function:
 ```julia
 # example
-f(x) = x^2-3
+f_ex(x) = x^2-3
 n = 5
 x0 = 1
 # compute proposed root
-xn = newton(f,x0,n) 
+xn = newton(f_ex,x0,n) 
 # check that obtained point is an approximate root
-f(xn)
+f_ex(xn)
 ```
 
 
