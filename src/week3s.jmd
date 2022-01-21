@@ -224,6 +224,7 @@ unit tests pass.
 ```julia
 function householderreflection(s::Bool, x::AbstractVector)
     # TODO: implement Householder reflection, returning a Reflection
+    
 end
 
 x = randn(5)

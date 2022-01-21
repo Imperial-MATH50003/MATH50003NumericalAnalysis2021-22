@@ -39,3 +39,4 @@ notebook("src/advanced1.jmd"; kwds...)
 
 notebook("src/week1s.jmd"; kwds...)
 notebook("src/week2s.jmd"; kwds...)
+notebook("src/week3s.jmd"; kwds...)

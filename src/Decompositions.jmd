@@ -4,14 +4,15 @@
 In this lecture, we look at several factorizations of a matrix. For a square or rectangular matrix $A ∈ ℝ^{m × n}$ with $m ≥ n$, we consider:
 1. The _QR decomposition_
 $$
-A = \underbrace{Q}_{m × m} \underbrace{R}_{m × n} = \begin{bmatrix} 𝐪_1 | \cdots 𝐪_m \end{pmatrix} \begin{bmatrix} × & \cdots & × \\ & \ddots & \vdots \\ && × \\ &&0 \\ &&\vdots \\ && 0 \end{bmatrix} 
+A = \underbrace{Q}_{m × m} \underbrace{R}_{m × n} = \begin{bmatrix} 𝐪_1 | \cdots | 𝐪_m \end{bmatrix} \begin{bmatrix} × & \cdots & × \\ & \ddots & \vdots \\ && × \\ &&0 \\ &&\vdots \\ && 0 \end{bmatrix} 
 $$
-where $Q$ is orthogonal and $R$ is _right triangular_.
+where $Q$ is orthogonal ($Q^⊤Q = I$, $𝐪_j ∈ ℝ^m$) and $R$ is _right triangular_.
+
 2. The _reduced QR decomposition_
 $$
-A = \underbrace{Q̂}_{m × n} \underbrace{R̂}_{m × m} = \begin{bmatrix} 𝐪_1 | \cdots 𝐪_n \end{pmatrix} \begin{bmatrix} × & \cdots & × \\ & \ddots & \vdots \\ && ×  \end{bmatrix} 
+A = \underbrace{Q̂}_{m × n} \underbrace{R̂}_{m × m} = \begin{bmatrix} 𝐪_1 | \cdots | 𝐪_n \end{bmatrix} \begin{bmatrix} × & \cdots & × \\ & \ddots & \vdots \\ && ×  \end{bmatrix} 
 $$
-where $Q$ has orthogonal columns ($Q^⊤Q = I$) 
+where $Q$ has orthogonal columns ($Q^⊤Q = I$, $𝐪_j ∈ ℝ^m$) 
 
 For a square matrix we consider the _PLU decomposition_:
 $$
@@ -28,10 +29,11 @@ $$
 The importance of these decomposition for square matrices is that their component pieces are easy to invert on a computer:
 $$
 \begin{align*}
-A = P^⊤ LU &\Rightarrow A^{-1}𝐛 = U^{-1} L^{-1} P 𝐛 \\
-A = QR &\Rightarrow A^{-1}𝐛 = R^{-1} Q^\top 𝐛 \\
-A = L L^⊤ &\Rightarrow A^{-1}𝐛 = L^{-⊤} L^{-1} 𝐛 \\
+A = P^⊤ LU &\Rightarrow\qquad A^{-1}𝐛 = U^{-1} L^{-1} P 𝐛 \\
+A = QR &\Rightarrow\qquad A^{-1}𝐛 = R^{-1} Q^\top 𝐛 \\
+A = L L^⊤ &\Rightarrow\qquad A^{-1}𝐛 = L^{-⊤} L^{-1} 𝐛
 \end{align*}
+$$
 and we saw last lecture that triangular and orthogonal matrices are easy to invert when applied to a vector $𝐛$.
 For rectangular matrices we will see that they lead to efficient solutions to the _least squares problem_: find
 $𝐱$ that minimizes the 2-norm
@@ -49,15 +51,19 @@ the PLU decomposition via Gaussian elimination with pivoting.
 3. Cholesky decomposition: we introduce symmetric positive definite matrices and show that their LU decomposition can be re-interpreted
 as a Cholesky decomposition.
 
+```julia
+using LinearAlgebra, Plots
+```
 
 
 
 ## 1. QR, Reduced QR, and least squares
 
+Here we consider rectangular matrices with more rows than columns.
 A QR decomposition decomposes a matrix into an orthogonal matrix $Q$ times a right triangular matrix $R$. 
 Note the QR decomposition contains within it the reduced QR decomposition:
 $$
-A = QR = \begin{bmatrix} Q̂ | 𝐪_{n+1} | ⋯ | 𝐪_m \end{pmatrix} \begin{bmatrix} R̂ \\  𝟎_{m-n × n} \end{pmatrix} = Q̂ R̂.
+A = QR = \begin{bmatrix} Q̂ | 𝐪_{n+1} | ⋯ | 𝐪_m \end{bmatrix} \begin{bmatrix} R̂ \\  𝟎_{m-n × n} \end{bmatrix} = Q̂ R̂.
 $$
 
 ### Relationship with least squares
@@ -65,7 +71,7 @@ $$
 We can use it to solve a least squares problem using the norm-preserving property (see PS3) of orthogonal matrices:
 $$
 \| A 𝐱 - 𝐛 \| = \| Q R 𝐱 - 𝐛 \| = \| R 𝐱 - Q^⊤ 𝐛 \| = \left \| 
-\begin{bmatrix} R̂ \\ 𝟎_{m-n × n} \end{bmatrix} 𝐱 - \begin{bmatrix} Q̂^⊤ \\ 𝐪_{n+1}^⊤ \\ \vdots \\ 𝐪_m^⊤ \end{pmatrix}     𝐛 \right \|
+\begin{bmatrix} R̂ \\ 𝟎_{m-n × n} \end{bmatrix} 𝐱 - \begin{bmatrix} Q̂^⊤ \\ 𝐪_{n+1}^⊤ \\ \vdots \\ 𝐪_m^⊤ \end{bmatrix}     𝐛 \right \|
 $$
 Now note that the rows $k > n$ are independent of $𝐱$ and are a fixed contribution. Thus to minimise this norm it suffices to
 drop them and minimise:
@@ -78,7 +84,7 @@ $$
 𝐱 = R̂^{-1} Q̂^⊤ 𝐛
 $$
 
-Let's look at an example using `\` to do a least squares solve. Suppose we want to find noisy data by a quadratic
+Let's look at an example. Suppose we want to find noisy data by a quadratic
 $$
 p(x) = a + bx + cx^2
 $$
@@ -86,10 +92,10 @@ That is, we want to choose $a,b,c$ at data samples $x_1, \ldots, x_m$ so that th
 $$
 a + b x_k + c x_k^2 ≈ f_k
 $$
-where $f_k$ are given by data. We can reinterpret this as a least squares problem: minimise
+where $f_k$ are given by data. We can reinterpret this as a least squares problem: minimise the norm
 $$
 \left\| \begin{bmatrix} 1 & x_1 & x_1^2 \\ \vdots & \vdots & \vdots \\ 1 & x_m & x_m^2 \end{bmatrix}
-\begin{bmatrix} a \\ b \\ c \end{bmatrix} - \begin{bmatrix} f_1 \\ \vdots \\ f_m \end{bmatrix}
+\begin{bmatrix} a \\ b \\ c \end{bmatrix} - \begin{bmatrix} f_1 \\ \vdots \\ f_m \end{bmatrix} \right \|
 $$
 We can solve this using the QR decomposition:
 ```julia
@@ -120,11 +126,124 @@ A \ f
 
 ### Gram–Schmidt and reduced QR
 
-We will now reinterpret 
+
+Write
+$$
+A = \begin{bmatrix} 𝐚_1 | \dots | 𝐚_n \end{bmatrix}
+$$
+where $𝐚_k \in  ℝ^m$.
+Note that the column span of the first $j$ columns of $A$
+will be the same as the first $j$ columns of $Q̂$:
+$$
+\span{𝐚_1,\ldots,𝐚_j} = \span{𝐪_1,\ldots,𝐪_j}
+$$
+In other words: the columns of $Q̂$ are an orthogonal basis
+of the column span of $A$.
+To see this: note that since `R̂` is triangular we have:
+```julia
+A[:,1:j] = Q̂[:,1:j]*R̂[1:j,1:j]
+```
+for all $j$, and the multiplication is taking linear combinations of
+`Q̂[:,1:j]`. 
+ 
+It is possible to find an orthogonal basis using the _Gram–Schmidt algorithm_,
+which you may have seen before. We construct it via induction:
+assume that
+$$
+\span{𝐚_1,\ldots,𝐚_{j-1}} = \span{𝐪_1,\ldots,𝐪_{j-1}}
+$$
+where $𝐪_1,\ldots,𝐪_{j-1}$ are orthogonal:
+$$
+𝐪_k^\top 𝐪_ℓ = δ_{kℓ} = \begin{cases} 1 & k == ℓ \\
+                                            0 & \hbox{otherwise} \end{cases}.
+$$
+for $k,ℓ < 1$.
+Define
+$$
+𝐯_j := 𝐚_j - \sum_{k=1}^{j-1} \underbrace{𝐪_k^\top 𝐚_j}_{v_{kj}} 𝐪_k
+$$
+so that for $k < j$
+$$
+𝐪_k^\top 𝐯_j = 𝐪_k^\top 𝐚_j - \sum_{k=1}^{j-1} \underbrace{𝐪_k^\top 𝐚_j}_{v_{kj}} 𝐪_k^\top 𝐪_k = 0.
+$$
+Then we define
+$$
+𝐪_j := {𝐯_j \over \|𝐯_j\|}.
+$$
+which sastisfies the same properties as the assumption.
+
+We now reinterpret this construction as a reduced QR decomposition.
+Define
+$$
+r_{jj} := {1 \over \|𝐯_j\|}, \qquad r_{kj} := {v_{kj} \over \|𝐯_j\|}
+$$
+Then rearrange the definition we have
+$$
+𝐚_j = \begin{bmatrix} 𝐪_1|\cdots|𝐪_j \end{bmatrix} \begin{bmatrix} r_{1j} \\ \vdots \\ r_{jj} \end{bmatrix}
+$$
+Thus
+$$
+\begin{bmatrix} 𝐚_1|\cdots|𝐚_j \end{bmatrix} r_{11} & \cdots & r_{1j} \\ & \ddots & \vdots \\ && r_{jj} \end{bmatrix}
+$$
+That is, we are computing the reduced QR decomposition column-by-column. Running this algorithm to $j = n$ completes the decomposition.
+
+Unfortunately, the Gram–Schmidt algorithm is _unstable_: the rounding errors when implemented in floating point
+accumulate in a disasterous way. This will be explored in the problem sheet.
+
 
 ### Householder reflections and QR
 
+As an alternative, we will consider using Householder reflections to introduce zeros.
+Thus, if Gram–Schmidt is a process of _triangular orthogonalisation_ (using triangular matrices
+to orthogonalise), Householder reflections is a process of _orthogonal triangularisation_ 
+(using orthogonal matrices to triangularise).
 
+Consider multiplication by the Householder reflection corresponding to the first column,
+that is, for
+$$
+Q_1 := Q_{𝐚_1}^{±,\rm H},
+$$
+consider
+$$
+Q_1 A = \begin{bmatrix} r_{11} & r_{12} & \cdots & r_{1n} \\ 
+& 𝐚_2^1 & \cdots & 𝐚_n^1   \end{bmatrix}
+$$
+where 
+$$
+r_{1j} :=  (Q_1 𝐚_j)[1] \qquad \hbox{and} \qquad 𝐚_j^1 := (Q_1 𝐚_j)[2:m],
+$$
+noting $r_{11} = ±\|𝐚_1\|$ and all entries of $𝐚_1^1$ are zero (thus not included).
+That is, we have made the first column triangular.
+
+But now consider
+$$
+Q_2 := \begin{bmatrix} 1  \\ & Q_{𝐚_2^1}^{±,\rm H} \end{bmatrix}
+$$
+so that
+$$
+Q_2 Q_1A  \begin{bmatrix} r_{11} & r_{12} & \cdots & r_{1n} \\ 
+    & r_{22} & r_{23} \cdots & r_{2n} \\
+&& 𝐚_3^2 & \cdots & 𝐚_n^2   \end{bmatrix}
+$$
+where 
+$$
+r_{2j} :=  (Q_2 𝐚_j^1)[1] \qquad \hbox{and} \qquad 𝐚_j^2 := (Q_2 𝐚_j^1)[2:m-1]
+$$
+Thus the first two columns are triangular. 
+
+The inductive construction is thus clear. If we define $𝐚_j^0 := 𝐚_j$ we
+have the construction
+$$
+\begin{align*}
+Q_j &:= \begin{bmatrix} I_{j-1 \times j-1}  \\ & Q_{𝐚_j^j}^{±,\rm H} \end{bmatrix} \\
+𝐚_j^k &:= (Q_k 𝐚_j^{k-1})[2:m-k+1]
+\end{align*}
+$$
+
+The implementation is cleaner. If we use the `Reflection` from PS3:
+```julia
+
+```
 
 
 
@@ -132,3 +251,4 @@ We will now reinterpret
 
 
 ## 3. 
+
