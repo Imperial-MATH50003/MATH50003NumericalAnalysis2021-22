@@ -216,6 +216,15 @@ $$
 $$
 Does your answer match (to 5 digits) Problem 1.4?
 
+** SOLUTION **
+
+With the previous problems solved, this is as simple as running
+```julia
+f(0.1+ϵ).b
+```
+```julia
+g(0.1+ϵ).b
+```
 
 ## 3. Newton iteration
 
