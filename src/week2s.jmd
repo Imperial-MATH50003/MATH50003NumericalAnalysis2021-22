@@ -179,13 +179,6 @@ end
 function finitediffsecond(x, h, f)
     ret = (f(x + h) - 2 * f(x) + f(x - h))/ (h^2)
 end
-
-# a convenient function to print out our desired values
-function finitediffsummary(x, h, f)
-    println("f'($x) with forward difference: ", forwarddiff(x, h, f))
-    println("f'($x) with central difference: ", centraldiff(x, h, f))
-    println("f''($x) via finite difference:  ", finitediffsecond(x, h, f))
-end
     
 # Define the functions
 f(x) = exp(exp(x)cos(x) + sin(x))
