@@ -75,25 +75,29 @@ function centraldifferror(x, h, f, fp)
 end
         
 #plotting f and g errors   
-x = 1.0
+x = 0.0 # some arbitrary point
+
+# helper function to avoid trying to take logs of 0 in plots
+errhelper(x) = iszero(x) ? NaN : abs(x)
+
 # We find the error for the derivative of f is 0 
 # (until we run into the errors for too small h we discussed in the lecture)
 h = 2.0 .^ (0:-1:-60)
-scatter(h,centraldifferror(x, h, f, fp), xaxis=:log10, legend=false)
+scatter(h,errhelper.(centraldifferror(x, h, f, fp)), yaxis=:log10, xaxis=:log10, legend=false)
 ```
 ```julia
 h = 10.0 .^ (0:-1:-16)
-scatter(h,centraldifferror(x, h, f, fp), xaxis=:log10, legend=false)
+scatter(h,errhelper.(centraldifferror(x, h, f, fp)), yaxis=:log10, xaxis=:log10, legend=false)
 ```
 ```julia
 # Now let's plot the errors for g
 h = 2.0 .^ (0:-1:-60)
-scatter(h,centraldifferror(x, h, g, gp), xaxis=:log10, legend=false)
+scatter(h,errhelper.(centraldifferror(x, h, g, gp)), yaxis=:log10, xaxis=:log10, legend=false)
 ```
 ```julia
 # Now let's plot the errors for g
 h = 10.0 .^ (0:-1:-16)
-scatter(h,centraldifferror(x, h, g, gp), xaxis=:log10, legend=false)
+scatter(h,errhelper.(centraldifferror(x, h, g, gp)), yaxis=:log10, xaxis=:log10, legend=false)
 ```
 
 To compute the errors of the central difference approximation of $f'(x)$ we compute
