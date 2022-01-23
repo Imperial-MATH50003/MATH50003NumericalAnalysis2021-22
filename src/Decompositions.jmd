@@ -239,8 +239,19 @@ have the construction
 $$
 \begin{align*}
 Q_j &:= \begin{bmatrix} I_{j-1 \times j-1}  \\ & Q_{𝐚_j^j}^{±,\rm H} \end{bmatrix} \\
-𝐚_j^k &:= (Q_k 𝐚_j^{k-1})[2:m-k+1]
+𝐚_j^k &:= (Q_k 𝐚_j^{k-1})[2:m-k+1] \\
+r_{kj} &:= (Q_k 𝐚_j^{k-1})[1]
 \end{align*}
+$$
+Then
+$$
+Q_n \cdots Q_1 A = \underbrace{\begin{bmatrix} 
+r_{11} & \cdots & r_{1n} \\ & \ddots & \vdots\\
+                                        && r_{nn} \\&& 0 \\ && \vdots \\ && 0 \end{bmatrix}}_R
+$$
+i.e.
+$$
+A = \underbrace{Q_n \cdots Q_1}_Q R.
 $$
 
 The implementation is cleaner. We do a naive implementation here:
@@ -256,7 +267,7 @@ m,n = 7,5
 A = randn(m, n)
 R = copy(A)
 Q = Matrix(1.0I, m, m)
-for j = 1:n-1
+for j = 1:n
     Qⱼ = householderreflection(R[j:end,j])
     R[j:end,:] = Qⱼ*R[j:end,:]
     Q[:,j:end] = Q[:,j:end]*Qⱼ
@@ -268,11 +279,115 @@ reflection this is a slow algorithm, taking $O(n^4)$ operations. The problem she
 will consider a better implementation that takes $O(n^3)$ operations.
 
 
+**Example** We will now do an example by hand. Consider the $4 \times 3$ matrix
+$$
+A = \begin{bmatrix} 
+1 & 2 & 2 \\
+1 & 1 & 2 \\
+1 & 1 & 1 \\
+1 & 1 & 1.
+$$
+For the first column we have
+$$
+Q_1 = I - {1 \over 6} \begin{bmatrix}3 \\ 1\\ 1\\ 1 \end{bmatrix} \begin{bmatrix}3 & 1& 1& 1 \end{bmatrix} = {1 \over 6} \begin{bmatrix} -3 & -3 & -3 & -3\\ -3 & 5 &-1 & -1 \\ -3 & -1 & 5 & -1 &-3 &-1 & -1 5 \end{bmatrix}
+$$
+and
+$$
+Q_1 A = {1 \over 6} \begin{bmatrix} -12 & -15 &  -18 \\  & -3 & 2 \\ &-3 &-4\\ -3 & -4 \end{bmatrix}
+$$
+Then 
+$$
+Q_2 = \begin{bmatrix} 1 \\ & I - 2
+\end{bmatrix}
+$$
+
 
 ## 2. PLU Decomposition
 
+Just as Gram–Schmidt can be reinterpreted as a reduced QR decomposition,
+Gaussian elimination with pivoting can be interpreted as a PLU decomposition.
+
+
 ### LU Decomposition
 
+Before discussing pivoting, consider standard Gaussian elimation where one row-reduces
+to introduce zeros column-by-column. We will mimick the computation of the QR decomposition
+to view this as a _triangular triangularisation_.
 
-## 3. Cholesky
+Consider the matrix
+$$
+L_𝐯 = \begin{bmatrix} 1 \\ -{v_2 \over v_1} & 1 \\ \vdots &&\ddots \\
+                -{v_n \over v_1}  &&& 1
+                \end{bmatrix} = I -\left[{𝐯 \over v_1}  - 𝐞_1 \right] 𝐞_1^\top
+$$
+so that
+$$
+L_𝐯 𝐯 = 𝐯 - (𝐯 - v_1 𝐞_1) = v_1 𝐞_1.
+$$
+Note that this is immediately invertible:
+$$
+L_𝐯^{-1} = \begin{bmatrix} 1 \\ {v_2 \over v_1} & 1 \\ \vdots &&\ddots \\
+                {v_n \over v_1}  &&& 1
+                \end{bmatrix} = I + \left[{𝐯 \over v_1}  - 𝐞_1 \right] 𝐞_1^\top
+$$
+
+
+For $L_1 := L_{𝐚_1}$ we have 
+$$
+L_1 A =  \begin{bmatrix} u_{11} & u_{12} & \cdots & u_{1n} \\ 
+& 𝐚_2^1 & \cdots & 𝐚_n^1   \end{bmatrix}
+$$
+where $𝐚_j^1 := (L_1 𝐚_j)[2:m]$ and $u_{1j} = a_{1j}$. But now consider
+$$
+L_2 := \begin{bmatrix} 1  \\ & L_{𝐚_2^1} \end{bmatrix}.
+$$
+Then
+$$
+L_2 L_1 A = \begin{bmatrix} u_{11} & u_{12} & \cdots & u_{1n} \\ 
+    & u_{22} & u_{23} \cdots & u_{2n} \\
+&& 𝐚_3^2 & \cdots & 𝐚_n^2   \end{bmatrix}
+$$
+where 
+$$
+r_{2j} :=  (𝐚_j^1)[1] \qquad \hbox{and} \qquad 𝐚_j^2 := (L_2 𝐚_j^1)[2:m-1]
+$$
+Thus the first two columns are triangular. 
+
+The inductive construction is again clear. If we define $𝐚_j^0 := 𝐚_j$ we
+have the construction
+$$
+\begin{align*}
+L_j &:= \begin{bmatrix} I_{j-1 \times j-1}  \\ & L_{𝐚_j^j} \end{bmatrix} \\
+𝐚_j^k &:= (L_k 𝐚_j^{k-1})[2:m-k+1]
+ \\
+u_{kj} &:= (L_k 𝐚_j^{k-1})[1]
+\end{align*}
+$$
+Then
+$$
+L_n \cdots L_1 A = \underbrace{\begin{bmatrix} 
+u_{11} & \cdots & u_{1n} \\ & \ddots & \vdots\\
+                                        && u_{nn}\end{bmatrix}}_U
+$$
+i.e.
+$$
+A = \underbrace{L_n^{-1} \cdots L_1^{-1}}_L R.
+$$
+
+
+
+### PLU Decomposition
+
+
+## 3. Cholesky Decomposition
+
+Cholesky Decomposition is a form of Gaussian elimination (without pivoting)
+that exploits symmetry in the problem. It is only relevant for _symmetric positive definite_
+matrices.
+
+**Definition (positive definite)** A square matrix $A \in \bbR^{n \times n}$ is _positive definite_ if
+for all $𝐱 \in \bbR^n$ we have
+$$
+𝐱^\top A 𝐱 > 0
+$$
 
