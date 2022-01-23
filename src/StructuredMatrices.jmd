@@ -551,10 +551,14 @@ $$
 Q_𝐱^{±,\rm H} := Q_𝐰
 $$
 for $𝐲 = ∓ \|𝐱\| 𝐞_1 + 𝐱$ and $𝐰 = {𝐲 \over \|𝐲\|}$.
+The default choice in sign is:
+$$
+Q_𝐱^{\rm H} := Q_𝐱^{-\hbox{sign}(x_1),\rm H}.
+$$
 
 **Lemma (Householder reflection)**
 $$
-Q_𝐰^{\rm H} 𝐱 = ±\|𝐱\| 𝐞_1
+Q_𝐰^{±,\rm H} 𝐱 = ±\|𝐱\| 𝐞_1
 $$
 
 **Proof**
@@ -572,3 +576,35 @@ $$
 
 ∎
 
+Why do we choose the the opposite sign of $x_1$ for the default reflection? For stability.
+We demonstrate the reason for this by numerical example. Consider $𝐱 = [1,h]$, i.e., a small perturbation
+from $𝐞_1$. If we reflect to $\hbox{norm}(𝐱)𝐞_1$ we see a numerical problem:
+```julia
+h = 10.0^(-10)
+x = [1,h]
+y = -norm(x)*[1,0] + x
+w = y/norm(y)
+Q = I-2w*w'
+Q*x
+```
+It didn't work! Even worse is if `h = 0`:
+```julia
+h = 0
+x = [1,h]
+y = -norm(x)*[1,0] + x
+w = y/norm(y)
+Q = I-2w*w'
+Q*x
+```
+This is because `y` has large relative error due to cancellation
+from floating point errors in computing the first entry `x[1] - norm(x)`. 
+(Or has norm zero if `h=0`.)
+We avoid this cancellation by using the default choice:
+```julia
+h = 10.0^(-10)
+x = [1,h]
+y = sign(x[1])*norm(x)*[1,0] + x
+w = y/norm(y)
+Q = I-2w*w'
+Q*x
+```

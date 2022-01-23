@@ -236,3 +236,7 @@ Q̃ = householderreflection(false, x)
 @test Q̃ isa Reflection
 @test Q̃*x ≈ -norm(x)*[1; zeros(length(x)-1)]
 ```
+
+**Problem 5.6⋆** Consider a Householder reflection with $𝐱 = [1,h]$
+with $h = 2^{-n}$. What is the floating point error in
+computing $𝐲 = ∓ \|𝐱\| 𝐞_1 + 𝐱$ for each choice of sign.

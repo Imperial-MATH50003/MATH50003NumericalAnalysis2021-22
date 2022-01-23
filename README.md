@@ -11,7 +11,7 @@ Q&A: 9:50–10:30 Mondays, 10:40–11:20 Tuesdays on Teams
 
 
 
-## Course Outline
+## Course notes
 
 **Background material**
 
@@ -27,7 +27,7 @@ which is essential to  machine learning.
 
 **Part II: Computing with matrices**
 
-1. Structured Matrices: we discuss types of structured matrices (permutations, orthogonal matrices, triangular, banded).
+1. [Structured Matrices](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/StructuredMatrices.ipynb): we discuss types of structured matrices (permutations, orthogonal matrices, triangular, banded).
 3. Decompositions: we discuss algorithms for computing matrix decompositions (QR and PLU decompositions) and their use in solving linear systems.
 3. Norms and condition numbers: we discuss vector and
 matrix norms, and condition numbers for matrices, and the singular value decomposition.

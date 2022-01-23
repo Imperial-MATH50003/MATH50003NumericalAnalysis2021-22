@@ -99,10 +99,12 @@ $$
 $$
 We can solve this using the QR decomposition:
 ```julia
-x = range(0,1; length=100) # 1000 points
+n = 100
+
+x = range(0,1; length=n) # 1000 points
 f = 2 .+ x .+ 2x.^2 .+ 0.1 .* randn.() # Noisy quadratic
 
-A = [ones(length(x)) x x.^2]
+A = [ones(n) x x.^2]
 Q,R̂ = qr(A)
 Q̂ = Q[:,1:3] # Q represents full orthogonal matrix so we take first 3 columns
 
@@ -127,7 +129,8 @@ A \ f
 ### Gram–Schmidt and reduced QR
 
 
-Write
+How do we compute the QR decomposition? We begin with a method
+you may have seen before in another guise. Write
 $$
 A = \begin{bmatrix} 𝐚_1 | \dots | 𝐚_n \end{bmatrix}
 $$
@@ -147,7 +150,7 @@ for all $j$, and the multiplication is taking linear combinations of
 `Q̂[:,1:j]`. 
  
 It is possible to find an orthogonal basis using the _Gram–Schmidt algorithm_,
-which you may have seen before. We construct it via induction:
+We construct it via induction:
 assume that
 $$
 \span{𝐚_1,\ldots,𝐚_{j-1}} = \span{𝐪_1,\ldots,𝐪_{j-1}}
@@ -240,15 +243,36 @@ Q_j &:= \begin{bmatrix} I_{j-1 \times j-1}  \\ & Q_{𝐚_j^j}^{±,\rm H} \end{bm
 \end{align*}
 $$
 
-The implementation is cleaner. If we use the `Reflection` from PS3:
+The implementation is cleaner. We do a naive implementation here:
 ```julia
+function householderreflection(x)
+    y = copy(x)
+    y[1] += sign(x[1])norm(x)
+    w = y/norm(y)
+    I - 2*w*w'
+end
 
+m,n = 7,5
+A = randn(m, n)
+R = copy(A)
+Q = Matrix(1.0I, m, m)
+for j = 1:n-1
+    Qⱼ = householderreflection(R[j:end,j])
+    R[j:end,:] = Qⱼ*R[j:end,:]
+    Q[:,j:end] = Q[:,j:end]*Qⱼ
+end
+Q*R ≈ A
 ```
+Note because we are forming a full matrix representation of each Householder
+reflection this is a slow algorithm, taking $O(n^4)$ operations. The problem sheet
+will consider a better implementation that takes $O(n^3)$ operations.
 
 
 
 ## 2. PLU Decomposition
 
+### LU Decomposition
 
-## 3. 
+
+## 3. Cholesky
 
