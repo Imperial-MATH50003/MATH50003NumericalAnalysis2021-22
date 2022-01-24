@@ -182,6 +182,18 @@ x = reinterpret(Float16, parse(UInt16, "0000000000000011"; base=2))
 x/2 == Float64(x)/2 # Float64 can exactly represent x/2
 ```
 
+For the second part, Similar to the next problem,
+we see that the property holds true if $|x| ≥ 2^{S+2}-1$:
+```julia
+x = Float16(2)^(12)-1 # bits 0110110000000000
+x+2 == x
+```
+We see this is sharp:
+```julia
+y = prevfloat(x)
+y+2 == y
+```
+
 
 
 
@@ -210,7 +222,8 @@ $S = 52$. First note $2^{53}$ does not satisfy the condition:
 x = 2.0^53
 x + 1 == x
 ```
-We can however successfully create $2^{53} -1$ by subtracting (WHY?):
+We can however successfully create the previsous float $2^{53} -1$ by subtracting
+(Explain why this works while `x+1` fails):
 ```julia
 y = x - 1
 printlnbits(x)
@@ -220,11 +233,6 @@ And this satisfies:
 ```julia
 y + 1 ≠ y
 ```
-
-
-
-
-
 
 
 **Problem 4.4** What are the exact bits for $1/5$, $1/5 + 1$ computed
@@ -351,12 +359,13 @@ $$
 $$
 Write
 $$
-{1 \over 1 + δ_3} = 1 + \underbrace{-δ_3 + δ_3^2 + \cdots}_{δ_5}
+{1 \over 1 + δ_3} = 1 + \delta_5
 $$
 where
 $$
-|δ_5| \leq {ϵ_{\rm m} \over 2} {1 \over 1 - ϵ_{\rm m}/2} \leq ϵ_{\rm m}
+|δ_5| \leq \left| {\delta_3 \over 1 + \delta_3} \right| \leq  {ϵ_{\rm m} \over 2} {1 \over 1 - 1/2} \leq ϵ_{\rm m}
 $$
+using the fact that $|\delta_3| < 1/2$.
 Further write
 $$
 (1 + δ_5)(1 + δ_4) = 1 + δ_6

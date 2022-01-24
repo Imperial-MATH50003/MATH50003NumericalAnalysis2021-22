@@ -54,7 +54,7 @@ with respect to a prescribed weight—and their usage in numerical computations.
 
 ## Problem sheets
 
-1. [Week 1](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/sheets/week1.ipynb): Binary representation, integers, floating point numbers, and interval arithmetic
+1. [Week 1](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/sheets/week1.ipynb) ([Solutions](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/sheets/week1s.ipynb)): Binary representation, integers, floating point numbers, and interval arithmetic
 1. [Week 2](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/sheets/week2.ipynb): Finite-differences, dual numbers, and Newton iteration
 
 
