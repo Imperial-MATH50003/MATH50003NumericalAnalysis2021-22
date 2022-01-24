@@ -267,7 +267,7 @@ We will later see how linear systems involving tridiagonal matrices can be solve
 
 Permutation matrices are matrices that represent the action of permuting the entries of a vector,
 that is, matrix representations of the symmetric group $S_n$, acting on $ℝ^n$.
-Recall every $σ \in S_n$ is a bisection between $\{1,2,\ldots,n\}$ and itself.
+Recall every $σ \in S_n$ is a bijection between $\{1,2,\ldots,n\}$ and itself.
 We can write a permutation $σ$ in _Cauchy notation_:
 $$
 \begin{pmatrix}
