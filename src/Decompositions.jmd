@@ -84,7 +84,7 @@ $$
 𝐱 = R̂^{-1} Q̂^⊤ 𝐛
 $$
 
-Let's look at an example. Suppose we want to find noisy data by a quadratic
+**Example (quadratic fit)** Suppose we want to find noisy data by a quadratic
 $$
 p(x) = a + bx + cx^2
 $$
@@ -99,16 +99,16 @@ $$
 $$
 We can solve this using the QR decomposition:
 ```julia
-n = 100
+m,n = 100,3
 
-x = range(0,1; length=n) # 1000 points
+x = range(0,1; length=m) # 100 points
 f = 2 .+ x .+ 2x.^2 .+ 0.1 .* randn.() # Noisy quadratic
 
-A = [ones(n) x x.^2]
+A = [ones(n) x x.^2] # 100 x 3 matrix
 Q,R̂ = qr(A)
-Q̂ = Q[:,1:3] # Q represents full orthogonal matrix so we take first 3 columns
+Q̂ = Q[:,1:n] # Q represents full orthogonal matrix so we take first 3 columns
 
-a,b,c = R \ Q̂'f
+a,b,c = R̂ \ Q̂'f
 ```
 We can visualise the fit:
 ```julia
@@ -117,7 +117,7 @@ p = x -> a + b*x + c*x^2
 scatter(x, f; label="samples", legend=:bottomright)
 plot!(x, p.(x); label="quadratic")
 ```
-Note that `\` with a rectangular system does least squares by default:
+Note that `\` with a rectangular system does the least squares by default:
 ```julia
 A \ f
 ```

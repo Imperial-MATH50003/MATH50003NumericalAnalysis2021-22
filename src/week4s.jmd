@@ -1,4 +1,9 @@
 
+## 1. QR decomposition
+
+**Problem 1.1** Implement the 
+
+
 **Problem** Show that there always exists a QR decomposition such that the diagonal of $R$ is non-negative.
 
 **SOLUTION**
@@ -24,4 +29,22 @@ Note $Q^⊤ Q̃$ is orthogonal, and $R R̃^{-1}$ has positive eigenvalues (the d
 $Q^⊤ Q̃$ are 1. This means that $Q^⊤ Q̃ = I$ and hence $Q̃ = Q$, which then implies $R̃ = R$.
 
 ∎
+
+**Problem**  Rotation's can also be used to compute a QR decomposition (_Given's rotations_).
+This is useful for computing the QR decomposition of a Tridiagonal matrix. Use Given's rotations
+to 
+
+
+**Problem** Consider the product of orthogonal matrices in the Householder version of QR.
+
+
+$$
+Q_1 \cdots Q_n
+$$
+
+
+Modify `Reflection` to support a sequence of Householder reflections:
+```julia
+
+```
 
