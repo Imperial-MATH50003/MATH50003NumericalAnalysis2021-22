@@ -52,9 +52,10 @@ Householder reflections.
 the PLU decomposition via Gaussian elimination with pivoting.
 3. Cholesky decomposition: we introduce symmetric positive definite matrices and show that their LU decomposition can be re-interpreted
 as a Cholesky decomposition.
+4. Timings: we see the relative trade-off in speed between the different decompositions.
 
 ```julia
-using LinearAlgebra, Plots
+using LinearAlgebra, Plots, BenchmarkTools
 ```
 
 
@@ -258,11 +259,11 @@ A = randn(300,300)
 Q,R = gramschmidt(A)
 norm(Q'Q-I)
 ```
-Thus we look for an alternative.
 
 ### Householder reflections and QR
 
-As an alternative, we will consider using Householder reflections to introduce zeros.
+As an alternative, we will consider using Householder reflections to introduce zeros below
+the diagonal.
 Thus, if Gram–Schmidt is a process of _triangular orthogonalisation_ (using triangular matrices
 to orthogonalise), Householder reflections is a process of _orthogonal triangularisation_ 
 (using orthogonal matrices to triangularise).
@@ -274,23 +275,30 @@ Q_1 := Q_{𝐚_1}^{\rm H},
 $$
 consider
 $$
-Q_1 A = \begin{bmatrix} r_{11} & r_{12} & \cdots & r_{1n} \\ 
+Q_1 A = \begin{bmatrix} \times & \times & \cdots & \times \\
+& \times & \cdots & \times \\
+                    & \vdots & \ddots & \vdots \\
+                    & \times & \cdots & \times \end{bmatrix} = 
+\begin{bmatrix} r_{11} & r_{12} & \cdots & r_{1n} \\ 
 & 𝐚_2^1 & \cdots & 𝐚_n^1   \end{bmatrix}
 $$
 where 
 $$
 r_{1j} :=  (Q_1 𝐚_j)[1] \qquad \hbox{and} \qquad 𝐚_j^1 := (Q_1 𝐚_j)[2:m],
 $$
-noting $r_{11} = ±\|𝐚_1\|$ and all entries of $𝐚_1^1$ are zero (thus not included).
+noting $r_{11} = -\hbox{sign}(a_{11})\|𝐚_1\|$ and all entries of $𝐚_1^1$ are zero (thus not included).
 That is, we have made the first column triangular.
 
 But now consider
 $$
-Q_2 := \begin{bmatrix} 1  \\ & Q_{𝐚_2^1}^{\rm H} \end{bmatrix}
+Q_2 := \begin{bmatrix} 1  \\ & Q_{𝐚_2^1}^{\rm H} \end{bmatrix} = Q_{\begin{bmatrix} 0 \\ 𝐚_2^1 \end{bmatrix}}^H
 $$
 so that
 $$
-Q_2 Q_1A  \begin{bmatrix} r_{11} & r_{12} & \cdots & r_{1n} \\ 
+Q_2 Q_1A = \begin{bmatrix} \times & \times & \times & \cdots & \times \\
+& \times & \times  & \cdots & \times \\
+                    && \vdots & \ddots & \vdots \\
+                    && \times & \cdots & \times \end{bmatrix}  =  \begin{bmatrix} r_{11} & r_{12} & r_{13} & \cdots & r_{1n} \\ 
     & r_{22} & r_{23} & \cdots & r_{2n} \\
 && 𝐚_3^2 & \cdots & 𝐚_n^2   \end{bmatrix}
 $$
@@ -329,16 +337,21 @@ function householderreflection(x)
     w = y/norm(y)
     I - 2*w*w'
 end
+function householderqr(A)
+    m,n = size(A)
+    R = copy(A)
+    Q = Matrix(1.0I, m, m)
+    for j = 1:n
+        Qⱼ = householderreflection(R[j:end,j])
+        R[j:end,:] = Qⱼ*R[j:end,:]
+        Q[:,j:end] = Q[:,j:end]*Qⱼ
+    end
+    Q,R
+end
 
 m,n = 7,5
 A = randn(m, n)
-R = copy(A)
-Q = Matrix(1.0I, m, m)
-for j = 1:n
-    Qⱼ = householderreflection(R[j:end,j])
-    R[j:end,:] = Qⱼ*R[j:end,:]
-    Q[:,j:end] = Q[:,j:end]*Qⱼ
-end
+Q,R = householderqr(A)
 Q*R ≈ A
 ```
 Note because we are forming a full matrix representation of each Householder
@@ -512,7 +525,7 @@ Which indeed introduces zeros in the first column:
 A₁ = L₁*A
 ```
 Now we make the next lower triangular operator:
-```
+```julia
 L₂ = I - [0; 0; A₁[3:end,2]/A₁[2,2]] * [0 1 zeros(1,n-2)]
 ```
 So that
@@ -520,7 +533,7 @@ So that
 A₂ = L₂*L₁*A
 ```
 The last one is:
-```
+```julia
 L₃ = I - [0; 0; 0; A₂[4:end,3]/A₂[3,3]] * [0 0 1 zeros(1,n-3)]
 ```
 Giving us
@@ -528,7 +541,7 @@ Giving us
 U = L₃*L₂*L₁*A
 ```
 and
-```
+```julia
 L = inv(L₁)*inv(L₂)*inv(L₃)
 ```
 Note how the entries of `L` are indeed identical to the negative
@@ -546,7 +559,8 @@ In terms of a decomposition, this leads to
 ## 3. Cholesky Decomposition
 
 Cholesky Decomposition is a form of Gaussian elimination (without pivoting)
-that exploits symmetry in the problem. It is only relevant for _symmetric positive definite_
+that exploits symmetry in the problem, resulting in a substantial speedup. 
+It is only relevant for _symmetric positive definite_
 matrices.
 
 **Definition (positive definite)** A square matrix $A \in ℝ^{n \times n}$ is _positive definite_ if
@@ -554,4 +568,64 @@ for all $𝐱 \in ℝ^n$ we have
 $$
 𝐱^\top A 𝐱 > 0
 $$
+
+**Proposition (conj. pos. def.)** If  $A \in ℝ^{n \times n}$ is positive definite and 
+$V \in ℝ^{n \times n}$ is non-singular then
+$$
+V^\top A V
+$$
+is positive definite.
+
+**Proposition (diag positivity)** If $A \in ℝ^{n \times n}$ is positive definite
+then its diagonal entries are positive: $a_{kk} > 0$.
+
+
+**Theorem (subslice pos. def.)** If $A \in ℝ^{n \times n}$ is positive definite
+and $𝐤 \in \{1,\ldots,n\}^n$ where any integer appears only once then $A[𝐤,𝐤]$ is also
+positive definite.
+
+
+
+We leave the proofs to the problem sheets.
+
+
+Write a symmetric pos. def. matrix as
+$$
+A = \begin{bmatrix} α & 𝐯^\top \\
+                    𝐯   & K
+                    \end{bmatrix} = \underbrace{\begin{bmatrix} \sqrt{α} \\ 
+                                    {𝐯 \over \sqrt{α}} & I \end{bmatrix}}_{L_1}
+                                    \underbrace{\begin{bmatrix} 1  \\ & K - {𝐯 𝐯^\top \over α} \end{bmatrix}}_{A_1}
+                                    \underbrace{\begin{bmatrix} \sqrt{α} & {𝐯^\top \over \sqrt{α}} \\
+                                     & I \end{bmatrix}}_{L_1^\top}.
+$$
+Note that $A_1$ is positive definite (because $A_1 = L_1^{-1} A L_1^{-\top}$) and therefore
+$K - {𝐯 𝐯^\top \over α}$ is also positive definite (as it is a subslice of $A_1$).
+Thus we can repeat. 
+
+
+# 4. Timings
+
+The different decompositions have trade-offs between speed and stability.
+First we compare the speed of the different decompositions on a symmetric positive
+definite matrix, from fastest to slowest:
+
+```julia
+n = 1000
+A = Symmetric(rand(n,n)) + 100I # shift by 10 ensures positivity
+@btime cholesky(A);
+@btime lu(A);
+@btime qr(A);
+```
+On my machine, `cholesky` is ~1.5x faster than `lu`,  which is ~2x faster than 
+
+
+
+In terms of stability, QR computed with Householder reflections
+(and Cholesky for positive definite matrices) are stable, whereas LU is usually unstable (unless the matrix
+is diagonally dominant). PLU is a very complicated story: in theory it is unstable,
+but the set of matrices for which it is unstable is extremely small, so small one does not
+normally run into them.
+
+For this reason, 
 
