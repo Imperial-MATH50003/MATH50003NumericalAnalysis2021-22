@@ -1,16 +1,17 @@
 # Decompositions and least squares
 
 
-In this lecture, we look at several factorizations of a matrix. For a square or rectangular matrix $A ∈ ℝ^{m × n}$ with $m ≥ n$, we consider:
+In this lecture, we look at several factorizations of a matrix. For a square or rectangular matrix $A ∈ ℝ^{m × n}$ with more rows than columns ($m ≥ n$), we consider:
 1. The _QR decomposition_
 $$
-A = \underbrace{Q}_{m × m} \underbrace{R}_{m × n} = \begin{bmatrix} 𝐪_1 | \cdots | 𝐪_m \end{bmatrix} \begin{bmatrix} × & \cdots & × \\ & \ddots & \vdots \\ && × \\ &&0 \\ &&\vdots \\ && 0 \end{bmatrix} 
+A = Q R = \underbrace{\begin{bmatrix} 𝐪_1 | \cdots | 𝐪_m \end{bmatrix}}_{m × m} \underbrace{\begin{bmatrix} × & \cdots & × \\ & \ddots & \vdots \\ && × \\ &&0 \\ &&\vdots \\ && 0 \end{bmatrix}}_{m × n}
 $$
-where $Q$ is orthogonal ($Q^⊤Q = I$, $𝐪_j ∈ ℝ^m$) and $R$ is _right triangular_.
+where $Q$ is orthogonal ($Q^⊤Q = I$, $𝐪_j ∈ ℝ^m$) and $R$ is _right triangular_, which means it 
+is only nonzero on or to the right of the diagonal.
 
 2. The _reduced QR decomposition_
 $$
-A = \underbrace{Q̂}_{m × n} \underbrace{R̂}_{m × m} = \begin{bmatrix} 𝐪_1 | \cdots | 𝐪_n \end{bmatrix} \begin{bmatrix} × & \cdots & × \\ & \ddots & \vdots \\ && ×  \end{bmatrix} 
+A = Q̂ R̂ = \underbrace{\begin{bmatrix} 𝐪_1 | \cdots | 𝐪_n \end{bmatrix}}_{m × n} \underbrace{\begin{bmatrix} × & \cdots & × \\ & \ddots & \vdots \\ && ×  \end{bmatrix}}_{n × n}
 $$
 where $Q$ has orthogonal columns ($Q^⊤Q = I$, $𝐪_j ∈ ℝ^m$) 
 
@@ -34,7 +35,8 @@ A = QR &\Rightarrow\qquad A^{-1}𝐛 = R^{-1} Q^\top 𝐛 \\
 A = L L^⊤ &\Rightarrow\qquad A^{-1}𝐛 = L^{-⊤} L^{-1} 𝐛
 \end{align*}
 $$
-and we saw last lecture that triangular and orthogonal matrices are easy to invert when applied to a vector $𝐛$.
+and we saw last lecture that triangular and orthogonal matrices are easy to invert when applied to a vector $𝐛$,
+e.g., using forward/back-substitution.
 For rectangular matrices we will see that they lead to efficient solutions to the _least squares problem_: find
 $𝐱$ that minimizes the 2-norm
 $$
@@ -104,7 +106,7 @@ m,n = 100,3
 x = range(0,1; length=m) # 100 points
 f = 2 .+ x .+ 2x.^2 .+ 0.1 .* randn.() # Noisy quadratic
 
-A = [ones(n) x x.^2] # 100 x 3 matrix
+A = x .^ (0:2)'  # 100 x 3 matrix, equivalent to [ones(m) x x.^2]
 Q,R̂ = qr(A)
 Q̂ = Q[:,1:n] # Q represents full orthogonal matrix so we take first 3 columns
 
@@ -136,24 +138,24 @@ A = \begin{bmatrix} 𝐚_1 | \dots | 𝐚_n \end{bmatrix}
 $$
 where $𝐚_k \in  ℝ^m$.
 Note that the column span of the first $j$ columns of $A$
-will be the same as the first $j$ columns of $Q̂$:
+will be the same as the first $j$ columns of $Q̂$, assuming that 
+$R̂$ is non-singular:
 $$
-\span{𝐚_1,\ldots,𝐚_j} = \span{𝐪_1,\ldots,𝐪_j}
+\hbox{span}(𝐚_1,\ldots,𝐚_j) = \hbox{span}(𝐪_1,\ldots,𝐪_j)
 $$
 In other words: the columns of $Q̂$ are an orthogonal basis
 of the column span of $A$.
-To see this: note that since `R̂` is triangular we have:
-```julia
-A[:,1:j] = Q̂[:,1:j]*R̂[1:j,1:j]
-```
-for all $j$, and the multiplication is taking linear combinations of
-`Q̂[:,1:j]`. 
+To see thism note that since `R̂` is triangular we have
+$$
+\begin{bmatrix} 𝐚_1 | \dots | 𝐚_j \end{bmatrix} = \begin{bmatrix} 𝐪_1 | \dots | 𝐪_j \end{bmatrix} * R̂[1:j,1:j]
+$$
+for all $j$.
  
 It is possible to find an orthogonal basis using the _Gram–Schmidt algorithm_,
 We construct it via induction:
 assume that
 $$
-\span{𝐚_1,\ldots,𝐚_{j-1}} = \span{𝐪_1,\ldots,𝐪_{j-1}}
+\hbox{span}(𝐚_1,\ldots,𝐚_{j-1}) = \hbox{span}(𝐪_1,\ldots,𝐪_{j-1})
 $$
 where $𝐪_1,\ldots,𝐪_{j-1}$ are orthogonal:
 $$
@@ -186,7 +188,8 @@ $$
 $$
 Thus
 $$
-\begin{bmatrix} 𝐚_1|\cdots|𝐚_j \end{bmatrix} r_{11} & \cdots & r_{1j} \\ & \ddots & \vdots \\ && r_{jj} \end{bmatrix}
+\begin{bmatrix} 𝐚_1|\cdots|𝐚_j \end{bmatrix} 
+\begin{bmatrix} r_{11} & \cdots & r_{1j} \\ & \ddots & \vdots \\ && r_{jj} \end{bmatrix}
 $$
 That is, we are computing the reduced QR decomposition column-by-column. Running this algorithm to $j = n$ completes the decomposition.
 
@@ -204,7 +207,7 @@ to orthogonalise), Householder reflections is a process of _orthogonal triangula
 Consider multiplication by the Householder reflection corresponding to the first column,
 that is, for
 $$
-Q_1 := Q_{𝐚_1}^{±,\rm H},
+Q_1 := Q_{𝐚_1}^{\rm H},
 $$
 consider
 $$
@@ -220,12 +223,12 @@ That is, we have made the first column triangular.
 
 But now consider
 $$
-Q_2 := \begin{bmatrix} 1  \\ & Q_{𝐚_2^1}^{±,\rm H} \end{bmatrix}
+Q_2 := \begin{bmatrix} 1  \\ & Q_{𝐚_2^1}^{\rm H} \end{bmatrix}
 $$
 so that
 $$
 Q_2 Q_1A  \begin{bmatrix} r_{11} & r_{12} & \cdots & r_{1n} \\ 
-    & r_{22} & r_{23} \cdots & r_{2n} \\
+    & r_{22} & r_{23} & \cdots & r_{2n} \\
 && 𝐚_3^2 & \cdots & 𝐚_n^2   \end{bmatrix}
 $$
 where 
@@ -258,7 +261,8 @@ The implementation is cleaner. We do a naive implementation here:
 ```julia
 function householderreflection(x)
     y = copy(x)
-    y[1] += sign(x[1])norm(x)
+    # we cannot use sign(x[1]) in case x[1] == 0
+    y[1] += (x[1] ≥ 0 ? 1 : -1)*norm(x) 
     w = y/norm(y)
     I - 2*w*w'
 end
@@ -282,24 +286,78 @@ will consider a better implementation that takes $O(n^3)$ operations.
 **Example** We will now do an example by hand. Consider the $4 \times 3$ matrix
 $$
 A = \begin{bmatrix} 
-1 & 2 & 2 \\
-1 & 1 & 2 \\
-1 & 1 & 1 \\
-1 & 1 & 1.
+1 & 2 & -1 \\ 
+0 & 15 & 18 \\
+-2 & -4 & -4 \\
+-2 & -4 & -10
+\end{bmatrix}
 $$
 For the first column we have
 $$
-Q_1 = I - {1 \over 6} \begin{bmatrix}3 \\ 1\\ 1\\ 1 \end{bmatrix} \begin{bmatrix}3 & 1& 1& 1 \end{bmatrix} = {1 \over 6} \begin{bmatrix} -3 & -3 & -3 & -3\\ -3 & 5 &-1 & -1 \\ -3 & -1 & 5 & -1 &-3 &-1 & -1 5 \end{bmatrix}
-$$
-and
-$$
-Q_1 A = {1 \over 6} \begin{bmatrix} -12 & -15 &  -18 \\  & -3 & 2 \\ &-3 &-4\\ -3 & -4 \end{bmatrix}
-$$
-Then 
-$$
-Q_2 = \begin{bmatrix} 1 \\ & I - 2
+Q_1 = I - {1 \over 12} \begin{bmatrix} 4 \\ 0 \\ -2 \\ -2 \end{bmatrix} \begin{bmatrix} 4 & 0 & -2 & -2 \end{bmatrix} =
+{1 \over 3} \begin{bmatrix}
+-1 & 0 & 2 & 2 \\
+0 & 3 & 0 & 0 \\
+2 & 0 & 2 & -1 \\
+2 & 0 & -1 &2
 \end{bmatrix}
 $$
+so that
+$$
+Q_1 A = \begin{bmatrix} -3 & -6 & -9 \\
+ & 15 & 18 \\
+  & 0 & 0 \\
+& 0 & -6
+\end{bmatrix}
+$$
+In this example the next column is already upper-triangular,
+but because of our choice of reflection we will end up swapping the sign, that is
+$$
+Q_2 = \begin{bmatrix} 1 \\ & -1 \\ && 1 \\ &&& 1 \end{bmatrix}
+$$
+so that
+$$
+Q_2 Q_1 A = \begin{bmatrix} -3 & -6 & -9 \\
+ & -15 & -18 \\
+  & 0 & 0 \\
+& 0 & -6
+\end{bmatrix}
+$$
+The final reflection is
+$$
+Q_3 = \begin{bmatrix} I_{2 \times 2} \\ &  I - \begin{bmatrix} 1 \\ -1 \end{bmatrix} \begin{bmatrix}1 & -1 \end{bmatrix} 
+\end{bmatrix}= \begin{bmatrix}1 \\ & 1 \\ & & 0 & 1 \\ & & 1 & 0 \end{bmatrix}
+$$
+giving us
+$$
+Q_3 Q_2 Q_1 A = \underbrace{\begin{bmatrix} -3 & -6 & -9 \\
+ & -15 & -18 \\
+  &  & -6 \\
+&  & 0
+\end{bmatrix}}_R
+$$
+That is,
+$$
+A = Q_1 Q_2 Q_3 R = \underbrace{{1 \over 3} \begin{bmatrix}
+-1 & 0 & 2 & 2 \\
+0 & 3 & 0 & 0 \\
+2 & 0 & -1 & 2 \\
+2 & 0 & 2 &-1
+\end{bmatrix}}_Q \underbrace{\begin{bmatrix} -3 & -6 & -9 \\
+ & -15 & -18 \\
+  &  & -6 \\
+&  & 0
+\end{bmatrix}}_R = \underbrace{{1 \over 3} \begin{bmatrix}
+-1 & 0 & 2  \\
+0 & 3 & 0  \\
+2 & 0 & -1  \\
+2 & 0 & 2 
+\end{bmatrix}}_Q̂  \underbrace{\begin{bmatrix} -3 & -6 & -9 \\
+ & -15 & -18 \\
+  &  & -6 
+\end{bmatrix}}_R̂
+$$
+
 
 
 ## 2. PLU Decomposition
@@ -324,12 +382,7 @@ so that
 $$
 L_𝐯 𝐯 = 𝐯 - (𝐯 - v_1 𝐞_1) = v_1 𝐞_1.
 $$
-Note that this is immediately invertible:
-$$
-L_𝐯^{-1} = \begin{bmatrix} 1 \\ {v_2 \over v_1} & 1 \\ \vdots &&\ddots \\
-                {v_n \over v_1}  &&& 1
-                \end{bmatrix} = I + \left[{𝐯 \over v_1}  - 𝐞_1 \right] 𝐞_1^\top
-$$
+
 
 
 For $L_1 := L_{𝐚_1}$ we have 
@@ -343,8 +396,8 @@ L_2 := \begin{bmatrix} 1  \\ & L_{𝐚_2^1} \end{bmatrix}.
 $$
 Then
 $$
-L_2 L_1 A = \begin{bmatrix} u_{11} & u_{12} & \cdots & u_{1n} \\ 
-    & u_{22} & u_{23} \cdots & u_{2n} \\
+L_2 L_1 A = \begin{bmatrix} u_{11} & u_{12} & u_{13} & \cdots & u_{1n} \\ 
+    & u_{22} & u_{23} & \cdots & u_{2n} \\
 && 𝐚_3^2 & \cdots & 𝐚_n^2   \end{bmatrix}
 $$
 where 
@@ -371,12 +424,60 @@ u_{11} & \cdots & u_{1n} \\ & \ddots & \vdots\\
 $$
 i.e.
 $$
-A = \underbrace{L_n^{-1} \cdots L_1^{-1}}_L R.
+A = \underbrace{L_{n-1}^{-1} \cdots L_1^{-1}}_L U.
 $$
 
+Finally, note  that the $L_k$ are immediately invertible:
+$$
+L_𝐯^{-1} = \begin{bmatrix} 1 \\ {v_2 \over v_1} & 1 \\ \vdots &&\ddots \\
+                {v_n \over v_1}  &&& 1
+                \end{bmatrix} = I + \left[{𝐯 \over v_1}  - 𝐞_1 \right] 𝐞_1^\top
+$$
+Moreover, as $L_k$ 
+ we note that $L$ simplifies:
+
+**Example**
+We will do a numerical example (by-hand is equivalent to Gaussian elimination).
+The first lower triangular matrix is:
+```julia
+n = 4
+A = randn(n,n)
+L₁ = I -[0; A[2:end,1]/A[1,1]] * [1 zeros(1,n-1)]
+```
+Which indeed introduces zeros in the first column:
+```julia
+A₁ = L₁*A
+```
+Now we make the next lower triangular operator:
+```
+L₂ = I - [0; 0; A₁[3:end,2]/A₁[2,2]] * [0 1 zeros(1,n-2)]
+```
+So that
+```julia
+A₂ = L₂*L₁*A
+```
+The last one is:
+```
+L₃ = I - [0; 0; 0; A₂[4:end,3]/A₂[3,3]] * [0 0 1 zeros(1,n-3)]
+```
+Giving us
+```julia
+U = L₃*L₂*L₁*A
+```
+and
+```
+L = inv(L₁)*inv(L₂)*inv(L₃)
+```
+Note how the entries of `L` are indeed identical to the negative
+lower entries of `L₁`, `L₂` and `L₃`.
 
 
 ### PLU Decomposition
+
+We learned in first year linear algebra that if a diagonal entry is zero
+when doing Gaussian elimnation one has to _row pivot_. For stability, 
+in implementation one _always_ pivots: move the largest in magnitude entry to the diagonal.
+In terms of a decomposition, this leads to 
 
 
 ## 3. Cholesky Decomposition
@@ -385,8 +486,8 @@ Cholesky Decomposition is a form of Gaussian elimination (without pivoting)
 that exploits symmetry in the problem. It is only relevant for _symmetric positive definite_
 matrices.
 
-**Definition (positive definite)** A square matrix $A \in \bbR^{n \times n}$ is _positive definite_ if
-for all $𝐱 \in \bbR^n$ we have
+**Definition (positive definite)** A square matrix $A \in ℝ^{n \times n}$ is _positive definite_ if
+for all $𝐱 \in ℝ^n$ we have
 $$
 𝐱^\top A 𝐱 > 0
 $$
