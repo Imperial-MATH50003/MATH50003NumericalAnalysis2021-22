@@ -1,5 +1,14 @@
 
-## 1. QR decomposition
+
+```julia
+using LinearAlgebra, Plots
+```
+
+## 1. QR decomposition and least squares
+
+**Problem 1.1** Find and plot the best least squares fit of ${1 \over 25x^2 + 1}$ by degree $n$
+polynomials for $n = 1,\ldots,5$ at 1000 evenly spaced points between $0$ and $1$.
+
 
 **Problem 1.1** Implement the 
 

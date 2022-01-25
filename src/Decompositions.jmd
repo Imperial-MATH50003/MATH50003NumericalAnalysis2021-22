@@ -165,11 +165,11 @@ $$
 for $k,ℓ < 1$.
 Define
 $$
-𝐯_j := 𝐚_j - \sum_{k=1}^{j-1} \underbrace{𝐪_k^\top 𝐚_j}_{v_{kj}} 𝐪_k
+𝐯_j := 𝐚_j - \sum_{k=1}^{j-1} \underbrace{𝐪_k^\top 𝐚_j}_{r_{kj}} 𝐪_k
 $$
 so that for $k < j$
 $$
-𝐪_k^\top 𝐯_j = 𝐪_k^\top 𝐚_j - \sum_{k=1}^{j-1} \underbrace{𝐪_k^\top 𝐚_j}_{v_{kj}} 𝐪_k^\top 𝐪_k = 0.
+𝐪_k^\top 𝐯_j = 𝐪_k^\top 𝐚_j - \sum_{k=1}^{j-1} \underbrace{𝐪_k^\top 𝐚_j}_{r_{kj}} 𝐪_k^\top 𝐪_k = 0.
 $$
 Then we define
 $$
@@ -180,7 +180,7 @@ which sastisfies the same properties as the assumption.
 We now reinterpret this construction as a reduced QR decomposition.
 Define
 $$
-r_{jj} := {1 \over \|𝐯_j\|}, \qquad r_{kj} := {v_{kj} \over \|𝐯_j\|}
+r_{jj} := {\|𝐯_j\|}, \qquad r_{kj} := r_{kj}.
 $$
 Then rearrange the definition we have
 $$
@@ -193,9 +193,72 @@ $$
 $$
 That is, we are computing the reduced QR decomposition column-by-column. Running this algorithm to $j = n$ completes the decomposition.
 
-Unfortunately, the Gram–Schmidt algorithm is _unstable_: the rounding errors when implemented in floating point
-accumulate in a disasterous way. This will be explored in the problem sheet.
+We now see this in action: we are going to compute the reduced QR of a random matrix
+```julia
+m,n = 5,4
+A = randn(m,n)
+Q,R̂ = qr(A)
+Q̂ = Q[:,1:n]
+```
+```julia
+R̂
+```
+The first column of `Q̂` is indeed a normalised first column of `A`:
+```
+R = zeros(n,n)
+Q = zeros(m,n)
+R[1,1] = norm(A[:,1])
+Q[:,1] = A[:,1]/R[1,1]
+```
+We now determine the next entries as
+```julia
+R[1,2] = Q[:,1]'A[:,2]
+v = A[:,2] - Q[:,1]*R[1,2]
+R[2,2] = norm(v)
+Q[:,2] = v/R[2,2]
+```
+And the third column is then:
+```julia
+R[1,3] = Q[:,1]'A[:,3]
+R[2,3] = Q[:,2]'A[:,3]
+v = A[:,3] - Q[:,1:2]*R[1:2,3]
+R[3,3] = norm(v)
+Q[:,3] = v/R[3,3]
+```
+(Note the signs may not necessarily match.)
 
+We can clean this up as a simple algorithm:
+```julia
+function gramschmidt(A)
+    m,n = size(A)
+    m ≥ n || error("Not supported")
+    R = zeros(n,n)
+    Q = zeros(m,n)
+    for j = 1:n
+        for k = 1:j-1
+            R[k,j] = Q[:,k]'*A[:,j]
+        end
+        v = A[:,j] - Q[:,1:j-1]*R[1:j-1,j]
+        R[j,j] = norm(v)
+        Q[:,j] = v/R[j,j]
+    end
+    Q,R
+end
+
+Q,R = gramschmidt(A)
+norm(A - Q*R)
+```
+
+
+
+Unfortunately, the Gram–Schmidt algorithm is _unstable_: the rounding errors when implemented in floating point
+accumulate in a way that we lose orthogonality:
+```julia
+A = randn(300,300)
+Q,R = gramschmidt(A)
+norm(Q'Q-I)
+```
+Thus we look for an alternative.
 
 ### Householder reflections and QR
 
