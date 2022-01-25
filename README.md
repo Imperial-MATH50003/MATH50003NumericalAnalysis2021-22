@@ -67,9 +67,12 @@ with respect to a prescribed weight—and their usage in numerical computations.
 5. [The Julia–Matlab–Python Cheatsheet](https://cheatsheets.quantecon.org)
 
 
-## Notes from lectures
+## Notes from lectures
 
 1. [Integers](lectures/Integers.png)
+2. [Floating Point Numbers](lectures/FloatingPoint.jpg)
+3. [Floating Point Arithmetic](lectures/Arithmetic.jpg)
+4. [Bounding Errors in Rounding](lectures/Rounding.jpg)
 
 ## What is numerical analysis? 
 
