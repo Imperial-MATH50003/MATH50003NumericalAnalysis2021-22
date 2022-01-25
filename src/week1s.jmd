@@ -174,16 +174,40 @@ None of these computations have errors since they are all exactly representable 
 **Problem 4.2** For what floating point numbers is $x \oslash 2 \neq x/2$ and $x ⊕ 2 \neq x + 2$?
 
 **SOLUTION**
-Provided $x$ is normal, $x ⊘ 2 = x/2$. Thus $x$ needs to be sub-normal, with a non-zero last bit.
-Or `NaN`.
-Here's an example:
+
+Consider a normal $x = 2^{q-σ} (1.b_1\ldots b_S)_2$.
+Provided $q > 1$  we have
+$$
+x ⊘ 2 = x/2 = 2^{q-σ-1} (1.b_1\ldots b_S)_2
+$$
+However, if $q = 1$ we lose a bit as we shift:
+$$
+x ⊘ 2 = 2^{1-σ} (0.b_1\ldots b_{S-1})_2
+$$
+and the property will be satisfy if $b_S = 1$.
+Similarily if we are sub-normal, $x = 2^{1-σ} (0.b_1\ldots b_S)_2$ and
+we have
+$$
+x ⊘ 2 = 2^{1-σ} (0.0b_1\ldots b_{S-1})_2
+$$
+and the property will be satisfy if $b_S = 1$.
+(Or `NaN`.)
+
+Here are two examples:
 ```julia
+# normal number with q = 1 and last bit 1
+x = reinterpret(Float16, parse(UInt16, "0000010000000011"; base=2))
+x/2 == Float64(x)/2 # Float64 can exactly represent x/2
+```
+```julia
+# sub-normal number with q = 1 and last bit 1
 x = reinterpret(Float16, parse(UInt16, "0000000000000011"; base=2))
 x/2 == Float64(x)/2 # Float64 can exactly represent x/2
 ```
 
 For the second part, Similar to the next problem,
-we see that the property holds true if $|x| ≥ 2^{S+2}-1$:
+we see that the property holds true if $|x| < 2^{S+2}-1$, 
+as otherwise:
 ```julia
 x = Float16(2)^(12)-1 # bits 0110110000000000
 x+2 == x
