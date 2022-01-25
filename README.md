@@ -67,6 +67,10 @@ with respect to a prescribed weight—and their usage in numerical computations.
 5. [The Julia–Matlab–Python Cheatsheet](https://cheatsheets.quantecon.org)
 
 
+## Notes from lectures
+
+1. [Integers](lectures/Integers.png)
+
 ## What is numerical analysis? 
 
 Broadly speaking, numerical analysis is the study of approximating
