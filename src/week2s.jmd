@@ -106,7 +106,7 @@ $$\left| \frac{f(x+h)-f(x-h)}{2h} - f'(x) \right|=$$
 $$ =\left| \frac{1 + (x+h) + (x+h)^2 - 1 - (x-h) - (x-h)^2}{2h} - (1+2x)\right|=$$
 $$ =\left| \frac{2h + 4hx}{2h} - 1 -2x\right| = 0.$$
 
-As we can see, in this special case the central difference approximation is exact. The error we start observing for very small step sizes is due to numerical error in floating point division, we refer to the video lecture on the topic for more details.
+As we can see, in this case the central difference approximation is exact. The errors we start observing for small step sizes are thus numerical in nature. The values of the function at $f(x+h)$ and $f(x-h)$ eventually become numerically indistinguishable and thus this finite difference approximation to the derivative incorrectly results in $0$.
 
 
 To compute the errors of the central difference approximation of $g'(x)$ we compute
@@ -201,23 +201,23 @@ x = 0.1;
 
 ```julia
 # We have to be a bit careful with the choice of h
-h = sqrt(eps())
+h = eps()
 # Values for exp(exp(x)cos(x) + sin(x))
-println("f'($x) with forward difference: ", forwarddiff(x, h, f))
-println("f'($x) with central difference: ", centraldiff(x, h, f))
-println("f''($x) via finite difference:  ", finitediffsecond(x, sqrt(h), f))
+println("f'($x) with forward difference: ", forwarddiff(x, sqrt(h), f))
+println("f'($x) with central difference: ", centraldiff(x, cbrt(h), f))
+println("f''($x) via finite difference:  ", finitediffsecond(x, cbrt(h), f))
 ```
 ```julia
 # Values for prod([x] ./ (1:1000) .- 1)
-println("f'($x) with forward difference: ", forwarddiff(x, h, g))
-println("f'($x) with central difference: ", centraldiff(x, h, g))
-println("f''($x) via finite difference:  ", finitediffsecond(x, sqrt(h), g))
+println("f'($x) with forward difference: ", forwarddiff(x, sqrt(h), g))
+println("f'($x) with central difference: ", centraldiff(x, cbrt(h), g))
+println("f''($x) via finite difference:  ", finitediffsecond(x, cbrt(h), g))
 ```
 ```julia
 # Values for the continued fraction
-println("f'($x) with forward difference: ", forwarddiff(x, h, x->cont(1000,x)))
-println("f'($x) with central difference: ", centraldiff(x, h, x->cont(1000,x)))
-println("f''($x) via finite difference:  ", finitediffsecond(x, sqrt(h), x->cont(1000,x)))
+println("f'($x) with forward difference: ", forwarddiff(x, sqrt(h), x->cont(1000,x)))
+println("f'($x) with central difference: ", centraldiff(x, sqrt(h), x->cont(1000,x)))
+println("f''($x) via finite difference:  ", finitediffsecond(x, cbrt(h), x->cont(1000,x)))
 ```
 
 ## 2. Dual numbers
