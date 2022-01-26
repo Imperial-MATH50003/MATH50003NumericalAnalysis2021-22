@@ -252,8 +252,10 @@ there exists $a^{-1}$ such that $a a^{-1} = 1$. Why isn't $\mathbb{D}$ a field?
 
 **SOLUTION**
 
-Fields require that all nonzero elements have a unique multiplicative inverse. However, no dual number of the form $0+c\epsilon$ and $c \neq 0$, that is dual numbers with zero real part and non-zero dual part have multiplicative inverses as division by $0+c\epsilon$ is not well-defined.
-
+Fields require that all nonzero elements have a unique multiplicative inverse. However, this is not the case for dual numbers. To give an explicit counter example, we show that there is no dual number $z$ which is the inverse of $0+\epsilon$, i.e. a dual number $z$ such that $$\frac{(0+\epsilon)}{(z_r+z_d \epsilon)} = 1 + 0 \epsilon.$$
+By appropriate multiplication with the conjugate we show that
+$$\frac{(0+\epsilon)(z_r-z_d \epsilon)}{(z_r+z_d \epsilon)(z_r-z_d \epsilon)} = \frac{z_r \epsilon}{z_r^2} = \frac{\epsilon}{z_r}.$$ This proves that no choice of real part $z_r$ can reach the multiplicative identity $1+0 \epsilon$ when starting from the number $0+\epsilon$. More general results for zero real part dual numbers can also be proved.
+ 
 **Problem 2.3⋆** A _matrix representation_ of a ring are maps from a group/ring to matrices such that matrix addition and multiplication
 behave exactly like addition and multiplication of the ring. 
 That is, if $A$ and $B$ are elements of the ring and $ρ$ is a representation, then
@@ -267,22 +269,22 @@ $\rho_\epsilon : a + b {\rm \epsilon} \mapsto \begin{pmatrix} a & b \\ 0 & a \en
 
 **SOLUTION**
 
-First we check that addition complies with addition of complex numbers, that is 
+Let $A = a+bi$ and $B=c+di$ and $\rho$ be the map to their proposed matrix representations. First we check that addition complies with addition of complex numbers, that is 
 $(a+bi)+(c+di) = (a+c)+(b+d)i:$
  
-$\rho(a) + \rho(b) = \begin{pmatrix} a & b \\ -b & a \end{pmatrix} + \begin{pmatrix} c & d \\ -d & c \end{pmatrix} = \begin{pmatrix} a+c & b+d \\ -(b+d) & a+c \end{pmatrix} = \rho(a+b).$
+$\rho(A) + \rho(B) = \begin{pmatrix} a & b \\ -b & a \end{pmatrix} + \begin{pmatrix} c & d \\ -d & c \end{pmatrix} = \begin{pmatrix} a+c & b+d \\ -(b+d) & a+c \end{pmatrix} = \rho(A+B).$
 
-Next for multiplication we need  $(a+bi)(c+di) = (ac-bd)+(bc+ad)i $:
+Next for multiplication we need $(a+bi)(c+di) = (ac-bd)+(bc+ad)i $:
 
-$\rho(a)\rho(b) = \begin{pmatrix} a & b \\ -b & a \end{pmatrix}\begin{pmatrix} c & d \\ -d & c \end{pmatrix} = \begin{pmatrix} ac-bd & bc+ad \\ -(bc+ad) & ac-bd \end{pmatrix} = \rho(ab)$
+$\rho(A)\rho(B) = \begin{pmatrix} a & b \\ -b & a \end{pmatrix}\begin{pmatrix} c & d \\ -d & c \end{pmatrix} = \begin{pmatrix} ac-bd & bc+ad \\ -(bc+ad) & ac-bd \end{pmatrix} = \rho(AB)$
 
-Likewise for addition of dual numbers $(a+b\epsilon )+(c+d\epsilon ) = (a+c) + (b+d) \epsilon$:
+Now we move on to dual numbers $A = a+b \epsilon $ and $B=c+d \epsilon$ and their matrix representation map $\rho_\epsilon$: For addition of dual numbers $(a+b\epsilon )+(c+d\epsilon ) = (a+c) + (b+d) \epsilon$:
 
-$\rho_\epsilon(a) + \rho_\epsilon(b) = \begin{pmatrix} a & b \\ 0 & a \end{pmatrix} + \begin{pmatrix} c & d \\ 0 & c \end{pmatrix} = \begin{pmatrix} a+c & b+d \\ 0 & a+c \end{pmatrix} = \rho_\epsilon(a+b).$
+$\rho_\epsilon(A) + \rho_\epsilon(b) = \begin{pmatrix} a & b \\ 0 & a \end{pmatrix} + \begin{pmatrix} c & d \\ 0 & c \end{pmatrix} = \begin{pmatrix} a+c & b+d \\ 0 & a+c \end{pmatrix} = \rho_\epsilon(A+B).$
 
 And finally for multiplication of dual numbers $(a+b\epsilon )(c+d\epsilon ) = ac+(ad+bc)\epsilon$:
 
-$\rho_\epsilon(a)\rho_\epsilon(b) = \begin{pmatrix}a & b \\ 0 & a \end{pmatrix}\begin{pmatrix} c & d \\ 0 & c \end{pmatrix} = \begin{pmatrix} ac & ad+bc \\ 0 & ac \end{pmatrix} = \rho_\epsilon(ab).$
+$\rho_\epsilon(A)\rho_\epsilon(B) = \begin{pmatrix}a & b \\ 0 & a \end{pmatrix}\begin{pmatrix} c & d \\ 0 & c \end{pmatrix} = \begin{pmatrix} ac & ad+bc \\ 0 & ac \end{pmatrix} = \rho_\epsilon(AB).$
 
 
 **Problem 2.4⋆** What is the correct definition of division on dual numbers, i.e.,
