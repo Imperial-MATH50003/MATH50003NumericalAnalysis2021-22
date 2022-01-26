@@ -56,6 +56,7 @@ with respect to a prescribed weight—and their usage in numerical computations.
 
 1. [Week 1](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/sheets/week1.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week1s.ipynb)): Binary representation, integers, floating point numbers, and interval arithmetic
 1. [Week 2](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/sheets/week2.ipynb): Finite-differences, dual numbers, and Newton iteration
+1. [Week 3](https://nbviewer.org/github/dlfivefifty/MATH50003NumericalAnalysis/blob/main/sheets/week3.ipynb): dense, triangular, banded, permutation, and rotation matrices
 
 
 ## Reading List
