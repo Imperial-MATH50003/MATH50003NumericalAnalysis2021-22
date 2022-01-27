@@ -1,0 +1,13 @@
+# Week 2
+
+
+**Problem 1** Use finite-differences with an appropriately chosen `h`
+to approximate the derivative in Newton iteration. Does the method still converge with an accurate initial guess?
+
+
+**Problem 2** Use matrix representations to compute derivatives of $f(x) = 1 + x + x^2$ and $1 + x/3 + x^2$
+by hand and in Julia.
+Hint: Use `I` or `one(x)` instead of `1`. 
+
+
+**Problem 3** Does a `Dual{Dual{T}}` work for second derivatives?

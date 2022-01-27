@@ -160,7 +160,7 @@ $$
 $$
 where $𝐪_1,\ldots,𝐪_{j-1}$ are orthogonal:
 $$
-𝐪_k^\top 𝐪_ℓ = δ_{kℓ} = \begin{cases} 1 & k == ℓ \\
+𝐪_k^\top 𝐪_ℓ = δ_{kℓ} = \begin{cases} 1 & k  ℓ \\
                                             0 & \hbox{otherwise} \end{cases}.
 $$
 for $k,ℓ < 1$.
@@ -205,7 +205,7 @@ Q̂ = Q[:,1:n]
 R̂
 ```
 The first column of `Q̂` is indeed a normalised first column of `A`:
-```
+```julia
 R = zeros(n,n)
 Q = zeros(m,n)
 R[1,1] = norm(A[:,1])
