@@ -303,6 +303,32 @@ $$\frac{a+b\epsilon}{c+d\epsilon} = \frac{(a+b\epsilon)(c-d\epsilon)}{(c+d\epsil
 Expanding the products and dropping terms with $\epsilon^2$ then leaves us with the definition of division for dual numbers (where the denominator must have non-zero real part):
 $$\frac{a}{c} + \frac{bc - ad}{c^2}\epsilon.$$ Thus we have $s = \frac{a}{c}$ and $t = \frac{bc - ad}{c^2}$.
 
+We saw in the lectures that we have
+$$
+\exp(a+b \epsilon) = \exp(a)+b \exp(a) \epsilon,
+$$
+$$
+\sin(a+b \epsilon) = \sin(a)+b \cos(a) \epsilon,
+$$
+and
+$$
+\cos(a+b \epsilon) = \cos(a)-b \sin(a) \epsilon.
+$$
+Using these, we find that evaluating at $a+b \epsilon$ yields
+$$
+\exp(\exp x \cos x + \sin x) = \exp ( (\exp (a) +b \exp (a) \epsilon ) (\cos(a)-b \sin(a) \epsilon) + \sin(a)+b \cos(a) \epsilon)
+$$
+$$
+= \exp ( \exp (a) \cos (a) + ( \cos (a) \exp (a) - \sin(a) \exp (a)) b \epsilon + \sin(a)+b \cos(a) \epsilon) = \exp ( (\exp (a) \cos (a) + \sin(a)) + b ( \cos (a) \exp (a) - \sin(a) \exp (a) + \cos(a)) \epsilon )
+$$
+which means $\exp(\exp x \cos x + \sin x)$ evaluated at $a+b \epsilon $ is
+$$
+\exp( (\exp (a) \cos (a) + \sin(a)) ) + b ( \cos (a) \exp (a) - \sin(a) \exp (a) + \cos(a)) \exp( (\exp (a) \cos (a) + \sin(a)) ) \epsilon.
+$$
+Setting $b=1$ the derivative at point $a$ is thus given by the dual part, i.e.:
+$$
+( \cos (a) \exp (a) - \sin(a) \exp (a) + \cos(a)) \exp( (\exp (a) \cos (a) + \sin(a)) ).
+$$
 
 **Problem 2.5** Add support for `cos`, `sin`, and `/` to the type `Dual`:
 ```julia
