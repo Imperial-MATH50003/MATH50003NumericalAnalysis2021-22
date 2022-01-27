@@ -4,16 +4,12 @@
 using LinearAlgebra, Plots
 ```
 
-## 1. QR decomposition and least squares
+## 1. Least squares and QR decompositions
 
 **Problem 1.1** Find and plot the best least squares fit of ${1 \over 25x^2 + 1}$ by degree $n$
 polynomials for $n = 1,\ldots,5$ at 1000 evenly spaced points between $0$ and $1$.
 
-
-**Problem 1.1** Implement the 
-
-
-**Problem** Show that there always exists a QR decomposition such that the diagonal of $R$ is non-negative.
+**Problem 1.2⋆** Show that there always exists a QR decomposition such that the diagonal of $R$ is non-negative.
 
 **SOLUTION**
 
@@ -21,7 +17,7 @@ We can assume that the diagonal of $R$ is positive (otherwise multiply $Q$ and $
 
 ∎
 
-**Problem** Show that the QR decomposition of a square invertible matrix is unique, provided that the diagonal of $R$ is positive.
+**Problem 1.3⋆** Show that the QR decomposition of a square invertible matrix is unique, provided that the diagonal of $R$ is positive.
 
 
 **SOLUTION**
@@ -39,9 +35,40 @@ $Q^⊤ Q̃$ are 1. This means that $Q^⊤ Q̃ = I$ and hence $Q̃ = Q$, which th
 
 ∎
 
-**Problem**  Rotation's can also be used to compute a QR decomposition (_Given's rotations_).
-This is useful for computing the QR decomposition of a Tridiagonal matrix. Use Given's rotations
-to 
+## 2. Gram–Schmidt
+
+**Problem 2.1⋆** The modified Gram–Schmidt algorithm is a slight variation of Gram–Schmidt where
+instead of computing
+$$
+𝐯_j := 𝐚_j - \sum_{k=1}^{j-1} \underbrace{𝐪_k^\top 𝐚_j}_{r_{kj}} 𝐪_k
+$$
+we compute it step-by-step:
+$$
+𝐯_j^1 := 𝐚_j
+𝐯_j^{k+1} =𝐯_j^k - 𝐪_k^\top 𝐯_j^k 𝐪_k
+$$
+Show that $𝐯_j^k = 𝐯_j$. 
+
+**Problem 2.2** Use this modification to complete the following
+function:
+```julia
+function modifiedgramschmidt(A)
+    m,n = size(A)
+    m ≥ n || error("Not supported")
+    R = zeros(n,n)
+    Q = zeros(m,n)
+    for j = 1:n
+        # TODO: Implement the Modified Gram–Schmidt algorthm
+    end
+    Q,R
+end
+```
+
+**Problem 2.3** Compare the orthogonality of `Q` between `gramschmidt` and `modifiedgramschmidt`
+when applied to a `300 × 300` random matrix.
+
+## 3. Householder reflections
+
 
 
 **Problem** Consider the product of orthogonal matrices in the Householder version of QR.
@@ -56,4 +83,9 @@ Modify `Reflection` to support a sequence of Householder reflections:
 ```julia
 
 ```
+
+## 4. 
+
+**Problem 3.1⋆**  Describe an algorithm for computing the QR decomposition
+of a tridiagonal matrix using rotations instead of reflections.
 
