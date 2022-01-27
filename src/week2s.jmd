@@ -314,9 +314,9 @@ and
 $$
 \cos(a+b \epsilon) = \cos(a)-b \sin(a) \epsilon.
 $$
-Using these, we find that evaluating at $a+b \epsilon$ yields
+Using these, we find that evaluating $\exp(\exp x \cos x + \sin x)$ at $a+b \epsilon$ yields
 $$
-\exp(\exp x \cos x + \sin x) = \exp ( (\exp (a) +b \exp (a) \epsilon ) (\cos(a)-b \sin(a) \epsilon) + \sin(a)+b \cos(a) \epsilon)
+\exp ( (\exp (a) +b \exp (a) \epsilon ) (\cos(a)-b \sin(a) \epsilon) + \sin(a)+b \cos(a) \epsilon)
 $$
 $$
 = \exp ( \exp (a) \cos (a) + ( \cos (a) \exp (a) - \sin(a) \exp (a)) b \epsilon + \sin(a)+b \cos(a) \epsilon) = \exp ( (\exp (a) \cos (a) + \sin(a)) + b ( \cos (a) \exp (a) - \sin(a) \exp (a) + \cos(a)) \epsilon )
