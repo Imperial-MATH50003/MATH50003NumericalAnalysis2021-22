@@ -448,6 +448,7 @@ Before discussing pivoting, consider standard Gaussian elimation where one row-r
 to introduce zeros column-by-column. We will mimick the computation of the QR decomposition
 to view this as a _triangular triangularisation_.
 
+
 Consider the matrix
 $$
 L_𝐯 = \begin{bmatrix} 1 \\ -{v_2 \over v_1} & 1 \\ \vdots &&\ddots \\
@@ -458,9 +459,6 @@ so that
 $$
 L_𝐯 𝐯 = 𝐯 - (𝐯 - v_1 𝐞_1) = v_1 𝐞_1.
 $$
-
-
-
 For $L_1 := L_{𝐚_1}$ we have 
 $$
 L_1 A =  \begin{bmatrix} u_{11} & u_{12} & \cdots & u_{1n} \\ 
@@ -494,7 +492,7 @@ u_{kj} &:= (L_k 𝐚_j^{k-1})[1]
 $$
 Then
 $$
-L_n \cdots L_1 A = \underbrace{\begin{bmatrix} 
+L_{n-1} \cdots L_1 A = \underbrace{\begin{bmatrix} 
 u_{11} & \cdots & u_{1n} \\ & \ddots & \vdots\\
                                         && u_{nn}\end{bmatrix}}_U
 $$
@@ -503,14 +501,36 @@ $$
 A = \underbrace{L_{n-1}^{-1} \cdots L_1^{-1}}_L U.
 $$
 
-Finally, note  that the $L_k$ are immediately invertible:
+Now we establish properties of our special class of lower-triangular matrices. Consider $n × n$ lower triangular
+matrices that are equal to the identity matrix apart from in the $j$th column:
 $$
-L_𝐯^{-1} = \begin{bmatrix} 1 \\ {v_2 \over v_1} & 1 \\ \vdots &&\ddots \\
-                {v_n \over v_1}  &&& 1
-                \end{bmatrix} = I + \left[{𝐯 \over v_1}  - 𝐞_1 \right] 𝐞_1^\top
+L_j = \begin{bmatrix}
+        1 \\ & \ddots \\ && 1 \\
+                    ℓ_{j+1,j} & 1 \\
+                    \vdots && \dots \\
+                    ℓ_{n,j} & & & 1 \end{bmatrix} = I + \begin{bmatrix} 𝟎_j \\ 𝐥_j \end{bmatrix} 𝐞_j^⊤
 $$
-Moreover, as $L_k$ 
- we note that $L$ simplifies:
+where $𝐥_j ∈ ℝ^{n-j}$. These satisify the following special properties:
+$$
+L_j^{-1} = \begin{bmatrix}
+        1 \\ & \ddots \\ && 1 \\
+                    -ℓ_{j+1,j} & 1 \\
+                    \vdots && \dots \\
+                    -ℓ_{n,j} & & & 1 \end{bmatrix} = I - \begin{bmatrix} 𝟎_j \\ 𝐥_j \end{bmatrix} 𝐞_j^⊤
+$$
+and if $k > j$
+$$
+L_j^{-1} L_k^{-1} =  I - \begin{bmatrix} 𝟎_j \\ 𝐥_j \end{bmatrix} 𝐞_j^⊤ -  \begin{bmatrix} 𝟎_k \\ 𝐥_k \end{bmatrix} 𝐞_k^⊤
+$$
+Thus we have
+$$
+L = \begin{bmatrix}
+
+\end{bmatrix}
+$$
+
+
+
 
 **Example**
 We will do a numerical example (by-hand is equivalent to Gaussian elimination).
@@ -554,6 +574,25 @@ We learned in first year linear algebra that if a diagonal entry is zero
 when doing Gaussian elimnation one has to _row pivot_. For stability, 
 in implementation one _always_ pivots: move the largest in magnitude entry to the diagonal.
 In terms of a decomposition, this leads to 
+
+We see that we can interpret this procedure as a decomposition
+$$
+L_{n-1} P_{n-1} \cdots P_2 L_1 P_1 A
+$$
+where $P_j$ is a permutation that leaves rows 1 through $j-1$ fixed.
+But note that since $P_2$ leaves row 1 alone we have $𝐞_1^⊤ P_2^\top = 𝐞_1^⊤$
+and thus we have 
+$$
+P_2 L_1 = P_2  + \begin{bmatrix} 0 \\ \tilde 𝐥_1 \end{bmatrix} 𝐞_1^⊤ = \tilde L_1 P_2
+$$
+
+
+We claim that we can write 
+$$
+(L_{n-1} P_{n-1} \cdots P_2 L_1 P_1)^{-1} = P_1^\top L_1^{-1}
+$$
+
+
 
 
 ## 3. Cholesky Decomposition
