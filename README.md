@@ -47,9 +47,9 @@ with respect to a prescribed weight—and their usage in numerical computations.
 
 ## Assessment
 
-1. Practice mid-term (computer-based Julia exam): 4 March 2022 (TBC)
-2. Mid-term (computer-based Julia exam): 18 March 2022 (TBC)
-3. Practice final exam (pen-and-paper): Summer Term (TBC)
+1. Practice late-term exam (computer-based Julia exam, not for credit): 4 March 2022 (TBC)
+2. Late-term exam (computer-based Julia exam): 18 March 2022 (TBC)
+3. Practice final exam (pen-and-paper, not for credit): Summer Term (TBC)
 3. Final exam (pen-and-paper): Summer Term (TBC)
 
 ## Problem sheets
