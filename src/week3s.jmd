@@ -386,5 +386,12 @@ for n=1:S
     numerical=1-sqrt(1+h^2)
     relative_error[n]=-abs(numerical-exact)/exact
 end
-plot(1:S,relative_error, xlabel="n", yaxis=:log)
+plot(1:S,log2.(relative_error), xlabel="n", ylabel="relative error (log2)")
 ```
+
+From this plot we can clearly identify the 3 phases:
+1. When $n$ is very small, the relative error grows smoothly with $n$;
+2. When $n$ is neither too large nor too small, the relative error has jumps at around $S/2=26$, $(S-3)/4=12.25$, $(S-4)/6=8$. In each stage, the slope is as predicted. For example, the first stage from $S/2$ to $(S-3)/4$ has relative error of $\frac{1}{8}h^2$, hence the slope is -2 between 13 and 25.
+3. When $n\ge S/2$, the relative error is 100%;
+
+The transition point between phase 1 and 2 is at the stage for $O(h^8)$ of relative error from phase 2 which meets $\frac{\epsilon_m}{2h^2}$ from phase 1.
