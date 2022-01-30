@@ -130,10 +130,70 @@ $$
 \end{pmatrix}.
 $$
 
+**SOLUTION**
+
+Let $\sigma=\begin{pmatrix}1 & 2 & 3 \\ 3 & 2 & 1\end{pmatrix}$ and $\tau=\begin{pmatrix}1 & 2 & 3 & 4 & 5 & 6\\ 2 & 1 & 4 & 3 & 6 & 5\end{pmatrix}$. There are two ways to construct $P_\sigma$ and $P_\tau$.
+
+- Column by column:
+  $$P_\sigma=
+  \left(\mathbf{e}_{\sigma_1^{-1}}\middle|\mathbf{e}_{\sigma_2^{-1}}\middle|\mathbf{e}_{\sigma_3^{-1}}\right)=
+  \left(\mathbf{e}_3\middle|\mathbf{e}_2\middle|\mathbf{e}_1\right)$$
+  $$P_\tau=
+  \left(\mathbf{e}_{\tau_1^{-1}}\middle|\mathbf{e}_{\tau_2^{-1}}\middle|\mathbf{e}_{\tau_3^{-1}}\middle|\mathbf{e}_{\tau_4^{-1}}\middle|\mathbf{e}_{\tau_5^{-1}}\middle|\mathbf{e}_{\tau_6^{-1}}\right)=
+  \left(\mathbf{e}_2\middle|\mathbf{e}_1\middle|\mathbf{e}_4\middle|\mathbf{e}_3\middle|\mathbf{e}_6\middle|\mathbf{e}_5\right)$$
+- Row by row:
+  $$P_\sigma=I[\mathbf{\sigma},:]=
+  \begin{pmatrix}
+  I[\sigma_1,:]\\
+  I[\sigma_2,:]\\
+  I[\sigma_3,:]
+  \end{pmatrix}=
+  \begin{pmatrix}
+  I[3,:]\\
+  I[2,:]\\
+  I[1,:]
+  \end{pmatrix}$$
+  $$P_\tau=I[\mathbf{\tau},:]=
+  \begin{pmatrix}
+  I[\tau_1,:]\\
+  I[\tau_2,:]\\
+  I[\tau_3,:]\\
+  I[\tau_4,:]\\
+  I[\tau_5,:]\\
+  I[\tau_6,:]\\
+  \end{pmatrix}=
+  \begin{pmatrix}
+  I[2,:]\\
+  I[1,:]\\
+  I[4,:]\\
+  I[3,:]\\
+  I[6,:]\\
+  I[5,:]\\
+  \end{pmatrix}$$
+
+Either way, we have
+$$P_\sigma=
+\begin{pmatrix}
+0 & 0 & 1\\ 
+0 & 1 & 0\\ 
+1 & 0 & 0
+\end{pmatrix}
+\qquad\text{and}\qquad
+P_\tau=
+\begin{pmatrix}
+0 & 1 & 0 & 0 & 0 & 0 \\
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1 \\
+0 & 0 & 0 & 0 & 1 & 0
+\end{pmatrix}$$
 
 **Problem 4.2** Complete the implementation of a type representing
 permutation matrices that supports `P[k,j]` and such that `*` takes $O(n)$ operations.
 ```julia
+using LinearAlgebra, Test
+
 struct PermutationMatrix <: AbstractMatrix{Int}
     p::Vector{Int} # represents the permutation whose action is v[p]
     function PermutationMatrix(p::Vector)
@@ -142,22 +202,27 @@ struct PermutationMatrix <: AbstractMatrix{Int}
     end
 end
 
-size(P::PermutationMatrix) = (length(P.p),length(P.p))
-
-function getindex(P::PermutationMatrix, k::Int, j::Int)
-    # TODO: Return P[k,j]
-    P.p[k] == j ? 1 : 0 
-end
-
-function *(P::PermutationMatrix, x::AbstractVector)
-    # TODO: permute the entries of x
-    x[P.p]
-end
+Base.size(P::PermutationMatrix) = (length(P.p),length(P.p))
+Base.getindex(P::PermutationMatrix, k::Int, j::Int) = P.p[k] == j ? 1 : 0 
+Base.:*(P::PermutationMatrix, x::AbstractVector) = x[P.p]
 
 # If your code is correct, this "unit test" will succeed
 p = [1, 4, 2, 5, 3]
 P = PermutationMatrix(p)
 @test P == I(5)[p,:]
+```
+
+The following codes show that `*` takes $O(n)$ of both time and space.
+```julia
+using BenchmarkTools, Random
+x=0 # for some reason, an error "UndefVarError: x not defined" will occur without this line. p and P are previously defined so they work fine.
+for n = 10 .^ (1:7)
+    print("n = ", n)
+    p = randperm(n)
+    P = PermutationMatrix(p)
+    x = randn(n)
+    @btime P*x
+end
 ```
 
 ## 5. Orthogonal matrices
@@ -185,10 +250,17 @@ $$
 
 **Problem 5.3⋆** Explain why an orthogonal matrix $Q$ must be equal to $I$ if all its eigenvalues are 1.
 
+**SOLUTION**
+
+Let $Q$'s linearly independent unit eigenvectors be $\mathbf{v}_1,\dots,\mathbf{v}_n$, then $Q\mathbf{v}_k=\mathbf{v}_k$ for all $k$ since all $Q$'s eigenvalues are $1$.
+
+Now if we let $V=\left(\mathbf{v}_1\middle|\dots\middle|\mathbf{v}_n\right)$, then $QV=V$. Recalling that vectors in $V$ are linearly independent, which means that $V$ is invertible, we can multiply both sides by $V^{-1}$ to get $Q=I$.
 
 **Problem 5.4** Complete the implementation of a type representing
 reflections that supports `Q[k,j]` and such that `*` takes $O(n)$ operations.
 ```julia
+using LinearAlgebra, Test
+
 # Represents I - 2v*v'
 struct Reflection{T} <: AbstractMatrix{T}
     v::Vector{T}
@@ -196,17 +268,9 @@ end
 
 Reflection(x::Vector{T}) where T = Reflection{T}(x/norm(x))
 
-size(Q::Reflection) = (length(Q.v),length(Q.v))
-
-function getindex(Q::Reflection, k::Int, j::Int)
-    # TODO: Return Q[k,j]
-    (k == j) - 2Q.v[k]*Q.v[j]
-end
-
-function *(P::Reflection, x::AbstractVector)
-    # TODO: permute the entries of x
-    x - 2*Q.v * dot(Q.v,x)
-end
+Base.size(Q::Reflection) = (length(Q.v),length(Q.v))
+Base.getindex(Q::Reflection, k::Int, j::Int) = (k == j) - 2Q.v[k]*Q.v[j]
+Base.:*(P::Reflection, x::AbstractVector) = x - 2*Q.v * dot(Q.v,x)
 
 # If your code is correct, these "unit tests" will succeed
 x = randn(5)
@@ -217,26 +281,110 @@ v = x/norm(x)
 @test Q'Q ≈ I
 ```
 
+The following codes show that `*` takes $O(n)$ of both time and space.
+```julia
+using BenchmarkTools, Random
+for n = 10 .^ (1:7)
+    print("n = ", n)
+    x = randn(n)
+    Q = Reflection(x)
+    v = randn(n)
+    @btime Q*v
+end
+```
 
 **Problem 5.5** Complete the following implementation of a Housholder reflection  so that the
 unit tests pass.
 
 ```julia
-function householderreflection(s::Bool, x::AbstractVector)
-    # TODO: implement Householder reflection, returning a Reflection
-    
-end
+householderreflection(s::Bool, x::AbstractVector) = Reflection(x-ifelse(s,one(eltype(x)),-one(eltype(x)))*[norm(x);zeros(eltype(x),length(x)-1)])
 
 x = randn(5)
 Q = householderreflection(true, x)
 @test Q isa Reflection
-@test Q*x ≈ norm(x)*[1; zeros(length(x)-1)]
+@test Q*x ≈ [norm(x);zeros(eltype(x),length(x)-1)]
 
 Q̃ = householderreflection(false, x)
 @test Q̃ isa Reflection
-@test Q̃*x ≈ -norm(x)*[1; zeros(length(x)-1)]
+@test Q̃*x ≈ [-norm(x);zeros(eltype(x),length(x)-1)]
 ```
 
 **Problem 5.6⋆** Consider a Householder reflection with $𝐱 = [1,h]$
 with $h = 2^{-n}$. What is the floating point error in
 computing $𝐲 = ∓ \|𝐱\| 𝐞_1 + 𝐱$ for each choice of sign.
+
+**SOLUTION**
+
+Since $\|\mathbf{x}\|=\sqrt{1+h^2}$, we have $\mathbf{y}=[1\mp\sqrt{1+h^2},h]$. We note first that $h^{fp}$ and $(h^2)^{fp}$ are exact due to the choice of $h$, so we only need to discuss the floating error in computing $1\mp\sqrt{1+h^2}$.
+
+Numerically, let the length of the significand be $S$, then
+$$1\oplus h^2=
+\begin{cases}
+1+h^2 & n\le S/2 \\
+1 & n>S/2
+\end{cases}
+=1+h^2+\delta_1$$
+where $|\delta_1|\le \frac{\epsilon_m}{2}$.
+
+$+$ PLUS $+$
+
+Since $\sqrt{1\oplus h^2}^{fp}>0$, we know that
+$$\begin{split}
+1\oplus\sqrt{1\oplus h^2}^{fp}=&(1+\delta_2)(1+\sqrt{1\oplus h^2}^{fp})\\
+=&(1+\delta_2)(1+\sqrt{1+h^2+\delta_1}(1+\delta_3))
+\end{split}$$
+where $|\delta_2|,|\delta_3|\le \frac{\epsilon_m}{2}$. Then
+$$\begin{split}
+\frac{1\oplus\sqrt{1\oplus h^2}^{fp}}{1+\sqrt{1+h^2}}=&(1+\delta_2)\left(1+\frac{\sqrt{1+h^2+\delta_1}(1+\delta_3)-\sqrt{1+h^2}}{1+\sqrt{1+h^2}}\right)\\
+=&(1+\delta_2)\left(1+\frac{(1+\delta_3)(\sqrt{1+h^2+\delta_1}-\sqrt{1+h^2})+\delta_3\sqrt{1+h^2}}{1+\sqrt{1+h^2}}\right)\\
+\approx &(1+\delta_2)\left(1+\frac{\delta_1}{2(1+\sqrt{1+h^2})\sqrt{1+h^2}}+\delta_3\frac{\sqrt{1+h^2}}{1+\sqrt{1+h^2}}\right)
+\end{split}$$
+and we can bound the relative error by
+$$|\delta_2|+|\delta_1|\frac{1}{2(1+\sqrt{1+h^2})\sqrt{1+h^2}}+|\delta_3|\frac{\sqrt{1+h^2}}{1+\sqrt{1+h^2}}\le |\delta_2|+\frac{|\delta_1|}{4}+\frac{3|\delta_3|}{4}\le \epsilon_m.$$
+
+In conclusion, it's very accurate to compute $1+\sqrt{1+h^2}$. Let us verify this:
+```julia
+using Plots
+S=precision(Float64)-1;
+relative_error=zeros(S)
+for n=1:S
+    h=2.0^(-n)
+    exact=1+sqrt(1+BigFloat(h)^2)
+    numerical=1+sqrt(1+h^2)
+    relative_error[n]=abs(numerical-exact)/exact
+end
+println(eps())
+maximum(relative_error)
+```
+
+$-$ MINUS $-$
+
+If $n>S/2$, then $1\ominus\sqrt{1\oplus h^2}^{fp}=1\ominus\sqrt{1}^{fp}=1\ominus 1=0$ so the relative error is 100%.
+
+If $n\le S/2$ but not too small, $1\oplus h^2$ is exactly $1+h^2$ but $\sqrt{1+h^2}^{fp}$ can have bounding error. Expand $\sqrt{1+h^2}$ into Taylor series:
+$$\sqrt{1+h^2}=1+\frac{1}{2}h^2-\frac{1}{8}h^4+\frac{1}{16}h^6-O(h^8)=1+2^{-2n-1}-2^{-4n-3}+2^{-6n-4}-O(2^{-8n})$$
+so
+$$\sqrt{1+h^2}^{fp}=
+\begin{cases}
+1 & n=S/2\\
+1+\frac{1}{2}h^2 & \frac{S-3}{4}\le n<S/2\\
+1+\frac{1}{2}h^2-\frac{1}{8}h^4 & \frac{S-4}{6}\le n<\frac{S-3}{4}\\
+\vdots & \vdots
+\end{cases}$$
+where we can conclude that the absolute error is approximately $\frac{1}{2}h^2,\frac{1}{8}h^4,\frac{1}{16}h^6,\dots$ for each stage when $h$ is small. Keeping in mind that $1-\sqrt{1+h^2}\approx -h^2$ when $h$ is small, the relative error is approximately $\frac{1}{2}, \frac{1}{8}h^2,\frac{1}{16}h^4,\dots$ for each stage. Special note: the relative error is exactly 100% in the first stage when $n=S/2$.
+
+If $n$ is so small that $\sqrt{1+h^2}$ is noticably larger than 1, the absolute error can be bounded by $\frac{\epsilon_m}{2}$ so the relative error is bounded by $\frac{\epsilon_m}{2(\sqrt{1+h^2}-1)}\approx \frac{\epsilon_m}{2h^2}$.
+
+Let us verify these conclusions:
+```julia
+using Plots
+S=precision(Float64)-1;
+relative_error=zeros(S)
+for n=1:S
+    h=2.0^(-n)
+    exact=1-sqrt(1+BigFloat(h)^2)
+    numerical=1-sqrt(1+h^2)
+    relative_error[n]=-abs(numerical-exact)/exact
+end
+plot(1:S,relative_error, xlabel="n", yaxis=:log)
+```
