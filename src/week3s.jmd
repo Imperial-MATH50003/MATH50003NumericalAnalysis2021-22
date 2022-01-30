@@ -361,7 +361,7 @@ $-$ MINUS $-$
 
 If $n>S/2$, then $1\ominus\sqrt{1\oplus h^2}^{fp}=1\ominus\sqrt{1}^{fp}=1\ominus 1=0$ so the relative error is 100%.
 
-If $n\le S/2$ but not too small, $1\oplus h^2$ is exactly $1+h^2$ but $\sqrt{1+h^2}^{fp}$ can have bounding error. Expand $\sqrt{1+h^2}$ into Taylor series:
+If $n\le S/2$ but not too small, $1\oplus h^2$ is exactly $1+h^2$ but $\sqrt{1+h^2}^{fp}$ can have rounding error. Expand $\sqrt{1+h^2}$ into Taylor series:
 $$\sqrt{1+h^2}=1+\frac{1}{2}h^2-\frac{1}{8}h^4+\frac{1}{16}h^6-O(h^8)=1+2^{-2n-1}-2^{-4n-3}+2^{-6n-4}-O(2^{-8n})$$
 so
 $$\sqrt{1+h^2}^{fp}=
