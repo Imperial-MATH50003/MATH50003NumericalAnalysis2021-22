@@ -6,14 +6,14 @@ of a matrix into products of structured matrices, and their use in solving least
 For a square or rectangular matrix $A ∈ ℝ^{m × n}$ with more rows than columns ($m ≥ n$), we consider:
 1. The _QR decomposition_
 $$
-A = Q R = \underbrace{\begin{bmatrix} 𝐪_1 | \cdots | 𝐪_m \end{bmatrix}}_{m × m} \underbrace{\begin{bmatrix} × & \cdots & × \\ & \ddots & \vdots \\ && × \\ &&0 \\ &&\vdots \\ && 0 \end{bmatrix}}_{m × n}
+A = Q R = \underbrace{\begin{bmatrix} 𝐪_1 | \cdots | 𝐪_m \end{bmatrix}}_{m × m} \underbrace{\begin{bmatrix} × & \cdots & × \\ & ⋱ & ⋮ \\ && × \\ &&0 \\ &&⋮ \\ && 0 \end{bmatrix}}_{m × n}
 $$
 where $Q$ is orthogonal ($Q^⊤Q = I$, $𝐪_j ∈ ℝ^m$) and $R$ is _right triangular_, which means it 
 is only nonzero on or to the right of the diagonal.
 
 2. The _reduced QR decomposition_
 $$
-A = Q̂ R̂ = \underbrace{\begin{bmatrix} 𝐪_1 | \cdots | 𝐪_n \end{bmatrix}}_{m × n} \underbrace{\begin{bmatrix} × & \cdots & × \\ & \ddots & \vdots \\ && ×  \end{bmatrix}}_{n × n}
+A = Q̂ R̂ = \underbrace{\begin{bmatrix} 𝐪_1 | \cdots | 𝐪_n \end{bmatrix}}_{m × n} \underbrace{\begin{bmatrix} × & \cdots & × \\ & ⋱ & ⋮ \\ && ×  \end{bmatrix}}_{n × n}
 $$
 where $Q$ has orthogonal columns ($Q^⊤Q = I$, $𝐪_j ∈ ℝ^m$) and $R̂$ is upper triangular.
 
@@ -75,7 +75,7 @@ $$
 We can use it to solve a least squares problem using the norm-preserving property (see PS3) of orthogonal matrices:
 $$
 \| A 𝐱 - 𝐛 \| = \| Q R 𝐱 - 𝐛 \| = \| R 𝐱 - Q^⊤ 𝐛 \| = \left \| 
-\begin{bmatrix} R̂ \\ 𝟎_{m-n × n} \end{bmatrix} 𝐱 - \begin{bmatrix} Q̂^⊤ \\ 𝐪_{n+1}^⊤ \\ \vdots \\ 𝐪_m^⊤ \end{bmatrix}     𝐛 \right \|
+\begin{bmatrix} R̂ \\ 𝟎_{m-n × n} \end{bmatrix} 𝐱 - \begin{bmatrix} Q̂^⊤ \\ 𝐪_{n+1}^⊤ \\ ⋮ \\ 𝐪_m^⊤ \end{bmatrix}     𝐛 \right \|
 $$
 Now note that the rows $k > n$ are independent of $𝐱$ and are a fixed contribution. Thus to minimise this norm it suffices to
 drop them and minimise:
@@ -98,8 +98,8 @@ p₀ + p₁ x_k + p₂ x_k^2 ≈ f_k
 $$
 where $f_k$ are given by data. We can reinterpret this as a least squares problem: minimise the norm
 $$
-\left\| \begin{bmatrix} 1 & x_1 & x_1^2 \\ \vdots & \vdots & \vdots \\ 1 & x_m & x_m^2 \end{bmatrix}
-\begin{bmatrix} p₀ \\ p₁ \\ p₂ \end{bmatrix} - \begin{bmatrix} f_1 \\ \vdots \\ f_m \end{bmatrix} \right \|
+\left\| \begin{bmatrix} 1 & x_1 & x_1^2 \\ ⋮ & ⋮ & ⋮ \\ 1 & x_m & x_m^2 \end{bmatrix}
+\begin{bmatrix} p₀ \\ p₁ \\ p₂ \end{bmatrix} - \begin{bmatrix} f_1 \\ ⋮ \\ f_m \end{bmatrix} \right \|
 $$
 We can solve this using the QR decomposition:
 ```julia
@@ -194,12 +194,12 @@ r_{jj} := {\|𝐯_j\|}
 $
 Then rearrange the definition we have
 $$
-𝐚_j = \begin{bmatrix} 𝐪_1|\cdots|𝐪_j \end{bmatrix} \begin{bmatrix} r_{1j} \\ \vdots \\ r_{jj} \end{bmatrix}
+𝐚_j = \begin{bmatrix} 𝐪_1|\cdots|𝐪_j \end{bmatrix} \begin{bmatrix} r_{1j} \\ ⋮ \\ r_{jj} \end{bmatrix}
 $$
 Thus
 $$
 \begin{bmatrix} 𝐚_1|\cdots|𝐚_j \end{bmatrix} 
-\begin{bmatrix} r_{11} & \cdots & r_{1j} \\ & \ddots & \vdots \\ && r_{jj} \end{bmatrix}
+\begin{bmatrix} r_{11} & \cdots & r_{1j} \\ & ⋱ & ⋮ \\ && r_{jj} \end{bmatrix}
 $$
 That is, we are computing the reduced QR decomposition column-by-column. 
 Running this algorithm to $j = n$ completes the decomposition.
@@ -291,7 +291,7 @@ consider
 $$
 Q_1 A = \begin{bmatrix} \times & \times & \cdots & \times \\
 & \times & \cdots & \times \\
-                    & \vdots & \ddots & \vdots \\
+                    & ⋮ & ⋱ & ⋮ \\
                     & \times & \cdots & \times \end{bmatrix} = 
 \begin{bmatrix} r_{11} & r_{12} & \cdots & r_{1n} \\ 
 & 𝐚_2^1 & \cdots & 𝐚_n^1   \end{bmatrix}
@@ -311,7 +311,7 @@ so that
 $$
 Q_2 Q_1A = \begin{bmatrix} \times & \times & \times & \cdots & \times \\
 & \times & \times  & \cdots & \times \\
-                    && \vdots & \ddots & \vdots \\
+                    && ⋮ & ⋱ & ⋮ \\
                     && \times & \cdots & \times \end{bmatrix}  =  \begin{bmatrix} r_{11} & r_{12} & r_{13} & \cdots & r_{1n} \\ 
     & r_{22} & r_{23} & \cdots & r_{2n} \\
 && 𝐚_3^2 & \cdots & 𝐚_n^2   \end{bmatrix}
@@ -334,8 +334,8 @@ $$
 Then
 $$
 Q_n \cdots Q_1 A = \underbrace{\begin{bmatrix} 
-r_{11} & \cdots & r_{1n} \\ & \ddots & \vdots\\
-                                        && r_{nn} \\&& 0 \\ && \vdots \\ && 0 \end{bmatrix}}_R
+r_{11} & \cdots & r_{1n} \\ & ⋱ & ⋮\\
+                                        && r_{nn} \\&& 0 \\ && ⋮ \\ && 0 \end{bmatrix}}_R
 $$
 i.e.
 $$
@@ -456,21 +456,21 @@ Just as Gram–Schmidt can be reinterpreted as a reduced QR decomposition,
 Gaussian elimination with pivoting can be interpreted as a PLU decomposition.
 
 
-### Special lower triangular matrices
+### Special "one-column" lower triangular matrices
 
 
 Consider the following set of $n × n$ lower triangular
-matrices:
+matrices which equals identity apart from one-column:
 $$
-{\cal L}_j := \left\{I + \begin{bmatrix} 𝟎_j \\ 𝐥 \end{bmatrix} 𝐞_j^⊤ : 𝐥 ∈ ℝ^{n-j} \right\}
+{\cal L}_j := \left\{I + \begin{bmatrix} 𝟎_j \\ 𝐥_j \end{bmatrix} 𝐞_j^⊤ : 𝐥_j ∈ ℝ^{n-j} \right\}
 $$
 where  $𝟎_j$ denotes the zero vector of length $j$. 
 That is, if $L_j ∈ {\cal L}_j$ then it is equal to the identity matrix apart from in the $j$ th column:
 $$
 L_j = \begin{bmatrix}
-        1 \\ & {\ddots} \\ && 1 \\
+        1 \\ & {⋱} \\ && 1 \\
                     && ℓ_{j+1,j} & 1 \\
-                    && \vdots && \dots \\
+                    && ⋮ && \dots \\
                     && ℓ_{n,j} & & & 1 \end{bmatrix} = 
 $$
 
@@ -480,12 +480,12 @@ These satisify the following special properties:
 If $L_j \in {\cal L}_j$ then
 $$
 L_j^{-1}  = I - \begin{bmatrix} 𝟎_j \\ 𝐥_j \end{bmatrix} 𝐞_j^⊤ = \begin{bmatrix}
-        1 \\ & \ddots \\ && 1 \\
+        1 \\ & ⋱ \\ && 1 \\
                     &&-ℓ_{j+1,j} & 1 \\
-                    &&\vdots && \dots \\
-                    &&-ℓ_{n,j} & & & 1 \end{bmatrix}
+                    &&⋮ && \dots \\
+                    &&-ℓ_{n,j} & & & 1 \end{bmatrix} ∈ {\cal L}_j.
 $$
-is also in ${\cal L}_j$.
+
 
 **Proposition (one-column lower triangular multiplication)**
 If $L_j \in {\cal L}_j$ and $L_k \in {\cal L}_k$ for $k ≥ j$ then
@@ -495,19 +495,32 @@ $$
 
 
 **Lemma (one-column lower triangular with pivoting)**
-If $P_j$ is a permutation that leaves the first $j$
-rows fixed, $L_k ∈ {\cal L}_k$ and $k < j$ then
+If $σ$ is a permutation that leaves the first $j$
+rows fixed (that is, $σ_ℓ = ℓ$ for $ℓ ≤ j$) and $L_j ∈ {\cal L}_j$ then
 $$
-P_j L_k =  \tilde L_k P_j
+P_σ L_j=  \tilde L_j P_σ
 $$
-where $\tilde L_k ∈ {\cal L}_k$.
+where $\tilde L_j ∈ {\cal L}_j$.
 
 **Proof**
 Write
 $$
-L_k = I + \begin{bmatrix} 𝟎_k \\ 𝐥 \end{bmatrix} 𝐞_k^⊤.
+P_σ = \begin{bmatrix} I_j \\ & P_τ \end{bmatrix}
 $$
-
+where $τ$ is the permutation with Cauchy notation
+$$
+\begin{pmatrix}
+1 & \cdots & n-j \\
+σ_{j+1}-j & ⋯ & σ_n-j
+\end{pmatrix}
+$$
+Then we have
+$$
+P_σ L_j = P_σ + \begin{bmatrix} 𝟎_j \\ P_τ 𝐥_j \end{bmatrix} 𝐞_j^⊤ =
+\underbrace{(I +  \begin{bmatrix} 𝟎_j \\ P_τ 𝐥_j \end{bmatrix} 𝐞_j^⊤)}_{\tilde L_j} P_σ
+$$
+noting that $𝐞_j^⊤ P_σ = 𝐞_j^⊤$ (as $σ_j = j$). 
+∎
 
 
 ### LU Decomposition
@@ -519,9 +532,9 @@ to view this as a _triangular triangularisation_.
 
 Consider the matrix
 $$
-L_1 = \begin{bmatrix} 1 \\ -{a_{21} \over a_{11}} & 1 \\ \vdots &&\ddots \\
+L_1 = \begin{bmatrix} 1 \\ -{a_{21} \over a_{11}} & 1 \\ ⋮ &&⋱ \\
                 -{a_{n1} \over a_{11}}  &&& 1
-                \end{bmatrix} = I - \begin{bmatrix} 0 \\ 𝐚_1[2:n]/𝐚_1[1] \end{bmatrix}  𝐞_1^\top.
+                \end{bmatrix} = I - \begin{bmatrix} 0 \\ {𝐚_1[2:n] \over 𝐚_1[1]} \end{bmatrix}  𝐞_1^\top.
 $$
 We then have
 $$
@@ -530,7 +543,7 @@ L_1 A =  \begin{bmatrix} u_{11} & u_{12} & \cdots & u_{1n} \\
 $$
 where $𝐚_j^1 := (L_1 𝐚_j)[2:n]$ and $u_{1j} = a_{1j}$. But now consider
 $$
-L_2 := I - \begin{bmatrix} 0 \\ 𝐚_2^1[2:n-1]/𝐚_2^1[1] \end{bmatrix}  𝐞_1^\top.
+L_2 := I - \begin{bmatrix} 0 \\ {𝐚_2^1[2:n-1] \over 𝐚_2^1[1]} \end{bmatrix}  𝐞_1^\top.
 $$
 Then
 $$
@@ -548,7 +561,7 @@ The inductive construction is again clear. If we define $𝐚_j^0 := 𝐚_j$ we
 have the construction
 $$
 \begin{align*}
-L_j &:= I + \begin{bmatrix} 𝟎_j \\ 𝐚_{j+1}^j[2:n-j] \end{bmatrix} 𝐞_j^⊤ \\
+L_j &:= I + \begin{bmatrix} 𝟎_j \\ {𝐚_{j+1}^j[2:n-j] \over 𝐚_{j+1}^j[1]} \end{bmatrix} 𝐞_j^⊤ \\
 𝐚_j^k &:= (L_k 𝐚_j^{k-1})[2:n-k+1]
  \\
 u_{kj} &:= (L_k 𝐚_j^{k-1})[1]
@@ -557,7 +570,7 @@ $$
 Then
 $$
 L_{n-1} \cdots L_1 A = \underbrace{\begin{bmatrix} 
-u_{11} & \cdots & u_{1n} \\ & \ddots & \vdots\\
+u_{11} & \cdots & u_{1n} \\ & ⋱ & ⋮\\
                                         && u_{nn}\end{bmatrix}}_U
 $$
 i.e.
@@ -567,13 +580,13 @@ $$
 
 Writing
 $$
-L_j = I + \begin{bmatrix} 𝟎_j \\ \ell_{j+1,j} \\ \vdots \\ \ell_{n,j} \end{bmatrix} 𝐞_j^\top
+L_j = I + \begin{bmatrix} 𝟎_j \\ \ell_{j+1,j} \\ ⋮ \\ \ell_{n,j} \end{bmatrix} 𝐞_j^\top
 $$
 and using the properties of inversion and multiplication we therefore deduce
 $$
 L = \begin{bmatrix} 1 \\ -\ell_{21} & 1 \\
 -\ell_{31} & -\ell_{32} & 1 \\
- \vdots & \vdots & \ddots & \ddots \\
+ ⋮ & ⋮ & ⋱ & ⋱ \\
     -\ell_{n1} & -\ell_{n2} & \cdots & -\ell_{n,n-1} & 1
     \end{bmatrix}
 $$
@@ -581,7 +594,7 @@ $$
 
 
 
-**Example**
+**Example (computer)**
 We will do a numerical example (by-hand is equivalent to Gaussian elimination).
 The first lower triangular matrix is:
 ```julia
@@ -616,7 +629,7 @@ L = inv(L₁)*inv(L₂)*inv(L₃)
 Note how the entries of `L` are indeed identical to the negative
 lower entries of `L₁`, `L₂` and `L₃`.
 
-**Example**
+**Example (by-hand)**
 
 Consider the matrix
 $$
@@ -674,7 +687,7 @@ The entries of $L$ are then again the negative of the entries below the diagonal
 
 Writing
 $$
-\tilde L_j = I + \begin{bmatrix} 𝟎_j \\ \tilde \ell_{j+1,j} \\ \vdots \\ \tilde \ell_{n,j} \end{bmatrix} 𝐞_j^\top
+\tilde L_j = I + \begin{bmatrix} 𝟎_j \\ \tilde \ell_{j+1,j} \\ ⋮ \\ \tilde \ell_{n,j} \end{bmatrix} 𝐞_j^\top
 $$
 and using the properties of inversion and multiplication we therefore deduce
 $$
@@ -682,7 +695,7 @@ L = \begin{bmatrix}
 1 \\ 
 -\tilde \ell_{21} & 1 \\
 -\tilde \ell_{31} & -\tilde \ell_{32} & 1 \\
- \vdots & \vdots & \ddots & \ddots \\
+ ⋮ & ⋮ & ⋱ & ⋱ \\
  -\tilde \ell_{n-1,1} & -\tilde \ell_{n-1,2} & \cdots &  - \tilde \ell_{n-1,n-2} & 1 \\
     -\tilde \ell_{n1} & -\tilde \ell_{n2} & \cdots &  - \tilde \ell_{n,n-2} &  -\ell_{n,n-1} & 1
 \end{bmatrix}
@@ -699,7 +712,7 @@ A = \begin{bmatrix} 1 & 1 & 1 \\
                     1 & 4 & 9
                     \end{bmatrix}
 $$
-Even though $A[1,1] \neq 0$, we still pivot: placing 
+Even though $a_{11} = 1 \neq 0$, we still pivot: placing 
 the maximum entry on the diagonal to mitigate numerical errors.
 That is, we do
 $$
@@ -739,6 +752,24 @@ $$
 L = \begin{bmatrix} 1\\ {1 \over 2} & 1 \\  {1 \over 2}  & -{1 \over 2} & 1 \end{bmatrix}
 $$
 
+We see how this example is done on a computer:
+```julia
+A = [1 1 1;
+     2 4 8;
+     1 4 9]
+L,U,σ = lu(A) # σ is a vector encoding the permutation
+```
+The permutation is
+```julia
+σ
+```
+Thus to invert a system we can do:
+```julia
+b = randn(3)
+U\(L\b[σ]) == A\b
+```
+Note the entries match exactly because this precisely what `\` is using.
+
 ## 3. Cholesky Decomposition
 
 Cholesky Decomposition is a form of Gaussian elimination (without pivoting)
@@ -774,7 +805,7 @@ positive definite.
 We leave the proofs to the problem sheets. Here is the key result:
 
 
-**Theorem (Cholesky existence)** A matrix $A$ is symmetric positive definite if and only if it has a Cholesky decomposition
+**Theorem (Cholesky and sym. pos. def.)** A matrix $A$ is symmetric positive definite if and only if it has a Cholesky decomposition
 $$
 A = L L^⊤
 $$
@@ -810,8 +841,25 @@ satisfies $A = L L^⊤$.
 ∎
 
 
-Note hidden in this proof is a simple algorithm form computing the Cholesky decomposition:
-Write
+Note hidden in this proof is a simple algorithm form computing the Cholesky decomposition.
+We define
+$$
+\begin{align*}
+A_1 &:= A \\
+𝐯_k &:= A_k[2:n-k+1,1] \\
+α_k &:= A_k[1,1] \\
+A_{k+1} &:= A_k[2:n-k+1,2:n-k+1] - {𝐯_k 𝐯_k^⊤ \over α_k}.
+\end{align*}
+$$
+Then
+$$
+L = \begin{bmatrix} \sqrt{α_1} \\
+    {𝐯_1[1] \over \sqrt{α_1}}  &  \sqrt{α_2} \\
+    {𝐯_1[2] \over \sqrt{α_1}}  & {𝐯_2[1] \over \sqrt{α_2}} &  \sqrt{α_2} \\
+    ⋮ & ⋮ & ⋱ & ⋱ \\
+    {𝐯_1[n-1] \over \sqrt{α_1}} &{𝐯_2[n-2] \over \sqrt{α_2}} & ⋯ & {𝐯_{n-1}[1] \over \sqrt{α_{n-1}}} & \sqrt{α_{n}}
+    \end{bmatrix}
+$$
 
 This algorithm succeeds if and only if $A$ is symmetric positive definite.
 
@@ -827,13 +875,13 @@ $$
 Then
 $$
 A_1 = \begin{bmatrix}
-2 &1 &1 
-1 & 2 & 1 
+2 &1 &1 \\
+1 & 2 & 1 \\
 1 & 1 & 2 
 \end{bmatrix} - {1 \over 2} \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} \begin{bmatrix} 1 & 1 & 1 \end{bmatrix} =
 {1 \over 2} \begin{bmatrix}
-3 &1 &1 
-1 & 3 & 1 
+3 & 1 & 1 \\
+1 & 3 & 1 \\
 1 & 1 & 3 
 \end{bmatrix}
 $$
@@ -847,7 +895,7 @@ A_2 = {1 \over 2} \left( \begin{bmatrix}
 $$
 Finally
 $$
-A_3 = {4 \over 3} - 
+A_3 = {5 \over 4}.
 $$
 Thus we get
 $$
@@ -895,7 +943,7 @@ function badmatrix(n)
 end
 A = badmatrix(5)
 ```
-Note that pivoting will occur, thus the PLU Decomposition is an LU decomposition:
+Note that pivoting will not occur (we do not pivot as the entries below the diagonal are the same magnitude as the diagonal), thus the PLU Decomposition is equivalent to an LU decomposition:
 ```julia
 L,U = lu(A)
 ```
