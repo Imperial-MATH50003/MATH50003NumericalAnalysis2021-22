@@ -1,7 +1,9 @@
 # Decompositions and least squares
 
 
-In this lecture, we look at several factorizations of a matrix. For a square or rectangular matrix $A ∈ ℝ^{m × n}$ with more rows than columns ($m ≥ n$), we consider:
+We now look at several decompositions (or factorisations) 
+of a matrix into products of structured matrices, and their use in solving least squares problems and linear systems.
+For a square or rectangular matrix $A ∈ ℝ^{m × n}$ with more rows than columns ($m ≥ n$), we consider:
 1. The _QR decomposition_
 $$
 A = Q R = \underbrace{\begin{bmatrix} 𝐪_1 | \cdots | 𝐪_m \end{bmatrix}}_{m × m} \underbrace{\begin{bmatrix} × & \cdots & × \\ & \ddots & \vdots \\ && × \\ &&0 \\ &&\vdots \\ && 0 \end{bmatrix}}_{m × n}
@@ -46,7 +48,7 @@ $$
 In this lecture we discuss the followng:
 
 1. QR and least squares: We discuss the QR decomposition and its usage in solving least squares problems.
-2. Reduced QR and Gram–Schmidt: We discuss computation of the Reduced QR decomposition using Gram–Schmidt
+2. Reduced QR and Gram–Schmidt: We discuss computation of the Reduced QR decomposition using Gram–Schmidt.
 3. Householder reflections and QR: We discuss comuting the  QR decomposition using Householder reflections.
 2. PLU decomposition: we discuss how the LU decomposition can be computed using Gaussian elimination, and the computation of
 the PLU decomposition via Gaussian elimination with pivoting.
@@ -69,7 +71,6 @@ $$
 A = QR = \begin{bmatrix} Q̂ | 𝐪_{n+1} | ⋯ | 𝐪_m \end{bmatrix} \begin{bmatrix} R̂ \\  𝟎_{m-n × n} \end{bmatrix} = Q̂ R̂.
 $$
 
-### Relationship with least squares
 
 We can use it to solve a least squares problem using the norm-preserving property (see PS3) of orthogonal matrices:
 $$
@@ -87,18 +88,18 @@ $$
 𝐱 = R̂^{-1} Q̂^⊤ 𝐛
 $$
 
-**Example (quadratic fit)** Suppose we want to find noisy data by a quadratic
+**Example (quadratic fit)** Suppose we want to fit noisy data by a quadratic
 $$
-p(x) = a + bx + cx^2
+p(x) = p₀ + p₁ x + p₂ x^2
 $$
-That is, we want to choose $a,b,c$ at data samples $x_1, \ldots, x_m$ so that the following is true:
+That is, we want to choose $p₀,p₁,p₂$ at data samples $x_1, \ldots, x_m$ so that the following is true:
 $$
-a + b x_k + c x_k^2 ≈ f_k
+p₀ + p₁ x_k + p₂ x_k^2 ≈ f_k
 $$
 where $f_k$ are given by data. We can reinterpret this as a least squares problem: minimise the norm
 $$
 \left\| \begin{bmatrix} 1 & x_1 & x_1^2 \\ \vdots & \vdots & \vdots \\ 1 & x_m & x_m^2 \end{bmatrix}
-\begin{bmatrix} a \\ b \\ c \end{bmatrix} - \begin{bmatrix} f_1 \\ \vdots \\ f_m \end{bmatrix} \right \|
+\begin{bmatrix} p₀ \\ p₁ \\ p₂ \end{bmatrix} - \begin{bmatrix} f_1 \\ \vdots \\ f_m \end{bmatrix} \right \|
 $$
 We can solve this using the QR decomposition:
 ```julia
@@ -111,11 +112,11 @@ A = x .^ (0:2)'  # 100 x 3 matrix, equivalent to [ones(m) x x.^2]
 Q,R̂ = qr(A)
 Q̂ = Q[:,1:n] # Q represents full orthogonal matrix so we take first 3 columns
 
-a,b,c = R̂ \ Q̂'f
+p₀,p₁,p₂ = R̂ \ Q̂'f
 ```
 We can visualise the fit:
 ```julia
-p = x -> a + b*x + c*x^2
+p = x -> p₀ + p₁*x + p₂*x^2
 
 scatter(x, f; label="samples", legend=:bottomright)
 plot!(x, p.(x); label="quadratic")
@@ -137,10 +138,10 @@ you may have seen before in another guise. Write
 $$
 A = \begin{bmatrix} 𝐚_1 | \dots | 𝐚_n \end{bmatrix}
 $$
-where $𝐚_k \in  ℝ^m$.
+where $𝐚_k \in  ℝ^m$ and assume they are linearly independent ($A$ has full column rank).
 Note that the column span of the first $j$ columns of $A$
-will be the same as the first $j$ columns of $Q̂$, assuming that 
-$R̂$ is non-singular:
+will be the same as the first $j$ columns of $Q̂$, as
+$R̂$ must be non-singular:
 $$
 \hbox{span}(𝐚_1,\ldots,𝐚_j) = \hbox{span}(𝐪_1,\ldots,𝐪_j)
 $$
@@ -156,7 +157,7 @@ $$
 $$
  while if $𝐰 ∈ \hbox{span}(𝐪_1,\ldots,𝐪_j)$ we have for $𝐝 ∈ ℝ^j$
 $$
-𝐰 = \begin{bmatrix} 𝐪_1 | \dots | 𝐪_j \end{bmatrix} 𝐝  =  \begin{bmatrix} 𝐚_1 | \dots | 𝐚_j \end{bmatrix} R̂[1:j,1:j]^{-1} 𝐜 ∈  \hbox{span}(𝐚_1,\ldots,𝐚_j).
+𝐰 = \begin{bmatrix} 𝐪_1 | \dots | 𝐪_j \end{bmatrix} 𝐝  =  \begin{bmatrix} 𝐚_1 | \dots | 𝐚_j \end{bmatrix} R̂[1:j,1:j]^{-1} 𝐝 ∈  \hbox{span}(𝐚_1,\ldots,𝐚_j).
 $$
 
  
@@ -168,10 +169,10 @@ $$
 $$
 where $𝐪_1,\ldots,𝐪_{j-1}$ are orthogonal:
 $$
-𝐪_k^\top 𝐪_ℓ = δ_{kℓ} = \begin{cases} 1 & k  ℓ \\
+𝐪_k^\top 𝐪_ℓ = δ_{kℓ} = \begin{cases} 1 & k = ℓ \\
                                             0 & \hbox{otherwise} \end{cases}.
 $$
-for $k,ℓ < 1$.
+for $k,ℓ < j$.
 Define
 $$
 𝐯_j := 𝐚_j - \sum_{k=1}^{j-1} \underbrace{𝐪_k^\top 𝐚_j}_{r_{kj}} 𝐪_k
@@ -184,7 +185,7 @@ Then we define
 $$
 𝐪_j := {𝐯_j \over \|𝐯_j\|}.
 $$
-which sastisfies the same properties as the assumption.
+which sastisfies $𝐪_k^\top 𝐪_j =δ_{kj}$ for $k \leq j$.
 
 We now reinterpret this construction as a reduced QR decomposition.
 Define
@@ -200,7 +201,8 @@ $$
 \begin{bmatrix} 𝐚_1|\cdots|𝐚_j \end{bmatrix} 
 \begin{bmatrix} r_{11} & \cdots & r_{1j} \\ & \ddots & \vdots \\ && r_{jj} \end{bmatrix}
 $$
-That is, we are computing the reduced QR decomposition column-by-column. Running this algorithm to $j = n$ completes the decomposition.
+That is, we are computing the reduced QR decomposition column-by-column. 
+Running this algorithm to $j = n$ completes the decomposition.
 
 ### Gram–Schmidt in action
 
@@ -210,9 +212,6 @@ m,n = 5,4
 A = randn(m,n)
 Q,R̂ = qr(A)
 Q̂ = Q[:,1:n]
-```
-```julia
-R̂
 ```
 The first column of `Q̂` is indeed a normalised first column of `A`:
 ```julia
@@ -457,6 +456,60 @@ Just as Gram–Schmidt can be reinterpreted as a reduced QR decomposition,
 Gaussian elimination with pivoting can be interpreted as a PLU decomposition.
 
 
+### Special lower triangular matrices
+
+
+Consider the following set of $n × n$ lower triangular
+matrices:
+$$
+{\cal L}_j := \left\{I + \begin{bmatrix} 𝟎_j \\ 𝐥 \end{bmatrix} 𝐞_j^⊤ : 𝐥 ∈ ℝ^{n-j} \right\}
+$$
+where  $𝟎_j$ denotes the zero vector of length $j$. 
+That is, if $L_j ∈ {\cal L}_j$ then it is equal to the identity matrix apart from in the $j$ th column:
+$$
+L_j = \begin{bmatrix}
+        1 \\ & {\ddots} \\ && 1 \\
+                    && ℓ_{j+1,j} & 1 \\
+                    && \vdots && \dots \\
+                    && ℓ_{n,j} & & & 1 \end{bmatrix} = 
+$$
+
+These satisify the following special properties:
+
+**Proposition (one-column lower triangular inverse)**
+If $L_j \in {\cal L}_j$ then
+$$
+L_j^{-1}  = I - \begin{bmatrix} 𝟎_j \\ 𝐥_j \end{bmatrix} 𝐞_j^⊤ = \begin{bmatrix}
+        1 \\ & \ddots \\ && 1 \\
+                    &&-ℓ_{j+1,j} & 1 \\
+                    &&\vdots && \dots \\
+                    &&-ℓ_{n,j} & & & 1 \end{bmatrix}
+$$
+is also in ${\cal L}_j$.
+
+**Proposition (one-column lower triangular multiplication)**
+If $L_j \in {\cal L}_j$ and $L_k \in {\cal L}_k$ for $k ≥ j$ then
+$$
+L_j L_k =  I + \begin{bmatrix} 𝟎_j \\ 𝐥_j \end{bmatrix} 𝐞_j^⊤ +  \begin{bmatrix} 𝟎_k \\ 𝐥_k \end{bmatrix} 𝐞_k^⊤
+$$
+
+
+**Lemma (one-column lower triangular with pivoting)**
+If $P_j$ is a permutation that leaves the first $j$
+rows fixed, $L_k ∈ {\cal L}_k$ and $k < j$ then
+$$
+P_j L_k =  \tilde L_k P_j
+$$
+where $\tilde L_k ∈ {\cal L}_k$.
+
+**Proof**
+Write
+$$
+L_k = I + \begin{bmatrix} 𝟎_k \\ 𝐥 \end{bmatrix} 𝐞_k^⊤.
+$$
+
+
+
 ### LU Decomposition
 
 Before discussing pivoting, consider standard Gaussian elimation where one row-reduces
@@ -466,22 +519,18 @@ to view this as a _triangular triangularisation_.
 
 Consider the matrix
 $$
-L_𝐯 = \begin{bmatrix} 1 \\ -{v_2 \over v_1} & 1 \\ \vdots &&\ddots \\
-                -{v_n \over v_1}  &&& 1
-                \end{bmatrix} = I -\left[{𝐯 \over v_1}  - 𝐞_1 \right] 𝐞_1^\top
+L_1 = \begin{bmatrix} 1 \\ -{a_{21} \over a_{11}} & 1 \\ \vdots &&\ddots \\
+                -{a_{n1} \over a_{11}}  &&& 1
+                \end{bmatrix} = I - \begin{bmatrix} 0 \\ 𝐚_1[2:n]/𝐚_1[1] \end{bmatrix}  𝐞_1^\top.
 $$
-so that
-$$
-L_𝐯 𝐯 = 𝐯 - (𝐯 - v_1 𝐞_1) = v_1 𝐞_1.
-$$
-For $L_1 := L_{𝐚_1}$ we have 
+We then have
 $$
 L_1 A =  \begin{bmatrix} u_{11} & u_{12} & \cdots & u_{1n} \\ 
 & 𝐚_2^1 & \cdots & 𝐚_n^1   \end{bmatrix}
 $$
-where $𝐚_j^1 := (L_1 𝐚_j)[2:m]$ and $u_{1j} = a_{1j}$. But now consider
+where $𝐚_j^1 := (L_1 𝐚_j)[2:n]$ and $u_{1j} = a_{1j}$. But now consider
 $$
-L_2 := \begin{bmatrix} 1  \\ & L_{𝐚_2^1} \end{bmatrix}.
+L_2 := I - \begin{bmatrix} 0 \\ 𝐚_2^1[2:n-1]/𝐚_2^1[1] \end{bmatrix}  𝐞_1^\top.
 $$
 Then
 $$
@@ -491,7 +540,7 @@ L_2 L_1 A = \begin{bmatrix} u_{11} & u_{12} & u_{13} & \cdots & u_{1n} \\
 $$
 where 
 $$
-r_{2j} :=  (𝐚_j^1)[1] \qquad \hbox{and} \qquad 𝐚_j^2 := (L_2 𝐚_j^1)[2:m-1]
+r_{2j} :=  (𝐚_j^1)[1] \qquad \hbox{and} \qquad 𝐚_j^2 := (L_2 𝐚_j^1)[2:n-1]
 $$
 Thus the first two columns are triangular. 
 
@@ -499,8 +548,8 @@ The inductive construction is again clear. If we define $𝐚_j^0 := 𝐚_j$ we
 have the construction
 $$
 \begin{align*}
-L_j &:= \begin{bmatrix} I_{j-1 \times j-1}  \\ & L_{𝐚_j^j} \end{bmatrix} \\
-𝐚_j^k &:= (L_k 𝐚_j^{k-1})[2:m-k+1]
+L_j &:= I + \begin{bmatrix} 𝟎_j \\ 𝐚_{j+1}^j[2:n-j] \end{bmatrix} 𝐞_j^⊤ \\
+𝐚_j^k &:= (L_k 𝐚_j^{k-1})[2:n-k+1]
  \\
 u_{kj} &:= (L_k 𝐚_j^{k-1})[1]
 \end{align*}
@@ -516,32 +565,17 @@ $$
 A = \underbrace{L_{n-1}^{-1} \cdots L_1^{-1}}_L U.
 $$
 
-Now we establish properties of our special class of lower-triangular matrices. Consider $n × n$ lower triangular
-matrices that are equal to the identity matrix apart from in the $j$th column:
+Writing
 $$
-L_j = \begin{bmatrix}
-        1 \\ & \ddots \\ && 1 \\
-                    ℓ_{j+1,j} & 1 \\
-                    \vdots && \dots \\
-                    ℓ_{n,j} & & & 1 \end{bmatrix} = I + \begin{bmatrix} 𝟎_j \\ 𝐥_j \end{bmatrix} 𝐞_j^⊤
+L_j = I + \begin{bmatrix} 𝟎_j \\ \ell_{j+1,j} \\ \vdots \\ \ell_{n,j} \end{bmatrix} 𝐞_j^\top
 $$
-where $𝐥_j ∈ ℝ^{n-j}$. These satisify the following special properties:
+and using the properties of inversion and multiplication we therefore deduce
 $$
-L_j^{-1} = \begin{bmatrix}
-        1 \\ & \ddots \\ && 1 \\
-                    -ℓ_{j+1,j} & 1 \\
-                    \vdots && \dots \\
-                    -ℓ_{n,j} & & & 1 \end{bmatrix} = I - \begin{bmatrix} 𝟎_j \\ 𝐥_j \end{bmatrix} 𝐞_j^⊤
-$$
-and if $k > j$
-$$
-L_j^{-1} L_k^{-1} =  I - \begin{bmatrix} 𝟎_j \\ 𝐥_j \end{bmatrix} 𝐞_j^⊤ -  \begin{bmatrix} 𝟎_k \\ 𝐥_k \end{bmatrix} 𝐞_k^⊤
-$$
-Thus we have
-$$
-L = \begin{bmatrix}
-
-\end{bmatrix}
+L = \begin{bmatrix} 1 \\ -\ell_{21} & 1 \\
+-\ell_{31} & -\ell_{32} & 1 \\
+ \vdots & \vdots & \ddots & \ddots \\
+    -\ell_{n1} & -\ell_{n2} & \cdots & -\ell_{n,n-1} & 1
+    \end{bmatrix}
 $$
 
 
@@ -624,24 +658,36 @@ $$
 L_{n-1} P_{n-1} \cdots P_2 L_1 P_1 A = U
 $$
 where $P_j$ is a permutation that leaves rows 1 through $j-1$ fixed,
-and swaps row $j$ with a row $k \geq j$.
+and swaps row $j$ with a row $k \geq j$ whose entry is maximal in absolute value.
 
-But note that since $P_2$ leaves row 1 alone we have $𝐞_1^⊤ P_2^\top = 𝐞_1^⊤$
-and thus we have 
-$$
-P_2 L_1 = P_2  + \begin{bmatrix} 0 \\ \tilde 𝐥_1 \end{bmatrix} 𝐞_1^⊤ = \tilde L_1 P_2
-$$
-More generally, if $P_j$ is a permutation that leaves the first $j$
-rows fixed and $k < j$ then
-$$
-P_j L_k =  \tilde L_k P_j
-$$
-where $\tilde L_k$ has the same structure as $L_k$. 
 Thus we can deduce that 
 $$
-(L_{n-1} P_{n-1} \cdots P_2 L_1 P_1)^{-1} = (L_{n-1} \tilde L_{n-2} \cdots  \tilde L_1  P_{n-1} \cdots P_2 P_1)^{-1} = 
-\underbrace{P_1 \cdots P_{n-1}}_{P^\top} \underbrace{\tilde L_1^{-1} \cdots \tilde L_{n-1}^{-1}}_{L}.
+L_{n-1} P_{n-1} \cdots P_2 L_1 P_1 = \underbrace{L_{n-1} \tilde L_{n-2} \cdots  \tilde L_1}_{L^{-1}}  \underbrace{P_{n-1} \cdots P_2 P_1}_P.
 $$
+where the tilde denotes the combined actions of swapping the permutation and lower-triangular matrices, that is,
+$$
+P_{n-1}\cdots P_{j+1} L_j = \tilde L_j P_{n-1}\cdots P_{j+1}.
+$$
+where $\tilde L_j \in {\cal L}_j$.
+The entries of $L$ are then again the negative of the entries below the diagonal of $L_{n-1}, \tilde L_{n-2}, \ldots,\tilde L_1$.
+
+
+Writing
+$$
+\tilde L_j = I + \begin{bmatrix} 𝟎_j \\ \tilde \ell_{j+1,j} \\ \vdots \\ \tilde \ell_{n,j} \end{bmatrix} 𝐞_j^\top
+$$
+and using the properties of inversion and multiplication we therefore deduce
+$$
+L = \begin{bmatrix} 
+1 \\ 
+-\tilde \ell_{21} & 1 \\
+-\tilde \ell_{31} & -\tilde \ell_{32} & 1 \\
+ \vdots & \vdots & \ddots & \ddots \\
+ -\tilde \ell_{n-1,1} & -\tilde \ell_{n-1,2} & \cdots &  - \tilde \ell_{n-1,n-2} & 1 \\
+    -\tilde \ell_{n1} & -\tilde \ell_{n2} & \cdots &  - \tilde \ell_{n,n-2} &  -\ell_{n,n-1} & 1
+\end{bmatrix}
+$$
+
 
 
 **Example**
@@ -661,30 +707,36 @@ L_2 P_2 L_1 P_1 A = L_2 P_2 L_1\begin{bmatrix} 0 & 1 \\ 1 & 0 \\ && 1 \end{bmatr
 \begin{bmatrix} 1 & 1 & 1 \\
                     2 & 4 & 8 \\
                     1 & 4 & 9
-                    \end{bmatrix} = L_2 P_2 \begin{bmatrix}1 \\ -{1 \over 2} & 1 \\ -1 && 1 \end{bmatrix}
+                    \end{bmatrix} = 
+                    L_2 P_2 \begin{bmatrix}1 \\ -{1 \over 2} & 1 \\ -{1 \over 2} && 1 \end{bmatrix}
 \begin{bmatrix} 2 & 4 & 8 \\
                 1 & 1 & 1 \\
                     1 & 4 & 9
                     \end{bmatrix}
-                    = L_2 \begin{bmatrix}
+                    = 
+                    L_2 \begin{bmatrix}
                     1 \\ &0 & 1 \\ &1 & 0 \end{bmatrix}
 \begin{bmatrix} 2 & 4 & 8 \\
                 0 & -1 & -3 \\
-                    0 & 3 & 8
+                    0 & 2 & 5
                     \end{bmatrix}
-                    = \begin{bmatrix} 1\\ & 1 \\ & {1 \over 3} & 1 \end{bmatrix}
+                    = \begin{bmatrix} 1\\ & 1 \\ & {1 \over 2} & 1 \end{bmatrix}
 \begin{bmatrix} 2 & 4 & 8 \\
-                0 & 3 & 8 \\
+                0 & 2 & 5 \\
                 0 & -1 & -3 
                     \end{bmatrix} = 
                     \underbrace{\begin{bmatrix} 2 & 4 & 8 \\
                 0 & 2 & 5 \\
-                0 & 0 & -{1 \over 3}
+                0 & 0 & -{1 \over 2}
                     \end{bmatrix}}_U
 $$
 We now reduce:
 $$
-L_2 P_2 L_1 P_1 = \begin{bmatrix} 1\\ & 1 \\ & {1 \over 2} & 1 \end{bmatrix}  
+L_2 P_2 L_1 P_1 = \underbrace{\begin{bmatrix} 1\\ -{1 \over 2} & 1 \\  -{1 \over 2}  & {1 \over 2} & 1 \end{bmatrix}}_{L_2 \tilde L_1} \underbrace{\begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \\ 1 & 0 & 0 \end{bmatrix}}_P
+$$
+That is
+$$
+L = \begin{bmatrix} 1\\ {1 \over 2} & 1 \\  {1 \over 2}  & -{1 \over 2} & 1 \end{bmatrix}
 $$
 
 ## 3. Cholesky Decomposition
@@ -699,6 +751,8 @@ for all $𝐱 \in ℝ^n$ we have
 $$
 𝐱^\top A 𝐱 > 0
 $$
+
+First we establish some basic properties of positive definite matrices:
 
 **Proposition (conj. pos. def.)** If  $A \in ℝ^{n \times n}$ is positive definite and 
 $V \in ℝ^{n \times n}$ is non-singular then
@@ -717,10 +771,23 @@ positive definite.
 
 
 
-We leave the proofs to the problem sheets.
+We leave the proofs to the problem sheets. Here is the key result:
 
 
-Write a symmetric pos. def. matrix as
+**Theorem (Cholesky existence)** A matrix $A$ is symmetric positive definite if and only if it has a Cholesky decomposition
+$$
+A = L L^⊤
+$$
+where the diagonals of $L$ are positive.
+
+**Proof** If $A$ has a Cholesky decomposition it is symmetric ($A^⊤ = (L L^⊤)^⊤ = A$) and for $𝐱 ≠ 0$ we have
+$$
+𝐱^⊤ A 𝐱 = (L𝐱)^⊤ L 𝐱 = \|L𝐱\|^2 > 0
+$$
+where we use the fact that $L$ is non-singular.
+
+For the other direction we will prove it by induction, with the $1 × 1$ case being trivial. 
+Write
 $$
 A = \begin{bmatrix} α & 𝐯^\top \\
                     𝐯   & K
@@ -730,9 +797,65 @@ A = \begin{bmatrix} α & 𝐯^\top \\
                                     \underbrace{\begin{bmatrix} \sqrt{α} & {𝐯^\top \over \sqrt{α}} \\
                                      & I \end{bmatrix}}_{L_1^\top}.
 $$
-Note that $A_1$ is positive definite (because $A_1 = L_1^{-1} A L_1^{-\top}$) and therefore
-$K - {𝐯 𝐯^\top \over α}$ is also positive definite (as it is a subslice of $A_1$).
-Thus we can repeat. 
+Note that $K - {𝐯 𝐯^\top \over α}$ is a subslice of $A_1 = L_1^{-1} A L_1^{-⊤}$, hence by the previous propositions is
+itself symmetric positive definite. Thus we can write 
+$$
+K - {𝐯 𝐯^\top \over α} = \tilde L \tilde L^⊤
+$$
+and hence $A = L L^⊤$ for
+$$
+L= L_1 \begin{bmatrix}1 \\ & \tilde L \end{bmatrix}.
+$$
+satisfies $A = L L^⊤$.
+∎
+
+
+Note hidden in this proof is a simple algorithm form computing the Cholesky decomposition:
+Write
+
+This algorithm succeeds if and only if $A$ is symmetric positive definite.
+
+**Example** Consider the matrix
+$$
+A_0 = A = \begin{bmatrix}
+2 &1 &1 &1 \\
+1 & 2 & 1 & 1 \\
+1 & 1 & 2 & 1 \\
+1 & 1 & 1 & 2
+\end{bmatrix}
+$$
+Then
+$$
+A_1 = \begin{bmatrix}
+2 &1 &1 
+1 & 2 & 1 
+1 & 1 & 2 
+\end{bmatrix} - {1 \over 2} \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} \begin{bmatrix} 1 & 1 & 1 \end{bmatrix} =
+{1 \over 2} \begin{bmatrix}
+3 &1 &1 
+1 & 3 & 1 
+1 & 1 & 3 
+\end{bmatrix}
+$$
+Continuing, we have 
+$$
+A_2 = {1 \over 2} \left( \begin{bmatrix}
+3 & 1 \\ 1 & 3
+\end{bmatrix} - {1 \over 3} \begin{bmatrix} 1 \\ 1  \end{bmatrix} \begin{bmatrix} 1 & 1  \end{bmatrix}
+\right)
+= {1 \over 3} \begin{bmatrix} 4 & 1 \\ 1 & 4 \end{bmatrix}
+$$
+Finally
+$$
+A_3 = {4 \over 3} - 
+$$
+Thus we get
+$$
+L= L_1 L_2 L_3 = \begin{bmatrix} \sqrt{2} \\ {1 \over \sqrt{2}} & {\sqrt{3} \over 2} \\ 
+{1 \over \sqrt{2}} & {1 \over \sqrt 6} & {2 \over \sqrt{3}} \\
+{1 \over \sqrt{2}} & {1 \over \sqrt 6} & {1 \over \sqrt{12}} & {\sqrt{5} \over 2}
+\end{bmatrix}
+$$
 
 
 # 4. Timings

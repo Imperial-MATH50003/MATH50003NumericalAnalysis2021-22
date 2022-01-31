@@ -89,3 +89,4 @@ Modify `Reflection` to support a sequence of Householder reflections:
 **Problem 3.1⋆**  Describe an algorithm for computing the QR decomposition
 of a tridiagonal matrix using rotations instead of reflections.
 
+## PLU
