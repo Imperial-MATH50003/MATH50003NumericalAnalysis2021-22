@@ -1,7 +1,7 @@
 # MATH50003 Numerical Analysis: Problem Sheet 2
 
 This week we look at other variants of finite-differences, including central differences and second-order
-finite-differences. We also investigate mathematical properties of dual numbers, extend their implementation to
+finite-differences. We also investigate mathematical properties of dual numbers and extend their implementation to
 other functions. Finally, we see how dual numbers can be combined with Newton iteration for root finding.
 
 Questions marked with a ⋆ are meant to be completed without using a computer.
@@ -13,14 +13,108 @@ $$
 f'(x) ≈ {f(x + h) - f(x - h) \over 2h}.
 $$
 Find an error bound when implemented in floating point arithmetic, assuming that
-$$
-f^{\rm FP}(x) = f(x) + δ_x
-$$
-where $|δ_x| \leq c ϵ_{\rm m}$.
+$$f^{\rm FP}(x) = f(x) + \delta_x$$
+where $|\delta_x| \leq c \epsilon_{\rm m}$.
+
+**SOLUTION**
+
+By Taylor's theorem, the approximation around $x+h$ is
+$$f(x+h) = f(x) + f'(x)h + \frac{f''(x)}{2}h^2 + \frac{f'''(z_1)}{6}h^3,$$
+for some $z_1 \in (x, x+h)$ and similarly
+$$f(x-h) = f(x) + f'(x)(-h) + \frac{f''(x)}{2}h^2 - \frac{f'''(z_2)}{6}h^3,$$
+for some $z_2 \in (x-h, x)$.
+
+Subtracting the second expression from the first we obtain
+$$f(x+h)-f(x-h) = f'(x)(2h) + \frac{f'''(z_1)+f'''(z_2)}{6}h^3.$$
+Hence,
+
+$$f'(x) = \frac{f(x+h)-f(x-h)}{2h} - \frac{f'''(z_1)+f'''(z_2)}{12}h^2.$$
+
+Thus, the error can be bounded by
+$$\left|\frac{f'''(z_1)+f'''(z_2)}{12}h^2\right|\le C h^2,$$
+where
+$$C=\max_{y \in [x-h,x+h]}\left| \frac{f'''(y)}{6}\right|.$$
+
+The error in floating point arithmetic is
+$$\left|f'^{FP}(x) - f'(x)\right| = \left|\frac{f^{FP}(x+h)-f^{FP}(x-h)}{2h} - \frac{f(x+h)-f(x-h)}{2h} +\frac{f'''(z_1)+f'''(z_2)}{12}h^2\right|$$
+$$\le \left| \frac{\delta_{x+h} - \delta_{x-h}}{2h} \right| + Ch^2 \le \frac{c ϵ_{\rm m}}{h} + Ch^2.$$
 
 **Problem 1.2** Implement central differences for $f(x) = 1 + x + x^2$ and $g(x) = 1 + x/3 + x^2$. 
 Plot the errors for `h = 2.0 .^ (0:-1:-60)` and `h = 10.0 .^ (0:-1:-16)`. 
 Derive the error exactly for the different cases to explain the observed behaviour.
+
+**SOLUTION**
+
+```julia
+using Plots
+
+# define the functions
+function f(x)
+    ret = 1 .+ x + x.^2
+end
+function g(x)
+    ret = 1 .+ x./3 + x.^2
+end
+
+# define analytic first derivatives for comparison
+function fp(x)
+    ret = 1 .+ 2 .*x
+end
+function gp(x)
+    ret = 1/3 .+ 2 .*x
+end
+
+# central difference derivative approximation
+function centraldiff(x, h, f)
+    ret = (f(x .+ h) - f(x .- h))./(2 .*h)
+end
+    
+# computes an error vector
+function centraldifferror(x, h, f, fp)
+    ret = abs.(centraldiff(x, h, f) - fp(x)*ones(length(h)))
+end
+        
+#plotting f and g errors   
+x = 0.0 # some arbitrary point
+
+# helper function to avoid trying to take logs of 0 in plots
+errhelper(x) = iszero(x) ? NaN : abs(x)
+
+# We find the error for the derivative of f is 0 
+# (until we run into the errors for too small h we discussed in the lecture)
+h = 2.0 .^ (0:-1:-60)
+scatter(h,errhelper.(centraldifferror(x, h, f, fp)), yaxis=:log10, xaxis=:log10, legend=false)
+```
+```julia
+h = 10.0 .^ (0:-1:-16)
+scatter(h,errhelper.(centraldifferror(x, h, f, fp)), yaxis=:log10, xaxis=:log10, legend=false)
+```
+```julia
+# Now let's plot the errors for g
+h = 2.0 .^ (0:-1:-60)
+scatter(h,errhelper.(centraldifferror(x, h, g, gp)), yaxis=:log10, xaxis=:log10, legend=false)
+```
+```julia
+# Now let's plot the errors for g
+h = 10.0 .^ (0:-1:-16)
+scatter(h,errhelper.(centraldifferror(x, h, g, gp)), yaxis=:log10, xaxis=:log10, legend=false)
+```
+
+To compute the errors of the central difference approximation of $f'(x)$ we compute
+
+$$\left| \frac{f(x+h)-f(x-h)}{2h} - f'(x) \right|=$$
+$$ =\left| \frac{1 + (x+h) + (x+h)^2 - 1 - (x-h) - (x-h)^2}{2h} - (1+2x)\right|=$$
+$$ =\left| \frac{2h + 4hx}{2h} - 1 -2x\right| = 0.$$
+
+As we can see, in this case the central difference approximation is exact. The errors we start observing for small step sizes are thus numerical in nature. The values of the function at $f(x+h)$ and $f(x-h)$ eventually become numerically indistinguishable and thus this finite difference approximation to the derivative incorrectly results in $0$.
+
+
+To compute the errors of the central difference approximation of $g'(x)$ we compute
+
+$$\left| \frac{g(x+h)-g(x-h)}{2h} - g'(x) \right|=$$
+$$ =\left| \frac{1 + \frac{(x+h)}{3} + (x+h)^2 - 1 - \frac{(x-h)}{3} - (x-h)^2}{2h} - \left(\frac{1}{3}+2x \right)\right|=$$
+$$ =\left| \frac{1}{3} + 2x - \frac{1}{3} - 2x\right| = 0.$$
+
 
 
 **Problem 1.3⋆** Use Taylor's theorem to derive an error bound on the second-order derivative approximation
@@ -33,6 +127,33 @@ f^{\rm FP}(x) = f(x) + δ_x
 $$
 where $|δ_x| \leq c ϵ_{\rm m}$.
 
+**SOLUTION**
+
+Using the same two formulas as in 1.1 we have
+$$f(x+h) = f(x) + f'(x)h + \frac{f''(x)}{2}h^2 + \frac{f'''(z_1)}{6}h^3,$$
+for some $z_1 \in (x, x+h)$
+and
+$$f(x-h) = f(x) + f'(x)(-h) + \frac{f''(x)}{2}h^2 - \frac{f'''(z_2)}{6}h^3,$$
+for some $z_2 \in (x-h, x)$.
+
+Summing the two we obtain
+$$f(x+h) + f(x-h) = 2f(x) + f''(x)h^2 + \frac{f'''(z_1)}{6}h^3 - \frac{f'''(z_2)}{6}h^3.$$
+
+Thus,
+$$f''(x) = \frac{f(x+h) - 2f(x) + f(x-h)}{h^2} + \frac{f'''(z_2) - f'''(z_1)}{6}h.$$
+
+Hence, the error is 
+$$\left|f''(x) - \frac{f(x+h) - 2f(x) + f(x-h)}{h^2}\right| = \left|\frac{f'''(z_2) - f'''(z_1)}{6}h\right|\le 2Ch ,$$
+where again
+$$C = \max_{y\in[x-h,x+h]}\left|\frac{f'''(y)}{6}\right|.$$
+
+In floating point arithmetic, the error is
+$$\left|f''^{FP}(x) - f''(x) \right|=  
+\left|\frac{f^{FP}(x+h) - 2f^{FP}(x) + f^{FP}(x-h)}{h^2} - \frac{f(x+h) - 2f(x) + f(x-h)}{h^2} - \frac{f'''(z_2) - f'''(z_1)}{6}h\right|$$
+$$\le \left|\frac{(f^{FP}(x+h) - f(x+h)) - 2(f^{FP}(x)  - f(x)) + (f^{FP}(x-h) - f(x-h))}{h^2}\right| + \left|\frac{f'''(z_2) - f'''(z_1)}{6}h\right|$$
+$$\le \left|\frac{\delta_{x+h} - 2\delta_x + \delta_{x-h}}{h^2}\right| + 2Ch \le \frac{4c\epsilon_m}{h^2} + 2Ch.$$
+
+
 **Problem 1.4** Use finite-differences, central differences, and second-order finite-differences to approximate to 5-digits the first and second 
 derivatives to the following functions
 at the point $x = 0.1$:
@@ -44,64 +165,126 @@ $$
 1 + {x-1 \over 2 + {x-1 \over 2 + {x-1 \over 2 + \ddots}}},
 $$
 e.g.:
-$$
-\begin{align*}
-f^{\rm s}_1(x) &= 1 + {x-1 \over 2} \\
-f^{\rm s}_2(x) &= 1 + {x-1 \over 2 + {x -1 \over 2}} \\
-f^{\rm s}_3(x) &= 1 + {x-1 \over 2 + {x -1 \over 2 + {x-1 \over 2}}}
-\end{align*}
-$$
+$$f^{\rm s}_1(x) = 1 + {x-1 \over 2}$$
+$$f^{\rm s}_2(x) = 1 + {x-1 \over 2 + {x -1 \over 2}}$$
+$$f^{\rm s}_3(x) = 1 + {x-1 \over 2 + {x -1 \over 2 + {x-1 \over 2}}}$$
 
 
 **SOLUTION**
 ```julia
-f = x -> exp(exp(x)cos(x) + sin(x))
+# Forward Difference
+function forwarddiff(x, h, f)
+    ret = (f(x + h) - f(x))/h
+end
 
-g = x -> prod(x ./ (1:1000) .- 1)
+# We already implemented central differences in a previous problem
 
+# Second derivative via finite difference
+function finitediffsecond(x, h, f)
+    ret = (f(x + h) - 2 * f(x) + f(x - h))/ (h^2)
+end
+    
+# Define the functions
+f(x) = exp(exp(x)cos(x) + sin(x))
+g(x) = prod([x] ./ (1:1000) .- 1)
 function cont(n, x)
-    ret = 2one(x)
+    ret = 2*one(x)
     for k = 1:n-1
         ret = 2 + (x-1)/ret
     end
     1 + (x-1)/ret
 end
 
-h = sqrt(eps())
-(cont(1000, 0.1+h)-cont(1000, 0.1))/h
+# Choose our point
+x = 0.1;
 ```
 
+```julia
+# We have to be a bit careful with the choice of h
+h = eps()
+# Values for exp(exp(x)cos(x) + sin(x))
+println("f'($x) with forward difference: ", forwarddiff(x, sqrt(h), f))
+println("f'($x) with central difference: ", centraldiff(x, cbrt(h), f))
+println("f''($x) via finite difference:  ", finitediffsecond(x, cbrt(h), f))
+```
+```julia
+# Values for prod([x] ./ (1:1000) .- 1)
+println("f'($x) with forward difference: ", forwarddiff(x, sqrt(h), g))
+println("f'($x) with central difference: ", centraldiff(x, cbrt(h), g))
+println("f''($x) via finite difference:  ", finitediffsecond(x, cbrt(h), g))
+```
+```julia
+# Values for the continued fraction
+println("f'($x) with forward difference: ", forwarddiff(x, sqrt(h), x->cont(1000,x)))
+println("f'($x) with central difference: ", centraldiff(x, sqrt(h), x->cont(1000,x)))
+println("f''($x) via finite difference:  ", finitediffsecond(x, cbrt(h), x->cont(1000,x)))
+```
 
 ## 2. Dual numbers
 
 **Problem 2.1⋆** 
-Show that dual numbers $𝔻$ are a _commutative ring_, that is, for all $a,b,c ∈ 𝔻$ the following are satisfied:
+Show that dual numbers $\mathbb{D}$ are a _commutative ring_, that is, for all $a,b,c \in \mathbb{D}$ the following are satisfied:
 1. _additive associativity_: $(a + b) + c = a + (b + c)$
 2. _additive commutativity_: $a + b = b + a$
-3. _additive identity_: There exists $0 ∈ 𝔻$ such that $a + 0 = a$.
+3. _additive identity_: There exists $0 ∈ \mathbb{D}$ such that $a + 0 = a$.
 4. _additive inverse_: There exists $-a$ such that $(-a) + a = 0$.
 5. _multiplicative associativity_: $(ab)c = a(bc)$
 6. _multiplictive commutativity_: $ab = ba$
-7. _multiplictive identity_: There exists $1 ∈ 𝔻$ such that $1a= a$.
+7. _multiplictive identity_: There exists $1 ∈ \mathbb{D}$ such that $1a= a$.
 8. _distributive_: $a(b+c) = ab + ac$
 
-**Problem 2.2⋆** A _field_ is a commutative ring such that $0 ≠ 1$ and all nonzero elements have a multiplicative inverse, i.e.,
-there exists $a^{-1}$ such that $a a^{-1} = 1$. Why isn't $𝔻$ a field?
+**SOLUTION**
+In what follows we write $a = a_r + a_d \epsilon$ and likewise for $b,c \in \mathbb{D}$.
 
+Additive associativity and commutativity and existence of additive inverse are both immediate results of dual number addition reducing to element-wise real number addition. Furthermore, by definition of addition on $\mathbb{D}$ the dual number $0+0 \epsilon$ acts as the additive identity since $$(a_r+a_d\epsilon)+(0+0\epsilon) = (a_r+a_d\epsilon ).$$ We explicitly prove multiplicative commutativity
+$$ ab = (a_r+a_d\epsilon )(b_r+b_d \epsilon ) = a_r b_r+(a_r b_d+a_d b_r)\epsilon = b_r a_r+(b_r a_d+b_d a_r)\epsilon = ba.$$
+We also explicitly prove multiplicative associativity:
+$$(ab)c = ((a_r b_r+(a_r b_d+a_d b_r) \epsilon ) c = a_r b_r c_r + ((a_r b_d + a_d b_r) c_r  + a_r b_r c_d) \epsilon = a_r b_r c_r + (a_r b_d c_r + a_d b_r c_r  + a_r b_r c_d) \epsilon $$  and $$a(bc) = a ((b_r c_r+(b_r c_d+b_d c_r) \epsilon ) = a_r b_r c_r + (a_r b_d c_r + a_d b_r c_r  + a_r b_r c_d) \epsilon .$$
+The number $1+0\epsilon $ serves as the multiplicative identity. Note that for any dual number $a$, we have
+$$ (1+0\epsilon )(a_r + a_d \epsilon ) = 1 a_r + (a_r 0 + 1 a_d) \epsilon = a_r+a_d \epsilon = a.$$ 
+Finally we show distributivity of multiplication:
+$$a(b+c) = a (b_r+c_r + (b_d+c_d)\epsilon) = (a_r b_r + a_r c_r) + (a_r b_d+a_r c_d+ a_d b_r + a_d c_r) \epsilon,$$
+$$ ab + ac = a_r b_r + (a_d b_r + a_r b_d) \epsilon + a_r c_r + (a_d c_r + a_r c_d) \epsilon = (a_r b_r + a_r c_r) + (a_r b_d+a_r c_d+ a_d b_r + a_d c_r) \epsilon. $$
+
+
+**Problem 2.2⋆** A _field_ is a commutative ring such that $0 ≠ 1$ and all nonzero elements have a multiplicative inverse, i.e.,
+there exists $a^{-1}$ such that $a a^{-1} = 1$. Why isn't $\mathbb{D}$ a field?
+
+**SOLUTION**
+
+Fields require that all nonzero elements have a unique multiplicative inverse. However, this is not the case for dual numbers. To give an explicit counter example, we show that there is no dual number $z$ which is the inverse of $0+\epsilon$, i.e. a dual number $z$ such that $$\frac{(0+\epsilon)}{(z_r+z_d \epsilon)} = 1 + 0 \epsilon.$$
+By appropriate multiplication with the conjugate we show that
+$$\frac{(0+\epsilon)(z_r-z_d \epsilon)}{(z_r+z_d \epsilon)(z_r-z_d \epsilon)} = \frac{z_r \epsilon}{z_r^2} = \frac{\epsilon}{z_r}.$$ This proves that no choice of real part $z_r$ can reach the multiplicative identity $1+0 \epsilon$ when starting from the number $0+\epsilon$. More general results for zero real part dual numbers can also be proved.
+ 
 **Problem 2.3⋆** A _matrix representation_ of a ring are maps from a group/ring to matrices such that matrix addition and multiplication
-behave exactly like addition and multiplication that of the ring. 
+behave exactly like addition and multiplication of the ring. 
 That is, if $A$ and $B$ are elements of the ring and $ρ$ is a representation, then
 $$
 ρ(A + B) = ρ(A) + ρ(B) \hbox{ and } ρ(AB) = ρ(A)ρ(B).
 $$
-Show that the following are matrix representations of complex numbers and
-dual numbers (respectively):
-$$
-\begin{align*}
-a + b {\rm i} &\mapsto \begin{pmatrix} a & b \\ -b & a \end{pmatrix} \\
-a + b {\rm i} &\mapsto \begin{pmatrix} a & b \\ 0 & a \end{pmatrix}
-\end{align*}
-$$
+Show that the following are matrix representations of complex numbers and dual numbers (respectively):
+$\rho : a + b {\rm i} \mapsto \begin{pmatrix} a & b \\ -b & a \end{pmatrix},$
+
+$\rho_\epsilon : a + b {\rm \epsilon} \mapsto \begin{pmatrix} a & b \\ 0 & a \end{pmatrix}.$
+
+**SOLUTION**
+
+Let $A = a+bi$ and $B=c+di$ and $\rho$ be the map to their proposed matrix representations. First we check that addition complies with addition of complex numbers, that is 
+$(a+bi)+(c+di) = (a+c)+(b+d)i:$
+ 
+$\rho(A) + \rho(B) = \begin{pmatrix} a & b \\ -b & a \end{pmatrix} + \begin{pmatrix} c & d \\ -d & c \end{pmatrix} = \begin{pmatrix} a+c & b+d \\ -(b+d) & a+c \end{pmatrix} = \rho(A+B).$
+
+Next for multiplication we need $(a+bi)(c+di) = (ac-bd)+(bc+ad)i $:
+
+$\rho(A)\rho(B) = \begin{pmatrix} a & b \\ -b & a \end{pmatrix}\begin{pmatrix} c & d \\ -d & c \end{pmatrix} = \begin{pmatrix} ac-bd & bc+ad \\ -(bc+ad) & ac-bd \end{pmatrix} = \rho(AB)$
+
+Now we move on to dual numbers $A = a+b \epsilon $ and $B=c+d \epsilon$ and their matrix representation map $\rho_\epsilon$: For addition of dual numbers $(a+b\epsilon )+(c+d\epsilon ) = (a+c) + (b+d) \epsilon$:
+
+$\rho_\epsilon(A) + \rho_\epsilon(B) = \begin{pmatrix} a & b \\ 0 & a \end{pmatrix} + \begin{pmatrix} c & d \\ 0 & c \end{pmatrix} = \begin{pmatrix} a+c & b+d \\ 0 & a+c \end{pmatrix} = \rho_\epsilon(A+B).$
+
+And finally for multiplication of dual numbers $(a+b\epsilon )(c+d\epsilon ) = ac+(ad+bc)\epsilon$:
+
+$\rho_\epsilon(A)\rho_\epsilon(B) = \begin{pmatrix}a & b \\ 0 & a \end{pmatrix}\begin{pmatrix} c & d \\ 0 & c \end{pmatrix} = \begin{pmatrix} ac & ad+bc \\ 0 & ac \end{pmatrix} = \rho_\epsilon(AB).$
 
 
 **Problem 2.4⋆** What is the correct definition of division on dual numbers, i.e.,
@@ -113,6 +296,39 @@ $$
 \exp(\exp x \cos x + \sin x), \prod_{k=1}^3 \left({x \over k}-1\right),\hbox{ and } f^{\rm s}_2(x) = {1 + {x - 1 \over 2 + {x-1 \over 2}}}
 $$
 
+**SOLUTION**
+
+As with complex numbers, division is easiest to understand by first multiplying with the conjugate, that is:
+$$\frac{a+b\epsilon}{c+d\epsilon} = \frac{(a+b\epsilon)(c-d\epsilon)}{(c+d\epsilon)(c-d\epsilon)}.$$
+Expanding the products and dropping terms with $\epsilon^2$ then leaves us with the definition of division for dual numbers (where the denominator must have non-zero real part):
+$$\frac{a}{c} + \frac{bc - ad}{c^2}\epsilon.$$ Thus we have $s = \frac{a}{c}$ and $t = \frac{bc - ad}{c^2}$.
+
+We saw in the lectures that we have
+$$
+\exp(a+b \epsilon) = \exp(a)+b \exp(a) \epsilon,
+$$
+$$
+\sin(a+b \epsilon) = \sin(a)+b \cos(a) \epsilon,
+$$
+and
+$$
+\cos(a+b \epsilon) = \cos(a)-b \sin(a) \epsilon.
+$$
+Using these, we find that evaluating $\exp(\exp x \cos x + \sin x)$ at $a+b \epsilon$ yields
+$$
+\exp ( (\exp (a) +b \exp (a) \epsilon ) (\cos(a)-b \sin(a) \epsilon) + \sin(a)+b \cos(a) \epsilon)
+$$
+$$
+= \exp ( \exp (a) \cos (a) + ( \cos (a) \exp (a) - \sin(a) \exp (a)) b \epsilon + \sin(a)+b \cos(a) \epsilon) = \exp ( (\exp (a) \cos (a) + \sin(a)) + b ( \cos (a) \exp (a) - \sin(a) \exp (a) + \cos(a)) \epsilon )
+$$
+which means $\exp(\exp x \cos x + \sin x)$ evaluated at $a+b \epsilon $ is
+$$
+\exp( (\exp (a) \cos (a) + \sin(a)) ) + b ( \cos (a) \exp (a) - \sin(a) \exp (a) + \cos(a)) \exp( (\exp (a) \cos (a) + \sin(a)) ) \epsilon.
+$$
+Setting $b=1$ the derivative at point $a$ is thus given by the dual part, i.e.:
+$$
+( \cos (a) \exp (a) - \sin(a) \exp (a) + \cos(a)) \exp( (\exp (a) \cos (a) + \sin(a)) ).
+$$
 
 **Problem 2.5** Add support for `cos`, `sin`, and `/` to the type `Dual`:
 ```julia
@@ -128,7 +344,7 @@ Dual(a::Real) = Dual(a, zero(a)) # for real numbers we use a + 0ϵ
 # Allow for a + b*ϵ syntax
 const ϵ = Dual(0, 1)
 
-import Base: +, *, -, /, ^, zero, exp, cos, sin
+import Base: +, *, -, /, ^, zero, exp, cos, sin, one
 
 # support polynomials like 1 + x, x - 1, 2x or x*2 by reducing to Dual
 +(x::Real, y::Dual) = Dual(x) + y
@@ -152,7 +368,10 @@ function ^(x::Dual, k::Integer)
     end
 end
 
-# Algebraic operationds for duals
+# support identity of type Dual
+one(x::Dual) = Dual(one(eltype(x.a)))
+
+# Algebraic operations for duals
 -(x::Dual) = Dual(-x.a, -x.b)
 +(x::Dual, y::Dual) = Dual(x.a + y.a, x.b + y.b)
 -(x::Dual, y::Dual) = Dual(x.a - y.a, x.b - y.b)
@@ -173,12 +392,42 @@ function /(x::Dual, y::Dual)
 end
 ```
 
+**SOLUTION**
+
+```julia
+cos(x::Dual) = Dual(cos(x.a), -sin(x.a) * x.b)
+
+sin(x::Dual) = Dual(sin(x.a), cos(x.a) * x.b)
+
+function /(x::Dual, y::Dual)
+    if iszero(y.a)
+        error("Division for dual numbers is ill-defined when denonimator real part is zero.")
+    end
+    return Dual(x.a / y.a, (y.a*x.b - x.a*y.b)/y.a^2)
+end
+```
+
 **Problem 2.6** Use dual numbers to compute the derivatives to
 $$
 \exp(\exp x \cos x + \sin x), \prod_{k=1}^{1000} \left({x \over k}-1\right), \hbox{ and } f^{\rm s}_{1000}(x).
 $$
 Does your answer match (to 5 digits) Problem 1.4?
 
+**SOLUTION**
+
+With the previous problems solved, this is as simple as running
+```julia
+fdual = f(0.1+ϵ)
+fdual.b
+```
+```julia
+gdual = g(0.1+ϵ)
+gdual.b
+```
+```julia
+contdual = cont(1000,0.1+ϵ)
+contdual.b
+```
 
 ## 3. Newton iteration
 
@@ -195,6 +444,31 @@ function newton(f, x0, n)
 end
 ```
 
+**SOLUTION**
+
+```julia
+function newton(f, x0, n)
+    xk = x0
+    for k = 1:n
+        fd = f(xk+ϵ)
+        xk = xk - fd.a/fd.b
+    end
+    return xk
+end
+```
+Here is a simple test case for the above function:
+```julia
+# example
+f_ex(x) = x^2-3
+n = 5
+x0 = 1
+# compute proposed root
+xn = newton(f_ex,x0,n) 
+# check that obtained point is an approximate root
+f_ex(xn)
+```
+
+
 **Problem 3.2** Compute points $y$ such that $|f(y)| \leq 10^{-13}$ (i.e., approximate roots):
 $$
 \exp(\exp x \cos x + \sin x)-6\hbox{ and } \prod_{k=1}^{1000} \left({x \over k}-1\right) - {1 \over 2}
@@ -202,6 +476,66 @@ $$
 (Hint: you may need to try different `x0` and `n` to get convergence. Plotting the function should give an
 indication of a good initial guess.)
 
+**SOLUTION**
+
+We can plot the functions on a few ranges to get an intuition
+```julia
+using Plots
+
+f1(x) = exp(exp(x)*cos(x) + sin(x)) - 6
+f2(x) = prod([x] ./ range(1,1000) .- 1) - 1/2
+
+plot(f1,-2,2,color="blue")
+plot!(x->0,color="red")
+```
+```julia
+plot(f2,0,2,color="blue")
+plot!(x->0,color="red") 
+```
+And then use our Newton iteration to compute approximate roots
+```julia
+rootf1 = newton(f1, 1.5, 5)
+f1(rootf1)
+```
+```julia
+rootf2 = newton(f2, 0.3, 8)
+f2(rootf2)
+```
+
 **Problem 3.3** Compute points $y$ such that $|f^{\rm s}_{1000}(y) - j| \leq 10^{-13}$ for $j = 1,2,3$. 
 Make a conjecture of what $f^{\rm s}_n(x)$ converges to as $n → ∞$. (Bonus problem: Prove your conjecture.)
 
+**SOLUTION**
+
+```julia
+xn = newton(x->cont(1000,x)-1.,0.5,10)
+cont(1000,xn)-1.
+```
+```julia
+xn = newton(x->cont(1000,x)-2.,0.5,10)
+cont(1000,xn)-2.
+```
+```julia
+xn = newton(x->cont(1000,x)-3.,0.5,10)
+cont(1000,xn)-3.
+```
+
+By plotting the function we can conjecture that the continued fraction converges to $\sqrt{x}$:
+```julia
+using Plots
+plot(x->cont(1000,x),0,10)
+plot!(x->sqrt(x))
+```
+There are a handful of ways to prove this conjecture. Here is one - start with
+
+$$ \sqrt{x}(1+\sqrt{x}) = \sqrt{x}+x,$$
+
+then extend the RHS by $0 = +1-1$ to also obtain the factor $1+\sqrt{x}$ there, resulting in
+
+$$ \sqrt{x}(1+\sqrt{x}) = (1+\sqrt{x})+x-1.$$
+
+Dividing through $(1+\sqrt{x})$ now yields
+
+$$ \sqrt{x} = 1 + \frac{x-1}{1+\sqrt{x}}.$$
+
+Note that we can now plug this equation into itself on the right hand side to obtain a recursive continued fraction for the square root function.
