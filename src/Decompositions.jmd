@@ -714,19 +714,22 @@ A = \begin{bmatrix} 1 & 1 & 1 \\
 $$
 Even though $a_{11} = 1 \neq 0$, we still pivot: placing 
 the maximum entry on the diagonal to mitigate numerical errors.
-That is, we do
+That is, we first pivot and upper triangularise the first column:
 $$
-L_2 P_2 L_1 P_1 A = L_2 P_2 L_1\begin{bmatrix} 0 & 1 \\ 1 & 0 \\ && 1 \end{bmatrix}
+ L_1 P_1 A =  L_1\begin{bmatrix} 0 & 1 \\ 1 & 0 \\ && 1 \end{bmatrix}
 \begin{bmatrix} 1 & 1 & 1 \\
                     2 & 4 & 8 \\
                     1 & 4 & 9
                     \end{bmatrix} = 
-                    L_2 P_2 \begin{bmatrix}1 \\ -{1 \over 2} & 1 \\ -{1 \over 2} && 1 \end{bmatrix}
+                     \begin{bmatrix}1 \\ -{1 \over 2} & 1 \\ -{1 \over 2} && 1 \end{bmatrix}
 \begin{bmatrix} 2 & 4 & 8 \\
                 1 & 1 & 1 \\
                     1 & 4 & 9
                     \end{bmatrix}
-                    = 
+$$
+We now pivot and upper triangularise the second column:
+$$
+  L_2 P_2 L_1 P_1 A = 
                     L_2 \begin{bmatrix}
                     1 \\ &0 & 1 \\ &1 & 0 \end{bmatrix}
 \begin{bmatrix} 2 & 4 & 8 \\
@@ -743,7 +746,7 @@ L_2 P_2 L_1 P_1 A = L_2 P_2 L_1\begin{bmatrix} 0 & 1 \\ 1 & 0 \\ && 1 \end{bmatr
                 0 & 0 & -{1 \over 2}
                     \end{bmatrix}}_U
 $$
-We now reduce:
+We now move $P_2$ to the right:
 $$
 L_2 P_2 L_1 P_1 = \underbrace{\begin{bmatrix} 1\\ -{1 \over 2} & 1 \\  -{1 \over 2}  & {1 \over 2} & 1 \end{bmatrix}}_{L_2 \tilde L_1} \underbrace{\begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \\ 1 & 0 & 0 \end{bmatrix}}_P
 $$

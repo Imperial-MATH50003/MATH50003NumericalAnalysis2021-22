@@ -4,9 +4,13 @@ This problem sheet explores least squares, the QR decomposition including for
 tridiagonal matrices,
 and the PLU decompositions.
 
+Questions marked with a ⋆ are meant to be completed without using a computer.
+
 ```julia
 using LinearAlgebra, Plots
 ```
+
+
 
 ## 1. Least squares and QR decompositions
 
@@ -26,15 +30,15 @@ end
 pl
 ```
 
-**Problem 1.2⋆** Show that there always exists a QR decomposition such that the diagonal of $R$ is non-negative.
+**Problem 1.2⋆** Show that every matrix has a QR decomposition such that the diagonal of $R$ is non-negative.
+Make sure to inlude the case of more columns than rows.
 
 **SOLUTION**
 
-We can assume that the diagonal of $R$ is positive (otherwise multiply $Q$ and $R$ by $\diag(\sign r_{11}, \ldots, \sign r_{mm})$).
-
 ∎
 
-**Problem 1.3⋆** Show that the QR decomposition of a square invertible matrix is unique, provided that the diagonal of $R$ is positive.
+**Problem 1.3⋆** Show that the QR decomposition of a square invertible matrix is unique, 
+provided that the diagonal of $R$ is positive.
 
 
 **SOLUTION**
@@ -62,7 +66,7 @@ $$
 we compute it step-by-step:
 $$
 𝐯_j^1 := 𝐚_j
-𝐯_j^{k+1} =𝐯_j^k - 𝐪_k^\top 𝐯_j^k 𝐪_k
+𝐯_j^{k+1} := 𝐯_j^k - 𝐪_k^\top 𝐯_j^k 𝐪_k
 $$
 Show that $𝐯_j^k = 𝐯_j$. 
 
@@ -114,7 +118,7 @@ end
 ```
 
 **Problem 3.2** Complete the following function that implements
-an $O(mn^2)$ implementation of Householder QR:
+ Householder QR using only $O(mn^2)$ operations:
 ```julia
 function householderqr(A)
     m,n = size(A)
@@ -130,10 +134,11 @@ end
 ## 4. Banded QR with Given's rotations
 
 **Problem 4.1⋆**  Describe an algorithm for computing the QR decomposition
-of a tridiagonal matrix using rotations instead of reflections.
+of a tridiagonal matrix using rotations instead of reflections to upper-triangularise
+column-by-column.
 
-**Problem 4.2** Implement `Rotations` which applies 
-a rotation 
+**Problem 4.2** Implement `Rotations` which represents an orthogonal matrix `Q` that is a product
+ of rotations of angle `θ[k]`, each acting on the entries `k:k+1`.
 ```julia
 struct Rotations{T} <: AbstractMatrix{T}
     θ::Vector{T}
@@ -167,9 +172,24 @@ function bandedqr(A::Tridiagonal)
 end
 ```
 
+**Problem 4.4⋆** Could one redesign the above to only use IEEE operatations (addition, multiplication, square-roots, 
+avoiding calls `atan`, `cos`, and `sin`)?
+Would it have been possible to implement this algorithm using reflections?
+If so, what would be the structure of a matrix whose columns are the vectors of reflections?
+
 ## 5. PLU decomposition
 
 **Problem 5.1⋆** Compute the PLU decompositions for the following matrices:
 $$
-
+\begin{bmatrix}
+0 & 2 & 1 \\
+2 & 6 & 1 \\
+1 & 1 & 4
+\end{bmatrix},
+\begin{bmatrix}
+1 & 2 & -1 & 0 \\
+2 & 4 & -2 & 1 \\
+-3 & -5 & 6 & 1 \\
+-1 & 2 & 8 & -2
+\end{bmatrix}
 $$
