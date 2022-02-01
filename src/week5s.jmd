@@ -1,0 +1,38 @@
+# MATH50003 Numerical Analysis: Problem Sheet 4
+
+This problem sheet explores positive definite matrices,
+Cholesky decompositions, matrix norms, and the singular value decomposition.
+
+Questions marked with a ⋆ are meant to be completed without using a computer.
+
+```julia
+using LinearAlgebra, Plots
+```
+
+## 1. Positive definite matrices and Cholesky decompositions
+
+
+**Problem 1.1⋆** Show that the following matrices are symmetric positive definite.
+
+
+**Problem 1.2⋆** Show that a matrix is symmetric positive definite if and only if it has a Cholesky
+decomposition of the form
+$$
+A = U U^⊤
+$$
+where $U$ is upper triangular with positive entries on the diagonal.
+
+
+**Problem 1.3⋆** Prove that the following $n × n$ matrix is symmetric positive definite
+for any $n$:
+$$
+Δ_n := \begin{bmatrix}
+2 & -1 \\
+-1 & 2 & -1 \\
+& -1 & 2 & ⋱ \\
+&& ⋱ & ⋱ & -1 \\
+&&& -1 & 2
+\end{bmatrix}
+$$
+Deduce its two Cholesky decompositions: $Δ_n = L_n L_n^⊤ = U_n U_n^⊤$ where
+$L_n$ is lower triangular and $U_n$ is upper triangular.
