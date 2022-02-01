@@ -43,6 +43,8 @@ Indeed:
 ```julia
 printbits(Float16(π))
 ```
+Instead of simply guessing the above representation we can instead continuously subtract the largest powers 2 which do not result in a negative number. For $\pi$ the procedure then finds that we can write
+$$ \pi - 1*2^1 - 1*2^0 - 1*2^{-3} - 1*2^{-6} ...$$
 
 
 ## 2. Integers
