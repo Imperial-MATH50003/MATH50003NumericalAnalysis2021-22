@@ -43,6 +43,8 @@ Indeed:
 ```julia
 printbits(Float16(π))
 ```
+Instead of simply guessing the above representation we can instead continuously subtract the largest powers 2 which do not result in a negative number. For $\pi$ the procedure then finds that we can write
+$$ \pi - 1*2^1 - 1*2^0 - 1*2^{-3} - 1*2^{-6} ...$$
 
 
 ## 2. Integers
@@ -150,11 +152,11 @@ command.
 
 
 **SOLUTION**
-The next float after $2$ is $2 * (1 + 2^{-23})$ hence we get $2^{-22}$:
+The next float after $2$ is $2 * (1 + 2^{-23})$ hence we get $m(2) - 2 = 2^{-22}$:
 ```julia
 nextfloat(2f0) - 2, 2^(-22)
 ```
-similarly, the next float after $1024 = 2^{10}$ is $2^{10-23} = 2^{-13}$:
+similarly, for $1024 = 2^{10}$ we find that the difference $m(1024) - 1024$ is $2^{10-23} = 2^{-13}$:
 ```julia
  nextfloat(1024f0) - 1024, 2^(-13)
 ```
@@ -334,7 +336,7 @@ printlnbits(Float16(0.1) / (Float16(1.1) - 1))
 ```
 
 
-**Problem 4.4** Find a bound on the _absolute error_ in terms of a constant times
+**Problem 4.6** Find a bound on the _absolute error_ in terms of a constant times
 $ϵ_{\rm m}$ for the following computations
 $$
 \begin{align*}

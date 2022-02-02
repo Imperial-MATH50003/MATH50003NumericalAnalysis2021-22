@@ -14,7 +14,7 @@ f'(x) ≈ {f(x + h) - f(x - h) \over 2h}.
 $$
 Find an error bound when implemented in floating point arithmetic, assuming that
 $$f^{\rm FP}(x) = f(x) + \delta_x$$
-where $|\delta_x| \leq c \epsilon_{\rm m}$.
+where $|\delta_x| \leq c ϵ_{\rm m}$.
 
 **SOLUTION**
 
@@ -49,56 +49,38 @@ Derive the error exactly for the different cases to explain the observed behavio
 using Plots
 
 # define the functions
-function f(x)
-    ret = 1 .+ x + x.^2
-end
-function g(x)
-    ret = 1 .+ x./3 + x.^2
-end
+f = x -> 1 + x + x^2
+g = x -> 1 + x/3 + x^2
 
 # define analytic first derivatives for comparison
-function fp(x)
-    ret = 1 .+ 2 .*x
-end
-function gp(x)
-    ret = 1/3 .+ 2 .*x
-end
+fp  = x -> 1 + 2 *x
+gp = x ->1/3 + 2 *x
 
 # central difference derivative approximation
-function centraldiff(x, h, f)
-    ret = (f(x .+ h) - f(x .- h))./(2 .*h)
-end
+centraldiff(x, h, f) = (f(x + h) - f(x - h))/(2 *h)
     
-# computes an error vector
-function centraldifferror(x, h, f, fp)
-    ret = abs.(centraldiff(x, h, f) - fp(x)*ones(length(h)))
-end
+# computes an error
+centraldifferror(x, h, f, fp) = abs(centraldiff(x, h, f) - fp(x))
+
         
 #plotting f and g errors   
 x = 0.0 # some arbitrary point
 
 # helper function to avoid trying to take logs of 0 in plots
-errhelper(x) = iszero(x) ? NaN : abs(x)
+nanabs(x) = iszero(x) ? NaN : abs(x)
 
 # We find the error for the derivative of f is 0 
 # (until we run into the errors for too small h we discussed in the lecture)
 h = 2.0 .^ (0:-1:-60)
-scatter(h,errhelper.(centraldifferror(x, h, f, fp)), yaxis=:log10, xaxis=:log10, legend=false)
+plot(nanabs.(centraldifferror.(x, h, f, fp)), yaxis=:log10, label="f")
+plot!(nanabs.(centraldifferror.(x, h, g, gp)), yaxis=:log10, label="g")
 ```
 ```julia
 h = 10.0 .^ (0:-1:-16)
-scatter(h,errhelper.(centraldifferror(x, h, f, fp)), yaxis=:log10, xaxis=:log10, legend=false)
+plot(nanabs.(centraldifferror.(x, h, f, fp)), yaxis=:log10, label="f")
+plot!(nanabs.(centraldifferror.(x, h, g, gp)), yaxis=:log10, label="g")
 ```
-```julia
-# Now let's plot the errors for g
-h = 2.0 .^ (0:-1:-60)
-scatter(h,errhelper.(centraldifferror(x, h, g, gp)), yaxis=:log10, xaxis=:log10, legend=false)
-```
-```julia
-# Now let's plot the errors for g
-h = 10.0 .^ (0:-1:-16)
-scatter(h,errhelper.(centraldifferror(x, h, g, gp)), yaxis=:log10, xaxis=:log10, legend=false)
-```
+
 
 To compute the errors of the central difference approximation of $f'(x)$ we compute
 
@@ -151,7 +133,7 @@ In floating point arithmetic, the error is
 $$\left|f''^{FP}(x) - f''(x) \right|=  
 \left|\frac{f^{FP}(x+h) - 2f^{FP}(x) + f^{FP}(x-h)}{h^2} - \frac{f(x+h) - 2f(x) + f(x-h)}{h^2} - \frac{f'''(z_2) - f'''(z_1)}{6}h\right|$$
 $$\le \left|\frac{(f^{FP}(x+h) - f(x+h)) - 2(f^{FP}(x)  - f(x)) + (f^{FP}(x-h) - f(x-h))}{h^2}\right| + \left|\frac{f'''(z_2) - f'''(z_1)}{6}h\right|$$
-$$\le \left|\frac{\delta_{x+h} - 2\delta_x + \delta_{x-h}}{h^2}\right| + 2Ch \le \frac{4c\epsilon_m}{h^2} + 2Ch.$$
+$$\le \left|\frac{\delta_{x+h} - 2\delta_x + \delta_{x-h}}{h^2}\right| + 2Ch \le \frac{4cϵ_m}{h^2} + 2Ch.$$
 
 
 **Problem 1.4** Use finite-differences, central differences, and second-order finite-differences to approximate to 5-digits the first and second 
@@ -173,20 +155,16 @@ $$f^{\rm s}_3(x) = 1 + {x-1 \over 2 + {x -1 \over 2 + {x-1 \over 2}}}$$
 **SOLUTION**
 ```julia
 # Forward Difference
-function forwarddiff(x, h, f)
-    ret = (f(x + h) - f(x))/h
-end
+forwarddiff(x, h, f) = (f(x + h) - f(x))/h
 
 # We already implemented central differences in a previous problem
 
 # Second derivative via finite difference
-function finitediffsecond(x, h, f)
-    ret = (f(x + h) - 2 * f(x) + f(x - h))/ (h^2)
-end
+finitediffsecond(x, h, f) = (f(x + h) - 2 * f(x) + f(x - h))/ (h^2)
     
 # Define the functions
-f(x) = exp(exp(x)cos(x) + sin(x))
-g(x) = prod([x] ./ (1:1000) .- 1)
+f = x -> exp(exp(x)cos(x) + sin(x))
+g = x -> prod([x] ./ (1:1000) .- 1)
 function cont(n, x)
     ret = 2*one(x)
     for k = 1:n-1
@@ -234,17 +212,40 @@ Show that dual numbers $\mathbb{D}$ are a _commutative ring_, that is, for all $
 8. _distributive_: $a(b+c) = ab + ac$
 
 **SOLUTION**
-In what follows we write $a = a_r + a_d \epsilon$ and likewise for $b,c \in \mathbb{D}$.
+In what follows we write $a = a_r + a_d ϵ$ and likewise for $b,c \in \mathbb{D}$.
 
-Additive associativity and commutativity and existence of additive inverse are both immediate results of dual number addition reducing to element-wise real number addition. Furthermore, by definition of addition on $\mathbb{D}$ the dual number $0+0 \epsilon$ acts as the additive identity since $$(a_r+a_d\epsilon)+(0+0\epsilon) = (a_r+a_d\epsilon ).$$ We explicitly prove multiplicative commutativity
-$$ ab = (a_r+a_d\epsilon )(b_r+b_d \epsilon ) = a_r b_r+(a_r b_d+a_d b_r)\epsilon = b_r a_r+(b_r a_d+b_d a_r)\epsilon = ba.$$
+Additive associativity and commutativity and existence of additive inverse are both 
+immediate results of dual number addition reducing to element-wise real number addition. 
+Furthermore, by definition of addition on $\mathbb{D}$ the dual number $0+0 ϵ$ acts as the additive 
+identity since
+$$
+(a_r+a_dϵ)+(0+0ϵ) = (a_r+a_dϵ ).
+$$
+We explicitly prove multiplicative commutativity
+$$
+ab = (a_r+a_dϵ )(b_r+b_d ϵ ) = a_r b_r+(a_r b_d+a_d b_r)ϵ = b_r a_r+(b_r a_d+b_d a_r)ϵ = ba.
+$$
 We also explicitly prove multiplicative associativity:
-$$(ab)c = ((a_r b_r+(a_r b_d+a_d b_r) \epsilon ) c = a_r b_r c_r + ((a_r b_d + a_d b_r) c_r  + a_r b_r c_d) \epsilon = a_r b_r c_r + (a_r b_d c_r + a_d b_r c_r  + a_r b_r c_d) \epsilon $$  and $$a(bc) = a ((b_r c_r+(b_r c_d+b_d c_r) \epsilon ) = a_r b_r c_r + (a_r b_d c_r + a_d b_r c_r  + a_r b_r c_d) \epsilon .$$
-The number $1+0\epsilon $ serves as the multiplicative identity. Note that for any dual number $a$, we have
-$$ (1+0\epsilon )(a_r + a_d \epsilon ) = 1 a_r + (a_r 0 + 1 a_d) \epsilon = a_r+a_d \epsilon = a.$$ 
+$$
+(ab)c = ((a_r b_r+(a_r b_d+a_d b_r) ϵ ) c = 
+a_r b_r c_r + ((a_r b_d + a_d b_r) c_r  + a_r b_r c_d) ϵ = 
+a_r b_r c_r + (a_r b_d c_r + a_d b_r c_r  + a_r b_r c_d) ϵ
+$$
+and
+$$
+a(bc) = a ((b_r c_r+(b_r c_d+b_d c_r) ϵ ) = a_r b_r c_r + (a_r b_d c_r + a_d b_r c_r  + a_r b_r c_d) ϵ.
+$$
+The number $1+0ϵ$ serves as the multiplicative identity. Note that for any dual number $a$, we have
+$$
+(1+0ϵ )(a_r + a_d ϵ ) = 1 a_r + (a_r 0 + 1 a_d) ϵ = a_r+a_d ϵ = a.
+$$
 Finally we show distributivity of multiplication:
-$$a(b+c) = a (b_r+c_r + (b_d+c_d)\epsilon) = (a_r b_r + a_r c_r) + (a_r b_d+a_r c_d+ a_d b_r + a_d c_r) \epsilon,$$
-$$ ab + ac = a_r b_r + (a_d b_r + a_r b_d) \epsilon + a_r c_r + (a_d c_r + a_r c_d) \epsilon = (a_r b_r + a_r c_r) + (a_r b_d+a_r c_d+ a_d b_r + a_d c_r) \epsilon. $$
+$$
+a(b+c) = a (b_r+c_r + (b_d+c_d)ϵ) = (a_r b_r + a_r c_r) + (a_r b_d+a_r c_d+ a_d b_r + a_d c_r) ϵ,
+$$
+$$
+ab + ac = a_r b_r + (a_d b_r + a_r b_d) ϵ + a_r c_r + (a_d c_r + a_r c_d) ϵ = (a_r b_r + a_r c_r) + (a_r b_d+a_r c_d+ a_d b_r + a_d c_r) ϵ.
+$$
 
 
 **Problem 2.2⋆** A _field_ is a commutative ring such that $0 ≠ 1$ and all nonzero elements have a multiplicative inverse, i.e.,
@@ -252,9 +253,15 @@ there exists $a^{-1}$ such that $a a^{-1} = 1$. Why isn't $\mathbb{D}$ a field?
 
 **SOLUTION**
 
-Fields require that all nonzero elements have a unique multiplicative inverse. However, this is not the case for dual numbers. To give an explicit counter example, we show that there is no dual number $z$ which is the inverse of $0+\epsilon$, i.e. a dual number $z$ such that $$\frac{(0+\epsilon)}{(z_r+z_d \epsilon)} = 1 + 0 \epsilon.$$
+Fields require that all nonzero elements have a unique multiplicative inverse. However, this is not the case for dual numbers. To give an explicit counter example, we show that there is no dual number $z$ which is the inverse of $0+ϵ$, i.e. a dual number $z$ such that
+$$
+\frac{(0+ϵ)}{(z_r+z_d ϵ)} = 1 + 0 ϵ.
+$$
 By appropriate multiplication with the conjugate we show that
-$$\frac{(0+\epsilon)(z_r-z_d \epsilon)}{(z_r+z_d \epsilon)(z_r-z_d \epsilon)} = \frac{z_r \epsilon}{z_r^2} = \frac{\epsilon}{z_r}.$$ This proves that no choice of real part $z_r$ can reach the multiplicative identity $1+0 \epsilon$ when starting from the number $0+\epsilon$. More general results for zero real part dual numbers can also be proved.
+$$
+\frac{(0+ϵ)(z_r-z_d ϵ)}{(z_r+z_d ϵ)(z_r-z_d ϵ)} = \frac{z_r ϵ}{z_r^2} = \frac{ϵ}{z_r}.
+$$
+This proves that no choice of real part $z_r$ can reach the multiplicative identity $1+0 ϵ$ when starting from the number $0+ϵ$. More general results for zero real part dual numbers can also be proved.
  
 **Problem 2.3⋆** A _matrix representation_ of a ring are maps from a group/ring to matrices such that matrix addition and multiplication
 behave exactly like addition and multiplication of the ring. 
@@ -265,7 +272,7 @@ $$
 Show that the following are matrix representations of complex numbers and dual numbers (respectively):
 $\rho : a + b {\rm i} \mapsto \begin{pmatrix} a & b \\ -b & a \end{pmatrix},$
 
-$\rho_\epsilon : a + b {\rm \epsilon} \mapsto \begin{pmatrix} a & b \\ 0 & a \end{pmatrix}.$
+$\rho_ϵ : a + b {\rm ϵ} \mapsto \begin{pmatrix} a & b \\ 0 & a \end{pmatrix}.$
 
 **SOLUTION**
 
@@ -278,18 +285,18 @@ Next for multiplication we need $(a+bi)(c+di) = (ac-bd)+(bc+ad)i $:
 
 $\rho(A)\rho(B) = \begin{pmatrix} a & b \\ -b & a \end{pmatrix}\begin{pmatrix} c & d \\ -d & c \end{pmatrix} = \begin{pmatrix} ac-bd & bc+ad \\ -(bc+ad) & ac-bd \end{pmatrix} = \rho(AB)$
 
-Now we move on to dual numbers $A = a+b \epsilon $ and $B=c+d \epsilon$ and their matrix representation map $\rho_\epsilon$: For addition of dual numbers $(a+b\epsilon )+(c+d\epsilon ) = (a+c) + (b+d) \epsilon$:
+Now we move on to dual numbers $A = a+b ϵ $ and $B=c+d ϵ$ and their matrix representation map $\rho_ϵ$: For addition of dual numbers $(a+bϵ )+(c+dϵ ) = (a+c) + (b+d) ϵ$:
 
-$\rho_\epsilon(A) + \rho_\epsilon(B) = \begin{pmatrix} a & b \\ 0 & a \end{pmatrix} + \begin{pmatrix} c & d \\ 0 & c \end{pmatrix} = \begin{pmatrix} a+c & b+d \\ 0 & a+c \end{pmatrix} = \rho_\epsilon(A+B).$
+$\rho_ϵ(A) + \rho_ϵ(B) = \begin{pmatrix} a & b \\ 0 & a \end{pmatrix} + \begin{pmatrix} c & d \\ 0 & c \end{pmatrix} = \begin{pmatrix} a+c & b+d \\ 0 & a+c \end{pmatrix} = \rho_ϵ(A+B).$
 
-And finally for multiplication of dual numbers $(a+b\epsilon )(c+d\epsilon ) = ac+(ad+bc)\epsilon$:
+And finally for multiplication of dual numbers $(a+bϵ )(c+dϵ ) = ac+(ad+bc)ϵ$:
 
-$\rho_\epsilon(A)\rho_\epsilon(B) = \begin{pmatrix}a & b \\ 0 & a \end{pmatrix}\begin{pmatrix} c & d \\ 0 & c \end{pmatrix} = \begin{pmatrix} ac & ad+bc \\ 0 & ac \end{pmatrix} = \rho_\epsilon(AB).$
+$\rho_ϵ(A)\rho_ϵ(B) = \begin{pmatrix}a & b \\ 0 & a \end{pmatrix}\begin{pmatrix} c & d \\ 0 & c \end{pmatrix} = \begin{pmatrix} ac & ad+bc \\ 0 & ac \end{pmatrix} = \rho_ϵ(AB).$
 
 
 **Problem 2.4⋆** What is the correct definition of division on dual numbers, i.e.,
 $$
-(a + b \epsilon )/(c + d \epsilon ) = s + t \epsilon
+(a + b ϵ )/(c + d ϵ ) = s + t ϵ
 $$
 for what choice of $s$ and $t$? Use dual numbers to compute the derivative of the following functions at $x = 0.1$:
 $$
@@ -299,31 +306,31 @@ $$
 **SOLUTION**
 
 As with complex numbers, division is easiest to understand by first multiplying with the conjugate, that is:
-$$\frac{a+b\epsilon}{c+d\epsilon} = \frac{(a+b\epsilon)(c-d\epsilon)}{(c+d\epsilon)(c-d\epsilon)}.$$
-Expanding the products and dropping terms with $\epsilon^2$ then leaves us with the definition of division for dual numbers (where the denominator must have non-zero real part):
-$$\frac{a}{c} + \frac{bc - ad}{c^2}\epsilon.$$ Thus we have $s = \frac{a}{c}$ and $t = \frac{bc - ad}{c^2}$.
+$$\frac{a+bϵ}{c+dϵ} = \frac{(a+bϵ)(c-dϵ)}{(c+dϵ)(c-dϵ)}.$$
+Expanding the products and dropping terms with $ϵ^2$ then leaves us with the definition of division for dual numbers (where the denominator must have non-zero real part):
+$$\frac{a}{c} + \frac{bc - ad}{c^2}ϵ.$$ Thus we have $s = \frac{a}{c}$ and $t = \frac{bc - ad}{c^2}$.
 
 We saw in the lectures that we have
 $$
-\exp(a+b \epsilon) = \exp(a)+b \exp(a) \epsilon,
+\exp(a+b ϵ) = \exp(a)+b \exp(a) ϵ,
 $$
 $$
-\sin(a+b \epsilon) = \sin(a)+b \cos(a) \epsilon,
+\sin(a+b ϵ) = \sin(a)+b \cos(a) ϵ,
 $$
 and
 $$
-\cos(a+b \epsilon) = \cos(a)-b \sin(a) \epsilon.
+\cos(a+b ϵ) = \cos(a)-b \sin(a) ϵ.
 $$
-Using these, we find that evaluating $\exp(\exp x \cos x + \sin x)$ at $a+b \epsilon$ yields
+Using these, we find that evaluating $\exp(\exp x \cos x + \sin x)$ at $a+b ϵ$ yields
 $$
-\exp ( (\exp (a) +b \exp (a) \epsilon ) (\cos(a)-b \sin(a) \epsilon) + \sin(a)+b \cos(a) \epsilon)
+\exp ( (\exp (a) +b \exp (a) ϵ ) (\cos(a)-b \sin(a) ϵ) + \sin(a)+b \cos(a) ϵ)
 $$
 $$
-= \exp ( \exp (a) \cos (a) + ( \cos (a) \exp (a) - \sin(a) \exp (a)) b \epsilon + \sin(a)+b \cos(a) \epsilon) = \exp ( (\exp (a) \cos (a) + \sin(a)) + b ( \cos (a) \exp (a) - \sin(a) \exp (a) + \cos(a)) \epsilon )
+= \exp ( \exp (a) \cos (a) + ( \cos (a) \exp (a) - \sin(a) \exp (a)) b ϵ + \sin(a)+b \cos(a) ϵ) = \exp ( (\exp (a) \cos (a) + \sin(a)) + b ( \cos (a) \exp (a) - \sin(a) \exp (a) + \cos(a)) ϵ )
 $$
-which means $\exp(\exp x \cos x + \sin x)$ evaluated at $a+b \epsilon $ is
+which means $\exp(\exp x \cos x + \sin x)$ evaluated at $a+b ϵ $ is
 $$
-\exp( (\exp (a) \cos (a) + \sin(a)) ) + b ( \cos (a) \exp (a) - \sin(a) \exp (a) + \cos(a)) \exp( (\exp (a) \cos (a) + \sin(a)) ) \epsilon.
+\exp( (\exp (a) \cos (a) + \sin(a)) ) + b ( \cos (a) \exp (a) - \sin(a) \exp (a) + \cos(a)) \exp( (\exp (a) \cos (a) + \sin(a)) ) ϵ.
 $$
 Setting $b=1$ the derivative at point $a$ is thus given by the dual part, i.e.:
 $$

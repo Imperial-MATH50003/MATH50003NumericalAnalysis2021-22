@@ -37,7 +37,7 @@ including both time-dependent ordinary differential equations and boundary value
 
 **Part III: Computing with functions**
 
-1. Interpolation and least squares regression: We discuss the use of polynomials to approximate
+1. Interpolation: We discuss the use of polynomials to approximate
 functions from samples. 
 2. Fourier series: we discuss Fourier series and their usage in numerical computations
 via the fast Fourier transform.
@@ -48,15 +48,16 @@ with respect to a prescribed weight—and their usage in numerical computations.
 ## Assessment
 
 1. Practice late-term exam (computer-based Julia exam, not for credit): 4 March 2022 (TBC)
-2. Late-term exam (computer-based Julia exam): 18 March 2022 (TBC)
+2. Late-term exam (computer-based Julia exam): 18 March 2022
 3. Practice final exam (pen-and-paper, not for credit): Summer Term (TBC)
 3. Final exam (pen-and-paper): Summer Term (TBC)
 
 ## Problem sheets
 
 1. [Week 1](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week1.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week1s.ipynb)): Binary representation, integers, floating point numbers, and interval arithmetic
-1. [Week 2](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week2.ipynb): Finite-differences, dual numbers, and Newton iteration
-1. [Week 3](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week3.ipynb): dense, triangular, banded, permutation, and rotation matrices
+2. [Week 2](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week2.ipynb): Finite-differences, dual numbers, and Newton iteration
+3. [Week 3](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week3.ipynb): dense, triangular, banded, permutation, rotation and reflection matrices
+4. [Week 4](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week4.ipynb): least squares, QR and PLU decompositions
 
 
 ## Reading List
