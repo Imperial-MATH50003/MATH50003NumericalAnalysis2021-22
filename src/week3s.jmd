@@ -306,19 +306,19 @@ Adense == Abanded
 
 ```julia
 x = [5.2,3/4,2/3,9.1415]
-Adense*x;
+Adense*x
 ```
 
 ```julia
-Abanded*x;
+Abanded*x
 ```
 
 ```julia
-Adense\x;
+Adense\x
 ```
 
 ```julia
-Abanded\x;
+Abanded\x
 ```
 
 And just for fun, let's do a larger scale dense speed comparison
@@ -329,19 +329,19 @@ Abanded = UpperTridiagonal(rand(n),rand(n-1),rand(n-2))
 Adense = Matrix(Abanded) # one of many easy ways to convert to dense storage
 x = rand(n)
 
-@btime Adense*x
+@btime Adense*x;
 
 ```
 ```julia
-@btime Abanded*x
+@btime Abanded*x;
 
 ```
 ```julia
-@btime Adense\x
+@btime Adense\x;
 
 ```
 ```julia
-@btime Abanded\x
+@btime Abanded\x;
 
 ```
 
@@ -532,9 +532,9 @@ Q = householderreflection(true, x)
 @test Q isa Reflection
 @test Q*x ≈ [norm(x);zeros(eltype(x),length(x)-1)]
 
-Q̃ = householderreflection(false, x)
-@test Q̃ isa Reflection
-@test Q̃*x ≈ [-norm(x);zeros(eltype(x),length(x)-1)]
+Q = householderreflection(false, x)
+@test Q isa Reflection
+@test Q*x ≈ [-norm(x);zeros(eltype(x),length(x)-1)]
 ```
 
 **Problem 5.6⋆** Consider a Householder reflection with $𝐱 = [1,h]$
