@@ -152,11 +152,11 @@ command.
 
 
 **SOLUTION**
-The next float after $2$ is $2 * (1 + 2^{-23})$ hence we get $2^{-22}$:
+The next float after $2$ is $2 * (1 + 2^{-23})$ hence we get $m(2) - 2 = 2^{-22}$:
 ```julia
 nextfloat(2f0) - 2, 2^(-22)
 ```
-similarly, the next float after $1024 = 2^{10}$ is $2^{10-23} = 2^{-13}$:
+similarly, for $1024 = 2^{10}$ we find that the difference $m(1024) - 1024$ is $2^{10-23} = 2^{-13}$:
 ```julia
  nextfloat(1024f0) - 1024, 2^(-13)
 ```
