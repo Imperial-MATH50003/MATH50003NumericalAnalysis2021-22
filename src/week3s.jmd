@@ -132,12 +132,12 @@ end
 
 Here is an example:
 ```julia
-x = [1 2 3 4]
+x = [1,2,3,4]
 Ldense = [1 0 0 0; 2 3 0 0; 4 5 6 0; 7 8 9 10]
 Ltriang = LowerTriangular(Ldense)
 ```
 ```julia
-Ldense\x-Ltriang\x
+Ldense\x-ldiv(Ltriang,x)
 ```
 
 
