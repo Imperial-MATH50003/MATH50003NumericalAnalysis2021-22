@@ -5,7 +5,7 @@ In this lecture we discuss matrix and vector norms. The matrix $2$-norm involves
 _singular values_, which are a measure of how matrices "stretch" vectors, similar to
 eigenvalues but more robust. We also introduce condition of problems, and show that
 the singular values of a matrix give a notion of a _condition number_, which allows us
-to bound errors in linear algebra operations.
+to bound errors introduced by floating point numbers in linear algebra operations.
 
 
 
@@ -13,7 +13,7 @@ to bound errors in linear algebra operations.
 
 Recall the definition of a (vector-)norm:
 
-**Definition (vector-norm)** A norm $\| ̇\|$ on $ℝ^n$ is a function that satisfies the following, for $𝐱,𝐲 ∈ ℝ^n$ and
+**Definition (vector-norm)** A norm $\|\cdot\|$ on $ℝ^n$ is a function that satisfies the following, for $𝐱,𝐲 ∈ ℝ^n$ and
 $c ∈ ℝ$:
 1. Triangle inequality: $\|𝐱 + 𝐲 \| ≤ \|𝐱\| + \|𝐲\|$
 2. Homogeneneity: $\| c 𝐱 \| = |c| \| 𝐱 \|$
@@ -25,7 +25,7 @@ Consider the following example:
 **Definition (p-norm)**
 For $1 ≤ p < ∞$ and $𝐱 \in ℝ^n$, define the $p$-norm:
 $$
-\|𝐱\|_p := (\sum_{k=1}^n |x_k|^p)^{1/p}
+\|𝐱\|_p := \left(\sum_{k=1}^n |x_k|^p\right)^{1/p}
 $$
 where $x_k$ is the $k$-th entry of $𝐱$. 
 For $p = ∞$ we define
@@ -33,7 +33,7 @@ $$
 \|𝐱\|_∞ := \max_k |x_k|
 $$
 
-**Theorem (p-norm)** $\| ⋅ \|_p$ is a norm.
+**Theorem (p-norm)** $\| ⋅ \|_p$ is a norm for $1 ≤ p ≤ ∞$.
 
 **Proof**
 
@@ -61,7 +61,8 @@ $$
 \| 𝐱 + 𝐲 \|^2 = \|𝐱\|^2 + 2 𝐱^⊤ 𝐲 + \|𝐲\|^2 ≤ \|𝐱\|^2 + 2\| 𝐱 \| \| 𝐲 \| + \|𝐲\|^2 = (\| 𝐱 \| +  \| 𝐲 \|)
 $$
 
-For general $1 < p  < ∞$ the proof is more involved.
+For general $1 < p  < ∞$, it suffices to assume $\| 𝐱 + 𝐲 \| = 1$.
+consider $\| 𝐱 + 𝐲 \|^p$...
 
 ∎
 
@@ -79,7 +80,6 @@ For general $1 < p  < ∞$ the proof is more involved.
 $$
 \|A\|_F := \sqrt{\sum_{k=1}^m \sum_{j=1}^n A_{kj}^2}
 $$
-
 While this is the simplest norm, it is not the most useful.  Instead, we will build a matrix norm from a 
 vector norm:
 
@@ -135,8 +135,32 @@ $$
 
 We have some simple examples of induced norms:
 
+**Example ($1$-norm)** We claim 
+$$
+\|A \|_1 = \max_j \|𝐚_j\|_1
+$$
+that is, the maximum $1$-norm of the columns. To see this use the triangle inequality to
+find for $\|𝐱\|_1 = 1$
+$$
+\| A 𝐱 \|_1 ≤ ∑_{j = 1}^n |x_j| \| 𝐚_j\|_1 ≤ \max_j \| 𝐚_j\| ∑_{j = 1}^n |x_j| = \max_j \| 𝐚_j\|_1.
+$$
+But the bound is also attained since if $j$ is the column that maximises the norms then
+$$
+\|A 𝐞_j \|_1 = \|𝐚_j\|_1 =  \max_j \| 𝐚_j\|_1.
+$$
 
-An example that is not simple is $\|A \|_2$.
+In the problem sheet we see that
+$$
+\|A\|_∞ = \max_k \|A[k,:]\|_1
+$$
+that is, the maximum $1$-norm of the rows.
+
+
+
+An example that is not simple is $\|A \|_2$, but we do have two simple cases:
+
+**Proposition (diagonal/orthogonal 2-norms)** If $Λ$ is diagonal with entries $λ_k$ then
+$\|Λ\|_2 = \max_k |λ_k|.$. If $Q$ is orthogonal then $\|Q\| = 1$.
 
 
 ## 3. Singular value decomposition
@@ -159,7 +183,7 @@ where $U ∈ ℝ^{m × m}$ and $V ∈  ℝ^{n × n}$ are orthogonal matrices and
 For symmetric matrices, the SVD is related to the eigenvalue decomposition.
 Recall that a symmetric matrix has real eigenvalues and orthogonal eigenvectors:
 $$
-A = Q Λ Q^⊤ = \undebrace{Q}_U \underbrace{|Λ|}_Σ \underbrace{(\sign Λ Q)^⊤}_{V^⊤}
+A = Q Λ Q^⊤ = \underbrace{Q}_U \underbrace{|Λ|}_Σ \underbrace{(\hbox{sign}(Λ) Q)^⊤}_{V^⊤}
 $$
 For non-symmetric matrices we relate it to the eigenvalues of the _Gram matrix_ $A^⊤A$ and $AA^⊤$ via:
 $$
@@ -185,7 +209,7 @@ which means $A 𝐱 = 0$ and $𝐱 ∈ \hbox{ker}(A)$.
 
 This connection allows us to prove existence:
 
-**Theorem** Every $A ∈ ℝ^{m× n}$ has an SVD.
+**Theorem (SVD existence)** Every $A ∈ ℝ^{m× n}$ has an SVD.
 
 **Proof**
 
@@ -219,8 +243,224 @@ U^⊤ U = Σ^{-1} V^⊤ A^⊤ A V Σ^{-1} = I.
 $$
 Thus we have
 $$
-U Σ V^⊤ = A V V^⊤
+U Σ V^⊤ = A V V^⊤ = A \underbrace{\begin{bmatrix} V | K \end{bmatrix}}_Q\underbrace{\begin{bmatrix} V^⊤ \\ K^⊤ \end{bmatrix}}_{Q^⊤}
 $$
-Finally, note that 
+where we use the fact that $A K = 0$ so that concatenating $K$ does not change the value.
 
 ∎
+
+Singular values tell us the 2-norm:
+
+**Corollary (singular values and norm)**
+$$
+\|A \|_2 = σ_1
+$$
+and if $A$ is invertible, then
+$$
+\|A^{-1} \|_2 = σ_r^{-1}
+$$
+
+**Proof**
+
+First we establish the upper-bound:
+$$
+\|A \|_2 ≤  \|U \|_2 \| Σ \|_2 \| V^⊤\|_2 = \| Σ \|_2  = σ_1
+$$
+This is attained using the first right singular vector:
+$$
+\|A 𝐯_1\|_2 = \|Σ V^⊤ 𝐯_1\|_2 = \|Σ  𝐞_1\|_2 = σ_1
+$$
+The inverse result follows since the inverse has SVD
+$$
+A^{-1} = V Σ^{-1} U^⊤ = V (W Σ^{-1} W) U^⊤
+$$
+where
+$$
+W := P_σ = \begin{bmatrix} && 1 \\ & ⋰ \\ 1 \end{bmatrix}
+$$
+is the permutation that reverses the entries, that is, $σ$ has Cauchy notation
+$$
+\begin{pmatrix}
+1 & 2 & ⋯ & n \\
+n & n-1 & ⋯ & 1
+\end{pmatrix}.
+$$
+
+
+∎
+
+We will not discuss in this module computation of singular value decompositions or eigenvalues:
+they involve iterative algorithms (actually built on a sequence of QR decompositions).
+
+One of the main usages for SVDs is low-rank approximation:
+
+**Theorem (best low rank approximation)** The  matrix
+$$
+A_k := \begin{bmatrix} 𝐮_1 | ⋯ | 𝐮_k \end{bmatrix} \begin{bmatrix}
+σ_1 \\
+& ⋱ \\
+&& σ_k\end{bmatrix} \begin{bmatrix} 𝐯_1 | ⋯ | 𝐯_k \end{bmatrix}^⊤
+$$ 
+is the best 2-norm approximation of $A$ by a rank $k$ matrix, that is, for all rank-$k$ matrices $B$, we have 
+$$\|A - A_k\|_2 ≤ \|A -B \|_2.$$
+
+
+**Proof**
+We have
+
+$$
+\|A - A_k\|_2 = \|U \begin{bmatrix} 0  \cr &\ddots \cr && 0 \cr &&& σ_{k+1} \cr &&&& \ddots \cr &&&&& σ_n \cr &&&&&\vdots \cr &&&&&0\end{bmatrix} = σ_{r+1}
+$$
+
+
+Suppose a rank-$k$ matrix $B$ has 
+$$
+\|A-B\|_2  < \|A-A_k\|_2 = σ_{k+1}.
+$$
+For all $𝐰 \in \ker(B)$ we have 
+$$
+\|A 𝐰\|_2 = \|(A-B) 𝐰\|_2 ≤ \|A-B\|\|𝐰\|_2  < σ_{k+1} \|𝐰\|_2
+$$
+
+But for all $𝐮 \in {\rm span}(𝐯_1,…,𝐯_{k+1})$, that is, $𝐮 = V[:,1:r+1]𝐜$ for some $𝐜 \in ℝ^{k+1}$  we have 
+$$
+\|A 𝐮\|_2^2 = \|U Σ_k 𝐜\|_2^2 = \|Σ_k 𝐜\|_2^2 =
+\sum_{j=1}^{k+1} (σ_j c_j)^2 ≥ σ_{k+1}^2 \|c\|^2,
+$$
+i.e., $\|A 𝐮\|_2 ≥ σ_{k+1} \|c\|$.  Thus $𝐰$ cannot be in this span.
+
+
+The dimension of the span of $\ker(B)$ is at least $n-k$, but the dimension of ${\rm span}(𝐯_1,…,𝐯_{k+1})$ is at least $k+1$.
+Since these two spaces cannot intersect we have a contradiction, since $(n-r) + (r+1) = n+1 > n$.  ∎
+
+
+In the problem sheet we explore the usage of low rank approximation to smooth functions.
+
+
+
+## 4. Condition numbers
+
+We have seen that floating point arithmetic induces errors in computations, and that we can typically
+bound the absolute errors to be proportional to $C ϵ_{\rm m}$. We want a way to bound the
+effect of more complicated calculations like computing $A 𝐱$ or $A^{-1} 𝐲$ without having to deal with
+the exact nature of floating point arithmetic. Here we consider only matrix-multiplication but will make a remark
+about matrix inversion.
+
+To justify what follows, we first observe that errors in implementing matrix-vector multiplication
+can be captured by considering the multiplication to be exact on the wrong matrix: that is, `A x`
+(implemented with floating point) is precisely $A + δA$ where $δA$ has small norm, relative to $A$.
+This is known as _backward error analysis_.
+
+
+
+To discuss floating point errors we need to be precise which order the operations happened.
+We will use the definition `mul(A,x)`, which denote ${\rm mul}(A, 𝐱)$. (Note that `mul_rows` actually
+does the _exact_ same operations, just in a different order.) Note that each entry of the result is in fact a dot-product
+of the corresponding rows so we first consider the error in the dot product  `dot(𝐱,𝐲)` as implemented in floating-point, 
+which we denote ${\rm dot}(A,x)$.
+
+We first need a helper proposition:
+
+**Proposition** If $|ϵ_i| ≤ ϵ$ and $n ϵ < 1$, then
+$$
+\prod_{k=1}^n (1+ϵ_i) = 1+θ_n
+$$
+for some constant $θ_n$ satisfying $|θ_n| ≤ {n ϵ \over 1-nϵ}$.
+
+The proof is left as an exercise (Hint: use induction).
+
+**Lemma (dot product backward error)**
+For any norm,
+$$
+{\rm dot}(𝐱, 𝐲) = (𝐱 + δ𝐱)^⊤ 𝐲
+$$
+where
+$$
+\|δ𝐱\| ≤  {n ϵ_{\rm m} \over 1-nϵ_{\rm m}} \|𝐱 \|
+$$
+
+
+**Proof**
+
+Note that 
+$$
+{\rm dot}(𝐱, 𝐲) = \{ [(x_1 ⊗ y_1) ⊕ (x_2 ⊗ y_2)] ⊕(x_3⊗ y_3)] ⊕⋯\}⊕(x_n ⊗ y_n) \\
+  & = \{ [(x_1 y_1)(1+δ_1) + (x_2 y_2)(1+δ_2)](1+γ_1) +x_3 y_3(1+δ_3)](1+γ_2) + ⋯ \}(1+γ_{n-1})+x_n y_n(1+δ_n) \\
+  & = x_1 y_1 (1+δ_1) \prod_{k=1}^{n-1}(1+γ_k) + x_2 y_2 (1+δ_2) \prod_{k=1}^{n-1}(1+γ_k) + x_3 y_3 (1+δ_3) \prod_{k=2}^{n-1}(1+γ_k)  + ⋯  +x_{n-1} y_{n-1}(1+δ_{n-1})(1+γ_{n-1}) + x_n y_n(1+δ_n) \\
+  &= x_1y_1(1+θ_n^1) + x_2y_2(1+θ_n^2)+ x_3y_3(1+θ_{n-1}) + \cdots + x_n y_n (1+θ_1)
+\end{align*}
+$$
+where we denote the errors from multiplication as $δ_k$ and those from addition by $γ_k$ and the previous proposition tells us
+$$
+|θ_n^1|, |θ_n^2| ≤ {n ϵ_{\rm m} \over 1-nϵ_{\rm m}}
+$$
+and
+$$
+|θ_k| ≤ {k ϵ_{\rm m} \over 1-kϵ_{\rm m}} ≤ {n ϵ_{\rm m} \over 1-nϵ_{\rm m}}.
+$$
+Thus
+$$
+δ𝐱 =  \begin{pmatrix} x_1 θ_n^1 \cr x_2 θ_n^2 \cr x_3 θ_{n-1} \cr \vdots \cr x_n θ_1\end{pmatrix}
+$$
+and the theorem follows:
+$$
+\| δ𝐱 \| ≤ {n ϵ_{\rm m} \over 1-nϵ_{\rm m}} \| 𝐱 \|
+$$
+
+∎
+
+**Theorem (matrix-vector backward error)**
+For any norm,
+$$
+{\rm mul}(A, 𝐱) = (A + δA)^⊤ 𝐱
+$$
+where
+$$
+\|δA\| ≤  {n ϵ_{\rm m} \over 1-nϵ_{\rm m}} \|A \|
+$$
+
+**Proof**
+
+Follows from applying the previous lemma to each row.
+
+∎
+
+
+So now we get to a mathematical question independent of floating point: can we bound the _relative error_ in approximating
+$$
+A 𝐱 ≈ (A + δA) 𝐱
+$$
+if we know a bound on $\|δA\|$?
+It turns out we can in turns of the _condition number_ of the matrix:
+
+**Definition (condition number)**
+For a square matrix $A$, the _condition number_ is
+$$
+κ(A) := \| A \| \| A^{-1} \| = {σ_1 \over σ_n}
+$$
+
+
+**Theorem (relative-error for matrix-vector)**
+The _worst-case_ relative error in $A 𝐱 ≈ (A + δA) 𝐱$ is
+$$
+{\| δA 𝐱 \| \over \| A 𝐱 \| } ≤ κ(A) {\|δA\| \over \|A \|}
+$$
+
+**Proof**
+We can assume $A$ is invertible (as otherwise $κ(A) = ∞$). Denote $𝐲 = A 𝐱$ and we have
+$$
+{\|𝐱 \| \over \| A 𝐱 \|} = {\|A^{-1} 𝐲 \| \over \|𝐲 \|} ≤ \| A^{-1}\|
+$$
+Thus we have:
+$$
+{\| δA 𝐱 \| \over \| A 𝐱 \| } ≤ \| δA\| \|A^{-1}\| ≤ κ(A) {\|δA\| \over \|A \|}
+$$
+
+∎
+
+
+Thus for floating point arithmetic we know the error is bounded by $κ(A) {n ϵ_{\rm m} \over 1-nϵ_{\rm m}}$.
+
+If one uses QR to solve $A 𝐱 = 𝐲$ the condition number also gives a meaningful bound on the error. 
+As we have already noted, there are some matrices where PLU decompositions introduce large errors, so
+in that case well-conditioning is not a guarantee (but it still usually works).
