@@ -430,9 +430,20 @@ struct PermutationMatrix <: AbstractMatrix{Int}
     end
 end
 
-Base.size(P::PermutationMatrix) = (length(P.p),length(P.p))
-Base.getindex(P::PermutationMatrix, k::Int, j::Int) = P.p[k] == j ? 1 : 0 
-Base.:*(P::PermutationMatrix, x::AbstractVector) = x[P.p]
+function size(P::PermutationMatrix)
+    (length(P.p),length(P.p))
+end
+function getindex(P::PermutationMatrix, k::Int, j::Int)
+    # P.p[k] == j ? 1 : 0 
+    if P.p[k] == j
+        1
+    else 
+        0
+    end
+end
+function *(P::PermutationMatrix, x::AbstractVector)
+    x[P.p]
+end
 
 # If your code is correct, this "unit test" will succeed
 p = [1, 4, 2, 5, 3]
