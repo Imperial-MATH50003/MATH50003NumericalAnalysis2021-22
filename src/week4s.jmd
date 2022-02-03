@@ -65,8 +65,10 @@ $$
 $$
 we compute it step-by-step:
 $$
-𝐯_j^1 := 𝐚_j
-𝐯_j^{k+1} := 𝐯_j^k - 𝐪_k^\top 𝐯_j^k 𝐪_k
+\begin{align*}
+𝐯_j^1 &:= 𝐚_j \\
+𝐯_j^{k+1} &:= 𝐯_j^k - 𝐪_k^\top 𝐯_j^k 𝐪_k
+\end{align*}
 $$
 Show that $𝐯_j^k = 𝐯_j$. 
 
