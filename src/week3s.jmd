@@ -218,7 +218,7 @@ end
 
 function setindex!(U::UpperTridiagonal, v, k::Int, j::Int)
     d,du,du2 = U.d,U.du,U.du2
-    if j > k+2
+    if (j > k+2)||(j<k)
         error("Cannot modify off-band")
     end
 
