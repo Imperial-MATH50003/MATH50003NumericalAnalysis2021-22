@@ -33,6 +33,8 @@ notebook("src/Integration.jmd"; nkwds...)
 notebook("src/week1.jmd"; skwds...)
 notebook("src/week2.jmd"; skwds...)
 notebook("src/advanced1.jmd"; skwds...)
+notebook("src/advanced2.jmd"; skwds...)
+notebook("src/advanced3.jmd"; skwds...)
 
 ##
 # solutions 

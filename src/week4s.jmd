@@ -70,7 +70,7 @@ $$
 𝐯_j^{k+1} &:= 𝐯_j^k - 𝐪_k^\top 𝐯_j^k 𝐪_k
 \end{align*}
 $$
-Show that $𝐯_j^k = 𝐯_j$. 
+Show that $𝐯_j^j = 𝐯_j$. 
 
 **Problem 2.2** Complete the following
 function implementing the modified Gram–Schmidt algorithm:

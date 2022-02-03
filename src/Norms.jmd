@@ -1,19 +1,69 @@
-# Vector and Matrix Norms
+# Norms, singular values, and conditioning
+
+
+In this lecture we discuss matrix and vector norms. The matrix $2$-norm involves
+_singular values_, which are a measure of how matrices "stretch" vectors, similar to
+eigenvalues but more robust. We also introduce condition of problems, and show that
+the singular values of a matrix give a notion of a _condition number_, which allows us
+to bound errors in linear algebra operations.
+
 
 
 ## 1. Vector norms
 
+Recall the definition of a (vector-)norm:
+
+**Definition (vector-norm)** A norm $\| ̇\|$ on $ℝ^n$ is a function that satisfies the following, for $𝐱,𝐲 ∈ ℝ^n$ and
+$c ∈ ℝ$:
+1. Triangle inequality: $\|𝐱 + 𝐲 \| ≤ \|𝐱\| + \|𝐲\|$
+2. Homogeneneity: $\| c 𝐱 \| = |c| \| 𝐱 \|$
+3. Positive-definiteness: $\|𝐱\| = 0$ implies that $𝐱 = 0$.
+
+
+Consider the following example:
+
 **Definition (p-norm)**
-For $1 \leq p < \infty$ and $\mathbf v \in {\mathbb R}^n$, define the $p$-norm:
+For $1 ≤ p < ∞$ and $𝐱 \in ℝ^n$, define the $p$-norm:
 $$
-\|\mathbf{v}\|_p := (\sum_{k=1}^n |v_k|^p)^{1/p}
+\|𝐱\|_p := (\sum_{k=1}^n |x_k|^p)^{1/p}
 $$
-where $v_k$ is the $k$-th entry of $\mathbf v$. 
-For $p = \infty$ we define
+where $x_k$ is the $k$-th entry of $𝐱$. 
+For $p = ∞$ we define
 $$
-\|\mathbf{v}\|_\infty := \max |v_k|
+\|𝐱\|_∞ := \max_k |x_k|
 $$
 
+**Theorem (p-norm)** $\| ⋅ \|_p$ is a norm.
+
+**Proof**
+
+Homogeneity and positive-definiteness are straightforward: e.g.,
+$$
+\|c 𝐱\|_p = (\sum_{k=1}^n |cx_k|^p)^{1/p} = (|c|^p \sum_{k=1}^n |x_k|^p)^{1/p} = |c| \| 𝐱 \|
+$$
+and if $\| 𝐱 \|_p = 0$ then all $|x_k|^p$ are have to be zero.
+
+For $p = 1,∞$ the triangle inequality is also straightforward:
+$$
+\| 𝐱 + 𝐲 \|_∞ = \max_k (|x_k + y_k|) ≤ \max_k (|x_k| + |y_k|) ≤ \|𝐱\|_∞ + \|𝐲\|_∞
+$$
+and
+$$
+\| 𝐱 + 𝐲 \|_1 = \sum_{k=1}^n |x_k + y_k| ≤  \sum_{k=1}^n (|x_k| + |y_k|) = \| 𝐱 \|_1 + \| 𝐲\|_1
+$$
+
+For $p = 2$ it can be proved using the Cauchy–Schwartz inequality:
+$$
+|𝐱^⊤ 𝐲| ≤ \| 𝐱 \|_2 \| 𝐲 \|_2
+$$
+That is, we have
+$$
+\| 𝐱 + 𝐲 \|^2 = \|𝐱\|^2 + 2 𝐱^⊤ 𝐲 + \|𝐲\|^2 ≤ \|𝐱\|^2 + 2\| 𝐱 \| \| 𝐲 \| + \|𝐲\|^2 = (\| 𝐱 \| +  \| 𝐲 \|)
+$$
+
+For general $1 < p  < ∞$ the proof is more involved.
+
+∎
 
 
  In Julia can use the inbuilt `norm` function to calculate norms:
@@ -29,64 +79,148 @@ $$
 $$
 \|A\|_F := \sqrt{\sum_{k=1}^m \sum_{j=1}^n A_{kj}^2}
 $$
-where ${\rm vec}(A)$ is the equivalent of `vec(A)`, which 
 
-While this is the simplest norm, it is not the most useful.  
+While this is the simplest norm, it is not the most useful.  Instead, we will build a matrix norm from a 
+vector norm:
 
 
-The important thing for us is that if $\|A\| = 0$ then $A = 0$, so it can be used to test if two matrices are equal: 
-if $\|A-B\| \approx 0$, then $A \approx B$:
 
-### Induced matrix norms
-
-Suppose $A$ is an $m \times n$ matrix, and consider two norms $\| \mathbf v\|_X$ for $\mathbf v \in \mathbb R^m$  and 
-$\| \matbf w \|_Y$ for $\mathbf w \in \mathbb R^n$.    For example, they could both be the 2-norm, both be the $\infty$-norm, 
-or a mixture of the two.  
-These two norms induce a norm on matrices:
-
-$$\|A\|_{X \rightarrow Y} \triangleq \sup_{\mathbf v : \|\mathbf{v}\|_X=1} \|A \mathbf v\|_Y$$
-
-That is, take the supremum of $\|{A \mathbf v}\|_Y$ over the set of all vectors $\mathbf v$ whose X-norm is one.
-
-When we use the same vector norm for the domain and range, we specify only one space
-
-$$\|A\|_X \triangleq \|A\|_{X \rightarrow X}$$
-
-For  the induced 2, 1, and $\infty$-norm we use
-
-$$\|A\|_2, \|A\|_1 \qquad \hbox{and} \qquad \|A\|_{\infty}.$$
-
-**Lemma (matrix norms are norms)** Matrix norms are norms, that is:
-1. $\|c A \| = |c| \|A\|$
-2. $\| A + B \| \leq  \|A\| + \|B\|$
-3. $\|A\| =0 \Rightarrow A = 0$
-In addition, they satisfy the additional property that
+**Definition (matrix-norm)** Suppose $A ∈ ℝ^{m × n}$  and consider two norms $\| ⋅ \|_X$ on $ℝ^n$  and 
+$\| ⋅ \|_Y$ on $ℝ^n$. Define the _(induced) matrix norm_ as:
 $$
-\| AB\| \leq \|A \| \|B\|
+\|A \|_{X → Y} := \sup_{𝐯 : \|𝐯\|_X=1} \|A 𝐯\|_Y
 $$
+Also define
+$$
+\|A\|_X \triangleq \|A\|_{X \rightarrow X}
+$$
+
+For  the induced 2, 1, and $∞$-norm we use
+$$
+\|A\|_2, \|A\|_1 \qquad \hbox{and} \qquad \|A\|_∞.
+$$
+
+Note an equivalent definition of the induced norm:
+$$
+\|A\|_{X → Y} = \sup_{𝐱 ∈ ℝ^n, 𝐱 ≠ 0} {\|A 𝐱\|_Y \over \| 𝐱\|_X}
+$$
+This follows since we can scale $𝐱$ by its norm so that it has unit norm, that is,
+${𝐱} \over \|𝐱\|_X$ has unit norm.
+
+**Lemma (matrix norms are norms)** Induced matrix norms are norms, that is for $\| ⋅ \| = \| ⋅ \|_{X → Y}$ we have:
+1. Triangle inequality: $\| A + B \| ≤  \|A\| + \|B\|$
+1. Homogeneneity: $\|c A \| = |c| \|A\|$
+3. Positive-definiteness: $\|A\| =0 \Rightarrow A = 0$
+In addition, they satisfy the following additional propertie:
+1. $\|A 𝐱 \|_Y ≤ \|A\|_{X → Y} \|𝐱 \|_X$
+2. Multiplicative inequality: $\| AB\|_{X → Z} ≤ \|A \|_{Y → Z} \|B\|_{X →  Y}$
 
 **Proof**
 
-First note an equivalent definition of the induced norm:
+First we show the _triangle inequality_:
 $$
-\|A\| = \sup_{\mathbf v} {\|A \mathbf v\| \over \| \mathbf v\|}
+\|A + B \| ≤ \sup_{𝐯 : \|𝐯\|_X=1} (\|A 𝐯\|_Y + \|B 𝐯\|_Y) ≤ \| A \| + \|B \|.
 $$
-This follows since we can scale $\mathbf v$ by its norm so that it has unit norm, that is,
-${\mathbf v} \over \|\mathbf v\|$ has unit norm.  Then
+Homogeneity is also immediate. Positive-definiteness follows from the fact that if
+$\|A\| = 0$ then $A 𝐱  = 0$ for all $𝐱 ∈ ℝ^n$.
+The property $\|A 𝐱 \|_Y ≤ \|A\|_{X → Y} \|𝐱 \|_X$ follows from the definition. Finally, 
+Finally, the multiplicative inequality follows from
 $$
-\sup_{\mathbf v} {\|A \mathbf v\| \over \| \mathbf v\|} = 
-\sup_{\mathbf v} {\|A {\mathbf v \over \mathbf \|\mathbf v\|}\|} \leq \sup_{\mathbf v : \|\mathbf w \| = 1} {\|A  w \|} = 
-\|A\|
+\|A B\| = \sup_{𝐯 : \|𝐯\|_X=1} \|A B 𝐯 |_Z ≤ \sup_{𝐯 : \|𝐯\|_X=1} \|A\|_{Y → Z} \| B 𝐯 | = \|A \|_{Y → Z} \|B\|_{X →  Y}
 $$
-This combined with the trivial case
-$$
-\sup_{\mathbf v} {\|A \mathbf v\| \over \| \mathbf v\|} \geq \sup_{\mathbf v : \|\mathbf v \| = 1 } {\|A \mathbf v\| \over \| \mathbf v\|}  = 
-\sup_{\mathbf v : \|\mathbf v \| = 1 } {\|A \mathbf v\| } = \|A\|  
-$$
+
+
 
 ∎
 
+We have some simple examples of induced norms:
 
-## Induced 2-norm
 
-Induced norms define the "length" of a matrix by how much they magnify vectors.  We can visualize this in 2D for the induced 2-norm $\|A\|_2$, taking a random 2 x 2 matrix.
+An example that is not simple is $\|A \|_2$.
+
+
+## 3. Singular value decomposition
+
+To define the induced $2$-norm we need to consider the following:
+
+**Definition (singular value decomposition)** For $A ∈ ℝ^{m × n}$ with rank $r > 0$, 
+the _reduced singular value decomposition (SVD)_ is
+$$
+A = U Σ V^⊤
+$$
+where $U ∈ ℝ^{m × r}$ and $V ∈  ℝ^{r × n}$ have orthonormal columns and $Σ ∈ ℝ^{r × r}$ is  diagonal whose
+diagonal entries, which which we call _singular values_, are all non-negative and decreasing: $σ_1 ≥ ⋯ ≥ σ_{\min(m,n)} ≥ 0$.
+The _full singular value decomposition (SVD)_ is
+$$
+A = U Σ V^⊤
+$$
+where $U ∈ ℝ^{m × m}$ and $V ∈  ℝ^{n × n}$ are orthogonal matrices and $Σ ∈ ℝ^{m × n}$.
+
+For symmetric matrices, the SVD is related to the eigenvalue decomposition.
+Recall that a symmetric matrix has real eigenvalues and orthogonal eigenvectors:
+$$
+A = Q Λ Q^⊤ = \undebrace{Q}_U \underbrace{|Λ|}_Σ \underbrace{(\sign Λ Q)^⊤}_{V^⊤}
+$$
+For non-symmetric matrices we relate it to the eigenvalues of the _Gram matrix_ $A^⊤A$ and $AA^⊤$ via:
+$$
+\begin{align*}
+A^⊤ A = V Σ^2 V^⊤ \\
+A A^⊤ = U Σ^2 U^⊤
+\end{align*}
+$$
+That is, $σ_k^2$ are non-zero eigenvalues of $A^⊤ A$ and $A A^⊤$. 
+We now establish some properties of a Gram matrix:
+
+**Proposition (Gram matrix kernel)** The kernel of $A$ is the also the kernel of $A^⊤ A$. 
+
+**Proof**
+If $A^⊤ A 𝐱 = 0$ then we have
+$$
+0 = 𝐱 A^⊤ A 𝐱 = \| A 𝐱 \|^2
+$$
+which means $A 𝐱 = 0$ and $𝐱 ∈ \hbox{ker}(A)$.
+∎
+
+
+
+This connection allows us to prove existence:
+
+**Theorem** Every $A ∈ ℝ^{m× n}$ has an SVD.
+
+**Proof**
+
+First note that $A^⊤ A = Q Λ Q^⊤$ has non-negative eigenvalues $λ_k$ as,
+for the corresponding (orthonormal) eigenvector $𝐪_k$,
+$$
+λ_k = λ_k 𝐪_k^⊤ 𝐪_k = 𝐪_k^⊤ A^⊤ A 𝐪_k = \| A 𝐪_k \| ≥ 0.
+$$
+Further, the kernel of $A^⊤ A$ is the same as $A$.
+Assume the eigenvalues are sorted in decreasing modulus, and so $λ_1,…,λ_r$
+are an enumeration of the non-zero eigenvalues and
+$$
+V := \begin{bmatrix} 𝐪_1 | ⋯ | 𝐪_r \end{bmatrix}
+$$
+the corresponding (orthonormal) eigenvectors, with
+$$
+K = \begin{bmatrix} 𝐪_{r+1} | ⋯ | 𝐪_n \end{bmatrix}
+$$
+the corresponding kernel. 
+Define
+$$
+Σ :=  \begin{bmatrix} \sqrt{λ_1} \\ & ⋱ \\ && \sqrt{λ_r} \end{bmatrix}
+$$
+Now define
+$$
+U := AV Σ^{-1}
+$$
+which is orthogonal since $A^⊤ A V = Σ^2 V$:
+$$
+U^⊤ U = Σ^{-1} V^⊤ A^⊤ A V Σ^{-1} = I.
+$$
+Thus we have
+$$
+U Σ V^⊤ = A V V^⊤
+$$
+Finally, note that 
+
+∎
