@@ -81,7 +81,7 @@ Float16(0.1) / (Float16(1.1) - 1)
 
 
 
-**Problem 4.4⋆** Find a bound on the _absolute error_ in terms of a constant times
+**Problem 4.6⋆** Find a bound on the _absolute error_ in terms of a constant times
 $ϵ_{\rm m}$ for the following computations
 $$
 \begin{align*}
