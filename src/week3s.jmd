@@ -507,9 +507,15 @@ end
 
 Reflection(x::Vector{T}) where T = Reflection{T}(x/norm(x))
 
-Base.size(Q::Reflection) = (length(Q.v),length(Q.v))
-Base.getindex(Q::Reflection, k::Int, j::Int) = (k == j) - 2Q.v[k]*Q.v[j]
-Base.:*(P::Reflection, x::AbstractVector) = x - 2*Q.v * dot(Q.v,x)
+function size(Q::Reflection)
+    (length(Q.v),length(Q.v))
+end
+function getindex(Q::Reflection, k::Int, j::Int)
+    (k == j) - 2Q.v[k]*Q.v[j]
+end
+function *(P::Reflection, x::AbstractVector)
+    x - 2*Q.v * dot(Q.v,x)
+end
 
 # If your code is correct, these "unit tests" will succeed
 x = randn(5)
