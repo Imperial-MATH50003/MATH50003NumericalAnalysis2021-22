@@ -11,13 +11,14 @@ skwds = (out_path = "sheets/", jupyter_path = "$(homedir())/.julia/conda/3/bin/j
 
 notebook("src/Julia.jmd"; nkwds...)
 notebook("src/Asymptotics.jmd"; nkwds...)
+notebook("src/SpectralTheorem.jmd"; nkwds...)
 
 notebook("src/Numbers.jmd"; nkwds...)
 notebook("src/Differentiation.jmd"; nkwds...)
 
 notebook("src/StructuredMatrices.jmd"; nkwds...)
 notebook("src/Decompositions.jmd"; nkwds...)
-notebook("src/Norms.jmd"; nkwds...)
+notebook("src/SingularValues.jmd"; nkwds...)
 notebook("src/DifferentialEquations.jmd"; nkwds...)
 
 notebook("src/Fourier.jmd"; nkwds...)

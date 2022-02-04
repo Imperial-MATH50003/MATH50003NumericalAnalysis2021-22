@@ -1,0 +1,33 @@
+# Spectral theorem for symmetric and normal matrices
+
+Here we review the proof of the spectral theorem for symmetric and normal
+matrices, as well as adjoints (complex-conjugation).
+
+## 1. Adjoints
+
+The adjoint of a matrix
+
+
+## 2. Spectral theorem for symmetric matrices
+
+
+
+
+
+**Theorem (spectral theorem for symmetric matrices)** If $A$ is symmetric
+($A = A^⊤$) then
+$$
+A = Q Λ Q^⊤
+$$
+where $Q$ is orthogonal ($Q^⊤Q = I$) and $Λ$ is real.
+
+**Proof**
+
+Recall every eigenvalue $λ$ has at least one eigenvector $𝐪$ which we can
+normalize, but this can be
+complex. Thus we have
+$$
+λ = λ 𝐪^⋆𝐪  = 𝐪^⋆ A 𝐪 = 
+$$
+
+∎

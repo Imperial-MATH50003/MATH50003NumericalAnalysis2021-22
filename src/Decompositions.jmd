@@ -339,7 +339,7 @@ r_{11} & \cdots & r_{1n} \\ & ⋱ & ⋮\\
 $$
 i.e.
 $$
-A = \underbrace{Q_n \cdots Q_1}_Q R.
+A = \underbrace{Q_1 \cdots Q_n}_Q R.
 $$
 
 The implementation is cleaner. We do a naive implementation here:

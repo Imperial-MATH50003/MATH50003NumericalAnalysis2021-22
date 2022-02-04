@@ -1,4 +1,4 @@
-# Norms, singular values, and conditioning
+# Singular values and conditioning
 
 
 In this lecture we discuss matrix and vector norms. The matrix $2$-norm involves
@@ -7,7 +7,13 @@ eigenvalues but more robust. We also introduce condition of problems, and show t
 the singular values of a matrix give a notion of a _condition number_, which allows us
 to bound errors introduced by floating point numbers in linear algebra operations.
 
-
+1. Vector norms: we discuss the standard $p$-norm for vectors in $ℝ^n$.
+2. Matrix norms: we discuss how two vector norms can be used to induce a norm on matrices. These
+satisfy an additional multiplicative inequality.
+3. Singular value decomposition: we introduce the singular value decomposition which is related to
+the matrix $2$-norm and best low rank approximation.
+4. Condition numbers: we will see how errors in matrix-vector multiplication and solving linear systems
+can be bounded in terms of the _condition number_, which is defined in terms of singular values.
 
 ## 1. Vector norms
 
@@ -173,27 +179,23 @@ $$
 A = U Σ V^⊤
 $$
 where $U ∈ ℝ^{m × r}$ and $V ∈  ℝ^{r × n}$ have orthonormal columns and $Σ ∈ ℝ^{r × r}$ is  diagonal whose
-diagonal entries, which which we call _singular values_, are all non-negative and decreasing: $σ_1 ≥ ⋯ ≥ σ_{\min(m,n)} ≥ 0$.
+diagonal entries, which which we call _singular values_, are all positive and decreasing: $σ_1 ≥ ⋯ ≥ σ_r > 0$.
 The _full singular value decomposition (SVD)_ is
 $$
-A = U Σ V^⊤
+A = Ũ Σ̃ Ṽ^⊤
 $$
-where $U ∈ ℝ^{m × m}$ and $V ∈  ℝ^{n × n}$ are orthogonal matrices and $Σ ∈ ℝ^{m × n}$.
+where $Ũ ∈ ℝ^{m × m}$ and $Ṽ ∈  ℝ^{n × n}$ are orthogonal matrices and $Σ̃ ∈ ℝ^{m × n}$ has only
+diagonal entries, i.e., if $m > n$,
+$$
+Σ̃ = \begin{bmatrix} σ_1 \\ & ⋱ \\ && σ_n \\ && 0 \\ && ⋮ \\ && 0 \end{bmatrix}
+$$
+and if $m < n,
+$$
+Σ̃ = \begin{bmatrix} σ_1 \\ & ⋱ \\ && σ_m & 0 & ⋯ & 0\end{bmatrix}
+$$
+where $σ_k = 0$ if $k > r$.
 
-For symmetric matrices, the SVD is related to the eigenvalue decomposition.
-Recall that a symmetric matrix has real eigenvalues and orthogonal eigenvectors:
-$$
-A = Q Λ Q^⊤ = \underbrace{Q}_U \underbrace{|Λ|}_Σ \underbrace{(\hbox{sign}(Λ) Q)^⊤}_{V^⊤}
-$$
-For non-symmetric matrices we relate it to the eigenvalues of the _Gram matrix_ $A^⊤A$ and $AA^⊤$ via:
-$$
-\begin{align*}
-A^⊤ A = V Σ^2 V^⊤ \\
-A A^⊤ = U Σ^2 U^⊤
-\end{align*}
-$$
-That is, $σ_k^2$ are non-zero eigenvalues of $A^⊤ A$ and $A A^⊤$. 
-We now establish some properties of a Gram matrix:
+To show the SVD exists we first establish some properties of a Gram matrix:
 
 **Proposition (Gram matrix kernel)** The kernel of $A$ is the also the kernel of $A^⊤ A$. 
 
@@ -205,6 +207,22 @@ $$
 which means $A 𝐱 = 0$ and $𝐱 ∈ \hbox{ker}(A)$.
 ∎
 
+**Proposition (Gram matrix diagonalisation)** The Gram-matrix
+satisfies
+$$
+A^⊤ A = Q Λ Q^⊤
+$$
+where $Q$ is orthogonal and the eigenvalues $λ_k$ are non-negative.
+
+**Proof**
+$A^⊤ A$ is symmetric so we appeal to the spectral theorem for the
+existence of the decomposition.
+For the corresponding (orthonormal) eigenvector $𝐪_k$,
+$$
+λ_k = λ_k 𝐪_k^⊤ 𝐪_k = 𝐪_k^⊤ A^⊤ A 𝐪_k = \| A 𝐪_k \| ≥ 0.
+$$
+
+∎
 
 
 This connection allows us to prove existence:
@@ -213,12 +231,6 @@ This connection allows us to prove existence:
 
 **Proof**
 
-First note that $A^⊤ A = Q Λ Q^⊤$ has non-negative eigenvalues $λ_k$ as,
-for the corresponding (orthonormal) eigenvector $𝐪_k$,
-$$
-λ_k = λ_k 𝐪_k^⊤ 𝐪_k = 𝐪_k^⊤ A^⊤ A 𝐪_k = \| A 𝐪_k \| ≥ 0.
-$$
-Further, the kernel of $A^⊤ A$ is the same as $A$.
 Assume the eigenvalues are sorted in decreasing modulus, and so $λ_1,…,λ_r$
 are an enumeration of the non-zero eigenvalues and
 $$
@@ -334,6 +346,40 @@ The dimension of the span of $\ker(B)$ is at least $n-k$, but the dimension of $
 Since these two spaces cannot intersect we have a contradiction, since $(n-r) + (r+1) = n+1 > n$.  ∎
 
 
+
+Here we show an example of a simple low-rank approximation using the SVD. Consider the Hilbert matrix:
+```julia
+using LinearAlgebra, Plots
+function hilbertmatrix(n)
+    ret = zeros(n,n)
+    for j = 1:n, k=1:n
+        ret[k,j] = 1/(k+j-1)
+    end
+    ret
+end
+hilbertmatrix(5)
+```
+That is, the $H[k,j] = 1/(k+j-1)$. This is a famous example of matrix with rapidly decreasing singular values:
+```julia
+H = hilbertmatrix(100)
+U,σ,V = svd(H)
+scatter(σ; yscale=:log10)
+```
+Note numerically we typically do not get a exactly zero singular values so the rank is always
+treated as $\min(m,n)$.
+Because the singular values decay rapidly 
+ we can approximate the matrix very well with a rank 20 matrix:
+```julia
+k = 20 # rank
+Σ_k = Diagonal(σ[1:k])
+U_k = U[:,1:k]
+V_k = V[:,1:k]
+norm(U_k * Σ_k * V_k' - H)
+```
+
+Note that this can be viewed as a _compression_ algorithm: we have replaced a matrix with 
+$100^2 = 10,000$ entries by two matrices and a vector with $4,000$ entries without losing
+any information.
 In the problem sheet we explore the usage of low rank approximation to smooth functions.
 
 
@@ -384,6 +430,7 @@ $$
 
 Note that 
 $$
+\begin{align*}
 {\rm dot}(𝐱, 𝐲) = \{ [(x_1 ⊗ y_1) ⊕ (x_2 ⊗ y_2)] ⊕(x_3⊗ y_3)] ⊕⋯\}⊕(x_n ⊗ y_n) \\
   & = \{ [(x_1 y_1)(1+δ_1) + (x_2 y_2)(1+δ_2)](1+γ_1) +x_3 y_3(1+δ_3)](1+γ_2) + ⋯ \}(1+γ_{n-1})+x_n y_n(1+δ_n) \\
   & = x_1 y_1 (1+δ_1) \prod_{k=1}^{n-1}(1+γ_k) + x_2 y_2 (1+δ_2) \prod_{k=1}^{n-1}(1+γ_k) + x_3 y_3 (1+δ_3) \prod_{k=2}^{n-1}(1+γ_k)  + ⋯  +x_{n-1} y_{n-1}(1+δ_{n-1})(1+γ_{n-1}) + x_n y_n(1+δ_n) \\

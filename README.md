@@ -29,7 +29,7 @@ which is essential to  machine learning.
 
 1. [Structured Matrices](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/StructuredMatrices.ipynb): we discuss types of structured matrices (permutations, orthogonal matrices, triangular, banded).
 3. [Decompositions](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/Decompositions.ipynb): we discuss algorithms for computing matrix decompositions (QR and PLU decompositions) and their use in solving linear systems.
-3. Norms and condition numbers: we discuss vector and
+3. Singular values and condition numbers: we discuss vector and
 matrix norms, and condition numbers for matrices, and the singular value decomposition.
 7. Differential Equations: we discuss the numerical solution of linear differential equations, 
 including both time-dependent ordinary differential equations and boundary value problems, by reduction to linear systems.
