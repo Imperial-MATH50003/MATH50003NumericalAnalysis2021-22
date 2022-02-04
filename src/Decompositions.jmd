@@ -553,7 +553,7 @@ L_2 L_1 A = \begin{bmatrix} u_{11} & u_{12} & u_{13} & \cdots & u_{1n} \\
 $$
 where 
 $$
-r_{2j} :=  (𝐚_j^1)[1] \qquad \hbox{and} \qquad 𝐚_j^2 := (L_2 𝐚_j^1)[2:n-1]
+u_{2j} :=  (𝐚_j^1)[1] \qquad \hbox{and} \qquad 𝐚_j^2 := (L_2 𝐚_j^1)[2:n-1]
 $$
 Thus the first two columns are triangular. 
 
@@ -561,7 +561,7 @@ The inductive construction is again clear. If we define $𝐚_j^0 := 𝐚_j$ we
 have the construction
 $$
 \begin{align*}
-L_j &:= I + \begin{bmatrix} 𝟎_j \\ {𝐚_{j+1}^j[2:n-j] \over 𝐚_{j+1}^j[1]} \end{bmatrix} 𝐞_j^⊤ \\
+L_j &:= I - \begin{bmatrix} 𝟎_j \\ {𝐚_{j+1}^j[2:n-j] \over 𝐚_{j+1}^j[1]} \end{bmatrix} 𝐞_j^⊤ \\
 𝐚_j^k &:= (L_k 𝐚_j^{k-1})[2:n-k+1]
  \\
 u_{kj} &:= (L_k 𝐚_j^{k-1})[1]
@@ -575,7 +575,7 @@ u_{11} & \cdots & u_{1n} \\ & ⋱ & ⋮\\
 $$
 i.e.
 $$
-A = \underbrace{L_{n-1}^{-1} \cdots L_1^{-1}}_L U.
+A = \underbrace{L_{1}^{-1} \cdots L_{n-1}^{-1}}_L U.
 $$
 
 Writing
