@@ -75,6 +75,17 @@ with respect to a prescribed weight—and their usage in numerical computations.
 2. [Floating Point Numbers](lectures/FloatingPoint.jpg)
 3. [Floating Point Arithmetic](lectures/Arithmetic.jpg)
 4. [Bounding Errors in Rounding](lectures/Rounding.jpg)
+5. [Finite Differences](lectures/FiniteDifferences.jpg)
+6. [Dual Numbers](lectures/DualNumbers.jpg)
+7. [Structured Matrices](lectures/StructuredMatrices.jpg)
+7. [Permutations](lectures/Permutations.jpg)
+7. [Orthogonal Matrices](lectures/OrthogonalMatrices.jpg)
+7. [Least Squares](lectures/LeastSquares.jpg)
+7. [Gram Schmidt and Reduced QR](lectures/GramSchmidt.jpg)
+7. [Householder and QR](lectures/Householder.jpg)
+7. [PLU Decomposition](lectures/PLU.jpg)
+
+
 
 ## What is numerical analysis? 
 
