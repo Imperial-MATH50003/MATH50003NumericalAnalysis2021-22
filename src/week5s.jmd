@@ -36,3 +36,46 @@ $$
 $$
 Deduce its two Cholesky decompositions: $Δ_n = L_n L_n^⊤ = U_n U_n^⊤$ where
 $L_n$ is lower triangular and $U_n$ is upper triangular.
+
+## 2. Matrix norms
+
+**Problem 2.1⋆** Prove the following:
+$$
+\begin{align*}
+\|A\|_∞ &= \max_k \|A[k,:]\|_1 \\
+\|A\|_{1 → ∞} &= \|\hbox{vec}(A)\|_∞ = \max_{kj} |a_{kj}|
+\end{align*}
+$$
+
+**Problem 2.2⋆** 
+
+## 3. Singular value decomposition
+
+**Problem 3.1** Consider functions sampled on a $(n+1) × (n+1)$ 2D grid 
+$(x_k,y_j) = (k/n, j/n)$ where $k,j = 0,…,n$. 
+For $n = 100$, what is the lowest rank $r$ such that
+the  best rank-$r$ approximation to the samples 
+that is accurate to within $10^{-5}$ accuracy for the following functions:
+$$
+(x + 2y)^2, \cos(\sin x \E^y), 1/(x + y + 1), $\sign(x-y)$
+$$
+For which examples does the answer change when $n = 1000$?
+
+**SOLUTION**
+
+```julia
+n = 100
+x = y = range(0, 1; length=n)
+
+f = (x,y) -> (x + 2y)^2
+g = (x,y) -> cos(sin(x)exp(y))
+h = (x,y) -> 1/(x + y + 1)
+s = (x,y) -> sign(x-y)
+
+svdvals(f.(x, y')) # rank 3
+svdvals(g.(x, y')) # rank 5
+svdvals(h.(x, y')) # rank 4
+svdvals(s.(x, y')) # rank n
+```
+
+**END**

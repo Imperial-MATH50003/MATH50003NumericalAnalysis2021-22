@@ -2,8 +2,8 @@
 
 
 In this lecture we discuss matrix and vector norms. The matrix $2$-norm involves
-_singular values_, which are a measure of how matrices "stretch" vectors, similar to
-eigenvalues but more robust. We also introduce condition of problems, and show that
+_singular values_, which are a measure of how matrices "stretch" vectors. 
+We also introduce show that
 the singular values of a matrix give a notion of a _condition number_, which allows us
 to bound errors introduced by floating point numbers in linear algebra operations.
 
@@ -14,6 +14,10 @@ satisfy an additional multiplicative inequality.
 the matrix $2$-norm and best low rank approximation.
 4. Condition numbers: we will see how errors in matrix-vector multiplication and solving linear systems
 can be bounded in terms of the _condition number_, which is defined in terms of singular values.
+
+```julia
+using LinearAlgebra, Plots
+```
 
 ## 1. Vector norms
 
@@ -43,6 +47,8 @@ $$
 
 **Proof**
 
+We will only prove the case $p = 1, 2, ∞$ as general $p$ is more involved.
+
 Homogeneity and positive-definiteness are straightforward: e.g.,
 $$
 \|c 𝐱\|_p = (\sum_{k=1}^n |cx_k|^p)^{1/p} = (|c|^p \sum_{k=1}^n |x_k|^p)^{1/p} = |c| \| 𝐱 \|
@@ -67,16 +73,15 @@ $$
 \| 𝐱 + 𝐲 \|^2 = \|𝐱\|^2 + 2 𝐱^⊤ 𝐲 + \|𝐲\|^2 ≤ \|𝐱\|^2 + 2\| 𝐱 \| \| 𝐲 \| + \|𝐲\|^2 = (\| 𝐱 \| +  \| 𝐲 \|)
 $$
 
-For general $1 < p  < ∞$, it suffices to assume $\| 𝐱 + 𝐲 \| = 1$.
-consider $\| 𝐱 + 𝐲 \|^p$...
 
 ∎
 
 
  In Julia can use the inbuilt `norm` function to calculate norms:
  ```julia
- norm([1,-2,3]) == norm([1,-2,3],2) == sqrt(1^2+2^2+3^2);
- norm([1,-2,3],1) == sqrt(1 + 2 + 3)
+ norm([1,-2,3]) == norm([1,-2,3], 2) == sqrt(1^2 + 2^2 + 3^2);
+ norm([1,-2,3], 1) == sqrt(1 + 2 + 3);
+ norm([1,-2,3], Inf) == 3;
  ```
 
 
@@ -86,6 +91,12 @@ consider $\| 𝐱 + 𝐲 \|^p$...
 $$
 \|A\|_F := \sqrt{\sum_{k=1}^m \sum_{j=1}^n A_{kj}^2}
 $$
+This is available as `norm` in Julia:
+```julia
+A = randn(5,3)
+norm(A) == norm(vec(A))
+```
+
 While this is the simplest norm, it is not the most useful.  Instead, we will build a matrix norm from a 
 vector norm:
 
@@ -161,9 +172,17 @@ $$
 $$
 that is, the maximum $1$-norm of the rows.
 
+Matrix norms are available via `opnorm`:
+```julia
+m,n = 5,3
+A = randn(m,n)
+opnorm(A,1) == maximum(norm(A[:,j],1) for j = 1:n)
+opnorm(A,Inf) == maximum(norm(A[k,:],1) for k = 1:m)
+opnorm(A) # the 2-norm
+```
 
 
-An example that is not simple is $\|A \|_2$, but we do have two simple cases:
+An example that does not have a simple formula is $\|A \|_2$, but we do have two simple cases:
 
 **Proposition (diagonal/orthogonal 2-norms)** If $Λ$ is diagonal with entries $λ_k$ then
 $\|Λ\|_2 = \max_k |λ_k|.$. If $Q$ is orthogonal then $\|Q\| = 1$.
@@ -195,7 +214,7 @@ $$
 $$
 where $σ_k = 0$ if $k > r$.
 
-To show the SVD exists we first establish some properties of a Gram matrix:
+To show the SVD exists we first establish some properties of a _Gram matrix_ ($A^⊤A$):
 
 **Proposition (Gram matrix kernel)** The kernel of $A$ is the also the kernel of $A^⊤ A$. 
 
@@ -227,11 +246,14 @@ $$
 
 This connection allows us to prove existence:
 
-**Theorem (SVD existence)** Every $A ∈ ℝ^{m× n}$ has an SVD.
+**Theorem (SVD existence)** Every $A ∈ ℝ^{m × n}$ has an SVD.
 
 **Proof**
-
-Assume the eigenvalues are sorted in decreasing modulus, and so $λ_1,…,λ_r$
+Consider
+$$
+A^⊤ A = Q Λ Q^⊤.
+$$
+Assume (as usual) that the eigenvalues are sorted in decreasing modulus, and so $λ_1,…,λ_r$
 are an enumeration of the non-zero eigenvalues and
 $$
 V := \begin{bmatrix} 𝐪_1 | ⋯ | 𝐪_r \end{bmatrix}
@@ -249,7 +271,7 @@ Now define
 $$
 U := AV Σ^{-1}
 $$
-which is orthogonal since $A^⊤ A V = Σ^2 V$:
+which is orthogonal since $A^⊤ A V = V Σ^2 $:
 $$
 U^⊤ U = Σ^{-1} V^⊤ A^⊤ A V Σ^{-1} = I.
 $$
@@ -267,9 +289,9 @@ Singular values tell us the 2-norm:
 $$
 \|A \|_2 = σ_1
 $$
-and if $A$ is invertible, then
+and if $A ∈ ℝ^{n × n}$ is invertible, then
 $$
-\|A^{-1} \|_2 = σ_r^{-1}
+\|A^{-1} \|_2 = σ_n^{-1}
 $$
 
 **Proof**
@@ -286,7 +308,7 @@ The inverse result follows since the inverse has SVD
 $$
 A^{-1} = V Σ^{-1} U^⊤ = V (W Σ^{-1} W) U^⊤
 $$
-where
+is the SVD of $A^{-1}$, where
 $$
 W := P_σ = \begin{bmatrix} && 1 \\ & ⋰ \\ 1 \end{bmatrix}
 $$
@@ -321,10 +343,8 @@ $$\|A - A_k\|_2 ≤ \|A -B \|_2.$$
 We have
 
 $$
-\|A - A_k\|_2 = \|U \begin{bmatrix} 0  \cr &\ddots \cr && 0 \cr &&& σ_{k+1} \cr &&&& \ddots \cr &&&&& σ_n \cr &&&&&\vdots \cr &&&&&0\end{bmatrix} = σ_{r+1}
+A - A_k = \|U \begin{bmatrix} 0  \cr &\ddots \cr && 0 \cr &&& σ_{k+1} \cr &&&& \ddots \cr &&&&& σ_r\end{bmatrix} V^⊤.
 $$
-
-
 Suppose a rank-$k$ matrix $B$ has 
 $$
 \|A-B\|_2  < \|A-A_k\|_2 = σ_{k+1}.
@@ -334,7 +354,7 @@ $$
 \|A 𝐰\|_2 = \|(A-B) 𝐰\|_2 ≤ \|A-B\|\|𝐰\|_2  < σ_{k+1} \|𝐰\|_2
 $$
 
-But for all $𝐮 \in {\rm span}(𝐯_1,…,𝐯_{k+1})$, that is, $𝐮 = V[:,1:r+1]𝐜$ for some $𝐜 \in ℝ^{k+1}$  we have 
+But for all $𝐮 \in {\rm span}(𝐯_1,…,𝐯_{k+1})$, that is, $𝐮 = V[:,1:k+1]𝐜$ for some $𝐜 \in ℝ^{k+1}$  we have 
 $$
 \|A 𝐮\|_2^2 = \|U Σ_k 𝐜\|_2^2 = \|Σ_k 𝐜\|_2^2 =
 \sum_{j=1}^{k+1} (σ_j c_j)^2 ≥ σ_{k+1}^2 \|c\|^2,
@@ -349,7 +369,6 @@ Since these two spaces cannot intersect we have a contradiction, since $(n-r) + 
 
 Here we show an example of a simple low-rank approximation using the SVD. Consider the Hilbert matrix:
 ```julia
-using LinearAlgebra, Plots
 function hilbertmatrix(n)
     ret = zeros(n,n)
     for j = 1:n, k=1:n
@@ -393,7 +412,7 @@ the exact nature of floating point arithmetic. Here we consider only matrix-mult
 about matrix inversion.
 
 To justify what follows, we first observe that errors in implementing matrix-vector multiplication
-can be captured by considering the multiplication to be exact on the wrong matrix: that is, `A x`
+can be captured by considering the multiplication to be exact on the wrong matrix: that is, `A*x`
 (implemented with floating point) is precisely $A + δA$ where $δA$ has small norm, relative to $A$.
 This is known as _backward error analysis_.
 
@@ -431,27 +450,25 @@ $$
 Note that 
 $$
 \begin{align*}
-{\rm dot}(𝐱, 𝐲) = \{ [(x_1 ⊗ y_1) ⊕ (x_2 ⊗ y_2)] ⊕(x_3⊗ y_3)] ⊕⋯\}⊕(x_n ⊗ y_n) \\
-  & = \{ [(x_1 y_1)(1+δ_1) + (x_2 y_2)(1+δ_2)](1+γ_1) +x_3 y_3(1+δ_3)](1+γ_2) + ⋯ \}(1+γ_{n-1})+x_n y_n(1+δ_n) \\
-  & = x_1 y_1 (1+δ_1) \prod_{k=1}^{n-1}(1+γ_k) + x_2 y_2 (1+δ_2) \prod_{k=1}^{n-1}(1+γ_k) + x_3 y_3 (1+δ_3) \prod_{k=2}^{n-1}(1+γ_k)  + ⋯  +x_{n-1} y_{n-1}(1+δ_{n-1})(1+γ_{n-1}) + x_n y_n(1+δ_n) \\
-  &= x_1y_1(1+θ_n^1) + x_2y_2(1+θ_n^2)+ x_3y_3(1+θ_{n-1}) + \cdots + x_n y_n (1+θ_1)
+{\rm dot}(𝐱, 𝐲) &= \{ [(x_1 ⊗ y_1) ⊕ (x_2 ⊗ y_2)] ⊕(x_3⊗ y_3)] ⊕⋯\}⊕(x_n ⊗ y_n) \\
+  & = \{ [(x_1 y_1)(1+δ_1) + (x_2 y_2)(1+δ_2)](1+γ_2) +x_3 y_3(1+δ_3)](1+γ_3) + ⋯  +x_n y_n(1+δ_n) \}(1+γ_n) \\
+  & = ∑_{j = 1}^n x_j y_j (1+δ_j) ∏_{k=j}^n (1 + γ_k)
+  & = ∑_{j = 1}^n x_j y_j (1+θ_j)
 \end{align*}
 $$
-where we denote the errors from multiplication as $δ_k$ and those from addition by $γ_k$ and the previous proposition tells us
+where we denote the errors from multiplication as $δ_k$ and those from addition by $γ_k$ 
+(with $γ_1 = 0$). Note that $θ_j$ each have at most $n$ terms each bounded by $ϵ_{\rm m}/2$,
+Thus the previous proposition tells us
 $$
-|θ_n^1|, |θ_n^2| ≤ {n ϵ_{\rm m} \over 1-nϵ_{\rm m}}
-$$
-and
-$$
-|θ_k| ≤ {k ϵ_{\rm m} \over 1-kϵ_{\rm m}} ≤ {n ϵ_{\rm m} \over 1-nϵ_{\rm m}}.
+|θ_j| ≤ {n ϵ_{\rm m} \over 2- nϵ_{\rm m}}.
 $$
 Thus
 $$
 δ𝐱 =  \begin{pmatrix} x_1 θ_n^1 \cr x_2 θ_n^2 \cr x_3 θ_{n-1} \cr \vdots \cr x_n θ_1\end{pmatrix}
 $$
-and the theorem follows:
+and the theorem follows from homogeneity:
 $$
-\| δ𝐱 \| ≤ {n ϵ_{\rm m} \over 1-nϵ_{\rm m}} \| 𝐱 \|
+\| δ𝐱 \| ≤ {n ϵ_{\rm m} \over 2-nϵ_{\rm m}} \| 𝐱 \|
 $$
 
 ∎
@@ -459,16 +476,15 @@ $$
 **Theorem (matrix-vector backward error)**
 For any norm,
 $$
-{\rm mul}(A, 𝐱) = (A + δA)^⊤ 𝐱
+{\rm mul}(A, 𝐱) = (A + δA) 𝐱
 $$
 where
 $$
-\|δA\| ≤  {n ϵ_{\rm m} \over 1-nϵ_{\rm m}} \|A \|
+\|δA\| ≤  {n ϵ_{\rm m} \over 2-nϵ_{\rm m}} \|A \|
 $$
 
 **Proof**
-
-Follows from applying the previous lemma to each row.
+Follows from applying the previous lemma to each row and homogeneity.
 
 ∎
 
@@ -481,17 +497,22 @@ if we know a bound on $\|δA\|$?
 It turns out we can in turns of the _condition number_ of the matrix:
 
 **Definition (condition number)**
-For a square matrix $A$, the _condition number_ is
+For a square matrix $A$, the _condition number_ (in $p$-norm) is
 $$
-κ(A) := \| A \| \| A^{-1} \| = {σ_1 \over σ_n}
+κ_p(A) := \| A \|_p \| A^{-1} \|_p
+$$
+with the $2$-norm:
+$$
+κ_2(A) = {σ_1 \over σ_n}.
 $$
 
 
 **Theorem (relative-error for matrix-vector)**
 The _worst-case_ relative error in $A 𝐱 ≈ (A + δA) 𝐱$ is
 $$
-{\| δA 𝐱 \| \over \| A 𝐱 \| } ≤ κ(A) {\|δA\| \over \|A \|}
+{\| δA 𝐱 \| \over \| A 𝐱 \| } ≤ κ(A) ε
 $$
+if we have the relative pertubation error $\|δA\| = \|A \| ε$.
 
 **Proof**
 We can assume $A$ is invertible (as otherwise $κ(A) = ∞$). Denote $𝐲 = A 𝐱$ and we have
@@ -506,7 +527,7 @@ $$
 ∎
 
 
-Thus for floating point arithmetic we know the error is bounded by $κ(A) {n ϵ_{\rm m} \over 1-nϵ_{\rm m}}$.
+Thus for floating point arithmetic we know the error is bounded by $κ(A) {n ϵ_{\rm m} \over 2-nϵ_{\rm m}}$.
 
 If one uses QR to solve $A 𝐱 = 𝐲$ the condition number also gives a meaningful bound on the error. 
 As we have already noted, there are some matrices where PLU decompositions introduce large errors, so
