@@ -8,3 +8,39 @@ $$
 \prod_{k=1}^n (1+ϵ_i) = 1+θ_n
 $$
 for some constant $θ_n$ satisfying $|θ_n| ≤ {n ϵ \over 1-nϵ}$.
+
+
+## 2. Finite-differences
+
+**Problem 2.1** For indefinite-integration, by modifying the function `indef_err`,
+determine the convergence rate
+if we measure the error using the $2$-norm instead of the $∞$-norm.
+Does the method converge in the $1$-norm?
+
+
+**Problem 2.2** Implement indefinite-integration 
+where we take the average of the two grid points:
+$$
+{u_{k+1} - u_k \over h} = {f(x_k) + f(x_{k+1}) \over 2}
+$$
+What is the observed rate-of-convergence using the ∞-norm for $f(x) = \cos x$?
+Does the method converge in the $1$-norm?
+
+**SOLUTION**
+
+```julia
+n = 1000
+x = range(0, 1; length=n+1)
+h = 1/n
+A = Bidiagonal([1; fill(1/h, n)], fill(-1/h, n), :L)
+c = 0 # u(0) = 0
+f = x -> cos(x)
+
+𝐟 = f.(x) # evaluate f at all but last points
+uₙ = A \ [c; (𝐟[1:end-1] + 𝐟[2:end])/2]
+
+
+norm(uₙ - sin.(x),1)
+```
+
+**END**
