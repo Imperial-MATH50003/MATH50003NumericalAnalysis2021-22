@@ -193,4 +193,9 @@ $$
 and solved as above but this approach is harder to generalise.
 
 
+## Backward Euler
+
+```julia
+a = 1
+c = 
 

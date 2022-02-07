@@ -9,6 +9,25 @@ $$
 $$
 for some constant $θ_n$ satisfying $|θ_n| ≤ {n ϵ \over 1-nϵ}$.
 
+**Problem 1.2⋆** Let $A,B ∈ ℝ^{m × n}$. Prove the following:
+1. If the columns satisfy $\|𝐚_j\|_2 ≤ \| 𝐛_j\|_2$ then $\|A\|_F ≤ \|B\|_F$ and \|A \|_2 ≤ \sqrt{\hbox{rank}(B)} \|B\|_2.
+
+**Problem 1.3⋆** Compute the 1-norm condition numbers for the following matrices:
+$$
+\begin{bmatrix}
+1 & 2 \\ 3 & 4
+\end{bmatrix}, \begin{bmatrix} 1 \\ & 1/2 \\ && ⋯ \\ &&& 1/2^n \end{bmatrix}
+$$
+What is the $2$-norm condition number for the last example?
+
+**Problem 1.4**
+Bound the error for the following computations:
+$$
+\begin{bmatrix}
+1 & 2 \\ 3 & 4
+\end{bmatrix} \begin{bmatrix}1 \\ 1 \end{bmatrix}
+$$
+Compare the result with the computer implementation. Is the bound sharp?
 
 ## 2. Finite-differences
 

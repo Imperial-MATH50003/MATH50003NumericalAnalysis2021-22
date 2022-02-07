@@ -435,14 +435,15 @@ for some constant $θ_n$ satisfying $|θ_n| ≤ {n ϵ \over 1-nϵ}$.
 The proof is left as an exercise (Hint: use induction).
 
 **Lemma (dot product backward error)**
-For any norm,
+For $𝐱, 𝐲 ∈ ℝ^n$,
 $$
 {\rm dot}(𝐱, 𝐲) = (𝐱 + δ𝐱)^⊤ 𝐲
 $$
 where
 $$
-\|δ𝐱\| ≤  {n ϵ_{\rm m} \over 1-nϵ_{\rm m}} \|𝐱 \|
+|δ𝐱| ≤  {n ϵ_{\rm m} \over 2-nϵ_{\rm m}} |𝐱 |,
 $$
+where $|𝐱 |$ means absolute-value of each entry.
 
 
 **Proof**
@@ -452,7 +453,7 @@ $$
 \begin{align*}
 {\rm dot}(𝐱, 𝐲) &= \{ [(x_1 ⊗ y_1) ⊕ (x_2 ⊗ y_2)] ⊕(x_3⊗ y_3)] ⊕⋯\}⊕(x_n ⊗ y_n) \\
   & = \{ [(x_1 y_1)(1+δ_1) + (x_2 y_2)(1+δ_2)](1+γ_2) +x_3 y_3(1+δ_3)](1+γ_3) + ⋯  +x_n y_n(1+δ_n) \}(1+γ_n) \\
-  & = ∑_{j = 1}^n x_j y_j (1+δ_j) ∏_{k=j}^n (1 + γ_k)
+  & = ∑_{j = 1}^n x_j y_j (1+δ_j) ∏_{k=j}^n (1 + γ_k) \\
   & = ∑_{j = 1}^n x_j y_j (1+θ_j)
 \end{align*}
 $$
@@ -474,22 +475,50 @@ $$
 ∎
 
 **Theorem (matrix-vector backward error)**
-For any norm,
+For $A ∈ ℝ^{m × n}$ and $𝐱 ∈ ℝ^n$ we have
 $$
 {\rm mul}(A, 𝐱) = (A + δA) 𝐱
 $$
 where
 $$
-\|δA\| ≤  {n ϵ_{\rm m} \over 2-nϵ_{\rm m}} \|A \|
+|δA| ≤ {n ϵ_{\rm m} \over 2-nϵ_{\rm m}}  |A|.
+$$
+Therefore
+$$
+\begin{align*}
+\|δA\|_1 &≤  {n ϵ_{\rm m} \over 2-nϵ_{\rm m}} \|A \|_1 \\
+\|δA\|_2 &≤  {\sqrt{\min(m,n)} n ϵ_{\rm m} \over 2-nϵ_{\rm m}} \|A \|_2 \\
+\|δA\|_∞ &≤  {n ϵ_{\rm m} \over 2-nϵ_{\rm m}} \|A \|_∞
+\end{align*}
 $$
 
 **Proof**
-Follows from applying the previous lemma to each row and homogeneity.
+The bound on $|δA|$ is implied by the previous lemma.
+The $1$ and $∞$-norm follow since
+$$
+\|A\|_1 = \||A|\|_1 \hbox{ and } \|A\|_∞ = \||A|\|_∞
+$$
+This leaves the 2-norm example, which is a bit more challenging as there are matrices
+$A$ such that $\|A\|_2 ≠ \| |A| \|_2$.
+Instead we will prove the result by going through the Fröbenius norm and using:
+$$
+\|A \|_2 ≤ \|A\|_F ≤ \sqrt{r} \| A\|_2
+$$
+where $r$ is rank of $A$ (see PS5)
+and $\|A\|_F = \| |A| \|_F$,
+so we deduce:
+$$
+\begin{align*}
+\|δA \|_2 &≤ \| δA\|F = \| |δA| \|F ≤ {n ϵ_{\rm m} \over 2-nϵ_{\rm m}} \| |A| \|_F \\
+          &= {n ϵ_{\rm m} \over 2-nϵ_{\rm m}} \| A \|_F ≤ {\sqrt{r} n ϵ_{\rm m} \over 2-nϵ_{\rm m}}\| A \|_2 \\
+          &≤ {\sqrt{\min(m,n)} n ϵ_{\rm m} \over 2-nϵ_{\rm m}} \|A \|_2
+\end{align*}
+$$
 
 ∎
 
-
-So now we get to a mathematical question independent of floating point: can we bound the _relative error_ in approximating
+So now we get to a mathematical question independent of floating point: 
+can we bound the _relative error_ in approximating
 $$
 A 𝐱 ≈ (A + δA) 𝐱
 $$

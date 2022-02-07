@@ -1,4 +1,4 @@
-# MATH50003 Numerical Analysis: Problem Sheet 4
+# MATH50003 Numerical Analysis: Problem Sheet 5
 
 This problem sheet explores positive definite matrices,
 Cholesky decompositions, matrix norms, and the singular value decomposition.
@@ -96,7 +96,10 @@ $$
 
 ## 3. Singular value decomposition
 
-**Problem 3.1** Consider functions sampled on a $(n+1) × (n+1)$ 2D grid 
+**Problem 3.1⋆** Show that $\|A \|_2 ≤ \|A\|_F ≤ \sqrt{r} \|A \|_2$ where
+$r$ is the rank of $A$.
+
+**Problem 3.2** Consider functions sampled on a $(n+1) × (n+1)$ 2D grid 
 $(x_k,y_j) = (k/n, j/n)$ where $k,j = 0,…,n$. 
 For $n = 100$, what is the lowest rank $r$ such that
 the  best rank-$r$ approximation to the samples 
