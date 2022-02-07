@@ -169,7 +169,7 @@ to implement a banded QR decomposition that only takes $O(n)$ operations:
 ```julia
 function bandedqr(A::Tridiagonal)
     n = size(A,1)
-    Q = Rotations(zeros(n)) # Assume Float64
+    Q = Rotations(zeros(n-1)) # Assume Float64
     R = UpperTridiagonal(zeros(n), zeros(n-1), zeros(n-2))
     for j = 1:n-1
         # TODO: populate Q and R
