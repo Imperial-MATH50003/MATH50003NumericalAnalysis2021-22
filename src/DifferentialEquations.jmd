@@ -74,7 +74,6 @@ For example we can solve
 a simple differential equation like a pendulum $u'' = \sin u$ as follows:
 ```julia
 using DifferentialEquations
-
 ```
 
 # 1.  Time-evolution problems
@@ -406,8 +405,37 @@ a pendulum.
 
 ## Long-time stability
 
+As of now we have not presented a compelling case for the
+backward-Euler method. We now present an example where it proves significantly
+more accurate: consider
+```julia
+n = 500
+𝐮 = fill(zeros(2), n)
+𝐯 = fill(zeros(2), n)
+x = range(0, 10; length=n)
+h = step(x) # same as x[k+1]-x[k]
 
-Consider a system of equations
+A = [-50.5 49.5;
+      49.5 -50.5]
+
+𝐯[1] = 𝐮[1] = [1,0]
+for k = 1:n-1
+    𝐮[k+1] = (I + h*A)*𝐮[k]
+    𝐯[k+1] = (I - h*A)\𝐯[k]
+end
+
+plot(x, first.(𝐮); ylims=(-1,1), label="forward")
+plot!(x, first.(𝐯); label="backward")
+```
+Here backward Euler successfully approximates the function
+while forward Euler produces garbage.
+(Note that we still have convergence for both methods
+by making `n` even larger.)
+
+
+
+
+
 
 
 # 2. Two-point boundary value problems
