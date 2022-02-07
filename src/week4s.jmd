@@ -94,7 +94,7 @@ when applied to a `300 × 300` random matrix.
 
 
 **Problem 3.1**
-Complete the definition of `Reflections` which supports a sequence of Householder reflections,
+Complete the definition of `Reflections` which supports a sequence of reflections,
 that is, 
 $$
 Q = Q_{𝐯_1} \cdots Q_{𝐯_n}
