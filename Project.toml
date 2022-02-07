@@ -1,6 +1,7 @@
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 ColorBitstring = "ce91de38-7578-4b98-aebb-6a5df05791d6"
+DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
 DualNumbers = "fa6b7ba4-c1ee-5f82-b5fc-ecf0adba8f74"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"

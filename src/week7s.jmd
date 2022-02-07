@@ -1,0 +1,29 @@
+
+
+
+# 1. Two-point boundary value problems
+
+**Problem 1.1** Consider the heat equation:
+$$
+u_t = u_{xx}
+$$
+
+
+
+
+**Problem** Discretisations can also be used to solve eigenvalue equations.
+Consider the Schrödinger equation with quadratic oscillator:
+$$
+u(-L) = u(L) = 0, -u'' + x^2 u = λ u
+$$
+with zero Dirichlet conditions, where $L = 10$. Approximate the eigenvalues using `eigvals`.
+Can you conjecture their exact value if $L = ∞$? (Hint: they are integers and the eigenvalues
+closest to zero are most accurate.)
+
+```julia
+L = 10
+n = 1000
+x = range(-L,L; length=n)
+h = step(x)
+eigvals(SymTridiagonal(fill(2/h^2,n-2)  + x[2:end-1].^2, fill(-1/h^2, n-3)))
+```
