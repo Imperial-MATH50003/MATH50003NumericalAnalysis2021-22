@@ -179,23 +179,43 @@ $$
 D_n -  S_n^{\rm L}  A_n
 \end{bmatrix} 𝐮_n = \underbrace{ \begin{bmatrix}
 1 \\
-a(x_0)-1/h & 1/h\\
+-a(x_0)-1/h & 1/h\\
 & \ddots & \ddots \\
-&& a(x_{n-1})-1/h & 1/h
+&& -a(x_{n-1})-1/h & 1/h
 \end{bmatrix}}_L 𝐮_n = \begin{bmatrix} c \\ 𝐟^{\rm L} \end{bmatrix}
 $$
 
+```julia
+a = -1
+c = 0
+n = 2000
+x = range(0, 1; length=n+1)
+h = 1/n
+A = Bidiagonal([1; fill(1/h, n)], fill(-a-1/h, n), :L)
 
-**Remark** Note this can be reduced to an integral
+norm(A \ [1; zeros(n)] - exp.(a*x),Inf)
+```
+
+
+**Remark** Note this can alternatively be reduced to an integral
 $$
-u(t) = c \E^{a t} + \E^{a x} \int_0^x f(t) \E^{-a t} \hbox d t
+u(t) = c \hbox{e}^{a t} + \hbox{e}^{a x} \int_0^x f(t) \hbox{e}^{-a t} \hbox d t
 $$
 and solved as above but this approach is harder to generalise.
 
 
 ## Backward Euler
 
-```julia
-a = 1
-c = 
 
+
+```julia
+a = -1
+c = 0
+n = 2000
+x = range(0, 1; length=n+1)
+h = 1/n
+A = Bidiagonal([1; fill(1/h-a, n)], fill(-1/h, n), :L)
+
+
+norm(A \ [1; zeros(n)] - exp.(a*x),Inf)
+```
