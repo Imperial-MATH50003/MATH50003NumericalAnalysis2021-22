@@ -99,7 +99,11 @@ that is,
 $$
 Q = Q_{𝐯_1} \cdots Q_{𝐯_n}
 $$
-where the vectors are stored as a matrix `V` whose $j$-th column is $𝐯_j$.
+where the vectors are stored as a matrix `V` whose $j$-th column is $𝐯_j$, and
+$$
+Q_{𝐯_j} = I - 2 𝐯_j 𝐯_j^\top.
+$$
+
 ```julia
 struct Reflections{T} <: AbstractMatrix{T}
     V::Matrix{T}
@@ -127,7 +131,7 @@ function householderqr(A)
     R = copy(A)
     Q = Reflections(Matrix(1.0I, m, n))
     for j = 1:n
-        # TODO: populate Q and R using O(m*j) operations
+        # TODO: populate Q and R using O(m*(n-j)) operations
     end
     Q,R
 end
