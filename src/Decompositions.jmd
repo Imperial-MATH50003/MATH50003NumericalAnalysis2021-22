@@ -55,7 +55,7 @@ the PLU decomposition via Gaussian elimination with pivoting.
 3. Cholesky decomposition: we introduce symmetric positive definite matrices and show that their LU decomposition can be re-interpreted
 as a Cholesky decomposition.
 4. Timings: we see the relative trade-off in speed between the different decompositions.
-
+x \in
 ```julia
 using LinearAlgebra, Plots, BenchmarkTools
 ```
@@ -781,7 +781,7 @@ It is only relevant for _symmetric positive definite_
 matrices.
 
 **Definition (positive definite)** A square matrix $A \in ℝ^{n \times n}$ is _positive definite_ if
-for all $𝐱 \in ℝ^n$ we have
+for all $𝐱 \in ℝ^n, x \neq 0$ we have
 $$
 𝐱^\top A 𝐱 > 0
 $$
