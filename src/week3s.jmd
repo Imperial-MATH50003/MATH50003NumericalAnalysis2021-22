@@ -491,9 +491,12 @@ $$
 
 **SOLUTION**
 
-Let $Q$'s linearly independent unit eigenvectors be $\mathbf{v}_1,\dots,\mathbf{v}_n$, then $Q\mathbf{v}_k=\mathbf{v}_k$ for all $k$ since all $Q$'s eigenvalues are $1$.
-
-Now if we let $V=\left(\mathbf{v}_1\middle|\dots\middle|\mathbf{v}_n\right)$, then $QV=V$. Recalling that vectors in $V$ are linearly independent, which means that $V$ is invertible, we can multiply both sides by $V^{-1}$ to get $Q=I$.
+Note that $Q$ is normal ($Q^⊤ Q = I$) and therefore by the spectral theorem for 
+normal matrices we have
+$$
+Q = Q̃ Λ Q̃^⋆ = Q̃ Q̃^⋆ = I
+$$
+since $Q̃$ is unitary. 
 
 **Problem 5.4** Complete the implementation of a type representing
 reflections that supports `Q[k,j]` and such that `*` takes $O(n)$ operations.
@@ -511,10 +514,10 @@ function size(Q::Reflection)
     (length(Q.v),length(Q.v))
 end
 function getindex(Q::Reflection, k::Int, j::Int)
-    (k == j) - 2Q.v[k]*Q.v[j]
+    (k == j) - 2Q.v[k]*Q.v[j] # note true is treated like 1 and false like 0
 end
 function *(P::Reflection, x::AbstractVector)
-    x - 2*Q.v * dot(Q.v,x)
+    x - 2*Q.v * dot(Q.v,x) # (Q.v'*x) also works instead of dot
 end
 
 # If your code is correct, these "unit tests" will succeed
@@ -560,7 +563,7 @@ computing $𝐲 = ∓ \|𝐱\| 𝐞_1 + 𝐱$ for each choice of sign.
 
 **SOLUTION**
 
-Since $\|\mathbf{x}\|=\sqrt{1+h^2}$, we have $\mathbf{y}=[1\mp\sqrt{1+h^2},h]$. We note first that $h^{fp}$ and $(h^2)^{fp}$ are exact due to the choice of $h$, so we only need to discuss the floating error in computing $1\mp\sqrt{1+h^2}$.
+Since $\|𝐱\|=\sqrt{1+h^2}$, we have $𝐲=[1∓\sqrt{1+h^2},h]$. We note first that $h^{fp}$ and $(h^2)^{fp}$ are exact due to the choice of $h$, so we only need to discuss the floating error in computing $1\mp\sqrt{1+h^2}$.
 
 Numerically, let the length of the significand be $S$, then
 $$1\oplus h^2=
