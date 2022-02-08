@@ -73,9 +73,13 @@ are packages available, e.g. [DifferentialEquations.jl]. Moreover Forward and Ba
 Euler are only the first baby steps to a wide range of time-steppers, with Runge–Kutta being
 one of the most successful.
 For example we can solve
-a simple differential equation like a pendulum $u'' = \sin u$ as follows:
+a simple differential equation like a pendulum $u'' = -\sin u$ can be solved
+as follows (writing at a system $u' = v, v' = -\sin u$):
 ```julia
 using DifferentialEquations
+
+u = solve(ODEProblem((u,_,x) -> [u[2], -sin(u[1])], [1,0], (0,10)))
+plot(u)
 ```
 
 # 1.  Time-evolution problems
@@ -307,9 +311,7 @@ that is
 $$
 {u_k - u_{k-1} \over h} - a(x_k) u_k = f(u_k)
 $$
-We represent it using the $n-1 × n$ _(right) restriction matrix_ that takes a vector
-evaluated at $x_1,…,x_n$ and restricts it to $x_2,…,x_n$,
-Putting everything together we have the system:
+This leads to the system:
 $$
 \begin{bmatrix}
 𝐞_1^⊤ \\
@@ -321,8 +323,6 @@ D_n -  I_n^{\rm R}  A_n
 && -α(x_{n-1})-1/h & 1/h
 \end{bmatrix}}_L 𝐮^n = \begin{bmatrix} c \\ I_n^{\rm R} 𝐟 \end{bmatrix}
 $$
-
-We can turn it into code: The following solves.
 
 
 ```julia
@@ -362,10 +362,7 @@ $$
 $$
 where $𝐮(x) ∈ ℝ^d$ and $A(x) ∈ ℝ^{d × d}$.
 We again discretise at the grid $x_k$
-$$
-𝐮^n = \begin{bmatrix} 𝐮_1 \\ ⋮ \\ 𝐮_n \end{bmatrix}
-$$
-where $𝐮(x_k) ≈ 𝐮_k ∈ ℝ^d$.
+by approximating $𝐮(x_k) ≈ 𝐮_k ∈ ℝ^d$.
 This can be reduced to a block-bidiagonal system as in
 the scalar case which is solved via forward-substitution. Though
 it's easier to think of it directly. 
@@ -385,10 +382,6 @@ $$
 𝐮_{k+1} &= 𝐮_k + h A(x_k) 𝐮_k + h 𝐟(x_k)
 \end{align*}
 $$
-
-
-. But it is 
-sli
 
 
 **Example**
@@ -459,12 +452,8 @@ end
 plot(x, first.(𝐮))
 ```
 As we see it correctly predicts the oscillatory behaviour of
-a pendulum.
-
-
-
-
-
+a pendulum, and matches the simulation using DifferentialEquations.jl
+above.
 
 ## Long-time stability
 
@@ -494,10 +483,6 @@ Here backward Euler successfully approximates the function
 while forward Euler produces garbage.
 (Note that we still have convergence for both methods
 by making `n` even larger.)
-
-
-
-
 
 
 
@@ -550,8 +535,104 @@ u = T \ [1; exp.(x[2:end-1]); 2]
 plot(x, u)
 ```
 
-## Convergence
+## 3. Convergence
+
+We now study convergence of the approaches for the constant-coefficient case.
+The key is the following:
+
+**Definition (Toeplitz)** A _Toeplitz matrix_ has constant diagonals: $T[k,j] = a_{k-j}$.
+
+
+**Proposition (Bidiagonal Toeplitz inverse)**
+The inverse of a $n × n$ bidiagonal Toeplitz matrix is:
+$$
+\underbrace{\begin{bmatrix}
+1 \\
+-ℓ & 1 \\
+&-ℓ & 1 \\
+&& ⋱ & ⋱ \\
+&&& -ℓ & 1\end{bmatrix}}_L^{-1} = 
+ \underbrace{\begin{bmatrix} 1 \\
+                            ℓ & 1 \\
+                            ℓ^2 & ℓ & 1 \\
+                            ⋮ & ⋱ & ⋱ & ⋱ \\
+                            ℓ^{n-1} & ⋯ & ℓ^2 & ℓ & 1
+\end{bmatrix}}_{L^{-1}}               
+$$
+Further:
+$$
+\| L^{-1} \|_1 = \| L^{-1} \|_∞ = \begin{cases}
+    {1 - |ℓ|^n \over 1 - |ℓ|} & |ℓ| ≠ 1 \\
+    n & otherwise
+    \end{cases}
+$$
+
+**Proof**
+The fact that $L L^{-1} = I$ can be verified directly. The norms of $L^{-1}$ follow
+from the formula
+$$
+\sum_{k=0}^{n-1} z^k = {1 - z^n \over   1- z}
+$$
+provided $z ≠ 1$.
+∎
+
+**Theorem (Forward/Backward Euler convergence)**
+Consider the equation
+$$
+u(a) = c, u'(x) + α u(x) = f(x)
+$$
+Denote
+$$
+𝐮ᵉ := \begin{bmatrix} u(x_1) \\ ⋮ \\ u(x_n) \end{bmatrix}
+$$
+Assume that $u$ is twice-differentiable with 
+Then the error for forward/backward Euler is
+$$
+\|𝐮ᶠ - 𝐮ᵉ\|_∞, \|𝐮ᵇ - 𝐮ᵉ\|_∞ = O(n^{-1})
+$$
+
+**Proof** 
+We prove the error bound for forward Euler as backward Euler is
+identical. This proof consists of two stages: (1) consistency and
+(2) stability. Consitency means our discretisation approximates the
+true equation, that is:
+$$
+L𝐮ᵉ = \begin{bmatrix} c \\
+        {u(x_2) - u(x_1) \over h} + a u(x_1) \\
+        ⋮ \\
+        {u(x_n) - u(x_{n-1}) \over h} + a u(x_{n-1}) 
+\end{bmatrix} = \begin{bmatrix} c \\
+        {u'(x_1) + a u(x_1) + u''(t_1) h \\
+        ⋮ \\
+        {u'(x_{n-1}) + a u(x_{n-1}) + u''(t_{n-1}) h
+\end{bmatrix} = = \begin{bmatrix} c \\
+        {f(x_1) + u''(t_1) h \\
+        ⋮ \\
+        f(x_{n-1}) + u''(t_1) h
+\end{bmatrix} = \begin{bmatrix} c \\ 𝐟ᶠ \end{bmatrix} + 𝛅
+$$
+where $\|𝛅\|_∞ = O(h)$. Stability means the inverse does not
+blow up the error, that is for $ℓ = 1 + h a$ we write
+$$
+L = \underbrace{\begin{bmatrix} 1 \\ & h \\ && ⋱ \\ &&& h \end{bmatrix}}_D
+ \underbrace{\begin{bmatrix} 1 \\ 
+                        -ℓ & 1 \\ & ⋱ & ⋱ \\
+                        && -ℓ &1 \end{bmatrix}}_{L̃}
+$$
+so that
+$$
+\|L^{-1}\|_∞ ≤ \|L\|
+$$
 
 
 
-## 3. Matrix exponentials
+We have
+$$
+\|𝐮ᶠ - 𝐮ᵉ\|_∞  = \|L^{-1} (L𝐮ᶠ - L𝐮ᵉ)\|_∞ ≤ \|L^{-1}\|_∞ \|𝐟ᶠ - L𝐮ᵉ\|_∞
+$$
+
+
+### Poisson
+
+For 2D problems we consider Poisson. We can multiply 
+
