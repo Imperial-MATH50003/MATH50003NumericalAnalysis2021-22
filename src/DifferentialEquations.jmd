@@ -39,7 +39,7 @@ $x_1,…,x_n$ with _step size_
 $$
 x_{k+1}-x_k = h = {b-a \over n-1}
 $$
-for a vector $𝐮^n ∈ ℝ^{n+1}$
+for a vector $𝐮 ∈ ℝ^n$
 that will be determined by solving a linear system:
 $$
 \begin{bmatrix}
@@ -50,18 +50,20 @@ u(x_n)
 u_1 \\
 ⋮ \\
 u_n
-\end{bmatrix}}_{𝐮^n}
+\end{bmatrix}}_𝐮
 $$
-2. Replace the derivatives with the finite-difference approximation
+2. Replace the derivatives with the finite-difference approximations (here $m_k = (x_{k+1} - x_k)/2$ is the mid-point
+of the grid):
 $$
 \begin{align*}
-u'(x_k) ≈ {u(x_{k+1}) - u(x_k) \over h} ≈ {u_{k+1} - u_k \over h} \qquad\hbox{(Forward-difference)} \\
-u'(x_k) ≈ {u(x_k) - u(x_{k-1}) \over h} ≈ {u_k - u_{k-1} \over h} \qquad\hbox{(Backward-difference)} \\
-u''(x_k) ≈ {u(x_{k+1}) - 2u(x_k) + u_{k-1} \over h^2} ≈ {u_{k+1} - u_k \over h}
+u'(x_k) &≈ {u(x_{k+1}) - u(x_k) \over h} ≈ {u_{k+1} - u_k \over h} \qquad\hbox{(Forward-difference)} \\
+u'(m_k) &≈ {u(x_{k+1}) - u(x_k) \over h} ≈ {u_{k+1} - u_k \over h} \qquad\hbox{(Central-difference)} \\
+u'(x_k) &≈ {u(x_k) - u(x_{k-1}) \over h} ≈ {u_k - u_{k-1} \over h} \qquad\hbox{(Backward-difference)} \\
+u''(x_k) &≈ {u(x_{k+1}) - 2u(x_k) + u_{k-1} \over h^2} ≈ {u_{k+1} - 2u_k + u_{k-1} \over h^2}
 \end{align*}
 $$
 3. Recast the differential equation as a linear system whose solution
-is $𝐮^n$, which we solve using numerical linear algebra.
+is $𝐮$, which we solve using numerical linear algebra.
 Add the initial/boundary conditions as extra rows to make sure the
 system is square.
 
@@ -86,7 +88,7 @@ Euler. We also consider systems of equations.
 
 ## Indefinite integration
 
-We begin with the simplest differential equation:
+We begin with the simplest differential equation on an interval $[a,b]$:
 $$
 \begin{align*}
 u(0) &= c \\
@@ -99,16 +101,21 @@ $$
 u'(x_k) ≈ {u_{k+1} - u_k \over h} = f(x_k)
 $$
 We do not include $k = n$ to avoid going outside our grid.
+
+
+
+
 Thus we have the rectangular system:
 $$
 \underbrace{{1 \over h} \begin{bmatrix}
 -1 & 1\\
 & \ddots & \ddots \\
 && -1 & 1
-\end{bmatrix}}_{D_n} 𝐮^n = \underbrace{\begin{bmatrix} f(x_1) \\ \vdots \\ f(x_{n-1})
-\end{bmatrix}}_{𝐟^{\rm L}}
+\end{bmatrix}}_{D_n} 𝐮^{\rm f} = \underbrace{\begin{bmatrix} f(x_1) \\ \vdots \\ f(x_{n-1})
+\end{bmatrix}}_{𝐟^{\rm f}}
 $$
-where the super-script $L$ denotes that we are evaluating on the left.
+where the super-script ${\rm f}$ denotes that this is leading towards the
+forward Euler method.
 Here $D_n ∈ ℝ^{n-1,n}$ so this system is not-invertible. Thus we need to
 add an extra row, coming from the initial condition: $𝐞_1^⊤ 𝐮^n = c$,
 that is:
@@ -116,17 +123,41 @@ $$
 \begin{bmatrix}
 𝐞_1^⊤ \\
 D_n
-\end{bmatrix} 𝐮^n = \underbrace{ \begin{bmatrix}
+\end{bmatrix} 𝐮^{\rm f} = \underbrace{ \begin{bmatrix}
 1 \\
 -1/h & 1/h\\
 & \ddots & \ddots \\
 && -1/h & 1/h
-\end{bmatrix}}_L 𝐮^n = \begin{bmatrix} c \\ 𝐟^{\rm L} \end{bmatrix}
+\end{bmatrix}}_L 𝐮^{\rm f} = \begin{bmatrix} c \\ 𝐟^{\rm f} \end{bmatrix}
 $$
-(With our grid $1/h = n$ but we leave it as-is since on a different
-interval $[a,b]$ this relationship would be $h = (b-a)/n$.)
 This is a lower-triangular bidiagonal system, so can be solved using
-forward substitution in $O(n)$ operations.
+forward substitution in $O(n)$ operations. 
+
+We can also consider discretisation at the mid-point $m_k = x_{k+1} - x_k \over 2$,
+which is the analogue of using central-differences:
+$$
+u'(m_k) ≈ {u_{k+1} - u_k \over h} = f(m_k)
+$$
+That is, we have the exact same system with a different right-hand side:
+$$
+\underbrace{{1 \over h} \begin{bmatrix}
+-1 & 1\\
+& \ddots & \ddots \\
+&& -1 & 1
+\end{bmatrix}}_{D_n} 𝐮^{\rm m} = 
+\underbrace{\begin{bmatrix} f(m_1) \\ \vdots \\ f(m_{n-1})
+\end{bmatrix}}_{𝐟^{\rm m}}
+$$
+
+And of course there is $𝐮^{\rm B}$ coming from the backwards-difference
+formula:
+$$
+u'(x_k) ≈ {u_k - u_{k-1} \over h} = f(x_k)
+$$
+which we leave as an exercise.
+
+
+**Example**
 
 Let's do an example of integrating $\cos x$, and see if our method matches
 the true answer of $\sin x$. First we construct the system
@@ -134,39 +165,66 @@ as a lower-triangular, `Bidiagonal` matrix:
 ```julia
 using LinearAlgebra, Plots
 
-n = 20
-x = range(0, 1; length=n+1)
-h = 1/n
-A = Bidiagonal([1; fill(1/h, n)], fill(-1/h, n), :L)
+function indefint(x)
+    h = step(x) # x[k+1]-x[k]
+    n = length(x)
+    L = Bidiagonal([1; fill(1/h, n-1)], fill(-1/h, n-1), :L)
+end
+
+n = 10
+x = range(0, 1; length=n)
+L = indefint(x)
 ```
-We can now solve for our particular problem:
+We can now solve for our particular problem using both the left and 
+mid-pint rules:
 ```julia
 c = 0 # u(0) = 0
 f = x -> cos(x)
 
-𝐟 = f.(x[1:end-1]) # evaluate f at all but last points
-uₙ = A \ [c; 𝐟]
+
+m = (x[1:end-1] + x[2:end])/2 # midpoints
+
+
+𝐟ᶠ = f.(x[1:end-1]) # evaluate f at all but last points
+𝐟ᵐ = f.(m)          # evaluate f at mid-points
+𝐮ᶠ = L \ [c; 𝐟ᶠ] # integrate using forward-differences
+𝐮ᵐ = L \ [c; 𝐟ᵐ] # integrate using central-differences
 
 plot(x, sin.(x); label="sin(x)", legend=:bottomright)
-scatter!(x, uₙ; label="u_n")
+scatter!(x, 𝐮ᶠ; label="forward")
+scatter!(x, 𝐮ᵐ; label="mid")
 ```
-Pretty good! We can estimate how fast it converges:
+They both are close though the mid-point version is significantly
+more accurate.
+ We can estimate how fast it converges:
 ```julia
 # Error from indefinite integration with c and f
-function indef_err(u, c, f, n)
-    x = range(0, 1; length=n+1)
-    h = 1/n
-    L = Bidiagonal([1; fill(1/h, n)], fill(-1/h, n), :L)
-
-    𝐟 = f.(x[1:end-1]) # evaluate f at all but last points
-    uₙ = L \ [c; 𝐟]
-    norm(uₙ - u.(x), Inf)
+function forward_err(u, c, f, n)
+    x = range(0, 1; length = n)
+    uᶠ = indefint(x) \ [c; f.(x[1:end-1])]
+    norm(uᶠ - u.(x), Inf)
 end
 
-ns = 10 .^ (1:7) # solve up to n = 10 million
-scatter(ns, indef_err.(sin, 0, f, ns); xscale=:log10, yscale=:log10, label="error")
-plot!(ns, ns .^ (-1); xscale=:log10, yscale=:log10, label="1/n")
+function mid_err(u, c, f, n)
+    x = range(0, 1; length = n)
+    m = (x[1:end-1] + x[2:end]) / 2 # midpoints
+    uᵐ = indefint(x) \ [c; f.(m)]
+    norm(uᵐ - u.(x), Inf)
+end
+
+ns = 10 .^ (1:8) # solve up to n = 10 million
+scatter(ns, forward_err.(sin, 0, f, ns); xscale=:log10, yscale=:log10, label="error")
+scatter!(ns, mid_err.(sin, 0, f, ns); label="error")
+plot!(ns, ns .^ (-1); label="1/n")
+plot!(ns, ns .^ (-2); label="1/n^2")
 ```
+This is a log-log plot:we scale both $x$ and $y$ axes logarithmically so that
+$n^α$ becomes a straight line where the slope is dictated by $α$.
+We seem experimentally that the error for forward-difference is
+
+A remarkable property here is that we are not seeing exponential growth in errors:
+finite-differences is **stable** for solving differential equations! Even though
+it was exponentially bad for _computing_ derivatives. 
 
 ## Forward Euler
 
@@ -177,6 +235,17 @@ u(0 ) &= c \\
 u'(x) - α(x) u(x) &= f(x)
 \end{align*}
 $$
+
+**Definition (Restriction matrices)**
+Define the $n-1 × n$ _restriction matrices_ as
+$$
+\begin{align*}
+    I_n^{\rm f} := \begin{bmatrix} 1 \\ &⋱ \\ &&1 & 0 \end{bmatrix}\\
+I_n^{\rm b} := \begin{bmatrix} 0 & 1 \\ &&⋱ \\ &&&1  \end{bmatrix} \\
+\end{align*}
+$$
+
+
 Again we can replace the discretisation using finite-differences, giving us
 $$
 {u_{k+1} - u_k \over h} - α(x_k) u_k = f(u_k)
@@ -184,9 +253,6 @@ $$
 for $k = 1,…,n-1$. We need to add the term $α(x_k) u_k$ to our differential equation,
 that is. We do this using the $n-1 × n$ _(left) restriction matrix_ that takes a vector
 evaluated at $x_1,…,x_n$ and restricts it to $x_1,…,x_{n-1}$,
-$$
-S_n^{\rm L} = \begin{bmatrix} 1 \\ &⋱ \\ &&1 & 0 \end{bmatrix}
-$$
 as well as the $n × n$ _multiplication matrix_
 $$
 A_n = \begin{bmatrix} α(x_0) \\ &⋱\\&& α(x_n) \end{bmatrix}
@@ -195,13 +261,13 @@ Putting everything together we have the system:
 $$
 \begin{bmatrix}
 𝐞_1^⊤ \\
-D_n -  S_n^{\rm L}  A_n
+D_n -  I_n^{\rm L}  A_n
 \end{bmatrix} 𝐮^n = \underbrace{ \begin{bmatrix}
 1 \\
 -α(x_0)-1/h & 1/h\\
 & \ddots & \ddots \\
 && -α(x_{n-1})-1/h & 1/h
-\end{bmatrix}}_L 𝐮^n = \begin{bmatrix} c \\ S_n^{\rm L} 𝐟 \end{bmatrix}
+\end{bmatrix}}_L 𝐮^n = \begin{bmatrix} c \\ I_n^{\rm f} 𝐟 \end{bmatrix}
 $$
 where $𝐟 = \begin{bmatrix} f(x_0) \\ ⋮ \\ f(x_n) \end{bmatrix}$.
 
@@ -243,20 +309,17 @@ $$
 $$
 We represent it using the $n-1 × n$ _(right) restriction matrix_ that takes a vector
 evaluated at $x_1,…,x_n$ and restricts it to $x_2,…,x_n$,
-$$
-S_n^{\rm R} = \begin{bmatrix} 0 & 1 \\ &&⋱ \\ &&&1  \end{bmatrix}
-$$
 Putting everything together we have the system:
 $$
 \begin{bmatrix}
 𝐞_1^⊤ \\
-D_n -  S_n^{\rm R}  A_n
+D_n -  I_n^{\rm R}  A_n
 \end{bmatrix} 𝐮^n = \underbrace{ \begin{bmatrix}
 1 \\
 -α(x_1)-1/h & 1/h\\
 & \ddots & \ddots \\
 && -α(x_{n-1})-1/h & 1/h
-\end{bmatrix}}_L 𝐮^n = \begin{bmatrix} c \\ S_n^{\rm R} 𝐟 \end{bmatrix}
+\end{bmatrix}}_L 𝐮^n = \begin{bmatrix} c \\ I_n^{\rm R} 𝐟 \end{bmatrix}
 $$
 
 We can turn it into code: The following solves.
