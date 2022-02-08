@@ -23,7 +23,7 @@ A = P^⊤ LU
 $$
 where $P$ is a permutation matrix, $L$ is lower triangular and $U$ is upper triangular.
 
-Finally, for a square, _symmetric positive definite_ ($𝐱^⊤ A 𝐱 > 0$ for all $𝐱 ∈ ℝ^n$) 
+Finally, for a square, _symmetric positive definite_ ($𝐱^⊤ A 𝐱 > 0$ for all $𝐱 ∈ ℝ^n$, $𝐱 \neq 0$) 
 matrix we consider the _Cholesky decomposition_:
 $$
 A = L L^⊤
@@ -781,7 +781,7 @@ It is only relevant for _symmetric positive definite_
 matrices.
 
 **Definition (positive definite)** A square matrix $A \in ℝ^{n \times n}$ is _positive definite_ if
-for all $𝐱 \in ℝ^n$ we have
+for all $𝐱 \in ℝ^n, x \neq 0$ we have
 $$
 𝐱^\top A 𝐱 > 0
 $$
