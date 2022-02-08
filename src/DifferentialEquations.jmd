@@ -559,22 +559,6 @@ $$
                             ℓ^{n-1} & ⋯ & ℓ^2 & ℓ & 1
 \end{bmatrix}}_{L^{-1}}               
 $$
-Further:
-$$
-\| L^{-1} \|_1 = \| L^{-1} \|_∞ = \begin{cases}
-    {1 - |ℓ|^n \over 1 - |ℓ|} & |ℓ| ≠ 1 \\
-    n & otherwise
-    \end{cases}
-$$
-
-**Proof**
-The fact that $L L^{-1} = I$ can be verified directly. The norms of $L^{-1}$ follow
-from the formula
-$$
-\sum_{k=0}^{n-1} z^k = {1 - z^n \over   1- z}
-$$
-provided $z ≠ 1$.
-∎
 
 **Theorem (Forward/Backward Euler convergence)**
 Consider the equation
@@ -593,8 +577,10 @@ $$
 
 **Proof** 
 We prove the error bound for forward Euler as backward Euler is
-identical. This proof consists of two stages: (1) consistency and
-(2) stability. Consitency means our discretisation approximates the
+similar. This proof consists of two stages: (1) consistency and
+(2) stability. 
+
+_Consitency_ means our discretisation approximates the
 true equation, that is:
 $$
 L𝐮ᵉ = \begin{bmatrix} c \\
@@ -609,27 +595,36 @@ L𝐮ᵉ = \begin{bmatrix} c \\
         {f(x_1) + u''(t_1) h \\
         ⋮ \\
         f(x_{n-1}) + u''(t_1) h
-\end{bmatrix} = \begin{bmatrix} c \\ 𝐟ᶠ \end{bmatrix} + 𝛅
+\end{bmatrix} = \begin{bmatrix} c \\ 𝐟ᶠ \end{bmatrix} + \begin{bmatrix} 0 \\ 𝛅 \end{bmatrix}
 $$
-where $\|𝛅\|_∞ = O(h)$. Stability means the inverse does not
-blow up the error, that is for $ℓ = 1 + h a$ we write
+where $\|𝛅\|_∞ = O(h)$, or $\|𝛅\|_1 = O(1)$. 
+
+_Stability_ means the inverse does not
+blow up the error. We need to be a bit careful and
+first write, for $ℓ = 1 + h a$,
 $$
-L = \underbrace{\begin{bmatrix} 1 \\ & h \\ && ⋱ \\ &&& h \end{bmatrix}}_D
+L = \underbrace{\begin{bmatrix} 1 \\ & h^{-1} \\ && ⋱ \\ &&& h^{-1} \end{bmatrix}}_D
  \underbrace{\begin{bmatrix} 1 \\ 
                         -ℓ & 1 \\ & ⋱ & ⋱ \\
                         && -ℓ &1 \end{bmatrix}}_{L̃}
 $$
-so that
+Stability in this case is the statement that
 $$
-\|L^{-1}\|_∞ ≤ \|L\|
+\|L̃^{-1}\|_{1 → ∞} ≤ (1 +  |a|/n)^{n-1} = O(1)
+$$
+using the fact (which likely you have seen in first year) that
+$$
+\lim_{n → ∞}  (1 +  |a|/n)^{n-1} = \exp|a|.
 $$
 
 
+We now combine stability and consistency. have
+$$
+\|𝐮ᶠ - 𝐮ᵉ\|_∞  = \|L^{-1} (L𝐮ᶠ - L𝐮ᵉ)\|_∞  = \|L̃^{-1} D^{-1} \begin{bmatrix} 0 \\ 𝛅 \end{bmatrix} \|_∞ 
+≤ h \|L̃^{-1}\|_{1 → ∞} \|𝛅\|_1 = O(h).
+$$
 
-We have
-$$
-\|𝐮ᶠ - 𝐮ᵉ\|_∞  = \|L^{-1} (L𝐮ᶠ - L𝐮ᵉ)\|_∞ ≤ \|L^{-1}\|_∞ \|𝐟ᶠ - L𝐮ᵉ\|_∞
-$$
+∎
 
 
 ### Poisson
