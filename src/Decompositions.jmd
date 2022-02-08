@@ -55,7 +55,7 @@ the PLU decomposition via Gaussian elimination with pivoting.
 3. Cholesky decomposition: we introduce symmetric positive definite matrices and show that their LU decomposition can be re-interpreted
 as a Cholesky decomposition.
 4. Timings: we see the relative trade-off in speed between the different decompositions.
-x \in
+
 ```julia
 using LinearAlgebra, Plots, BenchmarkTools
 ```
