@@ -30,6 +30,206 @@ end
 pl
 ```
 
+**SOLUTION**
+
+Let $A$ be a tridiagonal matrix:
+
+$$
+A = \left[\begin{matrix} 
+a_{11} & a_{12} & 0 & \cdots  &0\\
+a_{21} & a_{22} & a_{23} & \ddots  &\vdots\\
+0      & a_{32} & a_{33} & \ddots  &0\\
+       & 0      & \ddots & \ddots  &a_{n-1,n}\\
+       &        & 0      & a_{n,n-1}  & a_{nn} 
+\end{matrix}\right] = 
+\left[ \begin{matrix}
+\mathbf{a}_1 & \mathbf{a}_2 &\cdots & \mathbf{a}_n
+\end{matrix}\right],
+$$
+where each $\mathbf{a}_j \in \mathbb{R}^n$ and $[\mathbf{a}_j]_k = 0$ for $|j-k| > 1$.
+
+Recall that,
+$$
+\frac{1}{\sqrt{a^2 + b^2}} \left[\begin{matrix}
+a & b \\
+-b & a
+\end{matrix}\right] \left[\begin{matrix}
+a \\ b
+\end{matrix}\right] = \left[\begin{matrix}
+\sqrt{a^2 + b^2} \\ 0
+\end{matrix}\right],
+$$
+and that,
+$$
+\frac{1}{\sqrt{a^2 + b^2}} \left[\begin{matrix}
+a & b \\
+-b & a
+\end{matrix}\right] = \left[\begin{matrix}
+\cos \theta & -\sin\theta \\
+\sin\theta & \cos\theta
+\end{matrix}\right],
+$$
+is a rotation matrix where $\theta = -\arctan(b/a)$. With this in mind, consider multiplying $A$ from the left by,
+$$
+Q_1 = \left[\begin{matrix}
+\frac{a_{11}}{r_{11}} & \frac{a_{21}}{r_{11}} \\
+-\frac{a_{21}}{r_{11}} & \frac{a_{11}}{r_{11}} \\
+&&1\\
+&&&\ddots\\
+&&&&1
+\end{matrix}\right],
+$$
+where $r_{11} = \sqrt{a_{11}^2 + a_{21}^2}$. This rotates dimensions 1 and 2 through angle $\theta=-\arctan(a_{21}/a_{11})$. We have,
+$$
+Q_1 \mathbf{a}_1 = \left[\begin{matrix}
+r_{11} \\0 \\ \vdots \\ 0
+\end{matrix}\right],\hspace{10mm}
+Q_1 \mathbf{a}_2 = \left[\begin{matrix}
+r_{12} := \frac{1}{r_{11}}(a_{11}a_{12} + a_{21}a_{22}) \\
+t_1    := \frac{1}{r_{11}}(a_{11}a_{22} - a_{21}a_{12}) \\
+a_{32} \\
+0 \\
+\vdots \\ 0
+\end{matrix}\right],\hspace{10mm}
+Q_1 \mathbf{a}_3 = \left[\begin{matrix}
+r_{13} := \frac{1}{r_{11}}a_{21}a_{23} \\
+s_1    := \frac{1}{r_{11}}a_{11}a_{23} \\
+a_{33} \\
+a_{43} \\
+0 \\
+\vdots \\ 0
+\end{matrix}\right],\hspace{10mm}
+Q_1 \mathbf{a}_k = \mathbf{a}_k \textrm{ for } k > 3.
+$$
+Then we take,
+$$
+Q_2 = \left[ \begin{matrix}
+1 \\
+& \frac{t_1}{r_{22}} & \frac{a_{32}}{r_{22}} \\
+& -\frac{a_{32}}{r_{22}} & \frac{t_1}{r_{22}} \\
+&&&1 \\
+&&&&\ddots\\
+&&&&&1
+\end{matrix}\right],
+$$
+where $r_{22} = \sqrt{t_1^2 + a_{32}^2}$, a matrix which rotates dimensions 2 and 3 through angle $\theta_2 = -\arctan(a_{32}/t_1)$. Then,
+$$
+Q_2 Q_1 \mathbf{a}_{1} = Q_1\mathbf{a}_1 = \left[\begin{matrix}
+r_{11} \\0 \\ \vdots \\ 0
+\end{matrix}\right],\hspace{10mm}
+Q_2 Q_1 \mathbf{a}_{2} = Q_2\left[\begin{matrix}
+r_{12} \\
+t_1    \\
+a_{32} \\
+0 \\
+\vdots \\ 0
+\end{matrix}\right] = \left[\begin{matrix}
+r_{12} \\
+r_{22} \\
+0 \\
+0 \\
+\vdots \\
+0
+\end{matrix}\right],\hspace{10mm}
+Q_2Q_1\mathbf{a}_3 = Q_2 \left[\begin{matrix}
+r_{13} \\
+s_1    \\
+a_{33} \\
+a_{43} \\
+0 \\
+\vdots \\ 0
+\end{matrix}\right]
+=\left[\begin{matrix}
+r_{13} \\
+r_{23} := \frac{1}{r_{22}}(t_1s_1 + a_{32}a_{33})  \\
+t_2 := \frac{1}{r_{22}}(t_1a_{33} - a_{32}s_1) \\
+a_{43} \\
+0 \\
+\vdots \\ 0
+\end{matrix}\right]
+$$
+
+$$
+Q_2Q_1\mathbf{a}_4 = Q_2\left[\begin{matrix}
+0 \\
+0 \\
+a_{34} \\
+a_{44} \\
+a_{54} \\
+0 \\
+\vdots \\
+0
+\end{matrix}\right] = \left[\begin{matrix}
+0 \\
+r_{24} := \frac{1}{r_{22}}a_{32}a_{34} \\
+s_2 := \frac{1}{r_{22}} t_1 a_{34} \\
+a_{44} \\
+a_{54} \\
+0 \\
+\vdots \\
+0
+\end{matrix}\right], \hspace{10mm}
+Q_2Q_1 \mathbf{a}_k = \mathbf{a}_k \textrm{ for } k > 4.
+$$
+
+Now, for $j=3\rightarrow n-1$ we take,
+$$
+Q_j := \left[\begin{matrix}
+\mathbf{I}_{j-1} \\
+& \frac{t_{j-1}}{r_{jj}} & \frac{a_{j+1, j}}{r_{jj}} \\
+& \frac{a_{j+1, j}}{r_{jj}} & \frac{t_{j-1}}{r_{jj}} \\
+&&& \mathbf{I}_{n-j-1}
+\end{matrix}\right],
+$$
+where $r_{jj} := \sqrt{t_{j-1}^2 + a_{j+1, j}^2}$.
+
+This gives,
+$$
+Q_j \dots Q_1 \mathbf{a}_k =  \left[\begin{matrix}
+\mathbf{0}_{k-3} \\
+r_{k-2,k} \\
+r_{k-1, k} \\
+r_{k,k} \\
+\mathbf{0}_{n-k}
+\end{matrix}\right],
+$$
+for $k \leq j$, 
+and,
+$$
+Q_j \dots Q_1 \mathbf{a}_{j+1} = \left[\begin{matrix}
+\mathbf{0} \\
+r_{j-1,j+1} \\
+r_{j,j+1} := \frac{1}{r_{jj}}(t_{j-1}s_{j-1} + a_{j+1,j}a_{j+1,j+1}) \\
+t_j := \frac{1}{r_{jj}}(t_{j-1}a_{j+1,j+1} - s_{j-1}a_{j+1,j})\\
+a_{j+2,j+1} \\
+0 \\
+\vdots \\ 0
+\end{matrix}\right],\hspace{10mm}
+Q_j \dots Q_1 \mathbf{a}_{j+2} = \left[\begin{matrix}
+\mathbf{0} \\
+r_{j,j+2} := \frac{1}{r_{jj}}a_{j+1,j}a_{j+1,j+2} \\
+s_j := \frac{1}{r_{jj}}t_{j-1} a_{j+1,j+2} \\
+a_{j+2,j+2} \\
+0 \\
+\vdots \\ 
+0
+\end{matrix}\right].
+$$
+Finally we define, $r_{nn} = \frac{1}{r_{n-1,n-1}}(t_{n-2}a_{n,n} - a_{n, n-1}s_{n-2})$, to obtain,
+
+$$
+Q_{n-1}\dots Q_1 A = \left[\begin{matrix}
+r_{11} & r_{12} & r_{13} & 0      & \dots & 0\\
+0      & r_{22} & r_{23} & r_{24} &       & 0\\
+       & \ddots      & \ddots & \ddots & \ddots  & \vdots\\
+       &             &    0    &  r_{n-2,n-2} & r_{n-2, n-1}     & r_{n-2,n}\\
+       &             &        &    0    &     r_{n-1,n-1}    & r_{n-1,n}\\
+       &             &        &        &     0    & r_{n,n}\\
+\end{matrix}\right] =: R
+$$
+
+so that $A = QR$, for $Q = Q_1^{-1}\dots Q_{n-1}^{-1}$, where each matrix $Q_j$ rotates the coordinates $(j,j+1)$ through the angle $\theta_j = -\arctan(a_{j+1, j}/t_{j-1})$, and thus each matrix $Q_j^{-1}$ rotates the coordinates $(j, j+1)$ through the angle $\arctan(a_{j+1, j}/t_{j-1})$. This will be important for Problem 4.3.
+
 **Problem 1.2⋆** Show that every matrix has a QR decomposition such that the diagonal of $R$ is non-negative.
 Make sure to inlude the case of more columns than rows.
 
