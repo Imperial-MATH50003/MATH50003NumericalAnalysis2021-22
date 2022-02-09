@@ -49,7 +49,7 @@ $$
 Q^⊤ \tilde{Q} = R \tilde{R}^{-1}
 $$
 Note $Q^⊤ \tilde{Q}$ is orthogonal, and $R \tilde{R}^{-1}$ has positive eigenvalues (the diagonal), hence all $m$ eigenvalues of
-$Q^⊤ Q̃$ are 1. This means that $Q^⊤ \tilde{Q} = I$ and hence $\tilde{Q} = Q$, which then implies $\tilde{R} = R$.∎
+$Q^⊤ \tilde{Q}$ are 1. This means that $Q^⊤ \tilde{Q} = I$ and hence $\tilde{Q} = Q$, which then implies $\tilde{R} = R$.∎
 
 ## 2. Gram–Schmidt
 
