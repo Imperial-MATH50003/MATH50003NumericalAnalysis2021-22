@@ -120,6 +120,29 @@ function getindex(Q::Reflections, k::Int, j::Int)
 end
 ```
 
+**SOLUTION**
+```julia
+struct Reflections{T} <: AbstractMatrix{T}
+    V::Matrix{T}
+end
+
+import Base: *, size, getindex
+
+size(Q::Reflections) = (size(Q.V,1), size(Q.V,1))
+
+function *(Q::Reflections, x::AbstractVector)
+    return x - 2 * Q.V * Q.V' * x 
+end
+
+function getindex(Q::Reflections, k::Int, j::Int)
+    T = eltype(Q.V)
+    ej = zeros(T,size(Q,2))
+    ej[j] = one(T)
+    return (Q*ej)[k]
+end
+```
+
+
 **Problem 3.2** Complete the following function that implements
  Householder QR using only $O(mn^2)$ operations:
 ```julia
