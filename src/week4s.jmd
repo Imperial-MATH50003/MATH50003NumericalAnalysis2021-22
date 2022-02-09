@@ -49,9 +49,7 @@ $$
 Q^⊤ Q̃ = R R̃^{-1}
 $$
 Note $Q^⊤ Q̃$ is orthogonal, and $R R̃^{-1}$ has positive eigenvalues (the diagonal), hence all $m$ eigenvalues of
-$Q^⊤ Q̃$ are 1. This means that $Q^⊤ Q̃ = I$ and hence $Q̃ = Q$, which then implies $R̃ = R$.
-
-∎
+$Q^⊤ Q̃$ are 1. This means that $Q^⊤ Q̃ = I$ and hence $Q̃ = Q$, which then implies $R̃ = R$.∎
 
 ## 2. Gram–Schmidt
 
@@ -84,11 +82,67 @@ function modifiedgramschmidt(A)
 end
 ```
 
+**SOLUTION**
+```julia
+function modifiedgramschmidt(A)
+    m,n = size(A)
+    m ≥ n || error("Not supported")
+    R = zeros(n,n)
+    Q = zeros(m,n)
+    for j = 1:n
+        v = A[:,j]
+        for k = 1:j-1
+            R[k,j] = Q[:,k]'*v
+            v = A[:,j] - Q[:,1:j-1]*R[1:j-1,j]
+        end
+        R[j,j] = norm(v)
+        Q[:,j] = v/R[j,j]
+    end
+    Q,R
+end
+
+A = randn(300,300)
+Q,R = modifiedgramschmidt(A)
+A-Q*R
+```
+
 **Problem 2.3** Compare the orthogonality of `Q` between `gramschmidt` and `modifiedgramschmidt`
 when applied to a `300 × 300` random matrix.
 
-## 3. Householder reflections
+**SOLUTION**
 
+For reference, here is the gramschmidt algorithm from the lecture notes:
+
+```julia
+function gramschmidt(A)
+    m,n = size(A)
+    m ≥ n || error("Not supported")
+    R = zeros(n,n)
+    Q = zeros(m,n)
+    for j = 1:n
+        for k = 1:j-1
+            R[k,j] = Q[:,k]'*A[:,j]
+        end
+        v = A[:,j] - Q[:,1:j-1]*R[1:j-1,j]
+        R[j,j] = norm(v)
+        Q[:,j] = v/R[j,j]
+    end
+    Q,R
+end
+
+# Now compare MGS with GS:
+
+A = randn(300,300)
+Q,R = gramschmidt(A)
+Qm,Rm = modifiedgramschmidt(A)
+
+maximum(abs.(Q*Q')-I)
+```
+```julia
+maximum(abs.(Qm*Qm')-I)
+```
+
+## 3. Householder reflections
 
 **Problem 3.1**
 Complete the definition of `Reflections` which supports a sequence of reflections,
@@ -128,15 +182,19 @@ end
 
 import Base: *, size, getindex
 
-size(Q::Reflections) = (size(Q.V,1), size(Q.V,1))
+size(Q::Reflections) = (size(Q.V,1),size(Q.V,1))
 
 function *(Q::Reflections, x::AbstractVector)
-    return x - 2 * Q.V * Q.V' * x 
+    M = x-2*Q.V[1:end,end]*Q.V[1:end,end]'*x
+    for j = size(Q,1)-1:-1:1
+        M = M-2*Q.V[1:end,j]*Q.V[1:end,j]'*M
+    end
+    return M
 end
 
 function getindex(Q::Reflections, k::Int, j::Int)
     T = eltype(Q.V)
-    ej = zeros(T,size(Q,2))
+    ej = zeros(T,size(Q,1))
     ej[j] = one(T)
     return (Q*ej)[k]
 end
