@@ -30,6 +30,116 @@ end
 pl
 ```
 
+**Problem 1.2⋆** Show that every matrix has a QR decomposition such that the diagonal of $R$ is non-negative.
+Make sure to inlude the case of more columns than rows.
+
+
+**Problem 1.3⋆** Show that the QR decomposition of a square invertible matrix is unique, 
+provided that the diagonal of $R$ is positive.
+
+
+**SOLUTION**
+
+Assume there is a second decomposition also with positive diagonal
+$$
+A = QR = Q̃ R̃
+$$
+Then we know 
+$$
+Q^⊤ Q̃ = R R̃^{-1}
+$$
+Note $Q^⊤ Q̃$ is orthogonal, and $R R̃^{-1}$ has positive eigenvalues (the diagonal), hence all $m$ eigenvalues of
+$Q^⊤ Q̃$ are 1. This means that $Q^⊤ Q̃ = I$ and hence $Q̃ = Q$, which then implies $R̃ = R$.
+
+∎
+
+## 2. Gram–Schmidt
+
+**Problem 2.1⋆** The modified Gram–Schmidt algorithm is a slight variation of Gram–Schmidt where
+instead of computing
+$$
+𝐯_j := 𝐚_j - \sum_{k=1}^{j-1} \underbrace{𝐪_k^\top 𝐚_j}_{r_{kj}} 𝐪_k
+$$
+we compute it step-by-step:
+$$
+\begin{align*}
+𝐯_j^1 &:= 𝐚_j \\
+𝐯_j^{k+1} &:= 𝐯_j^k - 𝐪_k^\top 𝐯_j^k 𝐪_k
+\end{align*}
+$$
+Show that $𝐯_j^j = 𝐯_j$. 
+
+**Problem 2.2** Complete the following
+function implementing the modified Gram–Schmidt algorithm:
+```julia
+function modifiedgramschmidt(A)
+    m,n = size(A)
+    m ≥ n || error("Not supported")
+    R = zeros(n,n)
+    Q = zeros(m,n)
+    for j = 1:n
+        # TODO: Implement the Modified Gram–Schmidt algorthm
+    end
+    Q,R
+end
+```
+
+**Problem 2.3** Compare the orthogonality of `Q` between `gramschmidt` and `modifiedgramschmidt`
+when applied to a `300 × 300` random matrix.
+
+## 3. Householder reflections
+
+
+**Problem 3.1**
+Complete the definition of `Reflections` which supports a sequence of reflections,
+that is, 
+$$
+Q = Q_{𝐯_1} \cdots Q_{𝐯_n}
+$$
+where the vectors are stored as a matrix `V` whose $j$-th column is $𝐯_j$, and
+$$
+Q_{𝐯_j} = I - 2 𝐯_j 𝐯_j^\top.
+$$
+
+```julia
+struct Reflections{T} <: AbstractMatrix{T}
+    V::Matrix{T}
+end
+
+import Base: *, size, getindex
+
+size(Q::Reflections) = (size(Q.v,1), size(Q.v,1))
+
+
+function *(Q::Reflections, x::AbstractVector)
+    # TODO: Apply Q in O(mn) operations
+end
+
+function getindex(Q::Reflections, k::Int, j::Int)
+    # TODO: Return Q[k,j] in O(mn) operations (hint: use *)
+end
+```
+
+**Problem 3.2** Complete the following function that implements
+ Householder QR using only $O(mn^2)$ operations:
+```julia
+function householderqr(A)
+    m,n = size(A)
+    R = copy(A)
+    Q = Reflections(Matrix(1.0I, m, n))
+    for j = 1:n
+        # TODO: populate Q and R using O(m*(n-j)) operations
+    end
+    Q,R
+end
+```
+
+## 4. Banded QR with Given's rotations
+
+**Problem 4.1⋆**  Describe an algorithm for computing the QR decomposition
+of a tridiagonal matrix using rotations instead of reflections to upper-triangularise
+column-by-column.
+
 **SOLUTION**
 
 Let $A$ be a tridiagonal matrix:
@@ -230,118 +340,6 @@ $$
 
 so that $A = QR$, for $Q = Q_1^{-1}\dots Q_{n-1}^{-1}$, where each matrix $Q_j$ rotates the coordinates $(j,j+1)$ through the angle $\theta_j = -\arctan(a_{j+1, j}/t_{j-1})$, and thus each matrix $Q_j^{-1}$ rotates the coordinates $(j, j+1)$ through the angle $\arctan(a_{j+1, j}/t_{j-1})$. This will be important for Problem 4.3.
 
-**Problem 1.2⋆** Show that every matrix has a QR decomposition such that the diagonal of $R$ is non-negative.
-Make sure to inlude the case of more columns than rows.
-
-**SOLUTION**
-
-∎
-
-**Problem 1.3⋆** Show that the QR decomposition of a square invertible matrix is unique, 
-provided that the diagonal of $R$ is positive.
-
-
-**SOLUTION**
-
-Assume there is a second decomposition also with positive diagonal
-$$
-A = QR = Q̃ R̃
-$$
-Then we know 
-$$
-Q^⊤ Q̃ = R R̃^{-1}
-$$
-Note $Q^⊤ Q̃$ is orthogonal, and $R R̃^{-1}$ has positive eigenvalues (the diagonal), hence all $m$ eigenvalues of
-$Q^⊤ Q̃$ are 1. This means that $Q^⊤ Q̃ = I$ and hence $Q̃ = Q$, which then implies $R̃ = R$.
-
-∎
-
-## 2. Gram–Schmidt
-
-**Problem 2.1⋆** The modified Gram–Schmidt algorithm is a slight variation of Gram–Schmidt where
-instead of computing
-$$
-𝐯_j := 𝐚_j - \sum_{k=1}^{j-1} \underbrace{𝐪_k^\top 𝐚_j}_{r_{kj}} 𝐪_k
-$$
-we compute it step-by-step:
-$$
-\begin{align*}
-𝐯_j^1 &:= 𝐚_j \\
-𝐯_j^{k+1} &:= 𝐯_j^k - 𝐪_k^\top 𝐯_j^k 𝐪_k
-\end{align*}
-$$
-Show that $𝐯_j^j = 𝐯_j$. 
-
-**Problem 2.2** Complete the following
-function implementing the modified Gram–Schmidt algorithm:
-```julia
-function modifiedgramschmidt(A)
-    m,n = size(A)
-    m ≥ n || error("Not supported")
-    R = zeros(n,n)
-    Q = zeros(m,n)
-    for j = 1:n
-        # TODO: Implement the Modified Gram–Schmidt algorthm
-    end
-    Q,R
-end
-```
-
-**Problem 2.3** Compare the orthogonality of `Q` between `gramschmidt` and `modifiedgramschmidt`
-when applied to a `300 × 300` random matrix.
-
-## 3. Householder reflections
-
-
-**Problem 3.1**
-Complete the definition of `Reflections` which supports a sequence of reflections,
-that is, 
-$$
-Q = Q_{𝐯_1} \cdots Q_{𝐯_n}
-$$
-where the vectors are stored as a matrix `V` whose $j$-th column is $𝐯_j$, and
-$$
-Q_{𝐯_j} = I - 2 𝐯_j 𝐯_j^\top.
-$$
-
-```julia
-struct Reflections{T} <: AbstractMatrix{T}
-    V::Matrix{T}
-end
-
-import Base: *, size, getindex
-
-size(Q::Reflections) = (size(Q.v,1), size(Q.v,1))
-
-
-function *(Q::Reflections, x::AbstractVector)
-    # TODO: Apply Q in O(mn) operations
-end
-
-function getindex(Q::Reflections, k::Int, j::Int)
-    # TODO: Return Q[k,j] in O(mn) operations (hint: use *)
-end
-```
-
-**Problem 3.2** Complete the following function that implements
- Householder QR using only $O(mn^2)$ operations:
-```julia
-function householderqr(A)
-    m,n = size(A)
-    R = copy(A)
-    Q = Reflections(Matrix(1.0I, m, n))
-    for j = 1:n
-        # TODO: populate Q and R using O(m*(n-j)) operations
-    end
-    Q,R
-end
-```
-
-## 4. Banded QR with Given's rotations
-
-**Problem 4.1⋆**  Describe an algorithm for computing the QR decomposition
-of a tridiagonal matrix using rotations instead of reflections to upper-triangularise
-column-by-column.
 
 **Problem 4.2** Implement `Rotations` which represents an orthogonal matrix `Q` that is a product
  of rotations of angle `θ[k]`, each acting on the entries `k:k+1`.
@@ -362,6 +360,137 @@ end
 function getindex(Q::Rotations, k::Int, j::Int)
     # TODO: Return Q[k,j] in O(n) operations (hint: use *)
 end
+```
+
+**SOLUTION**
+
+First we make sure that the ```UpperTridiagonal``` class is defined, this will be where we store our values $r_{i,j}$:
+
+```julia
+struct UpperTridiagonal{T} <: AbstractMatrix{T}
+    d::Vector{T}   # diagonal entries
+    du::Vector{T}  # super-diagonal enries
+    du2::Vector{T} # second-super-diagonal entries
+end
+
+size(U::UpperTridiagonal) = (length(U.d),length(U.d))
+
+function getindex(U::UpperTridiagonal, k::Int, j::Int)
+    d,du,du2 = U.d,U.du,U.du2
+    # TODO: return U[k,j]
+    if j - k == 0
+        d[j]
+    elseif j - k == 1
+        du[k]
+    elseif j - k == 2
+        du2[k]
+    else
+        0
+    end
+end
+
+function setindex!(U::UpperTridiagonal, v, k::Int, j::Int)
+    d,du,du2 = U.d,U.du,U.du2
+    if j > k+2
+        error("Cannot modify off-band")
+    end
+
+    # TODO: modify d,du,du2 so that U[k,j] == v
+    if j - k == 0
+        d[k] = v
+    elseif j - k == 1
+        du[k] = v
+    elseif j - k == 2
+        du2[k] = v
+    else
+        error("Cannot modify off-band")
+    end
+    U = UpperTridiagonal(d,du,du2)
+
+    U # by convention we return the matrix
+end
+```
+Now we imlement the algorithm described above. Note that at each stage it is sufficient to compute and store the following six quantities:
+\begin{align}
+\theta_j &= \arctan(a_{j+1,j}/t_{j-1})\\
+r_{jj} &= \sqrt{t_{j-1}^2 + a_{j+1,j}^2}, \\
+r_{j,j+1} &= \frac{1}{r_{jj}}(t_{j-1}s_{j-1} + a_{j+1,j}a_{j+1,j+1}) \\
+r_{j,j+2} &= \frac{1}{r_{jj}}a_{j+1,j}a_{j+1,j+2} \\
+t_{j} &= \frac{1}{r_{jj}}(t_{j-1}a_{j+1,j+1}) - s_{j-1}a_{j+1, j} \\
+s_j &= \frac{1}{r_{jj}}t_{j-1}a_{j+1,j+2}
+\end{align}
+Note that we store $\arctan(a_{j+1,j}/t_{j-1})$ as we are interested in $Q = Q_1^{-1}\dots Q_n^{-1}$, where each $Q_j^{-1}$ rotates the coordinates ```j:j+1``` through angle $\arctan(a_{j+1,j}/t_{j-1})$. We don't have to store any values for $Q$ as our implementation of ```Rotations``` above will construct $Q$ from the list of angles that we store.
+```julia
+using LinearAlgebra
+function bandedqr(A::Tridiagonal)
+    n = size(A,1)
+    Q = Rotations(zeros(n-1)) # Assume Float64
+    R = UpperTridiagonal(zeros(n), zeros(n-1), zeros(n-2))
+    t = zeros(n-1)
+    s = zeros(n-1)
+    
+    #we will do the first iteration outside of the loop as t and s have special values here
+    #find the first angle, note we take the negative as we want the inverse of Q where QA = R
+    Q.θ[1] = atan(A[2,1], A[1,1])
+    
+    #update values for R
+    #R_11
+    v = sqrt(A[1,1]^2 + A[2,1]^2)
+    setindex!(R, v, 1, 1)
+    #R_12
+    v = 1/R[1,1] * (A[1,1]*A[1,2] + A[2,1]*A[2,2])
+    setindex!(R, v, 1, 2)
+    #R_13
+    v = A[2,1]*A[2,3]/R[1,1]
+    setindex!(R, v, 1, 3)
+    
+    #create initial storage values
+    t[1] = (-A[2,1]*A[1,2] + A[1,1]*A[2,2])/R[1,1]
+    s[1] = A[1,1]*A[2,3]/R[1,1]
+    
+    if n==2
+       Q, R 
+    end
+    
+    for j = 2:(n-1)
+        Q.θ[j] = atan(A[j+1,j],t[j-1])
+        
+        v = sqrt(A[j+1,j]^2 + t[j-1]^2)
+        setindex!(R, v, j, j)
+        
+        v=1/R[j,j]*(t[j-1]*s[j-1] + A[j+1,j]*A[j+1,j+1])
+        setindex!(R, v, j, j+1)
+        
+        #only compute this if j+2 <= n
+        #equivalently.        j < n-1
+        if j < n-1
+            v=1/R[j,j]*A[j+1,j]*A[j+1, j+2]
+            setindex!(R, v, j, j+2)
+        end
+        
+        t[j] = 1/R[j,j]*(-A[j+1,j]*s[j-1] + t[j-1]*A[j+1, j+1])
+        
+        #only compute this if j < n-1
+        if j < n-1
+            s[j] = 1/R[j,j]*t[j-1]*A[j+1, j+2]
+        end
+    end
+    v = (-A[n, n-1]*s[n-2] + t[n-2]*A[n,n])/R[n-1,n-1]
+    setindex!(R, v, n, n)
+    #now we just need to invert Q
+    
+    Q,R
+end
+```
+We can check an example:
+```julia
+A = Tridiagonal([1, 2, 3, 4], [1, 2, 3, 4, 5], [1, 2, 3, 4])
+```
+```julia
+Q, R = bandedqr(A)
+```
+```julia
+Q*R - A
 ```
 
 **Problem 4.3** Combine `Rotations` and `UpperTridiagonal` from last problem sheet
