@@ -56,6 +56,7 @@ with respect to a prescribed weight—and their usage in numerical computations.
 2. [Week 2](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week2.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week2s.ipynb)): Finite-differences, dual numbers, and Newton iteration
 3. [Week 3](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week3.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week3s.ipynb)): dense, triangular, banded, permutation, rotation and reflection matrices
 4. [Week 4](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week4.ipynb): least squares, QR and PLU decompositions
+4. [Week 5](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week4.ipynb): positive definite matrices, Cholesky, and SVD
 
 
 ## Reading List
