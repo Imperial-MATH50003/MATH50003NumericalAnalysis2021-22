@@ -364,6 +364,72 @@ end
 
 **SOLUTION**
 
+Implement Rotations which represents an orthogonal matrix ```Q``` that is a product of rotations of angle ```θ[k]```, each acting on the entries ```k:k+1```.
+
+Note that this can be interpreted in two ways. We can either:
+
+1. Rotate coordinates ```1:2``` through angle ```θ[1]```, then rotate coordinates ```2:3``` through angle ```θ[2]```, $\dots$, then rotate coordinates ```n-1:n``` through angle ```θ[n-1]```. Or we could,
+2. Rotate coordinates ```n-1:n``` through angle ```θ[n-1]```, then rotate coordinates ```n-2:n-1``` through angle ```θ[n-2]```, $\dots$, then rotate coordinates ```1:2``` through angle ```θ[1]```.
+
+Observe that the the form of the matrix $Q$ above would work best with the second implementation, so that is the one we choose to implement below (though technically both answers are correct).
+
+```julia
+struct Rotations{T} <: AbstractMatrix{T}
+    θ::Vector{T}
+end
+
+import Base: *, size, getindex
+
+size(Q::Rotations) = (length(Q.θ)+1, length(Q.θ)+1)
+
+function *(Q::Rotations, x::AbstractVector)
+    # TODO: Apply Q in O(n) operations
+    y = convert(Vector{AbstractFloat},x)
+    θ = Q.θ
+    #Does Q1....Qn x
+    for k=length(Q.θ):-1:1
+        #below has 4 ops to make the matrix and 12 to do the matrix-vector multiplication,
+        #total operations will be 48n = O(n)
+       y[k:(k+1)] = [cos(θ[k]) (-sin(θ[k])); sin(θ[k]) cos(θ[k])]*y[k:(k+1)]
+    end
+    y
+end
+
+function getindex(Q::Rotations, k::Int, j::Int)
+    #recall that A_kj = e_k'*A*e_j for any matrix A
+    #so if we use * above, this will take O(n) operations
+    n = size(Q)[1]
+    ej = zeros(n)
+    ej[j] = 1
+    #note, must be careful to ensure that ej is a VECTOR
+    #not a MATRIX, otherwise * above will not be used
+    Qj = Q*ej
+    Qj[k]
+end
+```
+
+For example:
+```julia
+θ1 = [0.5, 1, 1.5, 2]
+R = Rotations(θ1)
+```
+
+**Problem 4.3** Combine `Rotations` and `UpperTridiagonal` from last problem sheet
+to implement a banded QR decomposition that only takes $O(n)$ operations:
+```julia
+function bandedqr(A::Tridiagonal)
+    n = size(A,1)
+    Q = Rotations(zeros(n-1)) # Assume Float64
+    R = UpperTridiagonal(zeros(n), zeros(n-1), zeros(n-2))
+    for j = 1:n-1
+        # TODO: populate Q and R
+    end
+    Q,R
+end
+```
+
+**SOLUTION**
+
 First we make sure that the ```UpperTridiagonal``` class is defined, this will be where we store our values $r_{i,j}$:
 
 ```julia
@@ -491,20 +557,6 @@ Q, R = bandedqr(A)
 ```
 ```julia
 Q*R - A
-```
-
-**Problem 4.3** Combine `Rotations` and `UpperTridiagonal` from last problem sheet
-to implement a banded QR decomposition that only takes $O(n)$ operations:
-```julia
-function bandedqr(A::Tridiagonal)
-    n = size(A,1)
-    Q = Rotations(zeros(n-1)) # Assume Float64
-    R = UpperTridiagonal(zeros(n), zeros(n-1), zeros(n-2))
-    for j = 1:n-1
-        # TODO: populate Q and R
-    end
-    Q,R
-end
 ```
 
 **Problem 4.4⋆** Could one redesign the above to only use IEEE operatations (addition, multiplication, square-roots, 
