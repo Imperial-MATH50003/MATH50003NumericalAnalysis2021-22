@@ -234,7 +234,7 @@ size(Q::Reflections) = (size(Q.V,1),size(Q.V,1))
 
 function *(Q::Reflections, x::AbstractVector)
     M = x-2*Q.V[1:end,end]*Q.V[1:end,end]'*x
-    for j = size(Q,1)-1:-1:1
+    for j = size(Q.V,2)-1:-1:1
         M = M-2*Q.V[1:end,j]*Q.V[1:end,j]'*M
     end
     return M
@@ -268,21 +268,22 @@ end
 function householderqr(A)
     m,n = size(A)
     R = copy(A)
-    Q = Reflections(Matrix(1.0I, m, n))
-    for j = 1:n-1
-        y = R[j:end,j]-norm(R[j:end,j])*Q.V[j:end,j]
+    Q = Reflections(Matrix(0.0I, m, n))
+    for j = 1:min(n,m)
+        y = copy(R[j:end,j])
+        y[1] += ((y[1] ≥ 0) ? 1 : -1)*norm(y)
         w = y/norm(y)
         Q.V[j:end,j] = w
         R[j:end,:] = R[j:end,:]-2*w*(w'*R[j:end,:])
     end
-    R[n,n] = -R[n,n]
+   # R[end,:] = -R[end,:]
     return Q,R
 end
 
 # Some testing:
-A = randn(5,5)
+A = randn(4,6)
 Q,R = householderqr(A)
-A-Q*R
+Q*R-A
 ```
 
 ```julia
