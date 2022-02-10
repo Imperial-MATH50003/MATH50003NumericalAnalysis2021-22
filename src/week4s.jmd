@@ -751,6 +751,11 @@ avoiding calls `atan`, `cos`, and `sin`)?
 Would it have been possible to implement this algorithm using reflections?
 If so, what would be the structure of a matrix whose columns are the vectors of reflections?
 
+**SOLUTION**
+
+Yes, one could avoid using ```atan```, ```cos```, and ```sin```. At each stage of the algorithm, we only use ```atan``` to compute ```θ[i]``` which we then use to compute $Q_i^{-1}$ and thus $Q$ at the end. Instead, one could simply compute $Q_i^{-1}$ directly from $t_{i-1}$ and $a_{i+1, i}$ and save it at each stage. An efficient implementation of $Q_1^{-1}\dots Q_n^{-1}$ would then compute $Q$ at the end.
+One could implement this using Householder Reflections as well. Interpreting the 'vectors of reflections' to mean the vectors which define each Householder reflection (padded with 0s at the front so that they are the same dimension and fit into a matrix), the matrix with these columns would be a lower bidiagonal matrix with bandwidths $(l, u) = (1, 0)$.
+
 ## 5. PLU decomposition
 
 **Problem 5.1⋆** Compute the PLU decompositions for the following matrices:
