@@ -29,6 +29,20 @@ for n = 0:10
 end
 pl
 ```
+```julia
+# Here is the same approach as above but this time explicitly using QR as discussed in the lecture notes:
+x = range(0, 1; length=1000)
+pl = plot()
+f = 1 ./ (5x.^2 .+ 1)
+A = 1
+for n = 0:10
+    A = x .^ (0:n)'
+    (Q,R)=qr(A)
+    c = R \ Q[:,1:n+1]'*f
+    plot!(x, A*c)
+end
+pl
+```
 
 **Problem 1.2⋆** Show that every matrix has a QR decomposition such that the diagonal of $R$ is non-negative.
 Make sure to inlude the case of more columns than rows.
