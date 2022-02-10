@@ -31,7 +31,7 @@ pl
 ```
 
 **Problem 1.2⋆** Show that every matrix has a QR decomposition such that the diagonal of $R$ is non-negative.
-Make sure to inlude the case of more columns than rows.
+Make sure to include the case of more columns than rows.
 
 **SOLUTION**
 
