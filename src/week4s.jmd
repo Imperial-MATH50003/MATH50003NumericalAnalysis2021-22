@@ -276,7 +276,6 @@ function householderqr(A)
         Q.V[j:end,j] = w
         R[j:end,:] = R[j:end,:]-2*w*(w'*R[j:end,:])
     end
-   # R[end,:] = -R[end,:]
     return Q,R
 end
 
