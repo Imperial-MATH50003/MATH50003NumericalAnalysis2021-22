@@ -663,7 +663,7 @@ function setindex!(U::UpperTridiagonal, v, k::Int, j::Int)
     U # by convention we return the matrix
 end
 ```
-Now we imlement the algorithm described above. Note that at each stage it is sufficient to compute and store the following six quantities:
+Now we implement the algorithm described above. Note that at each stage it is sufficient to compute and store the following six quantities:
 \begin{align}
 \theta_j &= \arctan(a_{j+1,j}/t_{j-1})\\
 r_{jj} &= \sqrt{t_{j-1}^2 + a_{j+1,j}^2}, \\
