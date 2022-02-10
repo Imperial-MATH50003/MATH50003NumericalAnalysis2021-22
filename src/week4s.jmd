@@ -215,6 +215,64 @@ function householderqr(A)
 end
 ```
 
+**SOLUTION**
+```julia
+function householderqr(A)
+    m,n = size(A)
+    R = copy(A)
+    Q = Reflections(Matrix(1.0I, m, n))
+    for j = 1:n-1
+        y = R[j:end,j]-norm(R[j:end,j])*Q.V[j:end,j]
+        w = y/norm(y)
+        Q.V[j:end,j] = w
+        R[j:end,:] = R[j:end,:]-2*w*(w'*R[j:end,:])
+    end
+    R[n,n] = -R[n,n]
+    return Q,R
+end
+
+# Some testing:
+A = randn(5,5)
+Q,R = householderqr(A)
+A-Q*R
+```
+
+```julia
+# Here's a performance comparison with what we saw in the lecture notes:
+function householderreflection(x)
+    y = copy(x)
+    # we cannot use sign(x[1]) in case x[1] == 0
+    y[1] += (x[1] ≥ 0 ? 1 : -1)*norm(x) 
+    w = y/norm(y)
+    I - 2*w*w'
+end
+function lecturehouseholderqr(A)
+    m,n = size(A)
+    R = copy(A)
+    Q = Matrix(1.0I, m, m)
+    for j = 1:n
+        Qⱼ = householderreflection(R[j:end,j])
+        R[j:end,:] = Qⱼ*R[j:end,:]
+        Q[:,j:end] = Q[:,j:end]*Qⱼ
+    end
+    Q,R
+end
+
+using BenchmarkTools
+
+for j = 1:5
+    A = randn(j*100,j*100)
+    @btime lecturehouseholderqr(A);
+end
+```
+```julia
+for j = 1:5
+    A = randn(j*100,j*100)
+    @btime householderqr(A);
+end
+```
+
+
 ## 4. Banded QR with Given's rotations
 
 **Problem 4.1⋆**  Describe an algorithm for computing the QR decomposition
