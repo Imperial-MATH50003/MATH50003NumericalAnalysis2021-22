@@ -67,6 +67,14 @@ $$
 $$
 Show that $𝐯_j^j = 𝐯_j$. 
 
+**SOLUTION**
+
+Recall that the column vectors of $Q$ are orthonormal i.e. $(𝐪_i,𝐪_j) = \delta_{ij}$.
+Next observe that substituting from $𝐯^1_j$ for $𝐚_j$, for each $𝐯^i_j$ we get $i$ terms (note that the second term in the definition of $𝐯_j^{k+1}$ contributes only 1 term by orthonormality of $Q$, retrieving the contribution from $𝐯^{i-1}_j$ plus one.)
+$$
+𝐯^i_j := 𝐚_j - \sum_{k=1}^{i-2}{q_k^\top 𝐚_j} q_k - {q_{i-1}^\top 𝐚_j} q_{i-1}
+$$
+
 **Problem 2.2** Complete the following
 function implementing the modified Gram–Schmidt algorithm:
 ```julia
