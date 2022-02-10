@@ -33,6 +33,32 @@ pl
 **Problem 1.2⋆** Show that every matrix has a QR decomposition such that the diagonal of $R$ is non-negative.
 Make sure to inlude the case of more columns than rows.
 
+**SOLUTION**
+
+Beginning with the square case, a square matrix $A=QR$ with square orthogonal $Q$ and square upper triangular $R$ can always be rewritten in the form $A=QD^{-1}DR$ where $D$ is a diagonal matrix with $sign(R[j,j])$ on the diagonal. As a result, $DR$ is an upper triangular matrix with positive diagonal. It remains to check that $QD^{-1}=-QD$ is still orthogonal - this is easy to check since $$-QD(-QD)^T = QDDQ^T = QQ^T = I.$$
+Note we have made use of the fact that the inverse of a diagonal matrix is diagonal, that any diagonal matrix satisfies $D^{T} = D$ and that $DD=I$ since $sign(R[j,j])^2 = 1$.
+
+The same argument works for the non-square cases as long as we take care to consider the appropriate dimensions and pad with the identity matrix. Note that $Q$ is always a square matrix in the $QR$ decomposition. Assume the $R$ factor has more columns $m$ than rows $n$. Then a square $n \times n$ diagonal matrix with its $n$ diagonal entries being $sign(R[j,j]), j=1..n$ works with the same argument as above.
+
+Finally, assume that $R$ has less colums $m$ than rows $n$. In this case the square $n \times n$ diagonal matrix with its $n$ diagonal entries being $sign(R[j,j]), j=1..n$ and any remaining diagonal entries being $1$ works with the same argument as above. 
+
+Since the matrix $D$ is always square diagonal and orthogonal by construction, everything else for both of these cases is exactly as in the square case.
+
+Here are some practical examples in Julia:
+```julia
+E = [-1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]
+R = [-1 3; 0 2; 0 0; 0 0]
+```
+```julia
+E*R
+```
+```julia
+E = [-1 0 0 0; 0 1 0 0; 0 0 -1 0; 0 0 0 1]
+R = [-1 3 7 8 2 1; 0 2 9 2 1 9; 0 0 -7 2 1 9; 0 0 8 7 5 2]
+```
+```julia
+E*R
+```
 
 **Problem 1.3⋆** Show that the QR decomposition of a square invertible matrix is unique, 
 provided that the diagonal of $R$ is positive.
