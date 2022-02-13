@@ -31,7 +31,7 @@ which is essential to  machine learning.
 3. [Decompositions](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/Decompositions.ipynb): we discuss algorithms for computing matrix decompositions (QR and PLU decompositions) and their use in solving linear systems.
 3. [Singular values and condition numbers](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/SingularValues.ipynb): we discuss vector and
 matrix norms, and condition numbers for matrices, and the singular value decomposition.
-7. Differential Equations: we discuss the numerical solution of linear differential equations, 
+7. [Differential Equations](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/DifferentialEquations.ipynb): we discuss the numerical solution of linear differential equations, 
 including both time-dependent ordinary differential equations and boundary value problems, by reduction to linear systems.
 
 

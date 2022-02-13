@@ -3,39 +3,42 @@
 We now see our first application: solving differential equations.
 We will focus on the following differential equations:
 
-1. Indefinite integration:
+1. Indefinite integration for $a ≤ x ≤ b$:
 $$
 \begin{align*}
-u(0) &= c, \\
-u' &= f(x)
+u(a) = c, u' = f(x)
 \end{align*}
 $$
-2. Linear time-evolution problems:
+2. Linear time-evolution problems for $0 ≤ t ≤ T$:
 $$
 \begin{align*}
-u(0) &= c, \\
-u' - a(x) u &= f(x)
+u(0) = c, u' - a(t) u = f(t)
 \end{align*}
 $$
-2. Two-point boundary value problems:
+4. Vector time-evolution problems for $0 ≤ t ≤ T$:
 $$
 \begin{align*}
-u(0) &= c_0, \\
-u(1) &= c_1, \\
-u'' - a(x) u &= f(x)
+𝐮(0) = 𝐜, 𝐮' - A(t) 𝐮 = 𝐟(t)
 \end{align*}
 $$
-4. Nonlinear time-evolution problems:
+4. Nonlinear time-evolution problems for $0 ≤ t ≤ T$:
 $$
 \begin{align*}
-u(0) &= u_0, \\
-u' &= f(u(x))
+𝐮(0) = 𝐜, 𝐮' = f(t, 𝐮(t))
+\end{align*}
+$$
+5. Poisson equation with Dirichlet conditions for $a ≤ x ≤ b$:
+$$
+\begin{align*}
+u(a) &= c_0, u(b) = c_1, \\
+u'' &= f(x)
 \end{align*}
 $$
 
+
 Our approach to solving these is to
-1. Approximate the solution evaluated on a grid $(n+1)$-point grid
-$x_1,…,x_n$ with _step size_
+1. Approximate the solution on $[a,b]$ evaluated on a $n$-point grid
+$x_1,…,x_n$ (labelled $t_k$ for time-evolution problems) with _step size_
 $$
 x_{k+1}-x_k = h = {b-a \over n-1}
 $$
@@ -68,26 +71,29 @@ Add the initial/boundary conditions as extra rows to make sure the
 system is square.
 
 
-**Remark (advanced)** One should almost never implement these methods oneselves as there
-are packages available, e.g. [DifferentialEquations.jl]. Moreover Forward and Backward
+**Remark (advanced)** One should normally not need to implement these methods oneselves as there
+are packages available, e.g. [DifferentialEquations.jl](https://github.com/SciML/DifferentialEquations.jl). Moreover Forward and Backward
 Euler are only the first baby steps to a wide range of time-steppers, with Runge–Kutta being
 one of the most successful.
 For example we can solve
 a simple differential equation like a pendulum $u'' = -\sin u$ can be solved
 as follows (writing at a system $u' = v, v' = -\sin u$):
 ```julia
-using DifferentialEquations
+using DifferentialEquations, LinearAlgebra, Plots
 
 u = solve(ODEProblem((u,_,x) -> [u[2], -sin(u[1])], [1,0], (0,10)))
 plot(u)
 ```
+However, even in these automated packages one has a choice of different methods with
+different behaviour, so it is important to understand what is happening.
 
 # 1.  Time-evolution problems
 
 In this section we consider the forward and backward Euler methods, which are based on forward and backward difference
 approximations to the derivative. In the problem sheet we will investigate a rule that that takes the average of the two
-(with significant benefits). We first discuss the simplest case of indefinite integration, then introduce forward and backward
-Euler. We also consider systems of equations.
+(with significant benefits). We first discuss the simplest case of indefinite integration, where central differences is also
+applicable, then introduce forward and backward
+Euler for linear scalar, linear vector, and nonlinear differential equations.
 
 
 ## Indefinite integration
@@ -95,49 +101,49 @@ Euler. We also consider systems of equations.
 We begin with the simplest differential equation on an interval $[a,b]$:
 $$
 \begin{align*}
-u(0) &= c \\
+u(a) &= c \\
 u'(x) &= f(x)
 \end{align*}
 $$
-Using the forward-difference (which is the standard finite-difference) approximation we get,
-if $u_k ≈ u(x_k)$, for $k = 1, …, n-1$:
+Using the forward-difference (which is the standard finite-difference) approximation we 
+choose $u_k ≈ u(x_k)$ so that, for $k = 1, …, n-1$:
 $$
-u'(x_k) ≈ {u_{k+1} - u_k \over h} = f(x_k)
+f(x_k) = u'(x_k) ≈ {u_{k+1} - u_k \over h} = f(x_k)
 $$
+That is, where $u$ satisfies the differential equation exactly, 
+$u_k$ satisfies the _difference equation_ exactly.
 We do not include $k = n$ to avoid going outside our grid.
 
-
-
-
-Thus we have the rectangular system:
+This condition can be recast as a linear system:
 $$
 \underbrace{{1 \over h} \begin{bmatrix}
 -1 & 1\\
 & \ddots & \ddots \\
 && -1 & 1
-\end{bmatrix}}_{D_n} 𝐮^{\rm f} = \underbrace{\begin{bmatrix} f(x_1) \\ \vdots \\ f(x_{n-1})
+\end{bmatrix}}_{D_h} 𝐮^{\rm f} = \underbrace{\begin{bmatrix} f(x_1) \\ \vdots \\ f(x_{n-1})
 \end{bmatrix}}_{𝐟^{\rm f}}
 $$
-where the super-script ${\rm f}$ denotes that this is leading towards the
-forward Euler method.
-Here $D_n ∈ ℝ^{n-1,n}$ so this system is not-invertible. Thus we need to
-add an extra row, coming from the initial condition: $𝐞_1^⊤ 𝐮^n = c$,
+where the super-script ${\rm f}$ denotes that we are using 
+forward differences (and is leading towards the
+forward Euler method).
+Here $D_h ∈ ℝ^{n-1,n}$ so this system is not-invertible. Thus we need to
+add an extra row, coming from the initial condition: $𝐞_1^⊤ 𝐮^{\rm f} = c$,
 that is:
 $$
 \begin{bmatrix}
 𝐞_1^⊤ \\
-D_n
+D_h
 \end{bmatrix} 𝐮^{\rm f} = \underbrace{ \begin{bmatrix}
 1 \\
 -1/h & 1/h\\
 & \ddots & \ddots \\
 && -1/h & 1/h
-\end{bmatrix}}_L 𝐮^{\rm f} = \begin{bmatrix} c \\ 𝐟^{\rm f} \end{bmatrix}
+\end{bmatrix}}_{L_h} 𝐮^{\rm f} = \begin{bmatrix} c \\ 𝐟^{\rm f} \end{bmatrix}
 $$
 This is a lower-triangular bidiagonal system, so can be solved using
 forward substitution in $O(n)$ operations. 
 
-We can also consider discretisation at the mid-point $m_k = x_{k+1} - x_k \over 2$,
+We can also consider discretisation at the mid-point $m_k = {x_{k+1} - x_k \over 2}$,
 which is the analogue of using central-differences:
 $$
 u'(m_k) ≈ {u_{k+1} - u_k \over h} = f(m_k)
@@ -148,7 +154,7 @@ $$
 -1 & 1\\
 & \ddots & \ddots \\
 && -1 & 1
-\end{bmatrix}}_{D_n} 𝐮^{\rm m} = 
+\end{bmatrix}}_{D_h} 𝐮^{\rm m} = 
 \underbrace{\begin{bmatrix} f(m_1) \\ \vdots \\ f(m_{n-1})
 \end{bmatrix}}_{𝐟^{\rm m}}
 $$
@@ -180,7 +186,7 @@ x = range(0, 1; length=n)
 L = indefint(x)
 ```
 We can now solve for our particular problem using both the left and 
-mid-pint rules:
+mid-point rules:
 ```julia
 c = 0 # u(0) = 0
 f = x -> cos(x)
@@ -217,28 +223,28 @@ function mid_err(u, c, f, n)
 end
 
 ns = 10 .^ (1:8) # solve up to n = 10 million
-scatter(ns, forward_err.(sin, 0, f, ns); xscale=:log10, yscale=:log10, label="error")
-scatter!(ns, mid_err.(sin, 0, f, ns); label="error")
+scatter(ns, forward_err.(sin, 0, f, ns); xscale=:log10, yscale=:log10, label="forward")
+scatter!(ns, mid_err.(sin, 0, f, ns); label="mid")
 plot!(ns, ns .^ (-1); label="1/n")
 plot!(ns, ns .^ (-2); label="1/n^2")
 ```
 This is a log-log plot:we scale both $x$ and $y$ axes logarithmically so that
 $n^α$ becomes a straight line where the slope is dictated by $α$.
-We seem experimentally that the error for forward-difference is
-
-A remarkable property here is that we are not seeing exponential growth in errors:
-finite-differences is **stable** for solving differential equations! Even though
-it was exponentially bad for _computing_ derivatives. 
+We seem experimentally that the error for forward-difference is $O(n^{-1})$
+while for mid-point/central-differences we get faster $O(n^{-2})$ convergence. 
+Both methods appear to be stable.
+ 
 
 ## Forward Euler
 
-Now consider
+Now consider a scalar linear time-evolution problem for $0 ≤ t ≤ T$:
 $$
 \begin{align*}
 u(0 ) &= c \\
-u'(x) - α(x) u(x) &= f(x)
+u'(t) - a(t) u(t) &= f(t)
 \end{align*}
 $$
+Label the $n$-point grid as $t_k = (k-1)h$ for $h = T/(n-1)$.
 
 **Definition (Restriction matrices)**
 Define the $n-1 × n$ _restriction matrices_ as
@@ -252,53 +258,66 @@ $$
 
 Again we can replace the discretisation using finite-differences, giving us
 $$
-{u_{k+1} - u_k \over h} - α(x_k) u_k = f(u_k)
+{u_{k+1} - u_k \over h} - a(t_k) u_k = f(u_k)
 $$
-for $k = 1,…,n-1$. We need to add the term $α(x_k) u_k$ to our differential equation,
+for $k = 1,…,n-1$. We need to add the term $a(t_k) u_k$ to our differential equation,
 that is. We do this using the $n-1 × n$ _(left) restriction matrix_ that takes a vector
 evaluated at $x_1,…,x_n$ and restricts it to $x_1,…,x_{n-1}$,
 as well as the $n × n$ _multiplication matrix_
 $$
-A_n = \begin{bmatrix} α(x_0) \\ &⋱\\&& α(x_n) \end{bmatrix}
+A_n = \begin{bmatrix} a(t_1) \\ &⋱\\&& a(t_n) \end{bmatrix}
 $$
 Putting everything together we have the system:
 $$
 \begin{bmatrix}
 𝐞_1^⊤ \\
-D_n -  I_n^{\rm L}  A_n
-\end{bmatrix} 𝐮^n = \underbrace{ \begin{bmatrix}
+D_h -  I_n^{\rm f}  A_n
+\end{bmatrix} 𝐮^{\rm f} = \underbrace{ \begin{bmatrix}
 1 \\
--α(x_0)-1/h & 1/h\\
+-a(t_1)-1/h & 1/h\\
 & \ddots & \ddots \\
-&& -α(x_{n-1})-1/h & 1/h
-\end{bmatrix}}_L 𝐮^n = \begin{bmatrix} c \\ I_n^{\rm f} 𝐟 \end{bmatrix}
+&& -a(t_{n-1})-1/h & 1/h
+\end{bmatrix}}_L 𝐮^{\rm f} = \begin{bmatrix} c \\ I_n^{\rm f} 𝐟 \end{bmatrix}
 $$
-where $𝐟 = \begin{bmatrix} f(x_0) \\ ⋮ \\ f(x_n) \end{bmatrix}$.
+where $𝐟 = \begin{bmatrix} f(t_1) \\ ⋮ \\ f(t_n) \end{bmatrix}$.
+
+Here is a simple example for solving:
+$$
+u'(0) = 1, u' + t u = \E^t
+$$
+which has an exact solution in terms of a special error function
+(which we determined using Mathematica).
 
 ```julia
-a = -1
-c = 0
+using SpecialFunctions
+c = 1
+a = t -> t
 n = 2000
-x = range(0, 1; length=n+1)
-h = 1/n
-A = Bidiagonal([1; fill(1/h, n)], fill(-a-1/h, n), :L)
+t = range(0, 1; length=n)
+# exact solution, found in Mathematica
+u = t -> -(1/2)*exp(-(1+t^2)/2)*(-2sqrt(ℯ) + sqrt(2π)erfi(1/sqrt(2)) - sqrt(2π)erfi((1 + t)/sqrt(2)))
 
-norm(A \ [1; zeros(n)] - exp.(a*x),Inf)
+h = step(t)
+L = Bidiagonal([1; fill(1/h, n-1)], a.(t[1:end-1]) .- 1/h, :L)
+
+norm(L \ [c; exp.(t[1:end-1])] - u.(t),Inf)
 ```
+We see that it is converging to the true result.
+
 
 Note that this is a simple forward-substitution of a bidiagonal system,
 so we can also just construct it directly:
 $$
 \begin{align*}
 u_1 &= c \\
-u_{k+1} &= u_k + h a(x_k) u_k + h f(x_k)
+u_{k+1} &= (1 + h a(t_k)) u_k + h f(t_k)
 \end{align*}
 $$
 
 
 **Remark (advanced)** Note this can alternatively be reduced to an integral
 $$
-u(t) = c \hbox{e}^{a t} + \hbox{e}^{a x} \int_0^x f(t) \hbox{e}^{-a t} \hbox d t
+u(t) = c \hbox{e}^{a t} + \hbox{e}^{a t} \int_0^t f(τ) \hbox{e}^{-a τ} \hbox d τ
 $$
 and solved as above but this approach is harder to generalise.
 
@@ -306,47 +325,33 @@ and solved as above but this approach is harder to generalise.
 ## Backward Euler
 
 
-Backward Euler is a small modification where we replace the forward-difference with a backward-difference,
+In Backward Euler we replace the forward-difference with a backward-difference,
 that is
 $$
-{u_k - u_{k-1} \over h} - a(x_k) u_k = f(u_k)
+{u_k - u_{k-1} \over h} - a(t_k) u_k = f(u_k)
 $$
 This leads to the system:
 $$
 \begin{bmatrix}
 𝐞_1^⊤ \\
-D_n -  I_n^{\rm R}  A_n
-\end{bmatrix} 𝐮^n = \underbrace{ \begin{bmatrix}
+D_h -  I_n^{\rm b}  A_n
+\end{bmatrix} 𝐮^{\rm b} = \underbrace{ \begin{bmatrix}
 1 \\
--α(x_1)-1/h & 1/h\\
+-a(t_1)-1/h & 1/h\\
 & \ddots & \ddots \\
-&& -α(x_{n-1})-1/h & 1/h
-\end{bmatrix}}_L 𝐮^n = \begin{bmatrix} c \\ I_n^{\rm R} 𝐟 \end{bmatrix}
+&& -a(t_{n-1})-1/h & 1/h
+\end{bmatrix}}_L 𝐮^{\rm b} = \begin{bmatrix} c \\ I_n^{\rm b} 𝐟 \end{bmatrix}
 $$
-
-
-```julia
-c = 0
-n = 20
-x = range(0, 1; length=n+1)
-h = 1/n
-L = Bidiagonal([1; fill(1/h-a, n)], fill(-1/h, n), :L)
-```
-
-```julia
-norm(L \ [1; zeros(n)] - exp.(a*x),Inf)
-```
-
 Again this is a bidiagonal forward-substitution:
 $$
 \begin{align*}
 u_1 &= c \\
-(1 - h a(x_{k+1})) u_{k+1} &= u_k + h f(x_{k+1})
+(1 - h a(t_{k+1})) u_{k+1} &= u_k + h f(t_{k+1})
 \end{align*}
 $$
 That is,
 $$
-u_{k+1} = (1 - h a(x_{k+1}))^{-1}(u_k + h f(x_{k+1}))
+u_{k+1} = (1 - h a(t_{k+1}))^{-1}(u_k + h f(t_{k+1}))
 $$
 
 
@@ -357,12 +362,12 @@ We can also solve systems, that is, equations of the form:
 $$
 \begin{align*}
 𝐮(0) &= 𝐜 \\
-𝐮'(x) - A(x) 𝐮(x) &= 𝐟(x)
+𝐮'(t) - A(t) 𝐮(t) &= 𝐟(t)
 \end{align*}
 $$
-where $𝐮(x) ∈ ℝ^d$ and $A(x) ∈ ℝ^{d × d}$.
-We again discretise at the grid $x_k$
-by approximating $𝐮(x_k) ≈ 𝐮_k ∈ ℝ^d$.
+where $𝐮, 𝐟 : [0,T] → ℝ^d$ and $A : [0,T] → ℝ^{d × d}$.
+We again discretise at the grid $t_k$
+by approximating $𝐮(t_k) ≈ 𝐮_k ∈ ℝ^d$.
 This can be reduced to a block-bidiagonal system as in
 the scalar case which is solved via forward-substitution. Though
 it's easier to think of it directly. 
@@ -371,26 +376,27 @@ Forward Euler gives us:
 $$
 \begin{align*}
 𝐮_1 &= c \\
-𝐮_{k+1} &= 𝐮_k + h A(x_k) 𝐮_k + h 𝐟(x_k)
+𝐮_{k+1} &= 𝐮_k + h A(t_k) 𝐮_k + h 𝐟(t_k)
 \end{align*}
 $$
-That is, each time-step consists of matrix-vector multiplication.
-On the other hand:
+That is, each _time-step_ consists of matrix-vector multiplication.
+On the other hand Backward Euler requires inverting a matrix
+at each time-step:
 $$
 \begin{align*}
 𝐮_1 &= c \\
-𝐮_{k+1} &= 𝐮_k + h A(x_k) 𝐮_k + h 𝐟(x_k)
+𝐮_{k+1} &= (I- h A(t_{k+1})^{-1} (𝐮_k  + h 𝐟(t_{k+1}))
 \end{align*}
 $$
 
 
-**Example**
+**Example (Airy equation)**
 Consider the (negative-time) Airy equation:
 $$
 \begin{align*}
 u(0) &= 1 \\
 u'(0) &= 0 \\
-u''(x) + x u &= 0
+u''(t) + t u &= 0
 \end{align*}
 $$
 We can recast it as a system by defining
@@ -401,31 +407,104 @@ which satisfies
 $$
 \begin{align*}
 𝐮(0) = \begin{bmatrix} 1 \\ 0 \end{bmatrix} \\
-𝐮 + \begin{bmatrix} 0 & -1 \\ x & 0 \end{bmatrix} 𝐮 = 𝟎.
+𝐮 - \begin{bmatrix} 0 & 1 \\ -t & 0 \end{bmatrix} 𝐮 = 𝟎.
 \end{align*}
 $$
-Thus we get
+It is natural to represent the _time-slices_ $𝐮_k$ as
+columns of a matrix $U = [𝐮_1 | ⋯ | 𝐮_n] ∈ ℝ^{2 × n}$. Thus we get:
 ```julia
 n = 100_000
-x = range(0,1; length=n+1)
-A = x -> [0 -1; 100x 0]
-h = 1/n
+t = range(0, 50; length=n)
+A = t -> [0 1; -t 0]
+h = step(t)
 
-I₂ = Matrix(I,2,2)
-L = Bidiagonal([[I₂]; fill(-I₂/h,n)], fill(I₂/h, n) - A.(x[2:end]), :L)
-𝐮 = L \ [[[1.,0]]; fill([0.,0],n)]
+U = zeros(2, n) # each column is a time-slice
+U[:,1] = [1.0,0.0] # initial condition
+for k = 1:n-1
+    U[:,k+1] = (I + h*A(t[k]))*U[:,k]
+end
 
-plot(x, [𝐮[k][1] for k=1:n+1])
-plot!(x, [𝐮[k][2] for k=1:n+1])
+plot(t, U')
 ```
+
+We leave implementation of backward Euler as a simple exercise.
+
+**Example (Heat on a graph)**
+Those who took Introduction to Applied Mathematics will recall
+heat equation on a graph. Consider a simple graph of $m$ nodes labelled
+$1, …, m$ where node $k$ is connected to neighbouring nodes ${k-1}$ and ${k+1}$,
+whereas node $1$ is only connected to node $2$ and node $m$ only connected to
+${m-1}$. The graph Laplacian corresponding to this system is the matrix:
+$$
+Δ := \begin{bmatrix} -1 & 1 \\ 
+            1 & -2 & ⋱ \\ 
+            & 1 & ⋱ & 1 \\
+            && ⋱ & -2 & 1 \\
+                &&& 1 & -1
+                \end{bmatrix}
+$$
+If we denote the heat at time $t$ at node $k$ as $u_k(t)$,
+which we turn into a vector
+$$
+𝐮(t) = \begin{bmatrix} u_1(t) \\ ⋮ \\ u_m(t) \end{bmatrix}
+$$
+We consider the case of a periodic forcing at the node $n = 1$.
+
+Heat equation on this lattice is defined as follows:
+$$
+𝐮' = Δ𝐮 + 𝐞_1 \cos ωt
+$$
+We can employ forward and backward Euler:
+```julia
+n = 1_000 # number of time-steps
+t = range(0, 100; length=n)
+h = step(t)
+
+m = 50 # 100 nodes
+
+
+Δ = SymTridiagonal([-1; fill(-2.0, m-2); -1], ones(m-1))
+ω = 1
+f = t -> cos(ω*t) # periodic forcing with period 1
+
+Uᶠ = zeros(m, n) # each column is a time-slice for forward Euler
+Uᵇ = zeros(m, n) # each column is a time-slice for backwar Euler
+
+Uᶠ[:,1] = Uᵇ[:,1] = zeros(m) # initial condition
+
+
+
+for k = 1:n-1
+    Uᶠ[:,k+1] = (I + h*Δ)*Uᶠ[:,k]
+    Uᶠ[m÷2,k+1] += h*f(t[k]) # add forcing at 𝐞_1
+end
+
+𝐞 = zeros(m); 𝐞[m÷2] = 1;
+
+for k = 1:n-1
+    Uᵇ[:,k+1] = (I - h*Δ)\(Uᵇ[:,k] + h*f(t[k+1])𝐞)
+end
+
+scatter(Uᶠ[:,end]; label="forward")
+scatter!(Uᵇ[:,end]; label="backward")
+```
+Both match! 
+
+**Remark** If you change the number of time-steps to be too small, for example `n = 100`, forward
+Euler blows up while backward Euler does not. This will be discussed in the problem
+sheet.
+
+**Remark (advanced)** Memory allocations are very expensive so
+in practice one should preallocate and use memory. 
 
 
 ## Nonlinear problems
 
-Forward-Euler extends naturally to nonlinear equations, including the
+Forward-Euler extends naturally to nonlinear equations, 
+including the
 vector case:
 $$
-𝐮' = f(x, 𝐮)
+𝐮' = f(t, 𝐮(t))
 $$
 becomes:
 $$
@@ -455,35 +534,6 @@ As we see it correctly predicts the oscillatory behaviour of
 a pendulum, and matches the simulation using DifferentialEquations.jl
 above.
 
-## Long-time stability
-
-As of now we have not presented a compelling case for the
-backward-Euler method. We now present an example where it proves significantly
-more accurate: consider
-```julia
-n = 500
-𝐮 = fill(zeros(2), n)
-𝐯 = fill(zeros(2), n)
-x = range(0, 10; length=n)
-h = step(x) # same as x[k+1]-x[k]
-
-A = [-50.5 49.5;
-      49.5 -50.5]
-
-𝐯[1] = 𝐮[1] = [1,0]
-for k = 1:n-1
-    𝐮[k+1] = (I + h*A)*𝐮[k]
-    𝐯[k+1] = (I - h*A)\𝐯[k]
-end
-
-plot(x, first.(𝐮); ylims=(-1,1), label="forward")
-plot!(x, first.(𝐯); label="backward")
-```
-Here backward Euler successfully approximates the function
-while forward Euler produces garbage.
-(Note that we still have convergence for both methods
-by making `n` even larger.)
-
 
 
 # 2. Two-point boundary value problems
@@ -505,7 +555,7 @@ $$
 $$
 \begin{align*}
 u(0) &= c_0 \\
-u'' = f(x) \\
+u'' &= f(x) \\
 u(1) &= c_1
 \end{align*}
 $$
@@ -513,7 +563,7 @@ which we discretise as
 $$
 \begin{align*}
 u_0 &= c_0 \\
- {u_{k-1} - 2u_k + u_{k+1} \over h^2} = f(x_k) \\
+ {u_{k-1} - 2u_k + u_{k+1} \over h^2} &= f(x_k) \\
 u_1 &= c_1
 \end{align*}
 $$
@@ -523,22 +573,50 @@ $$
 𝐞_1^⊤ \\
 D_h^2 \\
 𝐞_{n+1}^⊤
-\end{bmatrix} 𝐮^n = \begin{bmatrix} c_0 \\ S 𝐟 \\ c_1 \end{bmatrix}
+\end{bmatrix} 𝐮 = \begin{bmatrix} c_0 \\ S 𝐟 \\ c_1 \end{bmatrix}
 $$
 
 Thus we solve:
 ```julia
-T = Tridiagonal([fill(1/h^2, n-1); 0], [1; fill(-2/h^2, n-1); 1], [0; fill(1/h^2, n-1)])
-
+x = range(0, 1; length = n)
+h = step(x)
+T = Tridiagonal([fill(1/h^2, n-2); 0], [1; fill(-2/h^2, n-2); 1], [0; fill(1/h^2, n-2)])
 u = T \ [1; exp.(x[2:end-1]); 2]
-
-plot(x, u)
+scatter(x, u)
 ```
+
+We can test convergence on $u(x) = \cos x^2$ which satisfies
+$$
+\begin{align*}
+u(0) = 1 \\
+u(1) = \cos 1 \\
+u''(x) = -4x^2*cos(x^2) - 2sin(x^2)
+\end{align*}
+$$
+We observe uniform ($∞$-norm) convergence:
+```julia
+function poisson_err(u, c_0, c_1, f, n)
+    x = range(0, 1; length = n)
+    h = step(x)
+    T = Tridiagonal([fill(1/h^2, n-2); 0], [1; fill(-2/h^2, n-2); 1], [0; fill(1/h^2, n-2)])
+    uᶠ = T \ [c_0; f.(x[2:end-1]); c_1]
+    norm(uᶠ - u.(x), Inf)
+end
+
+u = x -> cos(x^2)
+f = x -> -4x^2*cos(x^2) - 2sin(x^2)
+
+ns = 10 .^ (1:8) # solve up to n = 10 million
+scatter(ns, poisson_err.(u, 1, cos(1), f, ns); xscale=:log10, yscale=:log10, label="error")
+plot!(ns, ns .^ (-2); label="1/n^2")
+```
+
+
 
 ## 3. Convergence
 
 We now study convergence of the approaches for the constant-coefficient case.
-The key is the following:
+We will use _Toeplitz matrices_ as a tool to simplify the explanation.
 
 **Definition (Toeplitz)** A _Toeplitz matrix_ has constant diagonals: $T[k,j] = a_{k-j}$.
 
@@ -546,33 +624,34 @@ The key is the following:
 **Proposition (Bidiagonal Toeplitz inverse)**
 The inverse of a $n × n$ bidiagonal Toeplitz matrix is:
 $$
-\underbrace{\begin{bmatrix}
+\begin{bmatrix}
 1 \\
 -ℓ & 1 \\
 &-ℓ & 1 \\
 && ⋱ & ⋱ \\
-&&& -ℓ & 1\end{bmatrix}}_L^{-1} = 
- \underbrace{\begin{bmatrix} 1 \\
+&&& -ℓ & 1\end{bmatrix} = 
+ \begin{bmatrix} 1 \\
                             ℓ & 1 \\
                             ℓ^2 & ℓ & 1 \\
                             ⋮ & ⋱ & ⋱ & ⋱ \\
                             ℓ^{n-1} & ⋯ & ℓ^2 & ℓ & 1
-\end{bmatrix}}_{L^{-1}}               
+\end{bmatrix}              
 $$
 
 **Theorem (Forward/Backward Euler convergence)**
 Consider the equation
 $$
-u(a) = c, u'(x) + α u(x) = f(x)
+u(0) = c, u'(t) + a u(t) = f(t)
 $$
 Denote
 $$
-𝐮ᵉ := \begin{bmatrix} u(x_1) \\ ⋮ \\ u(x_n) \end{bmatrix}
+𝐮 := \begin{bmatrix} u(t_1) \\ ⋮ \\ u(t_n) \end{bmatrix}
 $$
-Assume that $u$ is twice-differentiable with 
+Assume that $u$ is twice-differentiable with uniformly bounded
+second derivative.
 Then the error for forward/backward Euler is
 $$
-\|𝐮ᶠ - 𝐮ᵉ\|_∞, \|𝐮ᵇ - 𝐮ᵉ\|_∞ = O(n^{-1})
+\|𝐮ᶠ - 𝐮\|_∞, \|𝐮ᵇ - 𝐮\|_∞ = O(n^{-1})
 $$
 
 **Proof** 
@@ -580,24 +659,25 @@ We prove the error bound for forward Euler as backward Euler is
 similar. This proof consists of two stages: (1) consistency and
 (2) stability. 
 
-_Consitency_ means our discretisation approximates the
+_Consistency_ means our discretisation approximates the
 true equation, that is:
 $$
-L𝐮ᵉ = \begin{bmatrix} c \\
-        {u(x_2) - u(x_1) \over h} + a u(x_1) \\
+L𝐮 = \begin{bmatrix} c \\
+        {u(t_2) - u(t_1) \over h} + a u(t_1) \\
         ⋮ \\
-        {u(x_n) - u(x_{n-1}) \over h} + a u(x_{n-1}) 
+        {u(t_n) - u(t_{n-1}) \over h} + a u(t_{n-1}) 
 \end{bmatrix} = \begin{bmatrix} c \\
-        {u'(x_1) + a u(x_1) + u''(t_1) h \\
+        u'(t_1) + a u(t_1) + u''(τ_1) h \\
         ⋮ \\
-        {u'(x_{n-1}) + a u(x_{n-1}) + u''(t_{n-1}) h
-\end{bmatrix} = = \begin{bmatrix} c \\
-        {f(x_1) + u''(t_1) h \\
+        u'(t_{n-1}) + a u(t_{n-1}) + u''(τ_{n-1}) h
+\end{bmatrix} = \begin{bmatrix} c \\
+        f(t_1) + u''(τ_1) h \\
         ⋮ \\
-        f(x_{n-1}) + u''(t_1) h
-\end{bmatrix} = \begin{bmatrix} c \\ 𝐟ᶠ \end{bmatrix} + \begin{bmatrix} 0 \\ 𝛅 \end{bmatrix}
+        f(t_{n-1}) + u''(τ_{n-1}) h
+\end{bmatrix} = \begin{bmatrix} c \\ 𝐟ᶠ \end{bmatrix} + \begin{bmatrix} 0 \\ δ \end{bmatrix}
 $$
-where $\|𝛅\|_∞ = O(h)$, or $\|𝛅\|_1 = O(1)$. 
+where $t_k ≤ τ_k ≤ t_{k+1}$, and uniform boundedness
+implies that $\|δ\|_∞ = O(h)$, or in other words $\|δ\|_1 = O(1)$. 
 
 _Stability_ means the inverse does not
 blow up the error. We need to be a bit careful and
@@ -620,8 +700,8 @@ $$
 
 We now combine stability and consistency. have
 $$
-\|𝐮ᶠ - 𝐮ᵉ\|_∞  = \|L^{-1} (L𝐮ᶠ - L𝐮ᵉ)\|_∞  = \|L̃^{-1} D^{-1} \begin{bmatrix} 0 \\ 𝛅 \end{bmatrix} \|_∞ 
-≤ h \|L̃^{-1}\|_{1 → ∞} \|𝛅\|_1 = O(h).
+\|𝐮ᶠ - 𝐮\|_∞  = \|L^{-1} (L𝐮ᶠ - L𝐮)\|_∞  = \|L̃^{-1} D^{-1} \begin{bmatrix} 0 \\ δ \end{bmatrix} \|_∞ 
+≤ h \|L̃^{-1}\|_{1 → ∞} \|δ\|_1 = O(h).
 $$
 
 ∎
@@ -629,5 +709,98 @@ $$
 
 ### Poisson
 
-For 2D problems we consider Poisson. We can multiply 
+For 2D problems we consider Poisson. The first stage is to
+row-reduce to get a symmetric tridiagonal (pos. def.) matrix:
+$$
+\begin{bmatrix} 
+1 \\
+-1/h^2 & 1 \\
+    && 1 \\ 
+    &&& ⋱ \\
+    &&&& 1 & -1/h^2 \\
+    &&&&& 1\end{bmatrix} \begin{bmatrix}
+    1 \\
+    1/h^2 & -2/h^2 & 1/h^2 \\
+        & ⋱ & ⋱ & ⋱ \\
+        && 1/h^2 & -2/h^2 & 1/h^2 \\
+        &&&& 1 \end{bmatrix} = 
+\begin{bmatrix}
+    1 \\
+    0 & -2/h^2 & 1/h^2 \\
+        & ⋱ & ⋱ & ⋱ \\
+        && 1/h^2 & -2/h^2 & 0 \\
+        &&&& 1 \end{bmatrix}.
+$$
+Considering the right-hand side and dropping
+the first and last rows our equation becomes:
+$$
+{1 \over h^2} \underbrace{\begin{bmatrix}
+ -2 & 1 \\
+        1 & -2 & ⋱ \\
+        & ⋱ &  ⋱ & 1 \\
+        && 1 & -2  
+        \end{bmatrix}}_Δ \begin{bmatrix}
+                u_2 \\ ⋮ \\ u_{n-1} \end{bmatrix} = \underbrace{\begin{bmatrix} f(x_2) - c_0/h^2 \\ f(x_3) \\ ⋮ \\ f(x_{n-2}) \\ f(x_{n-1}) - c_1/h^2 \end{bmatrix}}_{𝐟ᵖ}
+$$
 
+
+**Remark (advanced)** You may recognise $Δ$ as a discrete Laplacian corresponding to a graph with
+Dirichlet conditions,
+as discussed in first year applied mathematics.
+Thus one can interpret finite-differences as approximating a continuous differential equation by
+a graph. This view-point extends naturally to higher-dimensional equations. In the problem sheet we also
+discuss Neumann series.
+
+
+**Theorem (Poisson convergence)** Suppose that $u$ is four-times differentiable with uniformly
+bounded fourth derivative. Then the finite difference approximation to Poisson converges like $O(n^2)$.
+
+
+**Proof**
+
+
+For consistency we need the Taylor series error of second-order finite differences. We have
+$$
+\begin{align*}
+u(x+h) = u(x) + h u'(x) + h^2 {u''(x) \over 2} + h^3 {u'''(x) \over 6} +  h^4 {u^{(4)}(t_+) \over 24}  \\
+u(x-h) = u(x) - h u'(x) + h^2 {u''(x) \over 2} - h^3 {u'''(x) \over 6}  +  h^4 {u^{(4)}(t_-)  \over 24}
+\end{align*}
+$$
+where $t_+ ∈ [x,x+h]$ and $t_- ∈ [x-h,x]$. 
+Thus
+$$
+{u(x+h) - 2u(x) + u(x-h) \over h^2} = u''(x) + h^2 {u^{(4)}(t_+) + u^{(4)}(t_-) \over 24} = u''(x) + O(h^2)
+$$
+(Note this is a slightly stronger result than used in the solution of PS2.)
+Thus we have _consistency_:
+$$
+{Δ \over h^2} \begin{bmatrix} u_2 \\ ⋮ \\ u_{n-1} \end{bmatrix} = 𝐟ᵖ + {\bf\delta}
+$$
+where $\|{\bf\delta}\|_∞ = O(h^2)$.
+
+
+Following PS5 we deduce that it has the Cholesky-like decomposition
+$$
+Δ = -\underbrace{\begin{bmatrix} 1 & -1 \\  & ⋱ & ⋱ \\ && 1 & -1 \\ &&& 1 \end{bmatrix}}_U \underbrace{\begin{bmatrix} 1 \\ -1 & 1 \\ & ⋱ & ⋱ \\ && -1 & 1 \end{bmatrix} }_{U^⊤}
+$$
+We can invert:
+$$
+U^{-1} = \begin{bmatrix} 1 & 1 & ⋯ & 1 \\ & ⋱ & ⋱ & ⋮ \\
+                                        && 1 & 1 \\ &&& 1 \end{bmatrix}
+$$
+Thus we have _stability_: $\|h^2 Δ^{-1}\|_∞ ≤ h^2 \|U^{-1}\|_{∞} \|U^{-⊤}\|_{∞} = 1$.
+
+Putting everything together we have, for $𝐮 = [u(x_1), …, u(x_n)]^⊤$,
+$$
+\|𝐮ᶠ - 𝐮\|_∞  = \|Δ^{-1} (Δ𝐮ᶠ - Δ𝐮)\|_∞  ≤ \|h^2  Δ^{-1}\|_∞  \| {\bf\delta} \|_∞ = O(n^{-2})
+$$
+
+∎
+
+What about the observed instability? The condition number of the matrix provides an intuition
+(though not a proof: condition numbers are only upper bounds!).  Here we have
+$$
+κ_∞(Δ/h^2) = κ_∞(Δ) = \|Δ\|_∞ \|Δ^{-1}\|_∞ ≤ 2 n^2
+$$
+One can show by looking at $Δ^{-1}$ directly that the condition number is indeed growing like $n^2$.
+Thus we _expect_ floating-point errors to magnified propotional to $n^2$ in the linear solve.

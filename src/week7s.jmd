@@ -3,6 +3,44 @@
 
 # 1. Two-point boundary value problems
 
+**Problem 1.1** Solve Helmholtz
+
+```
+function helm_err(k, u, c_0, c_1, f, n)
+    x = range(0, 1; length = n)
+    h = step(x)
+    T = Tridiagonal([fill(1/h^2, n-2); 0], [1; fill(-k^2-2/h^2, n-2); 1], [0; fill(1/h^2, n-2)])
+    uᶠ = T \ [c_0; f.(x[2:end-1]); c_1]
+    norm(uᶠ - u.(x), Inf)
+end
+
+k = -10
+
+u = x -> ((exp(-k*x)*(exp(k*x)-1)*(exp(k*x)-exp(k)))/(k^2 * (1 + exp(k))))
+
+helm_err(k, u, 0, 0, one, 10_000_000)
+
+ns = 10 .^ (1:8) # solve up to n = 10 million
+scatter(ns, poisson_err.(u, 1, cos(1), f, ns); xscale=:log10, yscale=:log10, label="error")
+plot!(ns, ns .^ (-2); label="1/n^2")
+
+
+
+function helm_err(k, u, c_0, c_1, f, n)
+    x = range(0, 1; length = n)
+    h = step(x)
+    T = Tridiagonal([fill(1/h^2, n-2); 0], [1; fill(k^2-2/h^2, n-2); 1], [0; fill(1/h^2, n-2)])
+    uᶠ = T \ [c_0; f.(x[2:end-1]); c_1]
+    norm(uᶠ - u.(x), Inf)
+end
+
+let k = -10
+    u = x -> (1 - cos(k*x) + cot(k)sin(k*x) - csc(k)sin(k*x))/k^2
+
+    helm_err(k, u, 0, 0, one, 100_000_000)
+end
+```
+
 **Problem 1.1** Consider the heat equation:
 $$
 u_t = u_{xx}
@@ -27,3 +65,8 @@ x = range(-L,L; length=n)
 h = step(x)
 eigvals(SymTridiagonal(fill(2/h^2,n-2)  + x[2:end-1].^2, fill(-1/h^2, n-3)))
 ```
+
+## Convergence
+
+**Problem** Prove convergence for the trap rule.
+
