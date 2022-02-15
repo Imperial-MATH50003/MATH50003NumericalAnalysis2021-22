@@ -1,7 +1,7 @@
 
 
 
-# 1. Two-point boundary value problems
+## 1. Two-point boundary value problems
 
 **Problem 1.1** Solve Helmholtz
 
@@ -66,7 +66,26 @@ h = step(x)
 eigvals(SymTridiagonal(fill(2/h^2,n-2)  + x[2:end-1].^2, fill(-1/h^2, n-3)))
 ```
 
-## Convergence
+## 2. Convergence
 
 **Problem** Prove convergence for the trap rule.
 
+
+
+
+## 3. Fourier series
+
+
+
+**Problem 3.1⋆** Prove that if $f$ is $λ$ times differentiable that
+$$
+|f̂ₖ| = O(|k|^{-λ})\qquad \hbox{as $|k| → ∞}
+$$
+What does this tell us about the rate
+
+**Problem 3.2⋆** Prove if $f_k = 0$ for negative $k$ and $f$ is $λ$ differentiable we converge fast.
+
+**Problem 3.3⋆** Prove convergence for
+$$
+f_n(θ) = ∑_{k=-\ceil{n/2}}^{\floor{n/2}} f̂ₖ {\rm e}^{{\rm i} k θ}
+$$

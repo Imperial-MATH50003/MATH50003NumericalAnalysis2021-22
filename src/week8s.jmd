@@ -1,0 +1,3 @@
+**Problem** Show that $Q_n$ is symmetric ($Q_n = Q_n^⊤$) but not Hermitian ($Q_n ≠ Q_n^⋆$).
+
+**Problem** Show that $Q_n^⋆$ can also be applied in $O(n \log n)$ operations.

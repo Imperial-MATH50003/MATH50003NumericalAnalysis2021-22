@@ -283,7 +283,7 @@ where $𝐟 = \begin{bmatrix} f(t_1) \\ ⋮ \\ f(t_n) \end{bmatrix}$.
 
 Here is a simple example for solving:
 $$
-u'(0) = 1, u' + t u = \E^t
+u'(0) = 1, u' + t u = {\rm e}^t
 $$
 which has an exact solution in terms of a special error function
 (which we determined using Mathematica).
@@ -460,7 +460,7 @@ n = 1_000 # number of time-steps
 t = range(0, 100; length=n)
 h = step(t)
 
-m = 50 # 100 nodes
+m = 50 # number of nodes
 
 
 Δ = SymTridiagonal([-1; fill(-2.0, m-2); -1], ones(m-1))

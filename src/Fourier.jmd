@@ -1,0 +1,374 @@
+# Fourier series
+
+
+# 1. Fourier series and decay in coefficients
+
+Recall the (complex) Fourier series
+$$
+f(θ) = ∑_{k = -∞}^∞ f̂ₖ {\rm e}^{{\rm i} k θ}
+$$
+where
+$$
+f̂ₖ = {1 \over 2π} ∫_0^{2π} f(θ) {\rm e}^{{\rm i} k θ} {\rm d}θ.
+$$
+In numerical analysis we try to build on the analogy with linear algebra as much as possible.
+Therefore we write this as:
+$$
+f(θ) = \underbrace{[⋯ | {\rm e}^{-2{\rm i}θ} |{\rm e}^{-1{\rm i}θ} | \underline 1 | {\rm e}^{{\rm i}θ} | {\rm e}^{2{\rm i}θ} | ⋯]}_{F(θ)}
+\underbrace{\begin{bmatrix} ⋮ \\ f̂_{-2} \\ f̂_{-1} \\ \underline{f̂_0} \\ f̂_1 \\ f̂_2 \\ ⋮ \end{bmatrix}}_𝐟̂
+$$
+
+
+In analysis one typically works with continuous functions and relates results to continuoity.
+In numerical analysis we inheritely have to work with _vectors_, so it is more natural 
+to  focus on the case where the _Fourier coefficients_ $f̂_k$ are _absolutely convergent_,
+or in otherwords, the $1$-norm of $𝐟̂$ is bounded:
+$$
+\|𝐟̂\|_1 = ∑_{k=-∞}^∞ |f̂_k| < ∞
+$$
+
+Fortunately, continuity gives us sufficient (though not necessary) conditions for absolute convergence:
+
+**Proposition (differentiability and coeffiicent decay)** If $f : ℝ → ℂ$ and $f'$ are periodic
+ and $f''$ is uniformly bounded, then its Fourier coefficients satisfy
+$$
+\|𝐟̂\|₁ < ∞
+$$
+
+**Proof**
+Integrate by parts twice using the fact that $f(0) = f(2π)$, $f'(0) = f(2π)$:
+$$
+\begin{align*}
+f̂ₖ &= ∫_0^{2π} f(θ) {\rm e}^{-{\rm i} k θ} {\rm d}θ = 
+[f(θ) {\rm e}^{-{\rm i} k θ}]_0^{2π} + {1 \over {\rm i} k} ∫_0^{2π} f'(θ) {\rm e}^{-{\rm i} k θ} {\rm d}θ \\
+&= {1 \over {\rm i} k} [f'(θ) {\rm e}^{-{\rm i} k θ}]_0^{2π} - {1 \over k^2} ∫_0^{2π} f''(θ) {\rm e}^{-{\rm i} k θ} {\rm d}θ \\
+&= - {1 \over k^2} ∫_0^{2π} f''(θ) {\rm e}^{-{\rm i} k θ} {\rm d}θ
+$$
+thus uniform boundedness of $f''$ guarantees $|f̂ₖ| ≤ M |k|^{-2}$ for some $M$, and we have
+$$
+∑_{k = -∞}^∞ |f̂ₖ| ≤ |f̂_0|  + 2M ∑_{k = 1}^∞ |k|^{-2}  < ∞.
+$$
+
+
+∎
+
+This condition can be weakened. Moreover, as we shall see in the problem sheet, more derivatives implies
+faster decay/convergence. In fact, if a function is smooth and 2π-periodic its Fourier coefficients decay
+faster than algebraically: they decay like $O(k^{-λ})$ for any $λ$.
+
+**Remark (advanced)** Going further, if we let $z = {\rm e}^{{\rm i} θ}$ then if $f(z)$ is _analytic_ in a
+neighbourhood of the unit circle the Fourier coefficients decay _exponentially fast_. And if $f(z)$ is entire
+they decay even faster than exponentially.
+
+
+## 2. Trapezium rule and discrete Fourier coefficients
+
+Let $θ_j = 2π*j/n$ for $j = 0,1,…,n$ denote $n+1$ evenly spaced points over $[0,2π]$.
+The _Trapezium rule_ over $[0,2π]$ is the approximation:
+$$
+∫_0^{2π} f(θ) {\rm d}θ ≈ {2 π \over n} \left[{f(0) \over 2} + ∑_{j=1}^{n-1} f(θ_j) + {f(2 π) \over 2} \right]
+$$
+But if $f$ is periodic we have $f(0) = f(2π) we get the _periodic Trapezium rule_:
+$$
+∫_0^{2π} f(θ) {\rm d}θ ≈ \underbrace{{2 π \over n} ∑_{j=0}^{n-1} f(θ_j)}_{Σ_n[f]}
+$$
+Define the Trapezium rule approximation to the Fourier coefficients by:
+$$
+f̂_k^n := {1 \over 2 π} Σ_n[f(θ) {\rm e}^{-i k θ}]  = {1 \over n} ∑_{j=1}^n f(θ_j) {\rm e}^{-i k θ_j}
+$$
+
+**Lemma (Discrete orthogonality)**
+We have:
+$$
+∑_{j=1}^n {\rm e}^{i k θ_j} = \begin{cases} n & k = \ldots,-2n,-n,0,n,2n,\ldots  \cr
+0 & \hbox{otherwise}
+\end{cases}
+$$
+In other words,
+$$
+{1 \over 2π} Σ_n[{\rm e}^{i (k-j) θ_j}] = \begin{cases} 1 & k-j = \ldots,-2n,-n,0,n,2n,\ldots  \cr
+0 & \hbox{otherwise}
+\end{cases}.
+$$
+
+**Proof**
+
+Consider $ω := {\rm e}^{i θ_1} = {\rm e}^{2 π i \over n}$.  
+This is an $n$th root of unity: $ω^n = 1$.  Note that ${\rm e}^{i θ_j} ={\rm e}^{2 π i j \over n}= ω^j$.  
+
+(Case 1) Suppose $k$ is a multiple of $n$, that is, $k = M n$ for an integer $M$.  Then we have 
+
+$$∑_{j=1}^n {\rm e}^{i k θ_j} = ∑_{j=1}^n ω^{kj} = ∑_{j=1}^n ({ω^{Mn}})^j =   ∑_{j=1}^n 1 = n$$
+
+(Case 2)  Recall that
+
+$$∑_{j=0}^{n-1} z^j = {z^n-1 \over z-1}.$$
+
+Then we have
+
+$$∑_{j=1}^n {\rm e}^{i k θ_j} = ∑_{j=1}^n (ω^k)^j = {ω^{kn} -1 \over ω^k -1} = 0.$$
+
+∎
+
+
+**Theorem (discrete Fourier coefficients)** 
+If $𝐟̂$ is absolutely convergent then
+$$
+f̂_k^n = ⋯ + f̂_{k-2n} + f̂_{k-n} + f̂_k + f̂_{k+n} + f̂_{k+2n} + ⋯
+$$
+
+**Proof**
+$$
+\begin{align*}
+f̂_k^n &= {1 \over 2 π} Σ_n[f(θ) {\rm e}^{-i k θ}] = ∑_{j=-∞}^∞ f̂ⱼ {1 \over 2 π} Σ_n[f(θ) {\rm e}^{i (j-k) θ}] \\
+&= ∑_{j=-∞}^∞ f̂ⱼ \begin{cases} 1 & j-k = \ldots,-2n,-n,0,n,2n,\ldots  \cr
+0 & \hbox{otherwise}
+\end{cases}
+\end{align*}
+$$
+∎
+
+Note that there is redundancy:
+
+**Corollary (aliasing)**
+For all $m ∈ ℤ$,
+$$
+f̂_k^n = f̂_{k+mn}^n
+$$
+
+
+In other words if we know $f̂_0^n, …, f̂_{n-1}^n$, we know all $f̂_k^n$. 
+We first discuss the case when all negative coefficients are zero,
+noting that the Fourier series is in fact a Taylor series if we let $z = {\rm e}^{{\rm i} θ}$:
+$$
+f(z) = \sum_{k=0}^∞ f̂_k z^k.
+$$
+That is, $f̂_0^n, …, f̂_{n-1}^n$ are approximations of the Taylor series coefficients by evaluating
+on the boundary.
+
+**Example (computing derivatives)** The connection to Taylor series means that for a function $f(z)$
+has a Taylor series that converges in the unit disk we have $f̂_k = f^{(k)}(0)/k!$. Thus we can approximate
+$$
+f^{(k)}(0) ≈ k! f̂_k^n.
+$$
+```julia
+
+```
+
+**Corollary (Taylor series converges)** 
+If $0 = f̂_{-1} = f̂_{-2} = ⋯$ and $𝐟̂$ is absolutely convergent then
+$$
+f_n(θ) = ∑_{k=0}^{n-1} f̂_k^n {\rm e}^{{\rm i} k θ}
+$$
+converges uniformly to $f(θ)$. 
+
+**Proof**
+
+$$
+\begin{align*}
+|f(θ) - f_n(θ)| = |∑_{k=0}^{n-1} (f̂_k - f̂_k^n) {\rm e}^{{\rm i} k θ} + ∑_{k=n}^∞ f̂_k {\rm e}^{{\rm i} k θ}|
+= |∑_{k=n}^∞ f̂_k ({\rm e}^{{\rm i} k θ} - {\rm e}^{{\rm i} {\rm mod}(k,n) θ})|
+≤ 2|∑_{k=n}^∞ |f̂_k|
+\end{align*}
+$$
+which goes to zero as $n → ∞$.
+∎
+
+For the general case we need to choose a range of coefficients that includes roughly equally:
+if $n$ is odd we use
+$$
+f_n(θ) = ∑_{k=-\ceil{n/2}}^{\floor{n/2}} f̂ₖ {\rm e}^{{\rm i} k θ}
+$$
+In the problem sheet we will prove this converges provided the coefficients are absolutely convergent.
+
+
+
+
+
+
+
+
+## 3. Discrete Fourier transform and interpolation
+
+We note that the map from values to coefficients can be defined as a matrix-vector product using the DFT:
+
+
+**Definition (DFT)** 
+The _Discrete Fourier Transform (DFT)_ is defined as:
+$$
+Q_n := {1 \over √n} \begin{bmatrix} 1 & 1 & 1&  ⋯ & 1 \\
+                                    1 & {\rm e}^{-{\rm i} θ_1} & {\rm e}^{-{\rm i} θ_2} & ⋯ {\rm e}^{-{\rm i} θ_{n-1}} \\
+                                    1 & {\rm e}^{-{\rm i} 2 θ_1} & {\rm e}^{-{\rm i} 2 θ_2} & ⋯ {\rm e}^{-{\rm i} 2θ_{n-1}} \\
+                                    ⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
+                                    1 & {\rm e}^{-{\rm i} (n-1) θ_1} & {\rm e}^{-{\rm i} (n-1) θ_2} & ⋯ {\rm e}^{-{\rm i} (n-1) θ_{n-1}}
+\end{bmatrix}
+$$
+Note that
+$$
+\begin{align*}
+Q_n^⋆ &= {1 \over √n} \begin{bmatrix} 1 & 1 & 1&  ⋯ & 1 \\
+                                    1 & {\rm e}^{{\rm i} θ_1} & {\rm e}^{{\rm i} 2 θ_1} & ⋯ {\rm e}^{{\rm i} (n-1) θ_1} \\
+                                    1 &  {\rm e}^{{\rm i} θ_2}  & {\rm e}^{{\rm i} 2 θ_2} & ⋯ {\rm e}^{{\rm i} (n-1)θ_2} \\
+                                    ⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
+                                    1 & {\rm e}^{{\rm i} θ_{n-1}} & {\rm e}^{{\rm i} 2 θ_{n-1}} & ⋯ {\rm e}^{{\rm i} (n-1) θ_{n-1}}
+\end{bmatrix} \\
+&= {1 \over √n} [𝟏 | \exp({\rm i} 𝛉^n) | … | \exp({\rm i}(n-1) 𝛉^n)]
+\end{align*}
+$$
+
+That is, we have
+$$
+\underbrace{\begin{bmatrix} f_0^n \\ ⋮ \\ f_{n-1}^n \end{bmatrix}}_{𝐟̂ⁿ} = {1 \over √n} Q_n \underbrace{\begin{bmatrix} f(θ₀) \\ ⋮ \\ f(θₙ) \end{bmatrix}}_{𝐟ⁿ}
+$$
+
+The choice of normalisation constant is motivated by the following:
+
+**Proposition (DFT is Unitary)** $Q_n$ is unitary: $Q_n^⋆ Q_n = Q_n Q_n^⋆ = I$.
+
+**Proof**
+$$
+Q_n Q_n^⋆  = \begin{bmatrix} Q_n[1] & Q_n[{\rm e}^{{\rm i} θ}] & ⋯ & Q_n[{\rm e}^{{\rm i} (n-1) θ}] \\
+                            Q_n[{\rm e}^{-{\rm i} θ}] & Q_n[1] & ⋯ & Q_n[{\rm e}^{{\rm i} (n-2) θ}] \\
+                            ⋮ & ⋮ & ⋱ & ⋮ \\
+                            Q_n[{\rm e}^{-{\rm i}(n-1) θ}] & Q_n[{\rm e}^{-{\rm i}(n-2) θ}] & ⋯ & Q_n[1] 
+                            \end{bmatrix} = I
+$$
+∎
+
+In other words, $Q_n$ is easily inverted and we also have a map from discrete Fourier coefficients back to values:
+$$
+\sqrt{n} Q_n^⋆ 𝐟̂ⁿ = 𝐟ⁿ
+$$
+
+**Corollary (Interpolation)**
+$f_n(θ)$ interpolates $f$ at $θⱼ$:
+$$
+f_n(θⱼ) = f(θ_j)
+$$
+
+**Proof**
+We have
+$$
+f_n(θⱼ) = ∑_{k=0}^{n-1} f̂ₖⁿ {\rm e}^{{\rm i} k θ_j} = √n 𝐞_j^⊤ Q_n^⋆ 𝐟̂ⁿ = 𝐞_j^⊤ Q_n^⋆ Q_n 𝐟ⁿ = f(θⱼ).
+$$
+
+∎
+
+
+We will leave extending this result to the problem sheet. Note that regardless of choice of coefficients
+we interpolate, though some interpolations are better than others:
+
+```julia
+using Plots, LinearAlgebra
+
+
+# evaluates f_n at a point
+function finitefourier(𝐟̂ₙ, θ)
+    m = n ÷ 2 # use coefficients between -m:m
+    ret = 0.0 + 0.0im # coefficients are complex so we need complex arithmetic
+    for k = 0:m
+        ret += 𝐟̂ₙ[k+1] * exp(im*k*θ)
+    end
+    for k = -m:-1
+        ret += 𝐟̂ₙ[end+k+1] * exp(im*k*θ)
+    end
+    ret
+end
+
+function finitetaylor(𝐟̂ₙ, θ)
+    ret = 0.0 + 0.0im # coefficients are complex so we need complex arithmetic
+    for k = 0:n-1
+        ret += 𝐟̂ₙ[k+1] * exp(im*k*θ)
+    end
+    ret
+end
+
+
+f = θ -> exp(cos(θ))
+n = 7
+θ = range(0,2π; length=n+1)[1:end-1] # θ_0, …,θ_{n-1}, dropping θ_n == 2π
+Qₙ = 1/sqrt(n) * [exp(-im*(k-1)*θ[j]) for k = 1:n, j=1:n]
+𝐟̂ₙ = 1/sqrt(n) * Qₙ * f.(θ)
+
+
+fₙ = θ -> finitefourier(𝐟̂ₙ, θ)
+tₙ = θ -> finitetaylor(𝐟̂ₙ, θ)
+
+g = range(0, 2π; length=1000) # plotting grid
+plot(g, f.(g); label="function", legend=:bottomright)
+plot!(g, real.(fₙ.(g)); label="Fourier")
+plot!(g, real.(tₙ.(g)); label="Taylor")
+scatter!(θ, f.(θ); label="samples")
+```
+
+## 4. Fast Fourier Transform
+
+Applying $Qₙ$ or its adjoint $Q_n^⋆$ to a vector naively takes $O(n^2)$ operations.
+Both can be reduced to $O(n \log n)$ using the celebrated _Fast Fourier Transform_,
+which is one of the [Top 10 Algorithms of the 20th Century](https://pi.math.cornell.edu/~web6140/)
+(You won't believe number 7!).
+
+The key observation is that, if $n$ is even, then contained in $Q_n$ is
+$Q_{n ÷ 2}$. It is convenient here to drop the $√n$ so define $F_n := √n Q_n$
+and as we will work with multiple grids denote the evenly spaced grid with $n$ points
+as $θ_j^n := {2π j \over n}$. First note that if $n$ is even the grids interlace:
+$$
+𝛉^{2n} = P_σ^⊤ \begin{bmatrix}  𝛉^n \\ 𝛉^n + {π \over n} \end{bmatrix}
+$$
+where $σ$ has the Cauchy notation
+$$
+\begin{pmatrix}
+1 & 2 & 3 & ⋯ & n & n+1 & ⋯ & 2n \\
+1 & 3 & 5 & ⋯ & 2n-1 & 2 & ⋯ & 2n
+\end{pmatrix}
+$$
+That is, $P_σ$ is the following matrix which takes the even entries
+and places them in the first $n$ entries and the odd entries in the
+last $n$ entries:
+```julia
+n = 4
+σ = [1:2:2n-1; 2:2:2n]
+P_σ = I(2n)[σ,:]
+```
+Note that we therefore have:
+$$
+𝛚_{2n}^k = P_σ^⊤ \begin{pmatrix} \exp(im*k*𝛉^{n}) \\  \exp(im*k*(𝛉^{n} + {π \over n})) \end{pmatrix} 
+= P_σ^⊤ \begin{bmatrix} I_n \\  ω_{2n}^k I_n \end{bmatrix}  𝛚_{n}^k
+$$
+Thus we have
+$$
+F_{2n} = \begin{bmatrix} 𝟏_{2n} | 𝛚_{2n} | 𝛚_{2n}^2 | ⋯ | 𝛚_{2n}^{2n-1} \end{bmatrix} =
+P_σ^⊤ \begin{bmatrix} 𝟏_{n} &   𝛚_n        & 𝛚_n^2          & ⋯ & 𝛚_n^{n-1}          & 𝛚_n^n  & ⋯ & 𝛚_n^{2n-1}  \\
+                        𝟏_{n} & ω_{2n} 𝛚_n & ω_{2n}^2 𝛚_n^2 & ⋯ & ω_{2n}^{n-1} 𝛚_n^{n-1} & ω_{2n}^n 𝛚_n^n  & ⋯ & ω_{2n}^{2n-1} 𝛚_n^{2n-1}
+\end{bmatrix} =P_σ^⊤ \begin{bmatrix} F_n & F_n \\
+                                     F_n D_n & -F_n D_n
+                                     \end{bmatrix} = 
+                                     P_σ^⊤ \begin{bmatrix} F_n \\ &F_n \end{bmatrix} \begin{bmatrix} I_n & I_n \\ D_n & -D_n \end{bmatrix}å
+$$
+In other words, we reduced the DFT to two DFTs applied to vectors of half the dimension.
+
+We can see this formula in code:
+```julia
+function fftmatrix(n)
+    θ = range(0,2π; length=n+1)[1:end-1] # θ_0, …,θ_{n-1}, dropping θ_n == 2π
+    [exp(-im*(k-1)*θ[j]) for k = 1:n, j=1:n]
+end
+
+
+F₂ₙ = fftmatrix(2n)'
+Fₙ = fftmatrix(n)'
+Dₙ = Diagonal([exp(im*k*π/n) for k=0:n-1])
+(P_σ'*[Fₙ Fₙ; Fₙ*Dₙ -Fₙ*Dₙ])[1:n,1:n] ≈ F₂ₙ[1:n,1:n]
+```
+
+
+Now assume $n = 2^q$ so that $\log_2 n = q$. To see that we get $O(n \log n) = O(n q)$ operations we need to count the operations.
+Assume that applying $F_n$ takes $3n q$ additions and multiplications. The first $n$ rows takes $n$ additions. The last $n$ has $n$ multiplications and $n$ additions.
+Thus we have $3nq + 3n = 3n(q+1) = 3 n \log_2(2n)$ additions/multiplications, showing by induction that we have $O(n \log n)$ operations.
+
+
+function myfft(
+
+
+**Remark** The FFTW.jl package wraps the FFTW (Fastest Fourier Transform in the West) library, which is a highly optimised implementation
+of the FFT that also works well for $n$ not a power of 2.
