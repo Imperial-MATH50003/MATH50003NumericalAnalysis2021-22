@@ -1,4 +1,4 @@
-# MATH50003 Numerical Analysis: Problem Sheet 5
+# MATH50003 Numerical Analysis: Problem Sheet 6
 
 This problem sheet explores condition numbers, indefinite integration,
 and Euler's metohd.
@@ -30,8 +30,8 @@ $$
 1/3 & 1/5 \\ 0 & 1/7
 \end{bmatrix}, \begin{bmatrix} 1 \\ & 1/2 \\ && ⋯ \\ &&& 1/2^n \end{bmatrix}
 $$
-Hint: recall that the singular values of a matrix $A$ are the square roots of the eigenvalues of the Gram matrix
-$A^⊤A$.
+(Hint: recall that the singular values of a matrix $A$ are the square roots of the eigenvalues of the Gram matrix
+$A^⊤A$.)
 
 
 **Problem 1.4**
@@ -40,10 +40,11 @@ $$
 \begin{bmatrix}
 1/3 & 1/5 \\ 0 & 1/10^3
 \end{bmatrix},
- \begin{bmatrix} 1 \\ & 1/2 \\ && ⋯ \\ &&& 1/2^10 \end{bmatrix}
+ \begin{bmatrix} 1 \\ & 1/2 \\ && ⋯ \\ &&& 1/2^{10} \end{bmatrix}
 $$
 Compute the relative error (using `big` for a high-precision version to compare against)
-where $𝐯$ is a column of $V$ in the SVD $A = U Σ V^⊤$.
+where $𝐯$ is a column of $V$ in the SVD $A = U Σ V^⊤$, computed using the `svd` command with
+`Float64` inputs.
 
 
 
@@ -53,15 +54,16 @@ where $𝐯$ is a column of $V$ in the SVD $A = U Σ V^⊤$.
 
 **Problem 2.1** Implement backward differences to approximate
  indefinite-integration. How does the error compare to forward
- and mid-point versions  for $f(x) = \cos x$?
+ and mid-point versions  for $f(x) = \cos x$ on the interval $[0,1]$?
 
 
 **Problem 2.2** Implement indefinite-integration 
 where we take the average of the two grid points:
 $$
-{u_{k+1} - u_k \over h} = {f(x_k) + f(x_{k+1}) \over 2}
+{u'(x_{k+1}) + u'(x_k) \over 2} ≈ {u_{k+1} - u_k \over h}
 $$
-What is the observed rate-of-convergence using the ∞-norm for $f(x) = \cos x$?
+What is the observed rate-of-convergence using the ∞-norm for $f(x) = \cos x$
+on the interval $[0,1]$?
 Does the method converge if the error is measured in the $1$-norm?
 
 **SOLUTION**
@@ -87,16 +89,16 @@ norm(uₙ - sin.(x),1)
 
 **Problem 3.1⋆** For an evenly spaced grid $t_1, …, t_n$, use the approximation
 $$
-{u_{k+1} - u_k \over h} = {f(t_k) + f(t_{k+1}) \over 2}
+{u'(x_{k+1}) + u'(x_k) \over 2} ≈ {u_{k+1} - u_k \over h}
 $$
-to discretise
+to recast
 $$
 \begin{align*}
 u(0) &= c \\
 u'(t) &= a(t) u(t) + f(t)
 \end{align*}
 $$
-as a lower bidiagonal system. Use forward-substitution to extend this to vector linear problems:
+as a lower bidiagonal linear system. Use forward-substitution to extend this to vector linear problems:
 $$
 \begin{align*}
 𝐮(0) &= 𝐜 \\
@@ -105,7 +107,11 @@ $$
 $$
 
 
-**Problem 3.2** Implement the method designed in Problem 3.1 for the negative time Airy equation on $[0,50]$.
+**Problem 3.2** Implement the method designed in Problem 3.1 for the negative time Airy equation 
+$$
+u(0) = 1, u'(0) = 0, u''(t) = -t u(t)
+$$
+on $[0,50]$.
 How many time-steps are needed to get convergence to 1% accuracy (the "eyeball norm")?
 
 **Problem 3.3** Use `Dual` and Newton iteration to find a frequency `ω` such that
@@ -144,6 +150,51 @@ hω = heat(Dual(ω,1))
 
 **Problem 3.4** Consider the equation
 $$
-u(1) = 0, u'(t) = -100u(t)
+u(1) = 1, u'(t) = -10u(t)
 $$
-What behaviour do you observe at $t = 100$ of forward, backward, and that of Problem 3.1?
+What behaviour do you observe on $[0,10]$ of forward, backward, and that of Problem 3.1
+with a step-size of 0.5? What happens if you decrease the step-size to $0.01$? (Hint: you may wish to do a plot and scale the $y$-axis logarithmically,)
+
+**SOLUTION**
+
+```julia
+h = 0.5
+t = range(0, 10; step=h)
+n = length(t)
+uᶠ = zeros(n)
+uᵇ = zeros(n)
+uᵗ = zeros(n)
+uᶠ[1] = uᵇ[1] = uᵗ[1] = 1
+a = -10
+for k = 1:n-1
+    uᶠ[k+1] = (1+h*a) * uᶠ[k]
+    uᵇ[k+1] = (1-h*a) \ uᵇ[k]
+    uᵗ[k+1] = (1-h*a/2) \ (1 + h*a/2) * uᵗ[k]
+end
+
+plot(t, abs.(uᶠ); yscale=:log10)
+plot!(t, abs.(uᵇ); yscale=:log10)
+plot!(t, abs.(uᵗ); yscale=:log10)
+```
+
+
+```julia
+h = 0.01
+t = range(0, 10; step=h)
+n = length(t)
+uᶠ = zeros(n)
+uᵇ = zeros(n)
+uᵗ = zeros(n)
+uᶠ[1] = uᵇ[1] = uᵗ[1] = 1
+for k = 1:n-1
+    uᶠ[k+1] = (1+h*a) * uᶠ[k]
+    uᵇ[k+1] = (1-h*a) \ uᵇ[k]
+    uᵗ[k+1] = (1-h*a/2) \ (1 + h*a/2) * uᵗ[k]
+end
+
+nanabs(x) = iszero(x) ? NaN : abs(x)
+
+plot(t, nanabs.(uᶠ); yscale=:log10)
+plot!(t, nanabs.(uᵇ); yscale=:log10)
+plot!(t, nanabs.(uᵗ); yscale=:log10)
+```
