@@ -105,26 +105,6 @@ $$
 \end{align*}
 $$
 
-**SOLUTION**
-
-From Problem 2.3 use the fact that $\|A \|_F = \sqrt{\hbox{tr}(A^⊤ A)}$, where $A\in \mathbb{R}^{m\times n}$.
-
-Hence,
-
-$$\|A \|_F^2 = \hbox{tr}(A^⊤ A) = \sigma_1^2 +...+\sigma_m^2$$
-
-where $\sigma_1\ge...\ge \sigma_n \ge 0$ are the singular values of $A$ and $\sigma_i^2$ are the eigenvalues of $A^T A$
-
-Knowing that $\|A\|_2^2 = \sigma_1^2$ we have $\|A \|_2^2 ≤ \|A\|_F^2$
-
-Moreover, since if the rank of $A$ is $r$ we have that $\sigma_{r+1}=...=\sigma_m=0$ and we also know $\sigma_1\ge...\ge \sigma_n \ge 0$, we have that
-
-$\|A\|_F^2 = \sigma_1^2 +...+\sigma_m^2 =\sigma_1^2 +...+\sigma_r^2 \le r \sigma_1^2 =r \|A \|_2^2$
-
-Hence,
-
-$\|A \|_2 ≤ \|A\|_F ≤ \sqrt{r} \|A \|_2$
-
 **Problem 2.2⋆** For a rank-1 matrix $A = 𝐱 𝐲^⊤$ prove that
 $$
 \|A \|_2 = \|𝐱\|_2 \|𝐲\|_2.
@@ -147,6 +127,26 @@ $$
 **Problem 3.1⋆** Show that $\|A \|_2 ≤ \|A\|_F ≤ \sqrt{r} \|A \|_2$ where
 $r$ is the rank of $A$.
 
+**SOLUTION**
+
+From Problem 2.3 use the fact that $\|A \|_F = \sqrt{\hbox{tr}(A^⊤ A)}$, where $A\in \mathbb{R}^{m\times n}$.
+
+Hence,
+
+$$\|A \|_F^2 = \hbox{tr}(A^⊤ A) = \sigma_1^2 +...+\sigma_m^2$$
+
+where $\sigma_1\ge...\ge \sigma_n \ge 0$ are the singular values of $A$ and $\sigma_i^2$ are the eigenvalues of $A^T A$
+
+Knowing that $\|A\|_2^2 = \sigma_1^2$ we have $\|A \|_2^2 ≤ \|A\|_F^2$
+
+Moreover, since if the rank of $A$ is $r$ we have that $\sigma_{r+1}=...=\sigma_m=0$ and we also know $\sigma_1\ge...\ge \sigma_n \ge 0$, we have that
+
+$\|A\|_F^2 = \sigma_1^2 +...+\sigma_m^2 =\sigma_1^2 +...+\sigma_r^2 \le r \sigma_1^2 =r \|A \|_2^2$
+
+Hence,
+
+$\|A \|_2 ≤ \|A\|_F ≤ \sqrt{r} \|A \|_2$
+
 **Problem 3.2** Consider functions sampled on a $(n+1) × (n+1)$ 2D grid 
 $(x_k,y_j) = (k/n, j/n)$ where $k,j = 0,…,n$. 
 For $n = 100$, what is the lowest rank $r$ such that
@@ -160,21 +160,48 @@ For which examples does the answer change when $n = 1000$?
 **SOLUTION**
 
 ```julia
-n = 100
-x = y = range(0, 1; length=n)
+#define functions
+f₁(x,y) = (x + 2 * y) ^ 2
+f₂(x,y) = cos(sin(x)*exp(y))
+f₃(x,y) = 1/(x + y + 1)
+f₄(x,y) = sign(x-y)
 
-f = (x,y) -> (x + 2y)^2
-g = (x,y) -> cos(sin(x)exp(y))
-h = (x,y) -> 1/(x + y + 1)
-s = (x,y) -> sign(x-y)
+#define n and error goal
+error = 1e-5
 
-svdvals(f.(x, y')) # rank 3
-svdvals(g.(x, y')) # rank 5
-svdvals(h.(x, y')) # rank 4
-svdvals(s.(x, y')) # rank n
+#helper function to compute nxn samples
+function samples(f, n)
+    x = y = range(0, 1; length=n)
+    return f.(x,y')
+end
+
+#find minimum rank of f with precision ϵ
+function find_min_rank(f, n, ϵ)
+    σ = svdvals(samples(f, n))
+    for i in 1:length(σ)
+        if sum(σ[i:end]) <= ϵ
+            return i-1
+        end
+    end
+    return length(σ)
+end
+
+
+n=100
+println("Error ≤ ", error, " with n = ", n)
+println("Rank for f₁ = ", find_min_rank(f₁, n, error))
+println("Rank for f₂ = ", find_min_rank(f₂, n, error))
+println("Rank for f₃ = ", find_min_rank(f₃, n, error))
+println("Rank for f₄ = ", find_min_rank(f₄, n, error))
+
+
+n=1000
+println("Error ≤ ", error, " with n = ", n)
+println("Rank for f₁ = ", find_min_rank(f₁, n, error))
+println("Rank for f₂ = ", find_min_rank(f₂, n, error))
+println("Rank for f₃ = ", find_min_rank(f₃, n, error))
+println("Rank for f₄ = ", find_min_rank(f₄, n, error))
 ```
-
-**END**
 
 **Problem 3.3⋆** Define the _pseudo-inverse_:
 $$
@@ -185,11 +212,40 @@ Show that it satisfies the _Moore-Penrose conditions_:
 2. $A^+ A A^+ = A^+$
 3. $(A A^+)^⊤  = A A^+$ and $(A^+ A)^⊤ = A^+ A$
 
+**SOLUTION**
+
+Let $A=U\Sigma V^T$ and $A^+ := V Σ^{-1} U^⊤$. Note that $UU^T = U^TU = I$ ($U$ orthonormal) and $V^T V =I$
+
+1. We have
+$$A A^+ A = U \Sigma V^T V \Sigma^{-1} U^T U \Sigma V^T = U \Sigma \Sigma^{-1} \Sigma V^T = U\Sigma V^T = A$$
+
+2. Moreover,
+$$A^+ A A^+ = V \Sigma^{-1}U^T U \Sigma V^T V \Sigma^{-1} U^T = V \Sigma^{-1}\Sigma \Sigma^{-1} U^T = V \Sigma^{-1} U^T = A^+$$
+
+
+3. Furthermore, $AA^+ = U \Sigma V^T V \Sigma^{-1} U^T = U U^T = I$, thus
+
+$$(AA^+)^T = I^T = I = AA^+$$
+
+Moreover, $A^+A = V \Sigma^{-1} U^T U \Sigma V^T = VV^T$, hence,
+
+$$(A^+A)^T = (VV^T)^T=VV^T=A^+A$$
+
 **Problem 3.4⋆** Show for $A ∈ ℝ^{m × n}$ with $m ≥ n$ and full rank
 that $𝐱 =  A^+ 𝐛$ is the least squares solution, i.e., minimises $\| A 𝐱 - 𝐛 \|_2$.
+
+**SOLUTION**
+
+If $x=A^+b$ then
+
+$$\| Ax - b \|_2 = \| A A^+b - b\|_2 = \|b-b\|_2=\|0\|_2=0,$$
+
+so $x$ minimises the norm.
 
 **Problem 3.5⋆**
 If $A ∈ ℝ^{m × n}$ has a non-empty kernel there are multiple solutions to the least
 squares problem as 
 we can add any element of the kernel. Show that $𝐱 = A^+ 𝐛$ gives the least squares solution
 such that $\| 𝐱 \|_2$ is minimised.
+
+**SOLUTION**
