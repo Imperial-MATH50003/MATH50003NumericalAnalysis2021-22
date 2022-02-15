@@ -249,3 +249,19 @@ we can add any element of the kernel. Show that $𝐱 = A^+ 𝐛$ gives the leas
 such that $\| 𝐱 \|_2$ is minimised.
 
 **SOLUTION**
+
+Let $x=A^+b$ and take $y$ to be another solution i.e. $Ay=b$.
+
+Define $Q=A^+A$, then using 3.3
+
+$$Qx = A^+Ax=A^+AA^+b= A^+b=x$$
+
+and
+
+$$Q^T = (A^+A)^T = A^+A$$
+
+$$\|y\|_2^2 =  \|x -(x-y)\|_2^2= \|x\|_2^2 - 2(x, x-y) +  \|x-y\|_2^2 =  \|x\|_2^2 + \|x-y\|_2^2\ge \|x\|_2^2$$
+
+since 
+
+$$(x, x-y)= (Qx, x-y)=x^TQ^T(x-y)=x^TQ(x-y)=x^T(x-Qy)=x^T(x-A^+Ay)=x^T(x-A^+b)=x^T 0 =0$$
