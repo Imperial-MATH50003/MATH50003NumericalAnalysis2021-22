@@ -3,7 +3,7 @@
 
 In this lecture we discuss matrix and vector norms. The matrix $2$-norm involves
 _singular values_, which are a measure of how matrices "stretch" vectors. 
-We also introduce show that
+We also show that
 the singular values of a matrix give a notion of a _condition number_, which allows us
 to bound errors introduced by floating point numbers in linear algebra operations.
 
@@ -26,7 +26,7 @@ Recall the definition of a (vector-)norm:
 **Definition (vector-norm)** A norm $\|\cdot\|$ on $ℝ^n$ is a function that satisfies the following, for $𝐱,𝐲 ∈ ℝ^n$ and
 $c ∈ ℝ$:
 1. Triangle inequality: $\|𝐱 + 𝐲 \| ≤ \|𝐱\| + \|𝐲\|$
-2. Homogeneneity: $\| c 𝐱 \| = |c| \| 𝐱 \|$
+2. Homogeneity: $\| c 𝐱 \| = |c| \| 𝐱 \|$
 3. Positive-definiteness: $\|𝐱\| = 0$ implies that $𝐱 = 0$.
 
 
@@ -77,7 +77,7 @@ $$
 ∎
 
 
- In Julia can use the inbuilt `norm` function to calculate norms:
+ In Julia, one can use the inbuilt `norm` function to calculate norms:
  ```julia
  norm([1,-2,3]) == norm([1,-2,3], 2) == sqrt(1^2 + 2^2 + 3^2);
  norm([1,-2,3], 1) == sqrt(1 + 2 + 3);
@@ -128,7 +128,8 @@ ${𝐱} \over \|𝐱\|_X$ has unit norm.
 1. Triangle inequality: $\| A + B \| ≤  \|A\| + \|B\|$
 1. Homogeneneity: $\|c A \| = |c| \|A\|$
 3. Positive-definiteness: $\|A\| =0 \Rightarrow A = 0$
-In addition, they satisfy the following additional propertie:
+
+In addition, they satisfy the following additional properties:
 1. $\|A 𝐱 \|_Y ≤ \|A\|_{X → Y} \|𝐱 \|_X$
 2. Multiplicative inequality: $\| AB\|_{X → Z} ≤ \|A \|_{Y → Z} \|B\|_{X →  Y}$
 
@@ -140,7 +141,7 @@ $$
 $$
 Homogeneity is also immediate. Positive-definiteness follows from the fact that if
 $\|A\| = 0$ then $A 𝐱  = 0$ for all $𝐱 ∈ ℝ^n$.
-The property $\|A 𝐱 \|_Y ≤ \|A\|_{X → Y} \|𝐱 \|_X$ follows from the definition. Finally, 
+The property $\|A 𝐱 \|_Y ≤ \|A\|_{X → Y} \|𝐱 \|_X$ follows from the definition.
 Finally, the multiplicative inequality follows from
 $$
 \|A B\| = \sup_{𝐯 : \|𝐯\|_X=1} \|A B 𝐯 |_Z ≤ \sup_{𝐯 : \|𝐯\|_X=1} \|A\|_{Y → Z} \| B 𝐯 | = \|A \|_{Y → Z} \|B\|_{X →  Y}
@@ -208,7 +209,7 @@ diagonal entries, i.e., if $m > n$,
 $$
 Σ̃ = \begin{bmatrix} σ_1 \\ & ⋱ \\ && σ_n \\ && 0 \\ && ⋮ \\ && 0 \end{bmatrix}
 $$
-and if $m < n,
+and if $m < n$,
 $$
 Σ̃ = \begin{bmatrix} σ_1 \\ & ⋱ \\ && σ_m & 0 & ⋯ & 0\end{bmatrix}
 $$
@@ -221,7 +222,7 @@ To show the SVD exists we first establish some properties of a _Gram matrix_ ($A
 **Proof**
 If $A^⊤ A 𝐱 = 0$ then we have
 $$
-0 = 𝐱 A^⊤ A 𝐱 = \| A 𝐱 \|^2
+0 = 𝐱^T A^⊤ A 𝐱 = \| A 𝐱 \|^2
 $$
 which means $A 𝐱 = 0$ and $𝐱 ∈ \hbox{ker}(A)$.
 ∎
@@ -238,7 +239,7 @@ $A^⊤ A$ is symmetric so we appeal to the spectral theorem for the
 existence of the decomposition.
 For the corresponding (orthonormal) eigenvector $𝐪_k$,
 $$
-λ_k = λ_k 𝐪_k^⊤ 𝐪_k = 𝐪_k^⊤ A^⊤ A 𝐪_k = \| A 𝐪_k \| ≥ 0.
+λ_k = λ_k 𝐪_k^⊤ 𝐪_k = 𝐪_k^⊤ A^⊤ A 𝐪_k = \| A 𝐪_k \|^2 ≥ 0.
 $$
 
 ∎
@@ -343,7 +344,7 @@ $$\|A - A_k\|_2 ≤ \|A -B \|_2.$$
 We have
 
 $$
-A - A_k = \|U \begin{bmatrix} 0  \cr &\ddots \cr && 0 \cr &&& σ_{k+1} \cr &&&& \ddots \cr &&&&& σ_r\end{bmatrix} V^⊤.
+A - A_k = U \begin{bmatrix} 0  \cr &\ddots \cr && 0 \cr &&& σ_{k+1} \cr &&&& \ddots \cr &&&&& σ_r\end{bmatrix} V^⊤.
 $$
 Suppose a rank-$k$ matrix $B$ has 
 $$
