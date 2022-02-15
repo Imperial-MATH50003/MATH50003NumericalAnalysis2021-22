@@ -89,3 +89,9 @@ What does this tell us about the rate
 $$
 f_n(θ) = ∑_{k=-\ceil{n/2}}^{\floor{n/2}} f̂ₖ {\rm e}^{{\rm i} k θ}
 $$
+
+**Problem 3.4⋆** Consider Cosine series:
+$$
+f(θ) = ∑_{k=0}^∞ f̌_k \cos k θ
+$$
+where $f̌_k = $

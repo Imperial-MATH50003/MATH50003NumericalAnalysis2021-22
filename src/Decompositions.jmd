@@ -289,10 +289,10 @@ Q_1 := Q_{𝐚_1}^{\rm H},
 $$
 consider
 $$
-Q_1 A = \begin{bmatrix} \times & \times & \cdots & \times \\
-& \times & \cdots & \times \\
+Q_1 A = \begin{bmatrix} × & × & \cdots & × \\
+& × & \cdots & × \\
                     & ⋮ & ⋱ & ⋮ \\
-                    & \times & \cdots & \times \end{bmatrix} = 
+                    & × & \cdots & × \end{bmatrix} = 
 \begin{bmatrix} r_{11} & r_{12} & \cdots & r_{1n} \\ 
 & 𝐚_2^1 & \cdots & 𝐚_n^1   \end{bmatrix}
 $$
@@ -309,10 +309,10 @@ Q_2 := \begin{bmatrix} 1  \\ & Q_{𝐚_2^1}^{\rm H} \end{bmatrix} = Q_{\begin{bm
 $$
 so that
 $$
-Q_2 Q_1A = \begin{bmatrix} \times & \times & \times & \cdots & \times \\
-& \times & \times  & \cdots & \times \\
+Q_2 Q_1A = \begin{bmatrix} × & × & × & \cdots & × \\
+& × & ×  & \cdots & × \\
                     && ⋮ & ⋱ & ⋮ \\
-                    && \times & \cdots & \times \end{bmatrix}  =  \begin{bmatrix} r_{11} & r_{12} & r_{13} & \cdots & r_{1n} \\ 
+                    && × & \cdots & × \end{bmatrix}  =  \begin{bmatrix} r_{11} & r_{12} & r_{13} & \cdots & r_{1n} \\ 
     & r_{22} & r_{23} & \cdots & r_{2n} \\
 && 𝐚_3^2 & \cdots & 𝐚_n^2   \end{bmatrix}
 $$
@@ -326,7 +326,7 @@ The inductive construction is thus clear. If we define $𝐚_j^0 := 𝐚_j$ we
 have the construction
 $$
 \begin{align*}
-Q_j &:= \begin{bmatrix} I_{j-1 \times j-1}  \\ & Q_{𝐚_j^j}^{±,\rm H} \end{bmatrix} \\
+Q_j &:= \begin{bmatrix} I_{j-1 × j-1}  \\ & Q_{𝐚_j^j}^{±,\rm H} \end{bmatrix} \\
 𝐚_j^k &:= (Q_k 𝐚_j^{k-1})[2:m-k+1] \\
 r_{kj} &:= (Q_k 𝐚_j^{k-1})[1]
 \end{align*}
@@ -373,7 +373,7 @@ reflection this is a slow algorithm, taking $O(n^4)$ operations. The problem she
 will consider a better implementation that takes $O(n^3)$ operations.
 
 
-**Example** We will now do an example by hand. Consider the $4 \times 3$ matrix
+**Example** We will now do an example by hand. Consider the $4 × 3$ matrix
 $$
 A = \begin{bmatrix} 
 1 & 2 & -1 \\ 
@@ -415,7 +415,7 @@ Q_2 Q_1 A = \begin{bmatrix} -3 & -6 & -9 \\
 $$
 The final reflection is
 $$
-Q_3 = \begin{bmatrix} I_{2 \times 2} \\ &  I - \begin{bmatrix} 1 \\ -1 \end{bmatrix} \begin{bmatrix} 1 & -1 \end{bmatrix} 
+Q_3 = \begin{bmatrix} I_{2 × 2} \\ &  I - \begin{bmatrix} 1 \\ -1 \end{bmatrix} \begin{bmatrix} 1 & -1 \end{bmatrix} 
 \end{bmatrix} = \begin{bmatrix} å1 \\ & 1 \\ & & 0 & 1 \\ & & 1 & 0 \end{bmatrix}
 $$
 giving us
@@ -780,7 +780,7 @@ that exploits symmetry in the problem, resulting in a substantial speedup.
 It is only relevant for _symmetric positive definite_
 matrices.
 
-**Definition (positive definite)** A square matrix $A \in ℝ^{n \times n}$ is _positive definite_ if
+**Definition (positive definite)** A square matrix $A \in ℝ^{n × n}$ is _positive definite_ if
 for all $𝐱 \in ℝ^n, x \neq 0$ we have
 $$
 𝐱^\top A 𝐱 > 0
@@ -788,19 +788,20 @@ $$
 
 First we establish some basic properties of positive definite matrices:
 
-**Proposition (conj. pos. def.)** If  $A \in ℝ^{n \times n}$ is positive definite and 
-$V \in ℝ^{n \times n}$ is non-singular then
+**Proposition (conj. pos. def.)** If  $A \in ℝ^{n × n}$ is positive definite and 
+$V \in ℝ^{n × n}$ is non-singular then
 $$
 V^\top A V
 $$
 is positive definite.
 
-**Proposition (diag positivity)** If $A \in ℝ^{n \times n}$ is positive definite
+**Proposition (diag positivity)** If $A \in ℝ^{n × n}$ is positive definite
 then its diagonal entries are positive: $a_{kk} > 0$.
 
 
-**Theorem (subslice pos. def.)** If $A \in ℝ^{n \times n}$ is positive definite
-and $𝐤 \in \{1,\ldots,n\}^n$ where any integer appears only once then $A[𝐤,𝐤]$ is also
+**Theorem (subslice pos. def.)** If $A \in ℝ^{n × n}$ is positive definite
+and $𝐤 \in \{1,\ldots,n\}^m$ is a vector of $m$ integers where any integer appears only once,
+ then $A[𝐤,𝐤] ∈ ℝ^{m × m}$ is also
 positive definite.
 
 
