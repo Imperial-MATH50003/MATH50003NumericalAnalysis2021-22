@@ -105,6 +105,26 @@ $$
 \end{align*}
 $$
 
+**SOLUTION**
+
+From Problem 2.3 use the fact that $\|A \|_F = \sqrt{\hbox{tr}(A^⊤ A)}$, where $A\in \mathbb{R}^{m\times n}$.
+
+Hence,
+
+$$\|A \|_F^2 = \hbox{tr}(A^⊤ A) = \sigma_1^2 +...+\sigma_m^2$$
+
+where $\sigma_1\ge...\ge \sigma_n \ge 0$ are the singular values of $A$ and $\sigma_i^2$ are the eigenvalues of $A^T A$
+
+Knowing that $\|A\|_2^2 = \sigma_1^2$ we have $\|A \|_2^2 ≤ \|A\|_F^2$
+
+Moreover, since if the rank of $A$ is $r$ we have that $\sigma_{r+1}=...=\sigma_m=0$ and we also know $\sigma_1\ge...\ge \sigma_n \ge 0$, we have that
+
+$\|A\|_F^2 = \sigma_1^2 +...+\sigma_m^2 =\sigma_1^2 +...+\sigma_r^2 \le r \sigma_1^2 =r \|A \|_2^2$
+
+Hence,
+
+$\|A \|_2 ≤ \|A\|_F ≤ \sqrt{r} \|A \|_2$
+
 **Problem 2.2⋆** For a rank-1 matrix $A = 𝐱 𝐲^⊤$ prove that
 $$
 \|A \|_2 = \|𝐱\|_2 \|𝐲\|_2.
