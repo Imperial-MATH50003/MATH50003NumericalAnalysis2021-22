@@ -6,17 +6,19 @@ interval arithmetic, and thereby
 produce rigorous bounds on the exponential.
 
 ```julia
+# by importing previously installed packages in this way we add functionality to Julia
 using ColorBitstring, SetRounding
 ```
 
 ## 1. Binary representation
-
 
 **Problem 1.1** What is the binary representation of $1/5$? (Hint: use `printbits` to derive a proposed form.)
 
 **SOLUTION**
 Note that
 ```julia
+# printbits is a function defined in the ColorBitstring package we imported above
+# it prints the bit information of a number and color codes it as discussed in the lecture
 printbits(1/5)
 ```
 Hence we  show that
@@ -27,25 +29,19 @@ $$
 \end{align*}
 $$
 
-
-
-
-
 **Problem 1.2** What is $\pi$ to 5 binary places? Hint: recall that $\pi \approx  3.14$.
 
 **SOLUTION**
 Note that
 ```julia
-3 + 1/8  + 1/64
+3 + 1/8  + 1/64 # note that this is 2^1+2^0+2^(-3)+2^(-6)
 ```
-which has the binary representation $(11.001001)_2$.
-Indeed:
+which has the binary representation $(11.001001)_2$. Note that floating point notation is related to but not identical to the binary representation of a number:
 ```julia
 printbits(Float16(π))
 ```
 Instead of simply guessing the above representation we can instead continuously subtract the largest powers 2 which do not result in a negative number. For $\pi$ the procedure then finds that we can write
 $$ \pi - 1*2^1 - 1*2^0 - 1*2^{-3} - 1*2^{-6} ...$$
-
 
 ## 2. Integers
 
@@ -57,6 +53,9 @@ until we reach 0, e.g. $10 - 2^3 - 2 = 0$
 implies $10 = (1010)_2$.
 Thus the bits are:
 ```julia
+# By writing Int8(10) we tell the computer to store 10 as an 8 bit integer.
+# If we do not call Int8, the computer will default to the bit length that's native to your processor (in most cases nowadays this is 64 bit).
+# 64 bits leads to a lot of extra 0s which makes it hard to read, so for most exercises we will work with shorter bitlengths.
 printlnbits(Int8(10))
 ```
 Similarly,
@@ -76,8 +75,6 @@ This the bits are:
 printlnbits(Int8(-10))
 ```
 
-
-
 **Problem 2.2** What will `Int8(120) + Int8(10)` return?
 
 **SOLUTION**
@@ -88,7 +85,14 @@ $$
 ```julia
 Int8(120) + Int8(10)
 ```
-
+This is because of integer overflow. Except for special cases, computers store numbers in a fixed length of bits (in this case 8). This means we can only represent finitely many numbers using 8 bit integers. We can let Julia tell us the largest possible number of a type by running the following:
+```julia
+typemax(Int8)
+```
+Because checking bounds and checking if we will overflow is a costly operation, computers do not make these checks. Instead as we mentioned above, we work in modular arithmetic which results in overflow when we go beyond the maximum value, i.e. we "wrap around". Note that:
+```julia
+typemax(Int8)+1 == typemin(Int8) # typemin is like typemax but instead tells you the smallest value of a type
+```
 
 ## 3. Floating point numbers
 
