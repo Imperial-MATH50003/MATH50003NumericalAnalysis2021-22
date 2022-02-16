@@ -89,7 +89,7 @@ norm(uₙ - sin.(x),1)
 
 **Problem 3.1⋆** For an evenly spaced grid $t_1, …, t_n$, use the approximation
 $$
-{u'(x_{k+1}) + u'(x_k) \over 2} ≈ {u_{k+1} - u_k \over h}
+{u'(t_{k+1}) + u'(t_k) \over 2} ≈ {u_{k+1} - u_k \over h}
 $$
 to recast
 $$
