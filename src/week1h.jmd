@@ -16,16 +16,28 @@ Questions marked with a ⋆ are meant to be completed without using a computer.
 
 **Problem 1.1** What is the binary representation of $1/5$?
 
-**Problem 1.2⋆** What is $\pi$ to 5 binary places? Hint: Recall that $\pi \approx  3.14$.
+**HINTS:**
+Remember that the binary representation of a number x is the coefficients such that $x = ...+ b_1 2^1 + b_0 2^0 + b_{-1} 2^{-1} +... $ where each $b_j$ is either 0 or 1. You can also use `printbits` to derive a proposed form.
+
+**Problem 1.2⋆** What is $\pi$ to 5 binary places? 
+
+**HINTS:**
+Recall that $\pi \approx  3.14$. Try finding bits such that $\pi = ...+ b_1 2^1 + b_0 2^0 + b_{-1} 2^{-1} +... $. Note that 5 binary places is not the same accuracy as 5 decimal places.
 
 
 ## 2. Integers
 
 **Problem 2.1⋆** With 8-bit signed integers, find the bits for the following: $10, 120, -10$.
 
+**HINTS:**
+
+Remember that the first bit of a signed integer is allocated to the sign (i.e. + or - depending on whether it is 0 or 1). You can find a representation $x = ...+ b_1 2^1 + b_0 2^0 + b_{-1} 2^{-1} +... $ for a positive number by continuously subtracting powers of 2 from a number such that they don't yield negative numbers. For -10, make sure you look at how negative numbers are represented in the 2's complement notation (see lecture notes).
 
 **Problem 2.2⋆** What will `Int8(120) + Int8(10)` return?
 
+**HINTS:**
+
+What is the maximum and minimum number you can store in a signed 8 bit integer and what happens when we add 1 to the typemax? You can use typemax(Int8) and typemin(Int8) functions in Julia to numerically test your answers.
 
 ## 3. Floating point numbers
 
@@ -35,23 +47,31 @@ $$
 $$
 Check your answers using `printbits`.
 
+**HINTS:**
+
+A Float32 has 32 bits but make sure you look up in the lecture notes the way these bits are allocated between the sign bit, the exponent bit and the significand. In particular remember the representation
+$$±2^{q−\sigma}×(1.b_1 b_2 b_3…b_S)_2$$.
+
 
 **Problem 3.2** Let $m(y) = \min\{x \in F_{32} : x > y \}$ be the smallest single precision number
 greater than $y$. What is $m(2) - 2$ and $m(1024) - 1024$? Check your answer using the `nextfloat`
 command.
 
+**HINTS:**
 
+This problem is asking you for the smallest Float32 number that follows 2 and 1024. Remember that in floating point representations we write numbers as $$±2^{q−\sigma}×(1.b_1 b_2 b_3…b_S)_2$$ where S is the number of significand bits (look up how many there are for Float32). You can get the next binary number by incrementing the bitstring by 1. Think about which value each individual bit in $(1.b_1 b_2 b_3…b_S)_2$ represents.
 
 ## 4. Arithmetic
-
 
 **Problem 4.1⋆** Suppose $x = 1.25$ and consider 16-bit floating point arithmetic (`Float16`). 
 What is the error in approximating $x$ by the nearest float point number ${\rm fl}(x)$?
 What is the error in approximating $2x$, $x/2$, $x + 2$ and $x - 2$ by $2 \otimes x$, $x \oslash 2$, $x ⊕ 2$ and $x \ominus 2$?
 
+**HINTS:**
+
+Your first step should be to try and find the Float16 representation of $1.25$. Remember to look for a representation $±2^{q−\sigma}×(1.b_1 b_2 b_3…b_S)_2$. 
+
 **Problem 4.2⋆** For what floating point numbers is $x \oslash 2 \neq x/2$ and $x ⊕ 2 \neq x + 2$?
-
-
 
 
 **Problem 4.3⋆** Explain why the following return `true`. What is the largest floating point number `y` such that `y + 1 ≠ y`?
@@ -61,14 +81,12 @@ x + 1 == x
 ```
 
 
-
-
-
-
 **Problem 4.4⋆** What are the exact bits for $1/5$, $1/5 + 1$ computed
 using  half-precision arithmetic (`Float16`) (using default rounding)?
 
+**HINTS:**
 
+Your first step should be to try and find the Float16 representation of $1/5$. Remember to look for a representation $±2^{q−\sigma}×(1.b_1 b_2 b_3…b_S)_2$. 
 
 **Problem 4.5⋆** Explain why the following does not return `1`. Can you compute the bits explicitly?
 ```julia
@@ -89,7 +107,9 @@ $$
 $$
 implemented using floating point arithmetic (with any precision). 
 
+**HINTS**
 
+Each time you store a number in floating point arithmetic or compute a floating point arithmetic operation (such as multiplication, addition, division, etc.) you should include a relative error term. We discussed in the lecture how this relates to machine precision $ϵ_{\rm m}$. You may use pessimistic error bounds and do not need to make them particularly tight.
 
 
 ## 5. Interval arithmetic
@@ -105,9 +125,9 @@ $$
  and integer $n \neq 0$, 
 deduce formulas for the minimum and maximum of $A/n$, $A+B$ and $AB$.
 
+**HINTS:**
 
-
-
+In intervals, the left boundary is always less than or equal to the right boundary - so be careful about what happens to the order of the interval boundary when negative numbers are involved.
 
 
 **Problem 5.2** 
@@ -188,6 +208,10 @@ function *(x::Interval, y::Interval)
 end
 ```
 
+**HINTS:**
+
+If you solved the previous problem, this one simply involves putting the correct expressions under the correct #TODO comment. In the notation above, $a$ is always treated as the left boundary point (minimum of interal) and $b$ as the right boundary point (maximum of interval) when returning Interval(a, b).
+
 **Problem 5.3** The following function  computes the first `n+1` terms of the Taylor series of $\exp(x)$:
 $$
 \sum_{k=0}^n {x^k \over k!}
@@ -229,3 +253,9 @@ the following returns true:
 exp(big(1)) in exp_bound(Interval(1.0,1.0), 20) && exp(big(-1)) in exp_bound(Interval(-1.0,-1.0), 20)
 ```
 Further, ensure that the width of each returned interval is less than $10^{-14}$.
+
+**HINTS:**
+
+You will want to have Taylor's remainder theorem in mind, in particular $$
+{f^{(k+1)}(ξ) \over (k+1)!} |x|^{k+1} \leq {3 \over (k+1)!}.
+$$ How can we use this error bound to define an interval that will always include the true answer?
