@@ -147,7 +147,7 @@ $$ ⟨𝐱, 𝐲⟩ = 𝐱^⊤ K𝐲 = 𝐱 \cdot (K𝐲) = (K𝐲) \cdot 𝐱$$
 $$=  (K𝐲)^⊤ 𝐱 = 𝐲^⊤ K^⊤𝐱 = 𝐲^⊤ K 𝐱 = ⟨𝐲, 𝐱⟩.$$
 For linearity:
 $$ ⟨a𝐱+b𝐲, 𝐳⟩ = (a𝐱+b𝐲)^⊤ K𝐳 = (a𝐱^T+b𝐲^⊤)K𝐳$$
-$$ = a𝐱^⊤ K𝐳 + a𝐲^⊤ K𝐳 = a⟨𝐱, 𝐳⟩ + b⟨𝐲, 𝐳⟩.$$
+$$ = a𝐱^⊤ K𝐳 + b𝐲^⊤ K𝐳 = a⟨𝐱, 𝐳⟩ + b⟨𝐲, 𝐳⟩.$$
 Positive-definiteness of the matrix $K$ immediately yields $⟨𝐱, 𝐱⟩ = 𝐱^⊤ K 𝐱 >0$. Now we turn to the converse result, i.e. that there exists a symmetric positive definite matrix $K$ for any inner product ⟨𝐱, 𝐲⟩ such that it can be written as $⟨𝐱, 𝐲⟩ = 𝐱^⊤ K 𝐲$. Define the entries of $K$ by $K_{ij} = ⟨e_i, e_j⟩$ where $e_j$ is the $j$-th standard basis vector. Note that by linearity of the inner product any inner product on $ℝ^n$ can be written as $⟨𝐱, 𝐲⟩ = \sum_{k=0}^n \sum_{l=0}^n x_k y_l ⟨e_k, e_l⟩$ by linearity. But with the elements of $K$ defined as above this is precisely 
 $$⟨𝐱, 𝐲⟩ = \sum_{k=0}^n \sum_{l=0}^n x_k K_{kl} y_l = 𝐱^⊤ K 𝐲.$$
 What remains is to show that this $K$ is symmetric positive definite. Symmetry is an immediate conseqence of the symmetry of its elements, i.e. $K_{ij} = ⟨e_i, e_j⟩ = ⟨e_j, e_i⟩ = K_{ji}$. Finally, positive definiteness follows from the positive definiteness of the inner product $⟨𝐱, 𝐱⟩ > 0$ with $⟨𝐱, 𝐱⟩ = 𝐱^⊤ K 𝐱$.
