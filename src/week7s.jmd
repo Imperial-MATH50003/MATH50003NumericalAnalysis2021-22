@@ -70,6 +70,9 @@ eigvals(SymTridiagonal(fill(2/h^2,n-2)  + x[2:end-1].^2, fill(-1/h^2, n-3)))
 
 **Problem** Prove convergence for the trap rule.
 
+**Problem** Prove that if $|a_k| ≤ a$ then 
+Use this to prove convergence of Euler with a variable coefficient.
+
 
 
 
@@ -90,8 +93,50 @@ $$
 f_n(θ) = ∑_{k=-\ceil{n/2}}^{\floor{n/2}} f̂ₖ {\rm e}^{{\rm i} k θ}
 $$
 
-**Problem 3.4⋆** Consider Cosine series:
+**Problem 3.4**  A function with a jump does not have uniformly
+converging coefficients. Plot interpolant for $\sign(θ-1/2)$.
+Conjecture where the approximation converges. (This is known as
+Gibb's phenomena.)
+
+## 4. Cosine series
+
+The following problems consider approximating Cosine series
 $$
 f(θ) = ∑_{k=0}^∞ f̌_k \cos k θ
 $$
-where $f̌_k = $
+where $f(θ) = f(-θ)$ and $f : [0,π] → ℝ$, where
+$$
+f̌_k := {1 \over 2π} \int_0^π f(θ) \cos k θ {\rm d}θ \begin{cases} 2 & k = 0 \\ 1 & otherwise \end{cases}
+$$
+We will use an $n+1$ grid
+with $θ_j = jπ/n$.
+
+**Problem 4.1**  Define
+$$
+Σ̃_n[f] := {1 \over n}[f(0) + 2\sum_{j=1}^{n-1} f(θ_j) + f(π)]
+$$
+Show that
+$$
+Σ̃_n[f \cos k θ] = Σ_{2n}[f \cos k θ]
+$$
+
+**Problem 4.2** Show that
+$$
+Σ̃_n[\cos ℓ θ \cos k θ] = \begin{cases} 1 & k - j = 0 or k + j = 0 \\
+                                        0 & otherwise
+                                        \end{cases}
+$$
+
+**Problem 4.3** Define
+$$
+f̌_k^n := Σ̃_n[f(θ) \cos k θ]
+$$
+Show that
+$$
+\begin{align*}
+f̌_0^n = f̌_0 + f̌_{2n} + f̌_{4n} + ⋯ \\
+f̌_k^n = f̌_k + (f̌_{k+2n} + f̌_{k+4n} + ⋯) + (f̌_{-k+2n} + f̌_{-k+4n} + ⋯)  \\
+f̌_n^n = f̌_n + f̌_{3n} + f̌_{5n} + ⋯ 
+\end{align*}
+where $1 ≤ k ≤ n-1$.
+$$

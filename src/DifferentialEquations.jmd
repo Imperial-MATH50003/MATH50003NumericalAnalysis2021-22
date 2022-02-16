@@ -573,7 +573,7 @@ $$
 𝐞_1^⊤ \\
 D_h^2 \\
 𝐞_{n+1}^⊤
-\end{bmatrix} 𝐮 = \begin{bmatrix} c_0 \\ S 𝐟 \\ c_1 \end{bmatrix}
+\end{bmatrix} 𝐮 = \begin{bmatrix} c_0 \\ f(x_2) \\ ⋮ \\ f(x_{n-1}) \\ c_1 \end{bmatrix}
 $$
 
 Thus we solve:

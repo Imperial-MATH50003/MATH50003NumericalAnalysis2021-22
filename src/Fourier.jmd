@@ -1,9 +1,9 @@
 # Fourier series
 
-
-# 1. Fourier series and decay in coefficients
-
-Recall the (complex) Fourier series
+In Part III, Computing with Functions, we work with approximating functions by expansions in
+bases: that is, instead of approximating at a grid (as in the Differential Equations chapter),
+we approximate functions by other, simpler, functions. The most fundamental basis is (complex) Fourier
+series:
 $$
 f(θ) = ∑_{k = -∞}^∞ f̂ₖ {\rm e}^{{\rm i} k θ}
 $$
@@ -14,10 +14,15 @@ $$
 In numerical analysis we try to build on the analogy with linear algebra as much as possible.
 Therefore we write this as:
 $$
-f(θ) = \underbrace{[⋯ | {\rm e}^{-2{\rm i}θ} |{\rm e}^{-1{\rm i}θ} | \underline 1 | {\rm e}^{{\rm i}θ} | {\rm e}^{2{\rm i}θ} | ⋯]}_{F(θ)}
+f(θ) = \underbrace{[⋯ | {\rm e}^{-2{\rm i}θ} |{\rm e}^{-{\rm i}θ} | \underline 1 | {\rm e}^{{\rm i}θ} | {\rm e}^{2{\rm i}θ} | ⋯]}_{F(θ)}
 \underbrace{\begin{bmatrix} ⋮ \\ f̂_{-2} \\ f̂_{-1} \\ \underline{f̂_0} \\ f̂_1 \\ f̂_2 \\ ⋮ \end{bmatrix}}_𝐟̂
 $$
 
+```julia
+using FFTW
+```
+
+## 1. Absolute summability of coefficients
 
 In analysis one typically works with continuous functions and relates results to continuoity.
 In numerical analysis we inheritely have to work with _vectors_, so it is more natural 
@@ -29,7 +34,7 @@ $$
 
 Fortunately, continuity gives us sufficient (though not necessary) conditions for absolute convergence:
 
-**Proposition (differentiability and coeffiicent decay)** If $f : ℝ → ℂ$ and $f'$ are periodic
+**Proposition (differentiability and absolutely convergence)** If $f : ℝ → ℂ$ and $f'$ are periodic
  and $f''$ is uniformly bounded, then its Fourier coefficients satisfy
 $$
 \|𝐟̂\|₁ < ∞
@@ -52,9 +57,13 @@ $$
 
 ∎
 
-This condition can be weakened. Moreover, as we shall see in the problem sheet, more derivatives implies
-faster decay/convergence. In fact, if a function is smooth and 2π-periodic its Fourier coefficients decay
-faster than algebraically: they decay like $O(k^{-λ})$ for any $λ$.
+This condition can be weakened to Lipschitz continuity but the proof is the beyond the scope
+of this module. 
+Of more practical importance is the other direction: the more times differentiable a function the
+faster the coefficients decay, and thence the faster Fourier series converges. 
+In fact, if a function is smooth and 2π-periodic its Fourier coefficients decay
+faster than algebraically: they decay like $O(k^{-λ})$ for any $λ$. This will be explored in the
+problem sheet.
 
 **Remark (advanced)** Going further, if we let $z = {\rm e}^{{\rm i} θ}$ then if $f(z)$ is _analytic_ in a
 neighbourhood of the unit circle the Fourier coefficients decay _exponentially fast_. And if $f(z)$ is entire
@@ -68,45 +77,47 @@ The _Trapezium rule_ over $[0,2π]$ is the approximation:
 $$
 ∫_0^{2π} f(θ) {\rm d}θ ≈ {2 π \over n} \left[{f(0) \over 2} + ∑_{j=1}^{n-1} f(θ_j) + {f(2 π) \over 2} \right]
 $$
-But if $f$ is periodic we have $f(0) = f(2π) we get the _periodic Trapezium rule_:
+But if $f$ is periodic we have $f(0) = f(2π)$ we get the _periodic Trapezium rule_:
 $$
-∫_0^{2π} f(θ) {\rm d}θ ≈ \underbrace{{2 π \over n} ∑_{j=0}^{n-1} f(θ_j)}_{Σ_n[f]}
+∫_0^{2π} f(θ) {\rm d}θ ≈ 2 π\underbrace{{1 \over n} ∑_{j=0}^{n-1} f(θ_j)}_{Σ_n[f]}
 $$
 Define the Trapezium rule approximation to the Fourier coefficients by:
 $$
-f̂_k^n := {1 \over 2 π} Σ_n[f(θ) {\rm e}^{-i k θ}]  = {1 \over n} ∑_{j=1}^n f(θ_j) {\rm e}^{-i k θ_j}
+f̂_k^n := Σ_n[f(θ) {\rm e}^{-i k θ}]  = {1 \over n} ∑_{j=0}^{n-1} f(θ_j) {\rm e}^{-i k θ_j}
 $$
 
 **Lemma (Discrete orthogonality)**
 We have:
 $$
-∑_{j=1}^n {\rm e}^{i k θ_j} = \begin{cases} n & k = \ldots,-2n,-n,0,n,2n,\ldots  \cr
+∑_{j=0}^{n-1} {\rm e}^{i k θ_j} = \begin{cases} n & k = \ldots,-2n,-n,0,n,2n,\ldots  \cr
 0 & \hbox{otherwise}
 \end{cases}
 $$
 In other words,
 $$
-{1 \over 2π} Σ_n[{\rm e}^{i (k-j) θ_j}] = \begin{cases} 1 & k-j = \ldots,-2n,-n,0,n,2n,\ldots  \cr
+Σ_n[{\rm e}^{i (k-j) θ_j}] = \begin{cases} 1 & k-j = \ldots,-2n,-n,0,n,2n,\ldots  \cr
 0 & \hbox{otherwise}
 \end{cases}.
 $$
 
 **Proof**
 
-Consider $ω := {\rm e}^{i θ_1} = {\rm e}^{2 π i \over n}$.  
-This is an $n$th root of unity: $ω^n = 1$.  Note that ${\rm e}^{i θ_j} ={\rm e}^{2 π i j \over n}= ω^j$.  
+Consider $ω := {\rm e}^{{\rm i} θ_1} = {\rm e}^{2 π {\rm i} \over n}$.  
+This is an $n$th root of unity: $ω^n = 1$.  Note that ${\rm e}^{{\rm i} θ_j} ={\rm e}^{2 π {\rm i} j \over n}= ω^j$.  
 
-(Case 1) Suppose $k$ is a multiple of $n$, that is, $k = M n$ for an integer $M$.  Then we have 
-
-$$∑_{j=1}^n {\rm e}^{i k θ_j} = ∑_{j=1}^n ω^{kj} = ∑_{j=1}^n ({ω^{Mn}})^j =   ∑_{j=1}^n 1 = n$$
-
+(Case 1) Suppose $k$ is a multiple of $n$, that is, $k = M n$ for an integer $M$.  
+Then we have 
+$$
+∑_{j=1}^n {\rm e}^{i k θ_j} = ∑_{j=1}^n ω^{kj} = ∑_{j=1}^n ({ω^{Mn}})^j =   ∑_{j=1}^n 1 = n
+$$
 (Case 2)  Recall that
-
-$$∑_{j=0}^{n-1} z^j = {z^n-1 \over z-1}.$$
-
+$$
+∑_{j=0}^{n-1} z^j = {z^n-1 \over z-1}.
+$$
 Then we have
-
-$$∑_{j=1}^n {\rm e}^{i k θ_j} = ∑_{j=1}^n (ω^k)^j = {ω^{kn} -1 \over ω^k -1} = 0.$$
+$$
+∑_{j=1}^n {\rm e}^{i k θ_j} = ∑_{j=1}^n (ω^k)^j = {ω^{kn} -1 \over ω^k -1} = 0.
+$$
 
 ∎
 
@@ -120,7 +131,7 @@ $$
 **Proof**
 $$
 \begin{align*}
-f̂_k^n &= {1 \over 2 π} Σ_n[f(θ) {\rm e}^{-i k θ}] = ∑_{j=-∞}^∞ f̂ⱼ {1 \over 2 π} Σ_n[f(θ) {\rm e}^{i (j-k) θ}] \\
+f̂_k^n &= Σ_n[f(θ) {\rm e}^{-i k θ}] = ∑_{j=-∞}^∞ f̂ⱼ Σ_n[f(θ) {\rm e}^{i (j-k) θ}] \\
 &= ∑_{j=-∞}^∞ f̂ⱼ \begin{cases} 1 & j-k = \ldots,-2n,-n,0,n,2n,\ldots  \cr
 0 & \hbox{otherwise}
 \end{cases}
@@ -131,10 +142,7 @@ $$
 Note that there is redundancy:
 
 **Corollary (aliasing)**
-For all $m ∈ ℤ$,
-$$
-f̂_k^n = f̂_{k+mn}^n
-$$
+For all $m ∈ ℤ$, $f̂_k^n = f̂_{k+mn}^n$.
 
 
 In other words if we know $f̂_0^n, …, f̂_{n-1}^n$, we know all $f̂_k^n$. 
@@ -196,14 +204,22 @@ We note that the map from values to coefficients can be defined as a matrix-vect
 **Definition (DFT)** 
 The _Discrete Fourier Transform (DFT)_ is defined as:
 $$
-Q_n := {1 \over √n} \begin{bmatrix} 1 & 1 & 1&  ⋯ & 1 \\
-                                    1 & {\rm e}^{-{\rm i} θ_1} & {\rm e}^{-{\rm i} θ_2} & ⋯ {\rm e}^{-{\rm i} θ_{n-1}} \\
-                                    1 & {\rm e}^{-{\rm i} 2 θ_1} & {\rm e}^{-{\rm i} 2 θ_2} & ⋯ {\rm e}^{-{\rm i} 2θ_{n-1}} \\
+\begin{align*}
+Q_n &:= {1 \over √n} \begin{bmatrix} 1 & 1 & 1&  ⋯ & 1 \\
+                                    1 & {\rm e}^{-{\rm i} θ_1} & {\rm e}^{-{\rm i} θ_2} & ⋯ & {\rm e}^{-{\rm i} θ_{n-1}} \\
+                                    1 & {\rm e}^{-{\rm i} 2 θ_1} & {\rm e}^{-{\rm i} 2 θ_2} & ⋯ & {\rm e}^{-{\rm i} 2θ_{n-1}} \\
                                     ⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
-                                    1 & {\rm e}^{-{\rm i} (n-1) θ_1} & {\rm e}^{-{\rm i} (n-1) θ_2} & ⋯ {\rm e}^{-{\rm i} (n-1) θ_{n-1}}
+                                    1 & {\rm e}^{-{\rm i} (n-1) θ_1} & {\rm e}^{-{\rm i} (n-1) θ_2} & ⋯ & {\rm e}^{-{\rm i} (n-1) θ_{n-1}}
+\end{bmatrix} \\
+&= {1 \over √n} \begin{bmatrix} 1 & 1 & 1&  ⋯ & 1 \\
+                                    1 & ω^{-1} & ω^{-2} & ⋯ & ω^{-(n-1)}\\
+                                    1 & ω^{-2} & ω^{-4} & ⋯ & ω^{-2(n-1)}\\
+                                    ⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
+                                    1 & ω^{-(n-1)} & ω^{-2(n-1)} & ⋯ & ω^{-(n-1)^2}
 \end{bmatrix}
+\end{align*}
 $$
-Note that
+for the $n$-th root of unity $ω = {\rm e}^{{\rm i} π/n}$. Note that
 $$
 \begin{align*}
 Q_n^⋆ &= {1 \over √n} \begin{bmatrix} 1 & 1 & 1&  ⋯ & 1 \\
@@ -212,7 +228,12 @@ Q_n^⋆ &= {1 \over √n} \begin{bmatrix} 1 & 1 & 1&  ⋯ & 1 \\
                                     ⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
                                     1 & {\rm e}^{{\rm i} θ_{n-1}} & {\rm e}^{{\rm i} 2 θ_{n-1}} & ⋯ {\rm e}^{{\rm i} (n-1) θ_{n-1}}
 \end{bmatrix} \\
-&= {1 \over √n} [𝟏 | \exp({\rm i} 𝛉^n) | … | \exp({\rm i}(n-1) 𝛉^n)]
+&= {1 \over √n} \begin{bmatrix} 1 & 1 & 1&  ⋯ & 1 \\
+                                    1 & ω^{1} & ω^{2} & ⋯ & ω^{(n-1)}\\
+                                    1 & ω^{2} & ω^{4} & ⋯ & ω^{2(n-1)}\\
+                                    ⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
+                                    1 & ω^{(n-1)} & ω^{2(n-1)} & ⋯ & ω^{(n-1)^2} \\
+&= {1 \over √n} [𝟏 | \exp({\rm i} 𝛉^n) | … | \exp({\rm i}(n-1) 𝛉^n)] \\
 \end{align*}
 $$
 
@@ -354,7 +375,6 @@ function fftmatrix(n)
     [exp(-im*(k-1)*θ[j]) for k = 1:n, j=1:n]
 end
 
-
 F₂ₙ = fftmatrix(2n)'
 Fₙ = fftmatrix(n)'
 Dₙ = Diagonal([exp(im*k*π/n) for k=0:n-1])
@@ -367,8 +387,48 @@ Assume that applying $F_n$ takes $3n q$ additions and multiplications. The first
 Thus we have $3nq + 3n = 3n(q+1) = 3 n \log_2(2n)$ additions/multiplications, showing by induction that we have $O(n \log n)$ operations.
 
 
-function myfft(
-
 
 **Remark** The FFTW.jl package wraps the FFTW (Fastest Fourier Transform in the West) library, which is a highly optimised implementation
 of the FFT that also works well for $n$ not a power of 2.
+
+
+## 5. Differentiation and differential Equations
+
+Fourier series present an effective way of computing derivatives and solving differential equations.
+This is seen naturally as follows:
+$$
+f'(θ) = {{\rm d} \over {\rm d}θ} F(θ) 𝐟 &= 
+ [⋯ | -2{\rm i}{\rm e}^{-2{\rm i}θ} -{\rm i}|{\rm e}^{-{\rm i}θ} | \underline 0 | {\rm i} {\rm e}^{{\rm i}θ} | 2{\rm i}{\rm e}^{2{\rm i}θ} | ⋯]
+𝐟 \\
+&= F(θ) \underbrace{{\rm i} \begin{bmatrix} ⋱ \\ &-2 \\ && -1 \\ &&&\underline{0} \\ &&&& 1 \\  &&&&& 2 \\ &&&&&& ⋱\end{bmatrix}}_{D} 𝐟.
+$$
+Differentiating with Fourier series is _much_ more accurate than finite differences (though not as accurate as dual numbers):
+```julia
+f = θ -> exp(cos(θ-0.1))
+n = 31
+m = n÷2
+θ = range(0, 2π; length=n+1)[1:end-1]
+
+fc = fft(f.(θ))/n
+f̂ = [fc[m+2:end]; fc[1:m+1]]
+D = im*Diagonal(-m:m)
+fₙ = θ -> transpose([exp(im*k*θ) for k=-m:m]) * f̂
+fₙp = θ -> transpose([exp(im*k*θ) for k=-m:m]) * D * f̂
+fₙ(0.2) ≈ f(0.2)
+fₙp(0.2) - (-sin(0.1)*exp(cos(0.1)))
+```
+We can also compose derivatives to compute higher order derivatives:
+```julia
+fₙpp = θ -> transpose([exp(im*k*θ) for k=-m:m]) * D^2 * f̂
+fₙpp(0.2) - (-cos(0.1) + sin(0.1)^2)*exp(cos(0.1))
+```
+Note there is a limit to how much accuracy is maintained: the derivatve `D^λ` will maginify errors like `n^λ`. 
+
+
+### Differential equations
+
+Consider a differ
+
+
+
+
