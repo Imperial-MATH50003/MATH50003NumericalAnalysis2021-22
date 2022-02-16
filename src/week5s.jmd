@@ -299,10 +299,51 @@ $$
 \end{align*}
 $$
 
+**SOLUTION**
+
+**Step 1. upper bounds**
+
+$$\|A\mathbf{x}\|_\infty=\max_k\left|\sum_ja_{kj}x_j\right|\le\max_k\sum_j|a_{kj}x_j|\le
+\begin{cases}
+\max\limits_j|x_j|\max\limits_k\sum\limits_j|a_{kj}|=\|\mathbf{x}\|_\infty\max\limits_k\|A[k,:]\|_1\\
+\max\limits_{kj}|a_{kj}|\sum\limits_j|x_j|=\|\mathbf{x}\|_1\|\text{vec}(A)\|_\infty
+\end{cases}
+$$
+
+**Step 2.1. meeting the upper bound ($\|A\|_{1 → ∞}$)**
+
+Let $a_{lm}$ be the entry of $A$ with maximum absolute value. Let $\mathbf{x}=\mathbf{e}_m$, then
+$$\|A\mathbf{x}\|_\infty=\max_k\left|\sum_ja_{kj}x_j\right|=\max_k|a_{km}|=|a_{lm}|$$
+and
+$$\|\mathbf{x}\|_1\|\text{vec}(A)\|_\infty=1\cdot|a_{lm}|.$$
+
+
+**Step 2.2. meeting the upper bound ($\|A\|_∞$)**
+
+Let $A[n,:]$ be the row of $A$ with maximum 1-norm. Let $\mathbf{x}=\left(\text{sign}.(A[n,:])\right)^\top$, then $\left|\sum_ja_{kj}x_j\right|\begin{cases} =\sum_j|a_{kj}|=\|A[k,:]\|_1 & k=n \\ \le\sum_j|a_{kj}|=\|A[k,:]\|_1 & k\ne n \end{cases}$, so
+$$\|A\mathbf{x}\|_\infty=\max_k\left|\sum_ja_{kj}x_j\right|=\max\limits_k\|A[k,:]\|_1$$
+while
+$$\|\mathbf{x}\|_\infty\max\limits_k\|A[k,:]\|_1=1\cdot\max\limits_k\|A[k,:]\|_1.$$
+
+
+**Conclusion**
+
+In both cases, equality can hold, so the upper bounds are actually supremums.
+
+
 **Problem 2.2⋆** For a rank-1 matrix $A = 𝐱 𝐲^⊤$ prove that
 $$
 \|A \|_2 = \|𝐱\|_2 \|𝐲\|_2.
 $$
+
+**SOLUTION**
+
+$$\|A\mathbf{z}\|_2=\|\mathbf{x}\mathbf{y}^\top\mathbf{z}\|_2=|\mathbf{y}^\top\mathbf{z}|\|\mathbf{x}\|_2,$$
+so it remains to prove that $\|\mathbf{y}\|_2=\sup_{\mathbf{z}}\frac{|\mathbf{y}^\top\mathbf{z}|}{\|\mathbf{z}\|_2}$.
+
+By Cauchy-Schwartz inequality,
+$$|\mathbf{y}^\top\mathbf{z}|=|(\mathbf{y},\mathbf{z})|\le\|\mathbf{y}\|_2\|\mathbf{z}\|_2$$
+with the two sides being equal when $\mathbf{y}$ and $\mathbf{z}$ are linearly dependent, in which case the bound is tight.
 
 **Problem 2.3⋆** Show for any orthogonal matrix $Q ∈ ℝ^m$ and
 matrix $A ∈ ℝ^{m × n}$ that
@@ -315,6 +356,13 @@ $$
 \hbox{tr}(A) = a_{11} + a_{22} + ⋯ + a_{mm}.
 $$
 
+**SOLUTION**
+
+$$\text{tr}(A^\top A)=\sum_k(A^\top A)[k,k]=\sum_k\sum_jA^\top[k,j]A[j,k]=\sum_k\sum_jA[j,k]^2=\|A\|_F^2.$$
+
+On the other hand,
+$$\text{tr}(A^\top A)=\text{tr}(A^\top Q^\top QA)=\text{tr}((QA)^\top (QA))=\|QA\|_F^2,$$
+so $\|Q A\|_F = \|A\|_F$.
 
 ## 3. Singular value decomposition
 
