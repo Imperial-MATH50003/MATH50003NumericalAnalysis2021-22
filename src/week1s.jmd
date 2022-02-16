@@ -102,7 +102,6 @@ $$
 $$
 Check your answers using `printbits`.
 
-
 **SOLUTION**
 Recall that we have `σ,Q,S = 127,8,23`. Thus we write
 $$
@@ -149,11 +148,9 @@ and $229 = (11100101)_2$ giving us:
 printlnbits(23f0/4 * 2f0^100)
 ```
 
-
 **Problem 3.2** Let $m(y) = \min\{x \in F_{32} : x > y \}$ be the smallest single precision number
 greater than $y$. What is $m(2) - 2$ and $m(1024) - 1024$? Check your answer using the `nextfloat`
 command.
-
 
 **SOLUTION**
 The next float after $2$ is $2 * (1 + 2^{-23})$ hence we get $m(2) - 2 = 2^{-22}$:
@@ -165,10 +162,60 @@ similarly, for $1024 = 2^{10}$ we find that the difference $m(1024) - 1024$ is $
  nextfloat(1024f0) - 1024, 2^(-13)
 ```
 
+Detailed explanation:
+
+First, note that we can work with the bit representations of floating point numbers in the following way to convert back and forth between them:
+
+```julia
+x = 2f0 # store Float64 of 2 
+s = bitstring(x) # store bit representation 
+ns = parse(Int32,s,base=2) # parse bit representation 
+sval = reinterpret(Float32,ns) # reinterpret as Float32 to get original number
+```
+In the above, we stored the bitstring of Float32 version of 2 as a string (a sequence of characters rather than a number), then managed to get back to the Float32 representation of 2 by parsing and reinterpreting the bitstring to the appropriate type. Now let's see what happens if we do the same thing but increment the bitstring by 1, i.e. the smallest amount we can increment the floating point number by and convert that to a Float:
+
+```julia
+t = "01000000000000000000000000000001" # increment bitstring of 2f0 as seen above by 1 manually 
+nt = parse(Int32,t,base=2) 
+tval = reinterpret(Float32,nt) 
+```
+The number we obtained there is the floating point number directly after 2f0 and there are no Float32 numbers between those two because of how the bit representation works. We could have also just run
+```julia
+nextfloat(2f0) 
+```
+but this hides what is happening at the bit level. We can easily check that
+```julia
+tval-sval 
+```
+So the distance between the two is in fact exactly
+```julia
+2f0^(-22) 
+```
+
+As given in the short problem solution. This serves as an intuition for what we are trying to compute. Let us now discuss what is happening at the bit level. Note that the IEEE definition of Float32 has a significand with 23 bits and the representation of the Float32 numbers is
+
+$$±2^{q−\sigma}×(1.b_1 b_2 b_3…b_S)_2$$
+
+So what are we really doing when we increment by 1 in the last digit of the binary representation? We are incrementing in the S-th binary point place, which represents the value $2^{-S}$. This is the same way in which $0.1$ in decimal represents $10^{-1}$ and $0.0....01$ with $S$ zeros represents $10^{-S}$. So let's for now assume $b_S$ was $0$ before we incremented it to be 1 (which is the case here). Then that means we went from a number like
+
+$$±2^{q−\sigma}×(1.b_1 b_2 b_3…0)_2$$
+
+to a number
+
+$$±2^{q−\sigma}×(1.b_1 b_2 b_3…1)_2$$
+
+So what's the difference between these two numbers? It's
+
+$$±2^{q−\sigma}×((1.b_1 b_2 b_3…1)_2-(1.b_1 b_2 b_3…0)_2)$$
+
+and for this case the difference term can be computed directly because we know they are exactly $1$ apart in the $S$-th digit by construction:
+
+$$(1.b_1 b_2 b_3…1)_2-(1.b_1 b_2 b_3…0)_2 = (0.0 0 0…1)_2 = 2^{-23}$$
+
+But we can't forget we still have the term $±2^{q−\sigma}$. In the case of the number 2f0 in Float32, that term just equals $2$, so the final difference is $2*2^{-23}=2^{-22}$ which is exactly what we wrote above. For the number $1024 = 2^{10}$, the final multiplication is instead $2^{10}*2^{-23}$ which is $2^{-13}$, which is also the answer given above.
 
 
 ## 4. Arithmetic
-
 
 **Problem 4.1** Suppose $x = 1.25$ and consider 16-bit floating point arithmetic (`Float16`). 
 What is the error in approximating $x$ by the nearest float point number ${\rm fl}(x)$?
@@ -225,14 +272,11 @@ y+2 == y
 ```
 
 
-
-
 **Problem 4.3** Explain why the following return `true`. What is the largest floating point number `y` such that `y + 1 ≠ y`?
 ```julia
 x = 10.0^100
 x + 1 == x
 ```
-
 
 **SOLUTION**
 
@@ -263,7 +307,6 @@ And this satisfies:
 ```julia
 y + 1 ≠ y
 ```
-
 
 **Problem 4.4** What are the exact bits for $1/5$, $1/5 + 1$ computed
 using  half-precision arithmetic (`Float16`) (using default rounding)?
@@ -297,8 +340,6 @@ printbits(1 + Float16(1)/5)
 ```julia
 Float16(0.1) / (Float16(1.1) - 1)
 ```
-
-
 
 **SOLUTION**
 For the last problem, note that
@@ -338,7 +379,6 @@ round up anyways to get a zero last bit) and get:
 ```julia
 printlnbits(Float16(0.1) / (Float16(1.1) - 1))
 ```
-
 
 **Problem 4.6** Find a bound on the _absolute error_ in terms of a constant times
 $ϵ_{\rm m}$ for the following computations
@@ -381,8 +421,6 @@ $$
 |δ_8| ≤ 10 ϵ_{\rm m}
 $$
 
-
-
 For the second part, we do:
 $$
 ({\rm fl}(1.1) ⊖ 1) ⊘ {\rm fl}(0.1) = {(1.1 (1 + δ_1) - 1)(1 + δ_2) \over 0.1 (1 + δ_3)} (1 + δ_4)
@@ -422,14 +460,7 @@ $$
 $$
 This is quite pessimistic but still captures that we are on the order of $ϵ_{\rm m}$.
 
-
-
-
-
-
-
 ## 5. Interval arithmetic
-
 
 The following problems consider implementation of interval arithmetic for
 proving precise bounds on arithmetic operations. That is recall the set operations
@@ -587,7 +618,7 @@ $$
 
 ```julia
 function exp_t(x, n)
-    ret = one(x) # 1 of same type as x
+    ret = one(x) # the function one(x) returns a 1 of same type as x, e.g. Int8(1) or Float32(1) depending on the type of x.
     s = one(x)
     for k = 1:n
         s = s/k * x
@@ -615,6 +646,8 @@ function exp_bound(x::Interval, n)
     # TODO: modify ret so that exp(x) is guaranteed to lie in it
     ## SOLUTION
     err = setrounding(T, RoundUp) do
+        # The following value is from Taylor's remainder theorem: we know the error in the Taylor series is exp(t)/n! for some t ≤ 1. 
+        # Thus we have exp(t)/n! ≤ 3 / f but we are rounding up to make sure we don't mess up the inequality.
         3 / f
     end
     ret + Interval(-err,err)
