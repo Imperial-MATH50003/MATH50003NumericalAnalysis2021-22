@@ -464,7 +464,6 @@ $$A A^+ A = U \Sigma V^T V \Sigma^{-1} U^T U \Sigma V^T = U \Sigma \Sigma^{-1} \
 2. Moreover,
 $$A^+ A A^+ = V \Sigma^{-1}U^T U \Sigma V^T V \Sigma^{-1} U^T = V \Sigma^{-1}\Sigma \Sigma^{-1} U^T = V \Sigma^{-1} U^T = A^+$$
 
-
 3. Furthermore, $AA^+ = U \Sigma V^T V \Sigma^{-1} U^T = U U^T = I$, thus
 
 $$(AA^+)^T = I^T = I = AA^+$$
