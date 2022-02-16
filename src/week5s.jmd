@@ -328,7 +328,7 @@ $$\|\mathbf{x}\|_\infty\max\limits_k\|A[k,:]\|_1=1\cdot\max\limits_k\|A[k,:]\|_1
 
 **Conclusion**
 
-In both cases, equality can hold, so the upper bounds are actually supremums.
+In both cases, equality can hold, so the upper bounds are actually maxima.
 
 
 **Problem 2.2⋆** For a rank-1 matrix $A = 𝐱 𝐲^⊤$ prove that
