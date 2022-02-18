@@ -115,7 +115,7 @@ on $[0,50]$.
 How many time-steps are needed to get convergence to 1% accuracy (the "eyeball norm")?
 
 **Problem 3.3** Use `Dual` and Newton iteration to find a frequency `ω` such that
-the heat on a graph with 50 nodes is equal to zero at time $T = 0$ at node $25$, using Forward Euler
+the heat on a graph with 50 nodes, with periodic forcing $cos(\omega t)$ at node 25, is equal to zero at time $T = 1$ at node $25$, using Forward Euler
 with 200 time-steps to approximate the solution to the differential equation.
 (Hint: use `Uᶠ = zeros(typeof(ω), m, n)` to ensure duals are allowed and use an initial guess of
 `ω = 1`.)
