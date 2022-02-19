@@ -448,11 +448,11 @@ which we turn into a vector
 $$
 𝐮(t) = \begin{bmatrix} u_1(t) \\ ⋮ \\ u_m(t) \end{bmatrix}
 $$
-We consider the case of a periodic forcing at the node $n = 1$.
+We consider the case of a periodic forcing at the middle node $n = ⌊m/2⌋$.
 
 Heat equation on this lattice is defined as follows:
 $$
-𝐮' = Δ𝐮 + 𝐞_1 \cos ωt
+𝐮' = Δ𝐮 + 𝐞_{⌊m/2⌋} \cos ωt
 $$
 We can employ forward and backward Euler:
 ```julia

@@ -1,0 +1,81 @@
+**Problem 3.3** Use `Dual` and Newton iteration to find a frequency `ω` such that
+the heat on a graph with 50 nodes is equal to zero at time $T = 0$ at node $25$, using Forward Euler
+with 200 time-steps to approximate the solution to the differential equation.
+(Hint: use `Uᶠ = zeros(typeof(ω), m, n)` to ensure duals are allowed and use an initial guess of
+`ω = 1`.)
+
+**SOLUTION**
+```julia
+# Dual(a,b) represents a + b*ϵ
+struct Dual{T}
+    a::T
+    b::T
+end
+
+# Dual(a) represents a + 0*ϵ
+Dual(a::Real) = Dual(a, zero(a)) # for real numbers we use a + 0ϵ
+
+# Allow for a + b*ϵ syntax
+const ϵ = Dual(0, 1)
+
+import Base: +, *, -, /, ^, zero, exp, cos, sin, one
+
+# support polynomials like 1 + x, x - 1, 2x or x*2 by reducing to Dual
++(x::Real, y::Dual) = Dual(x) + y
++(x::Dual, y::Real) = x + Dual(y)
+-(x::Real, y::Dual) = Dual(x) - y
+-(x::Dual, y::Real) = x - Dual(y)
+*(x::Real, y::Dual) = Dual(x) * y
+*(x::Dual, y::Real) = x * Dual(y)
+
+# support x/2 (but not yet division of duals)
+/(x::Dual, k::Real) = Dual(x.a/k, x.b/k)
+
+# a simple recursive function to support x^2, x^3, etc.
+function ^(x::Dual, k::Integer)
+    if k < 0
+        error("Not implemented")
+    elseif k == 1
+        x
+    else
+        x^(k-1) * x
+    end
+end
+
+# support identity of type Dual
+one(x::Dual) = Dual(one(eltype(x.a)))
+zero(::Type{<:Dual{T}}) where T = Dual(zero(T), zero(T))
+zero(::Dual{T}) where T = Dual(zero(T), zero(T))
+
+
+# Algebraic operations for duals
+-(x::Dual) = Dual(-x.a, -x.b)
++(x::Dual, y::Dual) = Dual(x.a + y.a, x.b + y.b)
+-(x::Dual, y::Dual) = Dual(x.a - y.a, x.b - y.b)
+*(x::Dual, y::Dual) = Dual(x.a*y.a, x.a*y.b + x.b*y.a)
+
+cos(x::Dual) = Dual(cos(x.a), -sin(x.a) * x.b)
+
+function heat(ω)
+    n = 200 # number of time-steps
+    t = range(0, 1; length=n)
+    h = step(t)
+
+    m = 50 # number of nodes
+    Δ = SymTridiagonal([-1; fill(-2.0, m-2); -1], ones(m-1))
+
+    Uᶠ = zeros(typeof(ω), m, n) # each column is a time-slice for forward Euler
+
+    for k = 1:n-1
+        Uᶠ[:,k+1] = (I + h*Δ)*Uᶠ[:,k]
+        Uᶠ[m÷2,k+1] += h*cos(ω * t[k]) # add forcing at 𝐞_1
+    end
+    Uᶠ[m÷2,end]
+end
+
+ω = 1.0
+for _ = 1:10
+    hω = heat(Dual(ω,1.))
+    ω = ω - hω.b \ hω.a
+end
+```

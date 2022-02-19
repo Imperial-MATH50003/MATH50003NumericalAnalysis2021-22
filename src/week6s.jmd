@@ -1,7 +1,7 @@
 # MATH50003 Numerical Analysis: Problem Sheet 6
 
 This problem sheet explores condition numbers, indefinite integration,
-and Euler's metohd.
+and Euler's method.
 
 Questions marked with a ⋆ are meant to be completed without using a computer.
 
@@ -35,16 +35,16 @@ $A^⊤A$.)
 
 
 **Problem 1.4**
-What bound on the relative error on $A 𝐯$ for $\|𝐯\|_2 = 1$ give for the following matrices:
+State a bound on the relative error on $A 𝐯$ for $\|𝐯\|_2 = 1$ for the following matrices:
 $$
 \begin{bmatrix}
 1/3 & 1/5 \\ 0 & 1/10^3
 \end{bmatrix},
  \begin{bmatrix} 1 \\ & 1/2 \\ && ⋯ \\ &&& 1/2^{10} \end{bmatrix}
 $$
-Compute the relative error (using `big` for a high-precision version to compare against)
-where $𝐯$ is a column of $V$ in the SVD $A = U Σ V^⊤$, computed using the `svd` command with
-`Float64` inputs.
+Compute the relative error in computing $A 𝐯$ (using `big` for a high-precision version to compare against)
+where $𝐯$ is the last column of $V$ in the SVD $A = U Σ V^⊤$, computed using the `svd` command with
+`Float64` inputs. How does the error compare to the predicted error bound?
 
 
 
@@ -53,8 +53,13 @@ where $𝐯$ is a column of $V$ in the SVD $A = U Σ V^⊤$, computed using the 
 ## 2. Indefinite integration
 
 **Problem 2.1** Implement backward differences to approximate
- indefinite-integration. How does the error compare to forward
- and mid-point versions  for $f(x) = \cos x$ on the interval $[0,1]$?
+indefinite-integration. How does the error compare to forward
+and mid-point versions  for $f(x) = \cos x$ on the interval $[0,1]$?
+Use the method to approximate the integrals of
+$$
+\exp(\exp x \cos x + \sin x), \prod_{k=1}^{1000} \left({x \over k}-1\right), \hbox{ and } f^{\rm s}_{1000}(x)
+$$
+to 3 digits, where $f^{\rm s}_{1000}(x)$ was defined in PS2.
 
 
 **Problem 2.2** Implement indefinite-integration 
@@ -87,7 +92,37 @@ norm(uₙ - sin.(x),1)
 
 ## 3. Euler methods
 
-**Problem 3.1⋆** For an evenly spaced grid $t_1, …, t_n$, use the approximation
+**Problem 3.1** Solve the following ODEs 
+using forward and/or backward Euler and increasing $n$, the number of time-steps, 
+until $u(1)$ is determined to 3 digits:
+$$
+\begin{align*}
+u(0) &= 1, u'(t) = \cos(t) u(t) + t \\
+v(0) &= 1, v'(0) = 0, v''(t) = \cos(t) v(t) + t \\
+w(0) &= 1, w'(0) = 0, w''(t) = t w(t) + 2 w(t)^2
+\end{align*}
+$$
+If we increase the initial condition $w(0) = c > 1$, $w'(0)$
+the solution may blow up in finite time. Find the smallest positive integer $c$
+such that the numerical approximation suggests the equation
+does not blow up.
+
+
+```julia
+n = 1000
+t = range(0, 1; length=n)
+h = step(t)
+w = zeros(2, n)
+w[:,1] = [1,0]
+for k = 1:n-1
+    w[:,k+1] = w[:,k] + h*[w[2,k]; t[k]*w[1,k]+2w[1,k]^2]
+end
+
+plot(t, w[1,:])
+```
+
+
+**Problem 3.2⋆** For an evenly spaced grid $t_1, …, t_n$, use the approximation
 $$
 {u'(t_{k+1}) + u'(t_k) \over 2} ≈ {u_{k+1} - u_k \over h}
 $$
@@ -107,48 +142,58 @@ $$
 $$
 
 
-**Problem 3.2** Implement the method designed in Problem 3.1 for the negative time Airy equation 
+**Problem 3.3** Implement the method designed in Problem 3.1 for the negative time Airy equation 
 $$
 u(0) = 1, u'(0) = 0, u''(t) = -t u(t)
 $$
 on $[0,50]$.
 How many time-steps are needed to get convergence to 1% accuracy (the "eyeball norm")?
 
-**Problem 3.3** Use `Dual` and Newton iteration to find a frequency `ω` such that
-the heat on a graph with 50 nodes is equal to zero at time $T = 0$ at node $25$, using Forward Euler
-with 200 time-steps to approximate the solution to the differential equation.
-(Hint: use `Uᶠ = zeros(typeof(ω), m, n)` to ensure duals are allowed and use an initial guess of
-`ω = 1`.)
+**Problem 3.4** Implement Heat on a graph with $m = 50$ nodes with no forcing
+and initial condition $u_{m/2}(0) = 1$ and $u_k(0) = 0$, but where the first and last node are fixed
+to  zero, that is replace the first and last rows of the differential equation with
+the conditions:
+$$
+u_1(t) = u_m(t) = 0.
+$$
+Find the time $t$ such that  $\|𝐮(t)\|_∞ <10^{-3}$ to 2 digits.
+Hint: Differentiate to recast the conditions as a differential equation.
+Vary $n$, the number of time-steps used in Forward Euler, and increase $T$ in the interval $[0,T]$
+until the answer doesn't change.
+Do a for loop over the time-slices to find the first that satisfies the condition.
+(You may wish to call `println` to print the answer and `break` to exit the for loop).
 
 **SOLUTION**
+
 ```julia
-using DualNumbers
+n = 40_000 # number of time-steps
+t = range(0, 1000; length=n)
+h = step(t)
 
-function heat(ω)
-    n = 200 # number of time-steps
-    t = range(0, 1; length=n)
-    h = step(t)
+m = 50 # number of nodes
 
-    m = 50 # number of nodes
-    Δ = SymTridiagonal([-1; fill(-2.0, m-2); -1], ones(m-1))
 
-    Uᶠ = zeros(typeof(ω), m, n) # each column is a time-slice for forward Euler
+Δ = SymTridiagonal([0; fill(-2.0, m-2); 0], [0; ones(m-3); 0])
+Uᶠ = zeros(m, n) # each column is a time-slice for forward Euler
 
-    Uᶠ[:,1] = zeros(m) # initial condition
+Uᶠ[25,1] = 1
 
-    for k = 1:n-1
-        Uᶠ[:,k+1] = (I + h*Δ)*Uᶠ[:,k]
-        Uᶠ[m÷2,k+1] += h*cos(ω * t[k]) # add forcing at 𝐞_1
-    end
-    Uᶠ[m÷2,end]
+
+for k = 1:n-1
+    Uᶠ[:,k+1] = (I + h*Δ)*Uᶠ[:,k]
 end
 
-ω = 1.0
-hω = heat(Dual(ω,1))
-ω = ω - dualpart(hω) \ realpart(hω)
+for k = 1:n
+    if norm(Uᶠ[:,k],Inf) < 1E-3
+        println(t[k])
+        break
+    end
+end
 ```
 
-**Problem 3.4** Consider the equation
+
+
+**Problem 3.5** Consider the equation
 $$
 u(1) = 1, u'(t) = -10u(t)
 $$

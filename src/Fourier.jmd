@@ -9,7 +9,7 @@ f(θ) = ∑_{k = -∞}^∞ f̂ₖ {\rm e}^{{\rm i} k θ}
 $$
 where
 $$
-f̂ₖ = {1 \over 2π} ∫_0^{2π} f(θ) {\rm e}^{{\rm i} k θ} {\rm d}θ.
+f̂ₖ := {1 \over 2π} ∫_0^{2π} f(θ) {\rm e}^{-{\rm i} k θ} {\rm d}θ
 $$
 In numerical analysis we try to build on the analogy with linear algebra as much as possible.
 Therefore we write this as:
@@ -18,19 +18,41 @@ f(θ) = \underbrace{[⋯ | {\rm e}^{-2{\rm i}θ} |{\rm e}^{-{\rm i}θ} | \underl
 \underbrace{\begin{bmatrix} ⋮ \\ f̂_{-2} \\ f̂_{-1} \\ \underline{f̂_0} \\ f̂_1 \\ f̂_2 \\ ⋮ \end{bmatrix}}_𝐟̂
 $$
 
+
 ```julia
 using FFTW
 ```
 
-## 1. Absolute summability of coefficients
+## 1. Basics of Fourier series
 
-In analysis one typically works with continuous functions and relates results to continuoity.
+
+
+In analysis one typically works with continuous functions and relates results to continuity.
 In numerical analysis we inheritely have to work with _vectors_, so it is more natural 
 to  focus on the case where the _Fourier coefficients_ $f̂_k$ are _absolutely convergent_,
 or in otherwords, the $1$-norm of $𝐟̂$ is bounded:
 $$
 \|𝐟̂\|_1 = ∑_{k=-∞}^∞ |f̂_k| < ∞
 $$
+
+We first state a basic results (whose proof is beyond the scope of this module):
+
+
+**Theorem (convergence)**
+If the Fourier coeffients are absolutely convergent then
+$$
+f(θ) = ∑_{k = -∞}^∞ f̂ₖ {\rm e}^{{\rm i} k θ},
+$$
+which converges uniformly.
+
+**Remark (advanced)** We also have convergence for the continuous version
+of the $2$-norm,
+$$
+\| f \|_2 := \sqrt{\int_0^{2π} |f(θ)|^2 {\rm d} θ,
+$$
+for any function such that $\| f \|_2 < ∞$, but we won't need that in
+whast follows.
+
 
 Fortunately, continuity gives us sufficient (though not necessary) conditions for absolute convergence:
 
@@ -160,6 +182,7 @@ $$
 f^{(k)}(0) ≈ k! f̂_k^n.
 $$
 ```julia
+
 
 ```
 
