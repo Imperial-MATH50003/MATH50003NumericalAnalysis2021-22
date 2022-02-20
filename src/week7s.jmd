@@ -3,20 +3,36 @@
 
 ## 1. Two-point boundary value problems
 
-**Problem 1.1** Solve Helmholtz
+**Problem 1.1** Construct a finite-difference approximation to the forced Helmholtz equation
+$$
+u(0) = 0 \\
+u(1) = 0 \\
+u'' + k^2 u = \E^{x}
+$$
+Compare the error with the true solution:
+$$
+u(x) = (-cos(k x) + {\rm e}^x cos(k x)^2 + cot(k) sin(k x) - {\rm e} cos(k) cot(k) sin(k x) - {\rm e} sin(k) sin(k x) + E^x sin(k x)^2)/(1 + k^2)
+$$
 
 ```
-function helm_err(k, u, c_0, c_1, f, n)
+function helm(k, n)
     x = range(0, 1; length = n)
     h = step(x)
-    T = Tridiagonal([fill(1/h^2, n-2); 0], [1; fill(-k^2-2/h^2, n-2); 1], [0; fill(1/h^2, n-2)])
-    uᶠ = T \ [c_0; f.(x[2:end-1]); c_1]
-    norm(uᶠ - u.(x), Inf)
+    # TODO: Create a SymTridiagonal discretisation
+    ## SOLUTION
+    T = SymTridiagonal([1; fill(k^2-2/h^2, n-2); 1], [0; fill(1/h^2, n-2)])
+    T \ [0; exp.(x[2:end-1]); 1]
+    ## END
 end
 
-k = -10
+k = 10
+u = x -> (-cos(k*x) + exp(x)cos(k*x)^2 + cot(k)sin(k*x) - ℯ*cos(k)cot(k)sin(k*x) - ℯ*sin(k)sin(k*x) + exp(x)sin(k*x)^2)/(1 + k^2)
 
-u = x -> ((exp(-k*x)*(exp(k*x)-1)*(exp(k*x)-exp(k)))/(k^2 * (1 + exp(k))))
+
+helm(k, 100)
+
+```
+
 
 helm_err(k, u, 0, 0, one, 10_000_000)
 
@@ -68,9 +84,9 @@ eigvals(SymTridiagonal(fill(2/h^2,n-2)  + x[2:end-1].^2, fill(-1/h^2, n-3)))
 
 ## 2. Convergence
 
-**Problem** Prove convergence for the trap rule.
+**Problem 2.1** Prove convergence for the trap rule.
 
-**Problem** Prove that if $|a_k| ≤ a$ then 
+**Problem 2.2** Prove that if $|a_k| ≤ a$ then 
 Use this to prove convergence of Euler with a variable coefficient.
 
 
@@ -78,25 +94,34 @@ Use this to prove convergence of Euler with a variable coefficient.
 
 ## 3. Fourier series
 
-
-
-**Problem 3.1⋆** Prove that if $f$ is $λ$ times differentiable that
+**Problem 3.1⋆** Show that if $f(θ)$ and $g(θ)$ both have absolutely
+summable Fourier coefficients then so does their product $h(θ) = f(θ)g(θ)$.
+Deduce that the set of functions with absolutely summable Fourier coefficients
+(named the _Wiener algebra_)
 $$
-|f̂ₖ| = O(|k|^{-λ})\qquad \hbox{as $|k| → ∞}
+W := \{f : \| 𝐟̂ \|_1 < ∞ \}
 $$
-What does this tell us about the rate
+forms a commutative ring (recalling the definition of a commutative ring from PS2).
 
-**Problem 3.2⋆** Prove if $f_k = 0$ for negative $k$ and $f$ is $λ$ differentiable we converge fast.
+**Problem 3.2⋆** Prove that if the first $λ-1$ derivatives $f(θ), f'(θ), …, f^{(λ-1)}(θ)$ 
+are 2π-periodic and $f^{(λ)}$ is uniformly bounded  that
+$$
+|f̂ₖ| = O(|k|^{-λ})\qquad \hbox{as $|k| → ∞$}
+$$
+Use this to show for the Taylor case ($0 = f̂_{-1} = f̂_{-2} = ⋯$) that
+$$
+|f(θ) - ∑_{k=0}^{n-1} f̂_k {\rm e}^{{\rm i}kθ}| = O(n^{1-λ})
+$$
 
-**Problem 3.3⋆** Prove convergence for
+**Problem 3.3⋆** For the general (non-Taylor) case, prove convergence for
 $$
 f_n(θ) = ∑_{k=-\ceil{n/2}}^{\floor{n/2}} f̂ₖ {\rm e}^{{\rm i} k θ}
 $$
+to $f(θ)$.
+What is the rate of convergence if the first $λ-1$ derivatives $f(θ), f'(θ), …, f^{(λ-1)}(θ)$ 
+are 2π-periodic and $f^{(λ)}$ is uniformly bounded?
 
-**Problem 3.4**  A function with a jump does not have uniformly
-converging coefficients. Plot interpolant for $\sign(θ-1/2)$.
-Conjecture where the approximation converges. (This is known as
-Gibb's phenomena.)
+
 
 ## 4. Cosine series
 
@@ -109,7 +134,15 @@ $$
 f̌_k := {1 \over 2π} \int_0^π f(θ) \cos k θ {\rm d}θ \begin{cases} 2 & k = 0 \\ 1 & otherwise \end{cases}
 $$
 We will use an $n+1$ grid
-with $θ_j = jπ/n$.
+with $θ_j = jπ/n$. 
+
+**Problem 4.1** Show that any function $f̃ : [0,π] → ℝ$
+can be extended to  $f : ℝ → ℝ$ satisfying $f(θ) = f(θ+2π)$,
+$f(θ) = f(-θ)$, and $f(θ) = f̃(θ)$ for $θ ∈ [0,π]$. 
+Draw a picture of your extension for $f(θ) = \exp(θ)$.
+Show that if $f̃$ is continuous then so is $f$. 
+
+
 
 **Problem 4.1**  Define
 $$

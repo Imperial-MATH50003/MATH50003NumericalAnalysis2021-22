@@ -1,0 +1,68 @@
+# Julia Problem Sheet
+
+This problem sheet is designed to test some basic Julia
+knowledge. Note each problem has multiple solutions, and the solution
+sheet will show different ways of solving the same problem.
+
+
+## Array creation and broadcasting
+
+**Problem** Create a vector of length 5 whose entries are `Int` which is
+zero in all entries. 
+
+**SOLUTIONS**
+
+```julia
+zeros(Int, 5)
+```
+```julia
+fill(0, 5)
+```
+
+**Problem** Create a 5×6 matrix whose entries are `Int` which is
+zero in all entries.
+
+```julia
+zeros(Int, 5, 6)
+```
+```julia
+fill(0, 5, 6)
+```
+
+
+**Problem** Create a vector of length 5 whose entries are `Float64`
+approximations of `exp(-k)`. (Two solutions: one using a for loop and
+one using broadcasting.)
+
+```julia
+v = zeros(5) # defaults to Float64
+for k = 1:5
+    v[k] = exp(-k)
+end
+```
+
+```julia
+exp.(-(1:5))
+```
+
+
+**Problem** Create a 5 × 6 matrix `A` whose entries `A[k,j] == cos(k+j)`.
+ (Two solutions: one using a for loop and
+one using broadcasting.)
+
+```julia
+A = zeros(5,6)
+for k = 1:5, j = 1:6
+    A[k,j] = cos(k+j)
+end
+A
+```
+
+```julia
+k = 1:5
+j = 1:6
+cos.(k .+ j')
+```
+
+## Types
+
