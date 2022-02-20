@@ -187,7 +187,7 @@ $$
 Note that there is redundancy:
 
 **Corollary (aliasing)**
-For all $m ∈ ℤ$, $f̂_k^n = f̂_{k+mn}^n$.
+For all $p ∈ ℤ$, $f̂_k^n = f̂_{k+pn}^n$.
 
 
 In other words if we know $f̂_0^n, …, f̂_{n-1}^n$, we know all $f̂_k^n$. 
@@ -642,10 +642,6 @@ norm(C*𝐛 - fft(Λ * ifft(𝐛)))
 It has worked! (Though unfortunately has introduced more numerical error
 than `C*𝐛`.)
 
-**Remark (advanced)** The FFT is built on the fact that $ω$ is a root of unity,
-and this observation can be used to extend the FFT to other algebraic structures
-such as finite fields or groups. This connection can also be used to design a method for multiplying
-large integers with $n$ digits in $O(n \log n)$ operations. 
 
 
 
@@ -741,3 +737,11 @@ a =  θ -> transpose([exp(im*k*θ) for k=0:m-1])*𝐚
 Λ = Diagonal(a.(θ))
 fft(Λ*ifft([(1:6).^2; zeros(Int, 5)]))
 ```
+For multiplying polynomials with 6 coefficients this is not
+essential, but if we have polynomials with millions of coefficients it is
+necessary to use FFTs.
+
+**Remark (advanced)** The FFT is built on the fact that $ω$ is a root of unity,
+and this observation can be used to extend the FFT to other algebraic structures
+such as finite fields or groups. This connection can also be used to design a method for multiplying
+large integers with $n$ digits in $O(n \log n)$ operations. 
