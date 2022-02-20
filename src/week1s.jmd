@@ -9,10 +9,13 @@ produce rigorous bounds on the exponential.
 using ColorBitstring, SetRounding
 ```
 
+Questions marked with a ⋆ are meant to be completed without using a computer.
+Problems are denoted A/B/C to indicate their difficulty.
+
 ## 1. Binary representation
 
 
-**Problem 1.1** What is the binary representation of $1/5$? (Hint: use `printbits` to derive a proposed form.)
+**Problem 1.1 (C)** What is the binary representation of $1/5$? (Hint: use `printbits` to derive a proposed form.)
 
 **SOLUTION**
 Note that
@@ -31,7 +34,7 @@ $$
 
 
 
-**Problem 1.2** What is $\pi$ to 5 binary places? Hint: recall that $\pi \approx  3.14$.
+**Problem 1.2 (C)** What is $\pi$ to 5 binary places? Hint: recall that $\pi \approx  3.14$.
 
 **SOLUTION**
 Note that
@@ -49,7 +52,7 @@ $$ \pi - 1*2^1 - 1*2^0 - 1*2^{-3} - 1*2^{-6} ...$$
 
 ## 2. Integers
 
-**Problem 2.1** With 8-bit signed integers, find the bits for the following: $10, 120, -10$.
+**Problem 2.1 (C)** With 8-bit signed integers, find the bits for the following: $10, 120, -10$.
 
 **SOLUTION**
 We can find the binary digits by repeatedly subtracting the largest power of 2 less than a number
@@ -78,7 +81,7 @@ printlnbits(Int8(-10))
 
 
 
-**Problem 2.2** What will `Int8(120) + Int8(10)` return?
+**Problem 2.2 (C)** What will `Int8(120) + Int8(10)` return?
 
 **SOLUTION**
 It will return
@@ -92,7 +95,7 @@ Int8(120) + Int8(10)
 
 ## 3. Floating point numbers
 
-**Problem 3.1** What are the single precision $F_{32}$ (`Float32`) floating point representations for the following: 
+**Problem 3.1 (C)** What are the single precision $F_{32}$ (`Float32`) floating point representations for the following: 
 $$
 2, 31, 32, 23/4, (23/4)\times 2^{100}
 $$
@@ -146,7 +149,7 @@ printlnbits(23f0/4 * 2f0^100)
 ```
 
 
-**Problem 3.2** Let $m(y) = \min\{x \in F_{32} : x > y \}$ be the smallest single precision number
+**Problem 3.2 (B)** Let $m(y) = \min\{x \in F_{32} : x > y \}$ be the smallest single precision number
 greater than $y$. What is $m(2) - 2$ and $m(1024) - 1024$? Check your answer using the `nextfloat`
 command.
 
@@ -166,14 +169,14 @@ similarly, for $1024 = 2^{10}$ we find that the difference $m(1024) - 1024$ is $
 ## 4. Arithmetic
 
 
-**Problem 4.1** Suppose $x = 1.25$ and consider 16-bit floating point arithmetic (`Float16`). 
+**Problem 4.1 (C)** Suppose $x = 1.25$ and consider 16-bit floating point arithmetic (`Float16`). 
 What is the error in approximating $x$ by the nearest float point number ${\rm fl}(x)$?
 What is the error in approximating $2x$, $x/2$, $x + 2$ and $x - 2$ by $2 \otimes x$, $x \oslash 2$, $x ⊕ 2$ and $x \ominus 2$?
 
 **SOLUTION**
 None of these computations have errors since they are all exactly representable as floating point numbers.
 
-**Problem 4.2** For what floating point numbers is $x \oslash 2 \neq x/2$ and $x ⊕ 2 \neq x + 2$?
+**Problem 4.2 (B)** For what floating point numbers is $x \oslash 2 \neq x/2$ and $x ⊕ 2 \neq x + 2$?
 
 **SOLUTION**
 
@@ -223,7 +226,7 @@ y+2 == y
 
 
 
-**Problem 4.3** Explain why the following return `true`. What is the largest floating point number `y` such that `y + 1 ≠ y`?
+**Problem 4.3 (A)** Explain why the following return `true`. What is the largest floating point number `y` such that `y + 1 ≠ y`?
 ```julia
 x = 10.0^100
 x + 1 == x
@@ -261,7 +264,7 @@ y + 1 ≠ y
 ```
 
 
-**Problem 4.4** What are the exact bits for $1/5$, $1/5 + 1$ computed
+**Problem 4.4 (B)** What are the exact bits for $1/5$, $1/5 + 1$ computed
 using  half-precision arithmetic (`Float16`) (using default rounding)?
 
 **SOLUTION**
@@ -289,7 +292,7 @@ printbits(1 + Float16(1)/5)
 ```
 
 
-**Problem 4.5** Explain why the following does not return `1`. Can you compute the bits explicitly?
+**Problem 4.5 (A)** Explain why the following does not return `1`. Can you compute the bits explicitly?
 ```julia
 Float16(0.1) / (Float16(1.1) - 1)
 ```
@@ -336,7 +339,7 @@ printlnbits(Float16(0.1) / (Float16(1.1) - 1))
 ```
 
 
-**Problem 4.6** Find a bound on the _absolute error_ in terms of a constant times
+**Problem 4.6 (B)** Find a bound on the _absolute error_ in terms of a constant times
 $ϵ_{\rm m}$ for the following computations
 $$
 \begin{align*}
@@ -433,7 +436,7 @@ $$
 A + B = \{x + y : x \in A, y \in B\}, AB = \{xy : x \in A, y \in B\}.
 $$
 
-**Problem 5.1** For intervals $A = [a,b]$ and $B = [c,d]$ such that $0 \notin A,B$
+**Problem 5.1 (B)** For intervals $A = [a,b]$ and $B = [c,d]$ such that $0 \notin A,B$
  and integer $n \neq 0$, 
 deduce formulas for the minimum and maximum of $A/n$, $A+B$ and $AB$.
 
@@ -456,7 +459,7 @@ AB &= \begin{cases}
 $$
 
 
-**Problem 5.2** 
+**Problem 5.2 (B)**
 We want to implement floating point variants such that, for $S = [a,b] + [c,d]$
  $P = [a,b] * [c,d]$, and $D = [a,b]/n$ for an integer $n$,
 $$
@@ -576,7 +579,7 @@ function *(x::Interval, y::Interval)
 end
 ```
 
-**Problem 5.3** The following function  computes the first `n+1` terms of the Taylor series of $\exp(x)$:
+**Problem 5.3 (A)** The following function  computes the first `n+1` terms of the Taylor series of $\exp(x)$:
 $$
 \sum_{k=0}^n {x^k \over k!}
 $$

@@ -5,10 +5,11 @@ finite-differences. We also investigate mathematical properties of dual numbers 
 other functions. Finally, we see how dual numbers can be combined with Newton iteration for root finding.
 
 Questions marked with a ⋆ are meant to be completed without using a computer.
+Problems are denoted A/B/C to indicate their difficulty.
 
 ## 1. Finite-differences
 
-**Problem 1.1⋆** Use Taylor's theorem to derive an error bound for central differences
+**Problem 1.1⋆ (B)** Use Taylor's theorem to derive an error bound for central differences
 $$
 f'(x) ≈ {f(x + h) - f(x - h) \over 2h}.
 $$
@@ -55,7 +56,7 @@ $$
 $$
 
 
-**Problem 1.2** Implement central differences for $f(x) = 1 + x + x^2$ and $g(x) = 1 + x/3 + x^2$. 
+**Problem 1.2 (B)** Implement central differences for $f(x) = 1 + x + x^2$ and $g(x) = 1 + x/3 + x^2$. 
 Plot the errors for `h = 2.0 .^ (0:-1:-60)` and `h = 10.0 .^ (0:-1:-16)`. 
 Derive the error exactly for the different cases to explain the observed behaviour.
 
@@ -115,7 +116,7 @@ $$ =\left| \frac{1}{3} + 2x - \frac{1}{3} - 2x\right| = 0.$$
 
 
 
-**Problem 1.3⋆** Use Taylor's theorem to derive an error bound on the second-order derivative approximation
+**Problem 1.3 (A)⋆** Use Taylor's theorem to derive an error bound on the second-order derivative approximation
 $$
 f''(x) ≈ {f(x+h) - 2f(x) + f(x-h) \over h^2}
 $$
@@ -152,7 +153,7 @@ $$\le \left|\frac{(f^{FP}(x+h) - f(x+h)) - 2(f^{FP}(x)  - f(x)) + (f^{FP}(x-h) -
 $$\le \left|\frac{\delta_{x+h} - 2\delta_x + \delta_{x-h}}{h^2}\right| + 2Ch \le \frac{4cϵ_m}{h^2} + 2Ch.$$
 
 
-**Problem 1.4** Use finite-differences, central differences, and second-order finite-differences to approximate to 5-digits the first and second 
+**Problem 1.4 (B)** Use finite-differences, central differences, and second-order finite-differences to approximate to 5-digits the first and second 
 derivatives to the following functions
 at the point $x = 0.1$:
 $$
@@ -216,7 +217,7 @@ println("f''($x) via finite difference:  ", finitediffsecond(x, cbrt(h), x->cont
 
 ## 2. Dual numbers
 
-**Problem 2.1⋆** 
+**Problem 2.1⋆ (C)** 
 Show that dual numbers $\mathbb{D}$ are a _commutative ring_, that is, for all $a,b,c \in \mathbb{D}$ the following are satisfied:
 1. _additive associativity_: $(a + b) + c = a + (b + c)$
 2. _additive commutativity_: $a + b = b + a$
@@ -264,7 +265,7 @@ ab + ac = a_r b_r + (a_d b_r + a_r b_d) ϵ + a_r c_r + (a_d c_r + a_r c_d) ϵ = 
 $$
 
 
-**Problem 2.2⋆** A _field_ is a commutative ring such that $0 ≠ 1$ and all nonzero elements have a multiplicative inverse, i.e.,
+**Problem 2.2⋆ (C)** A _field_ is a commutative ring such that $0 ≠ 1$ and all nonzero elements have a multiplicative inverse, i.e.,
 there exists $a^{-1}$ such that $a a^{-1} = 1$. Why isn't $\mathbb{D}$ a field?
 
 **SOLUTION**
@@ -279,7 +280,7 @@ $$
 $$
 This proves that no choice of real part $z_r$ can reach the multiplicative identity $1+0 ϵ$ when starting from the number $0+ϵ$. More general results for zero real part dual numbers can also be proved.
  
-**Problem 2.3⋆** A _matrix representation_ of a ring are maps from a group/ring to matrices such that matrix addition and multiplication
+**Problem 2.3⋆ (B)** A _matrix representation_ of a ring are maps from a group/ring to matrices such that matrix addition and multiplication
 behave exactly like addition and multiplication of the ring. 
 That is, if $A$ and $B$ are elements of the ring and $ρ$ is a representation, then
 $$
@@ -310,7 +311,7 @@ And finally for multiplication of dual numbers $(a+bϵ )(c+dϵ ) = ac+(ad+bc)ϵ$
 $\rho_ϵ(A)\rho_ϵ(B) = \begin{pmatrix}a & b \\ 0 & a \end{pmatrix}\begin{pmatrix} c & d \\ 0 & c \end{pmatrix} = \begin{pmatrix} ac & ad+bc \\ 0 & ac \end{pmatrix} = \rho_ϵ(AB).$
 
 
-**Problem 2.4⋆** What is the correct definition of division on dual numbers, i.e.,
+**Problem 2.4⋆ (C)** What is the correct definition of division on dual numbers, i.e.,
 $$
 (a + b ϵ )/(c + d ϵ ) = s + t ϵ
 $$
@@ -353,7 +354,7 @@ $$
 ( \cos (a) \exp (a) - \sin(a) \exp (a) + \cos(a)) \exp( (\exp (a) \cos (a) + \sin(a)) ).
 $$
 
-**Problem 2.5** Add support for `cos`, `sin`, and `/` to the type `Dual`:
+**Problem 2.5 (C)** Add support for `cos`, `sin`, and `/` to the type `Dual`:
 ```julia
 # Dual(a,b) represents a + b*ϵ
 struct Dual{T}
@@ -430,7 +431,7 @@ function /(x::Dual, y::Dual)
 end
 ```
 
-**Problem 2.6** Use dual numbers to compute the derivatives to
+**Problem 2.6 (B)** Use dual numbers to compute the derivatives to
 $$
 \exp(\exp x \cos x + \sin x), \prod_{k=1}^{1000} \left({x \over k}-1\right), \hbox{ and } f^{\rm s}_{1000}(x).
 $$
@@ -460,7 +461,7 @@ $$
 x_{k+1} = x_k - {f(x_k) \over f'(x_k)}
 $$
 
-**Problem 3.1** Use `Dual` to implement the following function which returns $x_n$:
+**Problem 3.1 (B)** Use `Dual` to implement the following function which returns $x_n$:
 ```julia
 function newton(f, x0, n)
     ## TODO: compute x_n 
@@ -492,7 +493,7 @@ f_ex(xn)
 ```
 
 
-**Problem 3.2** Compute points $y$ such that $|f(y)| \leq 10^{-13}$ (i.e., approximate roots):
+**Problem 3.2 (B)** Compute points $y$ such that $|f(y)| \leq 10^{-13}$ (i.e., approximate roots):
 $$
 \exp(\exp x \cos x + \sin x)-6\hbox{ and } \prod_{k=1}^{1000} \left({x \over k}-1\right) - {1 \over 2}
 $$
@@ -525,7 +526,7 @@ rootf2 = newton(f2, 0.3, 8)
 f2(rootf2)
 ```
 
-**Problem 3.3** Compute points $y$ such that $|f^{\rm s}_{1000}(y) - j| \leq 10^{-13}$ for $j = 1,2,3$. 
+**Problem 3.3 (A)** Compute points $y$ such that $|f^{\rm s}_{1000}(y) - j| \leq 10^{-13}$ for $j = 1,2,3$. 
 Make a conjecture of what $f^{\rm s}_n(x)$ converges to as $n → ∞$. (Bonus problem: Prove your conjecture.)
 
 **SOLUTION**

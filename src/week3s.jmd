@@ -5,6 +5,9 @@ supporting a matrix with two super-diagonals, as well as
 permutation and Householder reflections that can be applied to a vector in
 $O(n)$ complexity.
 
+Questions marked with a ⋆ are meant to be completed without using a computer.
+Problems are denoted A/B/C to indicate their difficulty.
+
 
 ```julia
 using LinearAlgebra, Test
@@ -15,7 +18,7 @@ import Base: getindex, setindex!, size, *, \
 
 ## 1. Dense Matrices
 
-**Problem 1.1** Show that `A*x` is not
+**Problem 1.1 (C)** Show that `A*x` is not
 implemented as `mul(A, x)` from the lecture notes
 by finding a `Float64` example  where the bits do not match.
 
@@ -62,7 +65,7 @@ println(A*x-mul(A,x))
 
 ## 2. Triangular Matrices
 
-**Problem 2.1** Complete the following functions for solving linear systems with
+**Problem 2.1 (B)** Complete the following functions for solving linear systems with
 triangular systems by implementing back and forward-substitution:
 ```julia
 function ldiv(U::UpperTriangular, b)
@@ -142,7 +145,7 @@ Ldense\x-ldiv(Ltriang,x)
 
 
 
-**Problem 2.2⋆** Given $𝐱 \in \mathbb{R}^n$, find a lower triangular matrix of the form
+**Problem 2.2⋆ (B)** Given $𝐱 \in \mathbb{R}^n$, find a lower triangular matrix of the form
 $$
 L = I - 2 𝐯 𝐞_1^⊤
 $$
@@ -162,7 +165,7 @@ and thus we find such a lower triangular $L$ by choosing $v_1 = 0$ and $v_k = \f
 
 ## 3. Banded matrices
 
-**Problem 3.1** Complete the implementation of `UpperTridiagonal` which represents a banded matrix with
+**Problem 3.1 (C)** Complete the implementation of `UpperTridiagonal` which represents a banded matrix with
 bandwidths $(l,u) = (0,2)$:
 ```julia
 struct UpperTridiagonal{T} <: AbstractMatrix{T}
@@ -244,7 +247,7 @@ A[1,1] = 2
 A
 ```
 
-**Problem 3.2** Complete the following implementations of `*` and `\` for `UpperTridiagonal` so that
+**Problem 3.2 (B)** Complete the following implementations of `*` and `\` for `UpperTridiagonal` so that
 they take only $O(n)$ operations.
 ```julia
 function *(U::UpperTridiagonal, x::AbstractVector)
@@ -347,7 +350,7 @@ x = rand(n)
 
 ## 4. Permutations
 
-**Problem 4.1⋆** What are the permutation matrices corresponding to the following permutations?
+**Problem 4.1⋆ (C)** What are the permutation matrices corresponding to the following permutations?
 $$
 \begin{pmatrix}
 1 & 2 & 3 \\
@@ -417,7 +420,7 @@ P_\tau=
 0 & 0 & 0 & 0 & 1 & 0
 \end{pmatrix}$$
 
-**Problem 4.2** Complete the implementation of a type representing
+**Problem 4.2 (B)** Complete the implementation of a type representing
 permutation matrices that supports `P[k,j]` and such that `*` takes $O(n)$ operations.
 ```julia
 using LinearAlgebra, Test
@@ -466,7 +469,7 @@ end
 
 ## 5. Orthogonal matrices
 
-**Problem 5.1⋆** Show that orthogonal matrices preserve the 2-norm of vectors:
+**Problem 5.1⋆ (C)** Show that orthogonal matrices preserve the 2-norm of vectors:
 $$
 \|Q 𝐯\| = \|𝐯\|.
 $$
@@ -477,7 +480,7 @@ $$
 $$
 ∎
 
-**Problem 5.2⋆** Show that the eigenvalues $λ$ of an orthogonal matrix $Q$ are
+**Problem 5.2⋆ (B)** Show that the eigenvalues $λ$ of an orthogonal matrix $Q$ are
 on the unit circle: $|λ| = 1$.
 
 **SOLUTION**
@@ -487,7 +490,7 @@ $$
 $$
 ∎
 
-**Problem 5.3⋆** Explain why an orthogonal matrix $Q$ must be equal to $I$ if all its eigenvalues are 1.
+**Problem 5.3⋆ (A)** Explain why an orthogonal matrix $Q$ must be equal to $I$ if all its eigenvalues are 1.
 
 **SOLUTION**
 
@@ -498,7 +501,7 @@ Q = Q̃ Λ Q̃^⋆ = Q̃ Q̃^⋆ = I
 $$
 since $Q̃$ is unitary. 
 
-**Problem 5.4** Complete the implementation of a type representing
+**Problem 5.4 (B)** Complete the implementation of a type representing
 reflections that supports `Q[k,j]` and such that `*` takes $O(n)$ operations.
 ```julia
 using LinearAlgebra, Test
@@ -541,11 +544,19 @@ for n = 10 .^ (1:7)
 end
 ```
 
-**Problem 5.5** Complete the following implementation of a Housholder reflection  so that the
+**Problem 5.5 (C)** Complete the following implementation of a Housholder reflection  so that the
 unit tests pass.
 
 ```julia
-householderreflection(s::Bool, x::AbstractVector) = Reflection(x-ifelse(s,one(eltype(x)),-one(eltype(x)))*[norm(x);zeros(eltype(x),length(x)-1)])
+function householderreflection(s::Bool, x::AbstractVector)
+    y = copy(x) # don't modify `x`
+    if s
+        y[1] -= norm(x)
+    else
+        y[1] += norm(x)
+    end
+    Reflection(y)
+end
 
 x = randn(5)
 Q = householderreflection(true, x)
@@ -557,7 +568,7 @@ Q = householderreflection(false, x)
 @test Q*x ≈ [-norm(x);zeros(eltype(x),length(x)-1)]
 ```
 
-**Problem 5.6⋆** Consider a Householder reflection with $𝐱 = [1,h]$
+**Problem 5.6⋆ (A)** Consider a Householder reflection with $𝐱 = [1,h]$
 with $h = 2^{-n}$. What is the floating point error in
 computing $𝐲 = ∓ \|𝐱\| 𝐞_1 + 𝐱$ for each choice of sign.
 
@@ -566,12 +577,14 @@ computing $𝐲 = ∓ \|𝐱\| 𝐞_1 + 𝐱$ for each choice of sign.
 Since $\|𝐱\|=\sqrt{1+h^2}$, we have $𝐲=[1∓\sqrt{1+h^2},h]$. We note first that $h^{fp}$ and $(h^2)^{fp}$ are exact due to the choice of $h$, so we only need to discuss the floating error in computing $1\mp\sqrt{1+h^2}$.
 
 Numerically, let the length of the significand be $S$, then
-$$1\oplus h^2=
+$$
+1\oplus h^2=
 \begin{cases}
 1+h^2 & n\le S/2 \\
 1 & n>S/2
 \end{cases}
-=1+h^2+\delta_1$$
+=1+h^2+\delta_1
+$$
 where $|\delta_1|\le \frac{\epsilon_m}{2}$.
 
 $+$ PLUS $+$
@@ -593,13 +606,13 @@ $$|\delta_2|+|\delta_1|\frac{1}{2(1+\sqrt{1+h^2})\sqrt{1+h^2}}+|\delta_3|\frac{\
 In conclusion, it's very accurate to compute $1+\sqrt{1+h^2}$. Let us verify this:
 ```julia
 using Plots
-S=precision(Float64)-1;
-relative_error=zeros(S)
-for n=1:S
-    h=2.0^(-n)
-    exact=1+sqrt(1+BigFloat(h)^2)
-    numerical=1+sqrt(1+h^2)
-    relative_error[n]=abs(numerical-exact)/exact
+S = precision(Float64)-1;
+relative_error = zeros(S)
+for n = 1:S
+    h = 2.0^(-n)
+    exact = 1+sqrt(1+BigFloat(h)^2)
+    numerical = 1+sqrt(1+h^2)
+    relative_error[n] = abs(numerical-exact)/exact
 end
 println(eps())
 maximum(relative_error)

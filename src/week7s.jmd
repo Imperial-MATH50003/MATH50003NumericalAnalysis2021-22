@@ -113,7 +113,17 @@ $$
 |f(θ) - ∑_{k=0}^{n-1} f̂_k {\rm e}^{{\rm i}kθ}| = O(n^{1-λ})
 $$
 
-**Problem 3.3⋆** For the general (non-Taylor) case, prove convergence for
+
+**Problem 3.3⋆**
+If $f$ is a trigonometric polynomial  ($f̂_k = 0$ for $|k| > m$) show
+for $n ≥ 2m+1$ we can exactly recover $f$:
+$$
+f(θ) = \sum_{k=-m}^m f̂_k^n {\rm e}^{{\rm i} k θ}
+$$
+
+
+
+**Problem 3.4⋆** For the general (non-Taylor) case, prove convergence for
 $$
 f_n(θ) = ∑_{k=-\ceil{n/2}}^{\floor{n/2}} f̂ₖ {\rm e}^{{\rm i} k θ}
 $$
@@ -136,7 +146,7 @@ $$
 We will use an $n+1$ grid
 with $θ_j = jπ/n$. 
 
-**Problem 4.1** Show that any function $f̃ : [0,π] → ℝ$
+**Problem 4.1⋆** Show that any function $f̃ : [0,π] → ℝ$
 can be extended to  $f : ℝ → ℝ$ satisfying $f(θ) = f(θ+2π)$,
 $f(θ) = f(-θ)$, and $f(θ) = f̃(θ)$ for $θ ∈ [0,π]$. 
 Draw a picture of your extension for $f(θ) = \exp(θ)$.
@@ -144,7 +154,7 @@ Show that if $f̃$ is continuous then so is $f$.
 
 
 
-**Problem 4.1**  Define
+**Problem 4.1⋆**  Define
 $$
 Σ̃_n[f] := {1 \over n}[f(0) + 2\sum_{j=1}^{n-1} f(θ_j) + f(π)]
 $$
@@ -153,14 +163,14 @@ $$
 Σ̃_n[f \cos k θ] = Σ_{2n}[f \cos k θ]
 $$
 
-**Problem 4.2** Show that
+**Problem 4.2⋆** Show that
 $$
 Σ̃_n[\cos ℓ θ \cos k θ] = \begin{cases} 1 & k - j = 0 or k + j = 0 \\
                                         0 & otherwise
                                         \end{cases}
 $$
 
-**Problem 4.3** Define
+**Problem 4.3⋆** Define
 $$
 f̌_k^n := Σ̃_n[f(θ) \cos k θ]
 $$
@@ -173,3 +183,4 @@ f̌_n^n = f̌_n + f̌_{3n} + f̌_{5n} + ⋯
 \end{align*}
 where $1 ≤ k ≤ n-1$.
 $$
+

@@ -4,6 +4,8 @@ This problem sheet explores positive definite matrices,
 Cholesky decompositions, matrix norms, and the singular value decomposition.
 
 Questions marked with a ⋆ are meant to be completed without using a computer.
+Problems are denoted A/B/C to indicate their difficulty.
+
 
 ```julia
 using LinearAlgebra, Plots
@@ -12,7 +14,7 @@ using LinearAlgebra, Plots
 ## 1. Positive definite matrices and Cholesky decompositions
 
 
-**Problem 1.1⋆** Use the Cholesky decomposition to determine
+**Problem 1.1⋆ (C)** Use the Cholesky decomposition to determine
 which of the following matrices are symmetric positive definite:
 $$
 \begin{bmatrix} 1 & -1  \\
@@ -129,7 +131,7 @@ cholesky([3 2 1; 2 4 2; 1 2 5])
 cholesky([4 2 2 1; 2 4 2 2; 2 2 4 2; 1 2 2 4])
 ```
 
-**Problem 1.2⋆** Recall that an inner product $⟨𝐱, 𝐲⟩$ on $ℝ^n$
+**Problem 1.2⋆ (B)** Recall that an inner product $⟨𝐱, 𝐲⟩$ on $ℝ^n$
 over the reals $ℝ$ satisfies, for all $𝐱,𝐲,𝐳 ∈ ℝ$ and $a,b ∈ ℝ$:
 1. Symmetry: $⟨𝐱, 𝐲⟩ = ⟨𝐲, 𝐱⟩$
 2. Linearity: $⟨a𝐱+b𝐲, 𝐳⟩ = a ⟨𝐱, 𝐳⟩+ b⟨𝐲, 𝐳⟩$
@@ -152,7 +154,7 @@ Positive-definiteness of the matrix $K$ immediately yields $⟨𝐱, 𝐱⟩ = �
 $$⟨𝐱, 𝐲⟩ = \sum_{k=0}^n \sum_{l=0}^n x_k K_{kl} y_l = 𝐱^⊤ K 𝐲.$$
 What remains is to show that this $K$ is symmetric positive definite. Symmetry is an immediate conseqence of the symmetry of its elements, i.e. $K_{ij} = ⟨e_i, e_j⟩ = ⟨e_j, e_i⟩ = K_{ji}$. Finally, positive definiteness follows from the positive definiteness of the inner product $⟨𝐱, 𝐱⟩ > 0$ with $⟨𝐱, 𝐱⟩ = 𝐱^⊤ K 𝐱$.
 
-**Problem 1.3⋆** Show that a matrix is symmetric positive definite if and only if it has a Cholesky
+**Problem 1.3⋆ (A)** Show that a matrix is symmetric positive definite if and only if it has a Cholesky
 decomposition of the form
 $$
 A = U U^⊤
@@ -161,9 +163,16 @@ where $U$ is upper triangular with positive entries on the diagonal.
 
 **SOLUTION**
 
-First, note that because a symmetric positive definite matrix has stricly positive eigenvalues and has dimensions $n \times n$, they are always invertible. Then note that any such matrix has a Cholesky decomposition of standard form $A = L L^T$ where $L$ is lower triangular. The inverse of this standard form Cholesky decomposition is then $A^{-1} = L^{-T} L^{-1}$, which is of the desired form since $L$ is lower triangular and $L^{-T}$ is upper triangular. The positive entries on the diagonal follow directly because this is the case for the Cholesky decomposition factors of the original matrix. Thus, since all symmetric positive definite matrices can be written as the inverses of a symmetric positive definite matrix, this shows that they all have a decomposition $A = U U^⊤$ (using the Cholesky factors of its inverse).
 
-**Problem 1.4⋆** Prove that the following $n × n$ matrix is symmetric positive definite
+
+We didn't discuss this but note that because a symmetric positive definite matrix has stricly positive eigenvalues: for a normalised
+eigenvector we have
+$$
+λ = λ𝐯^⊤ 𝐯 = 𝐯^⊤ K 𝐯 > 0.
+$$
+Thus they are always invertible. Then note that any such matrix has a Cholesky decomposition of standard form $A = L L^T$ where $L$ is lower triangular. The inverse of this standard form Cholesky decomposition is then $A^{-1} = L^{-T} L^{-1}$, which is of the desired form since $L$ is lower triangular and $L^{-T}$ is upper triangular. The positive entries on the diagonal follow directly because this is the case for the Cholesky decomposition factors of the original matrix. Thus, since all symmetric positive definite matrices can be written as the inverses of a symmetric positive definite matrix, this shows that they all have a decomposition $A = U U^⊤$ (using the Cholesky factors of its inverse).
+
+**Problem 1.4⋆ (A)** Prove that the following $n × n$ matrix is symmetric positive definite
 for any $n$:
 $$
 Δ_n := \begin{bmatrix}
@@ -223,7 +232,7 @@ Recalling that $c_1=1$, we know that $\frac{1}{c_k-1}=k$. As a result, $c_k=(k+1
 We can apply the same process to $U_n$, but this is a special case since flipping $\Delta_n$ horizontally and vertically gives itself: $P\Delta_nP^\top=\Delta_n$ where $P=\begin{bmatrix} & & 1 \\ & ⋰ & \\ 1 & & \end{bmatrix}$. So we can also flip $L_n$ to get $U_n$:
 $$U_n=PL_n.$$
 
-**Problem 1.5** `SymTridiagonal(dv, eu)` is a type for representing symmetric tridiagonal
+**Problem 1.5 (B)** `SymTridiagonal(dv, eu)` is a type for representing symmetric tridiagonal
 matrices (that is, `SymTridiagonal(dv, ev) == Tridiagonal(ev, dv, ev)`). Complete the following
 implementation of `cholesky` to return a `Bidiagonal` cholesky factor in $O(n)$ operations, 
 and check your result
@@ -291,7 +300,7 @@ L=cholesky(A)
 
 ## 2. Matrix norms
 
-**Problem 2.1⋆** Prove the following:
+**Problem 2.1⋆ (B)** Prove the following:
 $$
 \begin{align*}
 \|A\|_∞ &= \max_k \|A[k,:]\|_1 \\
@@ -331,7 +340,7 @@ $$\|\mathbf{x}\|_\infty\max\limits_k\|A[k,:]\|_1=1\cdot\max\limits_k\|A[k,:]\|_1
 In both cases, equality can hold, so the upper bounds are actually maxima.
 
 
-**Problem 2.2⋆** For a rank-1 matrix $A = 𝐱 𝐲^⊤$ prove that
+**Problem 2.2⋆ (B)** For a rank-1 matrix $A = 𝐱 𝐲^⊤$ prove that
 $$
 \|A \|_2 = \|𝐱\|_2 \|𝐲\|_2.
 $$
@@ -345,7 +354,7 @@ By Cauchy-Schwartz inequality,
 $$|\mathbf{y}^\top\mathbf{z}|=|(\mathbf{y},\mathbf{z})|\le\|\mathbf{y}\|_2\|\mathbf{z}\|_2$$
 with the two sides being equal when $\mathbf{y}$ and $\mathbf{z}$ are linearly dependent, in which case the bound is tight.
 
-**Problem 2.3⋆** Show for any orthogonal matrix $Q ∈ ℝ^m$ and
+**Problem 2.3⋆ (B)** Show for any orthogonal matrix $Q ∈ ℝ^m$ and
 matrix $A ∈ ℝ^{m × n}$ that
 $$
 \|Q A\|_F = \|A\|_F
@@ -366,7 +375,7 @@ so $\|Q A\|_F = \|A\|_F$.
 
 ## 3. Singular value decomposition
 
-**Problem 3.1⋆** Show that $\|A \|_2 ≤ \|A\|_F ≤ \sqrt{r} \|A \|_2$ where
+**Problem 3.1⋆ (B)** Show that $\|A \|_2 ≤ \|A\|_F ≤ \sqrt{r} \|A \|_2$ where
 $r$ is the rank of $A$.
 
 **SOLUTION**
@@ -389,7 +398,7 @@ Hence,
 
 $\|A \|_2 ≤ \|A\|_F ≤ \sqrt{r} \|A \|_2$
 
-**Problem 3.2** Consider functions sampled on a $(n+1) × (n+1)$ 2D grid 
+**Problem 3.2 (A)** Consider functions sampled on a $(n+1) × (n+1)$ 2D grid 
 $(x_k,y_j) = (k/n, j/n)$ where $k,j = 0,…,n$. 
 For $n = 100$, what is the lowest rank $r$ such that
 the  best rank-$r$ approximation to the samples 
@@ -445,7 +454,7 @@ println("Rank for f₃ = ", find_min_rank(f₃, n, error))
 println("Rank for f₄ = ", find_min_rank(f₄, n, error))
 ```
 
-**Problem 3.3⋆** Define the _pseudo-inverse_:
+**Problem 3.3⋆ (B)** Define the _pseudo-inverse_:
 $$
 A^+ := V Σ^{-1} U^⊤.
 $$
@@ -456,7 +465,7 @@ Show that it satisfies the _Moore-Penrose conditions_:
 
 **SOLUTION**
 
-Let $A=U\Sigma V^T$ and $A^+ := V Σ^{-1} U^⊤$. Note that $UU^T = U^TU = I$ ($U$ orthonormal) and $V^T V =I$
+Let $A=UΣ V^T$ and $A^+ := V Σ^{-1} U^⊤$. Note that $UU^T = U^TU = I$ ($U$ orthonormal) and $V^T V =I$
 
 1. We have
 $$A A^+ A = U \Sigma V^T V \Sigma^{-1} U^T U \Sigma V^T = U \Sigma \Sigma^{-1} \Sigma V^T = U\Sigma V^T = A$$
@@ -472,18 +481,27 @@ Moreover, $A^+A = V \Sigma^{-1} U^T U \Sigma V^T = VV^T$, hence,
 
 $$(A^+A)^T = (VV^T)^T=VV^T=A^+A$$
 
-**Problem 3.4⋆** Show for $A ∈ ℝ^{m × n}$ with $m ≥ n$ and full rank
+**Problem 3.4⋆ (A)** Show for $A ∈ ℝ^{m × n}$ with $m ≥ n$ and ⊤ rank
 that $𝐱 =  A^+ 𝐛$ is the least squares solution, i.e., minimises $\| A 𝐱 - 𝐛 \|_2$.
+Hint: extend $U$ in the SVD to be a square orthogonal matrix.
 
 **SOLUTION**
 
-If $x=A^+b$ then
+The proof mimics that of the QR decomposition. Write $A =  U Σ V^⊤$ and let
+$$
+Ũ = [U K]
+$$
+so that $Ũ$ is orthogonal. We use the fact orthogonal matrices do not change norms:
+$$
+\|A 𝐱 - 𝐛 \|_2^2 &= \|U Σ V^⊤ 𝐱 - 𝐛 \|_2^2 = \|Ũ^⊤ U Σ V^⊤ 𝐱 - Ũ^⊤ 𝐛 \|_2^2 = \|\underbrace{\begin{bmatrix}I_m \\ O \end{bmatrix}}_{∈ ℝ^{m × n}} Σ V^⊤ 𝐱 - \begin{bmatrix} U^⊤ \\ K^⊤ \end{bmatrix} 𝐛 \|_2^2 \\
+&= \|Σ V^⊤ 𝐱 - U^⊤ 𝐛 \|_2^2 + \|K^⊤ 𝐛\|^2
+$$
+The second term is independent of $𝐱$. The first term is minimised when zero:
+$$
+ \|Σ V^⊤ 𝐱 - U^⊤ 𝐛 \|_2 =\|Σ V^⊤ V Σ^{-1} U^⊤ 𝐛  - U^⊤ 𝐛 \|_2 = 0
+$$
 
-$$\| Ax - b \|_2 = \| A A^+b - b\|_2 = \|b-b\|_2=\|0\|_2=0,$$
-
-so $x$ minimises the norm.
-
-**Problem 3.5⋆**
+**Problem 3.5⋆ (B)**
 If $A ∈ ℝ^{m × n}$ has a non-empty kernel there are multiple solutions to the least
 squares problem as 
 we can add any element of the kernel. Show that $𝐱 = A^+ 𝐛$ gives the least squares solution
