@@ -151,7 +151,7 @@ Consider $ω := {\rm e}^{{\rm i} θ_1} = {\rm e}^{2 π {\rm i} \over n}$. This i
 (Case 1: $k = pn$ for an integer $p$)
 We have 
 $$
-∑_{j=1}^n {\rm e}^{i k θ_j} = ∑_{j=1}^n ω^{kj} = ∑_{j=1}^n ({ω^{pn}})^j =   ∑_{j=1}^n 1 = n
+∑_{j=0}^{n-1} {\rm e}^{i k θ_j} = ∑_{j=0}^{n-1} ω^{kj} = ∑_{j=0}^{n-1} ({ω^{pn}})^j =   ∑_{j=0}^{n-1} 1 = n
 $$
 (Case 2 $k ≠ pn$ for an integer $p$)  Recall that
 $$
@@ -159,7 +159,7 @@ $$
 $$
 Then we have
 $$
-∑_{j=1}^n {\rm e}^{i k θ_j} = ∑_{j=1}^n (ω^k)^j = {ω^{kn} -1 \over ω^k -1} = 0.
+∑_{j=0}^{n-1} {\rm e}^{i k θ_j} = ∑_{j=0}^{n-1} (ω^k)^j = {ω^{kn} -1 \over ω^k -1} = 0.
 $$
 where we use the fact that $k$ is not a multiple of $n$ to guarantee that $ω^k ≠ 1$.
 
@@ -175,8 +175,8 @@ $$
 **Proof**
 $$
 \begin{align*}
-f̂_k^n &= Σ_n[f(θ) {\rm e}^{-i k θ}] = ∑_{j=-∞}^∞ f̂ⱼ Σ_n[f(θ) {\rm e}^{i (j-k) θ}] \\
-&= ∑_{j=-∞}^∞ f̂ⱼ \begin{cases} 1 & j-k = \ldots,-2n,-n,0,n,2n,\ldots  \cr
+f̂_k^n &= Σ_n[f(θ) {\rm e}^{-i k θ}] = ∑_{j=-∞}^∞ f̂_j Σ_n[f(θ) {\rm e}^{i (j-k) θ}] \\
+&= ∑_{j=-∞}^∞ f̂_j \begin{cases} 1 & j-k = \ldots,-2n,-n,0,n,2n,\ldots  \cr
 0 & \hbox{otherwise}
 \end{cases}
 \end{align*}
@@ -267,10 +267,10 @@ $$
 \begin{align*}
 Q_n^⋆ &= {1 \over √n} \begin{bmatrix} 
 1 & 1 & 1&  ⋯ & 1 \\
-1 & {\rm e}^{{\rm i} θ_1} & {\rm e}^{{\rm i} 2 θ_1} & ⋯ {\rm e}^{{\rm i} (n-1) θ_1} \\
-1 &  {\rm e}^{{\rm i} θ_2}  & {\rm e}^{{\rm i} 2 θ_2} & ⋯ {\rm e}^{{\rm i} (n-1)θ_2} \\
+1 & {\rm e}^{{\rm i} θ_1} & {\rm e}^{{\rm i} 2 θ_1} & ⋯ & {\rm e}^{{\rm i} (n-1) θ_1} \\
+1 &  {\rm e}^{{\rm i} θ_2}  & {\rm e}^{{\rm i} 2 θ_2} & ⋯ & {\rm e}^{{\rm i} (n-1)θ_2} \\
 ⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
-1 & {\rm e}^{{\rm i} θ_{n-1}} & {\rm e}^{{\rm i} 2 θ_{n-1}} & ⋯ {\rm e}^{{\rm i} (n-1) θ_{n-1}}
+1 & {\rm e}^{{\rm i} θ_{n-1}} & {\rm e}^{{\rm i} 2 θ_{n-1}} & ⋯ & {\rm e}^{{\rm i} (n-1) θ_{n-1}}
 \end{bmatrix} \\
 &= {1 \over √n} \begin{bmatrix} 
 1 & 1 & 1&  ⋯ & 1 \\
@@ -293,10 +293,10 @@ The choice of normalisation constant is motivated by the following:
 
 **Proof**
 $$
-Q_n Q_n^⋆  = \begin{bmatrix} Q_n[1] & Q_n[{\rm e}^{{\rm i} θ}] & ⋯ & Q_n[{\rm e}^{{\rm i} (n-1) θ}] \\
-                            Q_n[{\rm e}^{-{\rm i} θ}] & Q_n[1] & ⋯ & Q_n[{\rm e}^{{\rm i} (n-2) θ}] \\
+Q_n Q_n^⋆  = \begin{bmatrix} Σ_n[1] & Σ_n[{\rm e}^{{\rm i} θ}] & ⋯ & Σ_n[{\rm e}^{{\rm i} (n-1) θ}] \\
+                            Σ_n[{\rm e}^{-{\rm i} θ}] & Σ_n[1] & ⋯ & Σ_n[{\rm e}^{{\rm i} (n-2) θ}] \\
                             ⋮ & ⋮ & ⋱ & ⋮ \\
-                            Q_n[{\rm e}^{-{\rm i}(n-1) θ}] & Q_n[{\rm e}^{-{\rm i}(n-2) θ}] & ⋯ & Q_n[1] 
+                            Σ_n[{\rm e}^{-{\rm i}(n-1) θ}] & Σ_n[{\rm e}^{-{\rm i}(n-2) θ}] & ⋯ & Σ_n[1] 
                             \end{bmatrix} = I
 $$
 ∎
@@ -307,15 +307,15 @@ $$
 $$
 
 **Corollary (Interpolation)**
-$f_n(θ)$ interpolates $f$ at $θⱼ$:
+$f_n(θ)$ interpolates $f$ at $θ_j$:
 $$
-f_n(θⱼ) = f(θ_j)
+f_n(θ_j) = f(θ_j)
 $$
 
 **Proof**
 We have
 $$
-f_n(θⱼ) = ∑_{k=0}^{n-1} f̂ₖⁿ {\rm e}^{{\rm i} k θ_j} = √n 𝐞_j^⊤ Q_n^⋆ 𝐟̂ⁿ = 𝐞_j^⊤ Q_n^⋆ Q_n 𝐟ⁿ = f(θⱼ).
+f_n(θ_j) = ∑_{k=0}^{n-1} f̂_k^n {\rm e}^{{\rm i} k θ_j} = √n 𝐞_j^⊤ Q_n^⋆ 𝐟̂ⁿ = 𝐞_j^⊤ Q_n^⋆ Q_n 𝐟ⁿ = f(θ_j).
 $$
 
 ∎
@@ -374,16 +374,12 @@ Both can be reduced to $O(n \log n)$ using the celebrated _Fast Fourier Transfor
 which is one of the [Top 10 Algorithms of the 20th Century](https://pi.math.cornell.edu/~web6140/)
 (You won't believe number 7!).
 
-The key observation is that, if $n$ is even, then hidden in $Q_n$ are 4 copies of
-$Q_{n ÷ 2}$. It is convenient here to drop the $√n$ so define $F_n := √n Q_n$
-and as we will work with multiple grids denote the evenly spaced grid with $n$ points
-as $θ_j^n := {2π j \over n}$ and
+The key observation is that hidden in $Q_{2n}$ are 2 copies of
+$Q_n$. We will work with multiple $n$ we denote the $n$-th root as $ω_n = \exp(2π/n)$.
+Note that we can relate a vector of powers of $ω_{2n}$ to two copies of vectors of powers of $ω_n$:
 $$
-\vec{θ}^n := \begin{bmatrix} θ_0^n \\ ⋮ \\ θ_{n-1}^n \end{bmatrix}
-$$
-First note that if $n$ is even the grids interlace:
-$$
-\vec{θ}^{2n} = P_σ^⊤ \begin{bmatrix}  \vec{θ}^n \\ \vec{θ}^n + {π \over n} \end{bmatrix}
+\underbrace{\begin{bmatrix} 1 \\ ω_{2n} \\ ⋮ \\ ω_{2n}^{2n-1} \end{bmatrix}}_{\vec{ω}_{2n}} = 
+P_σ^⊤ \begin{bmatrix} I_n \\ ω_{2n} I_n \end{bmatrix} \underbrace{\begin{bmatrix} 1 \\ ω_n \\ ⋮ \\ ω_n^{n-1} \end{bmatrix}}_{\vec{ω}_n}
 $$
 where $σ$ has the Cauchy notation
 $$
@@ -400,20 +396,19 @@ n = 4
 σ = [1:2:2n-1; 2:2:2n]
 P_σ = I(2n)[σ,:]
 ```
-Note that we therefore have:
-$$
-𝛚_{2n}^k = P_σ^⊤ \begin{pmatrix} \exp(im*k*\vec{θ}^{n}) \\  \exp(im*k*(\vec{θ}^{n} + {π \over n})) \end{pmatrix} 
-= P_σ^⊤ \begin{bmatrix} I_n \\  ω_{2n}^k I_n \end{bmatrix}  𝛚_{n}^k
-$$
+and so $P_σ^⊤$ reverses the process.
 Thus we have
 $$
-F_{2n} = \begin{bmatrix} 𝟏_{2n} | 𝛚_{2n} | 𝛚_{2n}^2 | ⋯ | 𝛚_{2n}^{2n-1} \end{bmatrix} =
-P_σ^⊤ \begin{bmatrix} 𝟏_{n} &   𝛚_n        & 𝛚_n^2          & ⋯ & 𝛚_n^{n-1}          & 𝛚_n^n  & ⋯ & 𝛚_n^{2n-1}  \\
-                        𝟏_{n} & ω_{2n} 𝛚_n & ω_{2n}^2 𝛚_n^2 & ⋯ & ω_{2n}^{n-1} 𝛚_n^{n-1} & ω_{2n}^n 𝛚_n^n  & ⋯ & ω_{2n}^{2n-1} 𝛚_n^{2n-1}
-\end{bmatrix} =P_σ^⊤ \begin{bmatrix} F_n & F_n \\
-                                     F_n D_n & -F_n D_n
+\begin{align*}
+Q_{2n} &= {1 \over \sqrt{2n}} \begin{bmatrix} 𝟏_{2n} | \vec{ω}_{2n} | \vec{ω}_{2n}^2 | ⋯ | \vec{ω}_{2n}^{2n-1} \end{bmatrix} 
+= {1 \over \sqrt{2n}} P_σ^⊤ \begin{bmatrix} 𝟏_{n} &   \vec{ω}_n        & \vec{ω}_n^2          & ⋯ & \vec{ω}_n^{n-1}          & \vec{ω}_n^n  & ⋯ & \vec{ω}_n^{2n-1}  \\
+                        𝟏_{n} & ω_{2n} \vec{ω}_n & ω_{2n}^2 \vec{ω}_n^2 & ⋯ & ω_{2n}^{n-1} \vec{ω}_n^{n-1} & ω_{2n}^n \vec{ω}_n^n  & ⋯ & ω_{2n}^{2n-1} \vec{ω}_n^{2n-1}
+\end{bmatrix} \\
+&= {1 \over \sqrt{2}} P_σ^⊤ \begin{bmatrix} Q_n & Q_n \\
+                                     Q_n D_n & -Q_n D_n
                                      \end{bmatrix} = 
-                                     P_σ^⊤ \begin{bmatrix} F_n \\ &F_n \end{bmatrix} \begin{bmatrix} I_n & I_n \\ D_n & -D_n \end{bmatrix}å
+                                     {1 \over \sqrt{2}}P_σ^⊤ \begin{bmatrix} Q_n \\ &Q_n \end{bmatrix} \begin{bmatrix} I_n & I_n \\ D_n & -D_n \end{bmatrix}
+\end{align*}
 $$
 In other words, we reduced the DFT to two DFTs applied to vectors of half the dimension.
 
@@ -421,13 +416,13 @@ We can see this formula in code:
 ```julia
 function fftmatrix(n)
     θ = range(0,2π; length=n+1)[1:end-1] # θ_0, …,θ_{n-1}, dropping θ_n == 2π
-    [exp(-im*(k-1)*θ[j]) for k = 1:n, j=1:n]
+    [exp(-im*(k-1)*θ[j]) for k = 1:n, j=1:n]/sqrt(n)
 end
 
-F₂ₙ = fftmatrix(2n)'
-Fₙ = fftmatrix(n)'
+Q₂ₙ = fftmatrix(2n)'
+Qₙ = fftmatrix(n)'
 Dₙ = Diagonal([exp(im*k*π/n) for k=0:n-1])
-(P_σ'*[Fₙ Fₙ; Fₙ*Dₙ -Fₙ*Dₙ])[1:n,1:n] ≈ F₂ₙ[1:n,1:n]
+(P_σ'*[Qₙ Qₙ; Qₙ*Dₙ -Qₙ*Dₙ])[1:n,1:n] ≈ sqrt(2)Q₂ₙ[1:n,1:n]
 ```
 
 
@@ -468,10 +463,10 @@ plot(abs.(fₙ.(g) - f.(g)))
 ```
 Thus we have successfully approximate the function to roughly machine precision.
 The magic of the FFT is because it's $O(n \log n)$ we can scale it to very high orders.
-Here we plot the Fourier coefficients for a function that requires `n = 100_001`
+Here we plot the Fourier coefficients for a function that requires around 100k
 coefficients to resolve:
 ```julia
-f = θ -> exp(sin(θ))/(1+1e9cos(θ)^2)
+f = θ -> exp(sin(θ))/(1+1e6cos(θ)^2)
 n = 100_001
 m = n÷2
 # evenly spaced points from 0:2π, dropping last node
@@ -512,14 +507,16 @@ f_n'(θ) = {{\rm d} \over {\rm d}θ} F_{-m:m}(θ) 𝐟\\
 $$
 
 
-Differentiating with Fourier series is _much_ more accurate than finite differences:
+Differentiating with Fourier series is _much_ more accurate than finite differences,
+getting error on the order proportional to $nϵ_{\rm m}$ instead of $√{ϵ_{\rm m}}$.
 ```julia
-n = 31
+n = 51
 m = n÷2
 # evenly spaced points from 0:2π, dropping last node
 θ = range(0, 2π; length=n+1)[1:end-1]
 
 # fft returns discrete Fourier coefficients n*[f̂ⁿ_0, …, f̂ⁿ_(n-1)]
+f = θ -> exp(cos(θ))
 fc = fft(f.(θ))/n
 
 # We reorder using [f̂ⁿ_(-m), …, f̂ⁿ_(-1)] == [f̂ⁿ_(n-m), …, f̂ⁿ_(n-1)]
@@ -527,10 +524,10 @@ fc = fft(f.(θ))/n
 f̂ = [fc[m+2:end]; fc[1:m+1]]
 
 D = im*Diagonal(-m:m)
-f = θ -> exp(cos(θ))
 fpₙ = θ -> transpose([exp(im*k*θ) for k=-m:m]) * D * f̂
 fp = θ -> -sin(θ)*exp(cos(θ))
 
+g = range(0, 2π; length=1000) # plotting grid
 plot(g, abs.(fpₙ.(g) .- fp.(g)); label="f' error")
 ```
 We can also compose derivatives to compute higher order derivatives:
@@ -539,7 +536,15 @@ fppₙ = θ -> transpose([exp(im*k*θ) for k=-m:m]) * D^2 * f̂
 fpp = θ -> (-cos(θ) + sin(θ)^2)*exp(cos(θ))
 plot(g, abs.(fppₙ.(g) .- fpp.(g)); label="f'' error")
 ```
-Note there is a limit to how much accuracy is maintained: the derivatve `D^λ` will magnify errors like `n^λ`. 
+Note that there is a limit to how much accuracy is maintained: the derivative `D^λ` will magnify errors like `n^λ`. 
+This can be explained using the condition number:
+$$
+κ_2(Q_n^⋆ D_n^λ Q_n) = κ_2(D_n^λ) = (n/2)^λ
+$$
+where
+$$
+D_n = \begin{bmatrix} -(n-1)/2 \\ &⋱ \\ && (n-1)/2 \end{bmatrix}.
+$$
 
 This is not as accurate as using dual numbers, but only requires the ability to evaluate a function pointwise.
 Further, we can use this construction for solving differential equations, something that is not possible with
@@ -570,7 +575,6 @@ $$
 
 Here is an example construction:
 ```julia
-
 function circulantmatrix(𝐚)
     n = length(𝐚)
     C = zeros(eltype(𝐚), n, n)
@@ -695,12 +699,12 @@ $$
 that is, $C ∈ ℂ^{2n-1 × 2n-1}$ satisfies
 $$
 \begin{align*}
-C[1:2n-1,1:n] = T \\
-C[1:n-1,n+1:2n-1] = T[n+1:2n-2,1:n-1] \\
-C[n+1:2n-1,n+1:2n-1] = T[1:n-1,1:n-1] 
+C[1:2n-1,1:n] &= T \\
+C[1:n-1,n+1:2n-1] &= T[n+1:2n-2,1:n-1] \\
+C[n+1:2n-1,n+1:2n-1] &= T[1:n-1,1:n-1].
 \end{align*}
+$$
 
-$$A = T[1:n,1:n]$ and $B = T[n+1:2n,1:n]$.
 
 Here is a low dimensional example. Suppose we want to multiply 
 $$

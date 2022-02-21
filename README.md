@@ -37,7 +37,7 @@ including both time-dependent ordinary differential equations and boundary value
 
 **Part III: Computing with functions**
 
-1. Fourier series: we discuss Fourier series and their usage in numerical computations
+1. [Fourier series](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/Fourier.ipynb): we discuss Fourier series and their usage in numerical computations
 via the fast Fourier transform.
 2. Orthogonal Polynomials: we discuss orthogonal polynomials—polynomials orthogonal 
 with respect to a prescribed weight—and their usage in numerical computations.
