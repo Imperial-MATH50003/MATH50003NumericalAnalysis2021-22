@@ -1,0 +1,128 @@
+# Julia Problem Sheet
+
+This problem sheet is designed to test some basic Julia
+knowledge. Note each problem has multiple solutions, and the solution
+sheet will show different ways of solving the same problem.
+
+In assessment, _any_ "solution" will be accepted provided it does the right thing!
+So you do not need to be able to write broadcasting or comprehensions
+if you can do for loops.
+
+
+
+## Array creation and broadcasting
+
+**Problem** Create a vector of length 5 whose entries are `Int` which is
+zero in all entries. 
+
+**SOLUTIONS**
+
+```julia
+zeros(Int, 5)
+```
+```julia
+fill(0, 5)
+```
+```julia
+[0 for k=1:5]
+```
+
+**Problem** Create a 5×6 matrix whose entries are `Int` which is
+one in all entries.
+
+**SOLUTIONS**
+
+1. For-loop:
+```julia
+ret = zeros(Int, 5, 6)
+for k=1:5, j=1:6
+    ret[k,j] = 1
+end
+ret
+```
+2. Ones:
+```julia
+ones(Int, 5, 6)
+```
+3. Fill:
+```julia
+fill(1, 5, 6)
+```
+4. Comprehension
+```julia
+[1 for k=1:5, j=1:6]
+```
+
+**Problem** Create a 1 × 5 `Matrix{Int}` with entries `A[k,j] = j`.
+
+1. For-loop
+```julia
+A = zeros(Int, 1, 5)
+for j = 1:5
+    A[1,j] = j
+end
+```
+2. Comprehension
+```julia
+[j for k=1:1, j=1:5]
+```
+3. convert transpose:
+```julia
+# Note: (1:5)' is a "row-vector" which behaves differently than a matrix
+Matrix((1:5)')
+```
+
+**Problem** Create a vector of length 5 whose entries are `Float64`
+approximations of `exp(-k)`. (Two solutions: one using a for loop and
+one using broadcasting.)
+
+**SOLUTIONS**
+
+1. For-loop
+```julia
+v = zeros(5) # defaults to Float64
+for k = 1:5
+    v[k] = exp(-k)
+end
+```
+2. Broadcast:
+```julia
+exp.(-(1:5))
+```
+3. Explicit broadcsat:
+```julia
+broadcast(k -> exp(-k), 1:5)
+```
+4. Comprehension:
+```julia
+[exp(-k) for k=1:5]
+```
+
+
+**Problem** Create a 5 × 6 matrix `A` whose entries `A[k,j] == cos(k+j)`.
+ (Two solutions: one using a for loop and
+one using broadcasting.)
+
+**SOLUTIONS**
+
+1. For-loop:
+```julia
+A = zeros(5,6)
+for k = 1:5, j = 1:6
+    A[k,j] = cos(k+j)
+end
+A
+```
+2. Broadcasting:
+```julia
+k = 1:5
+j = 1:6
+cos.(k .+ j')
+```
+3. Broadcasting (explicit):
+```julia
+broadcast((k,j) -> cos(k+j), 1:5, (1:6)')
+```
+
+## Types
+

@@ -1,7 +1,61 @@
 
 
 
-# 1. Two-point boundary value problems
+## 1. Two-point boundary value problems
+
+**Problem 1.1** Construct a finite-difference approximation to the forced Helmholtz equation
+$$
+u(0) = 0 \\
+u(1) = 0 \\
+u'' + k^2 u = \E^{x}
+$$
+Compare the error with the true solution:
+$$
+u(x) = (-cos(k x) + {\rm e}^x cos(k x)^2 + cot(k) sin(k x) - {\rm e} cos(k) cot(k) sin(k x) - {\rm e} sin(k) sin(k x) + E^x sin(k x)^2)/(1 + k^2)
+$$
+
+```
+function helm(k, n)
+    x = range(0, 1; length = n)
+    h = step(x)
+    # TODO: Create a SymTridiagonal discretisation
+    ## SOLUTION
+    T = SymTridiagonal([1; fill(k^2-2/h^2, n-2); 1], [0; fill(1/h^2, n-2)])
+    T \ [0; exp.(x[2:end-1]); 1]
+    ## END
+end
+
+k = 10
+u = x -> (-cos(k*x) + exp(x)cos(k*x)^2 + cot(k)sin(k*x) - ℯ*cos(k)cot(k)sin(k*x) - ℯ*sin(k)sin(k*x) + exp(x)sin(k*x)^2)/(1 + k^2)
+
+
+helm(k, 100)
+
+```
+
+
+helm_err(k, u, 0, 0, one, 10_000_000)
+
+ns = 10 .^ (1:8) # solve up to n = 10 million
+scatter(ns, poisson_err.(u, 1, cos(1), f, ns); xscale=:log10, yscale=:log10, label="error")
+plot!(ns, ns .^ (-2); label="1/n^2")
+
+
+
+function helm_err(k, u, c_0, c_1, f, n)
+    x = range(0, 1; length = n)
+    h = step(x)
+    T = Tridiagonal([fill(1/h^2, n-2); 0], [1; fill(k^2-2/h^2, n-2); 1], [0; fill(1/h^2, n-2)])
+    uᶠ = T \ [c_0; f.(x[2:end-1]); c_1]
+    norm(uᶠ - u.(x), Inf)
+end
+
+let k = -10
+    u = x -> (1 - cos(k*x) + cot(k)sin(k*x) - csc(k)sin(k*x))/k^2
+
+    helm_err(k, u, 0, 0, one, 100_000_000)
+end
+```
 
 **Problem 1.1** Consider the heat equation:
 $$
@@ -27,3 +81,106 @@ x = range(-L,L; length=n)
 h = step(x)
 eigvals(SymTridiagonal(fill(2/h^2,n-2)  + x[2:end-1].^2, fill(-1/h^2, n-3)))
 ```
+
+## 2. Convergence
+
+**Problem 2.1** Prove convergence for the trap rule.
+
+**Problem 2.2** Prove that if $|a_k| ≤ a$ then 
+Use this to prove convergence of Euler with a variable coefficient.
+
+
+
+
+## 3. Fourier series
+
+**Problem 3.1⋆** Show that if $f(θ)$ and $g(θ)$ both have absolutely
+summable Fourier coefficients then so does their product $h(θ) = f(θ)g(θ)$.
+Deduce that the set of functions with absolutely summable Fourier coefficients
+(named the _Wiener algebra_)
+$$
+W := \{f : \| 𝐟̂ \|_1 < ∞ \}
+$$
+forms a commutative ring (recalling the definition of a commutative ring from PS2).
+
+**Problem 3.2⋆** Prove that if the first $λ-1$ derivatives $f(θ), f'(θ), …, f^{(λ-1)}(θ)$ 
+are 2π-periodic and $f^{(λ)}$ is uniformly bounded  that
+$$
+|f̂ₖ| = O(|k|^{-λ})\qquad \hbox{as $|k| → ∞$}
+$$
+Use this to show for the Taylor case ($0 = f̂_{-1} = f̂_{-2} = ⋯$) that
+$$
+|f(θ) - ∑_{k=0}^{n-1} f̂_k {\rm e}^{{\rm i}kθ}| = O(n^{1-λ})
+$$
+
+
+**Problem 3.3⋆**
+If $f$ is a trigonometric polynomial  ($f̂_k = 0$ for $|k| > m$) show
+for $n ≥ 2m+1$ we can exactly recover $f$:
+$$
+f(θ) = \sum_{k=-m}^m f̂_k^n {\rm e}^{{\rm i} k θ}
+$$
+
+
+
+**Problem 3.4⋆** For the general (non-Taylor) case, prove convergence for
+$$
+f_n(θ) = ∑_{k=-\ceil{n/2}}^{\floor{n/2}} f̂ₖ {\rm e}^{{\rm i} k θ}
+$$
+to $f(θ)$.
+What is the rate of convergence if the first $λ-1$ derivatives $f(θ), f'(θ), …, f^{(λ-1)}(θ)$ 
+are 2π-periodic and $f^{(λ)}$ is uniformly bounded?
+
+
+
+## 4. Cosine series
+
+The following problems consider approximating Cosine series
+$$
+f(θ) = ∑_{k=0}^∞ f̌_k \cos k θ
+$$
+where $f(θ) = f(-θ)$ and $f : [0,π] → ℝ$, where
+$$
+f̌_k := {1 \over 2π} \int_0^π f(θ) \cos k θ {\rm d}θ \begin{cases} 2 & k = 0 \\ 1 & otherwise \end{cases}
+$$
+We will use an $n+1$ grid
+with $θ_j = jπ/n$. 
+
+**Problem 4.1⋆** Show that any function $f̃ : [0,π] → ℝ$
+can be extended to  $f : ℝ → ℝ$ satisfying $f(θ) = f(θ+2π)$,
+$f(θ) = f(-θ)$, and $f(θ) = f̃(θ)$ for $θ ∈ [0,π]$. 
+Draw a picture of your extension for $f(θ) = \exp(θ)$.
+Show that if $f̃$ is continuous then so is $f$. 
+
+
+
+**Problem 4.1⋆**  Define
+$$
+Σ̃_n[f] := {1 \over n}[f(0) + 2\sum_{j=1}^{n-1} f(θ_j) + f(π)]
+$$
+Show that
+$$
+Σ̃_n[f \cos k θ] = Σ_{2n}[f \cos k θ]
+$$
+
+**Problem 4.2⋆** Show that
+$$
+Σ̃_n[\cos ℓ θ \cos k θ] = \begin{cases} 1 & k - j = 0 or k + j = 0 \\
+                                        0 & otherwise
+                                        \end{cases}
+$$
+
+**Problem 4.3⋆** Define
+$$
+f̌_k^n := Σ̃_n[f(θ) \cos k θ]
+$$
+Show that
+$$
+\begin{align*}
+f̌_0^n = f̌_0 + f̌_{2n} + f̌_{4n} + ⋯ \\
+f̌_k^n = f̌_k + (f̌_{k+2n} + f̌_{k+4n} + ⋯) + (f̌_{-k+2n} + f̌_{-k+4n} + ⋯)  \\
+f̌_n^n = f̌_n + f̌_{3n} + f̌_{5n} + ⋯ 
+\end{align*}
+where $1 ≤ k ≤ n-1$.
+$$
+

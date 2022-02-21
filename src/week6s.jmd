@@ -1,49 +1,77 @@
+# MATH50003 Numerical Analysis: Problem Sheet 6
+
+This problem sheet explores condition numbers, indefinite integration,
+and Euler's method.
+
+Questions marked with a ⋆ are meant to be completed without using a computer.
+Problems are denoted A/B/C to indicate their difficulty.
+
+
+```julia
+using LinearAlgebra, Plots
+```
 
 
 ## 1. Condition numbers
 
 
-**Problem 1.1⋆** Prove that, if $|ϵ_i| ≤ ϵ$ and $n ϵ < 1$, then
+**Problem 1.1⋆ (B)** Prove that, if $|ϵ_i| ≤ ϵ$ and $n ϵ < 1$, then
 $$
 \prod_{k=1}^n (1+ϵ_i) = 1+θ_n
 $$
 for some constant $θ_n$ satisfying $|θ_n| ≤ {n ϵ \over 1-nϵ}$.
 
-**Problem 1.2⋆** Let $A,B ∈ ℝ^{m × n}$. Prove the following:
-1. If the columns satisfy $\|𝐚_j\|_2 ≤ \| 𝐛_j\|_2$ then $\|A\|_F ≤ \|B\|_F$ and \|A \|_2 ≤ \sqrt{\hbox{rank}(B)} \|B\|_2.
+**Problem 1.2⋆ (B)** Let $A,B ∈ ℝ^{m × n}$. Prove that if the columns satisfy $\|𝐚_j\|_2 ≤ \| 𝐛_j\|_2$ then
+$\|A\|_F ≤ \|B\|_F$ and $\|A \|_2 ≤ \sqrt{\hbox{rank}(B)} \|B\|_2$.
 
-**Problem 1.3⋆** Compute the 1-norm condition numbers for the following matrices:
+**Problem 1.3⋆ (C)** Compute the 1-norm, 2-norm, and ∞-norm condition numbers for the following matrices:
 $$
 \begin{bmatrix}
 1 & 2 \\ 3 & 4
+\end{bmatrix}, \begin{bmatrix}
+1/3 & 1/5 \\ 0 & 1/7
 \end{bmatrix}, \begin{bmatrix} 1 \\ & 1/2 \\ && ⋯ \\ &&& 1/2^n \end{bmatrix}
 $$
-What is the $2$-norm condition number for the last example?
+(Hint: recall that the singular values of a matrix $A$ are the square roots of the eigenvalues of the Gram matrix
+$A^⊤A$.)
 
-**Problem 1.4**
-Bound the error for the following computations:
+
+**Problem 1.4 (B)**
+State a bound on the relative error on $A 𝐯$ for $\|𝐯\|_2 = 1$ for the following matrices:
 $$
 \begin{bmatrix}
-1 & 2 \\ 3 & 4
-\end{bmatrix} \begin{bmatrix}1 \\ 1 \end{bmatrix}
+1/3 & 1/5 \\ 0 & 1/10^3
+\end{bmatrix},
+ \begin{bmatrix} 1 \\ & 1/2 \\ && ⋯ \\ &&& 1/2^{10} \end{bmatrix}
 $$
-Compare the result with the computer implementation. Is the bound sharp?
-
-## 2. Finite-differences
-
-**Problem 2.1** For indefinite-integration, by modifying the function `indef_err`,
-determine the convergence rate
-if we measure the error using the $2$-norm instead of the $∞$-norm.
-Does the method converge in the $1$-norm?
+Compute the relative error in computing $A 𝐯$ (using `big` for a high-precision version to compare against)
+where $𝐯$ is the last column of $V$ in the SVD $A = U Σ V^⊤$, computed using the `svd` command with
+`Float64` inputs. How does the error compare to the predicted error bound?
 
 
-**Problem 2.2** Implement indefinite-integration 
+
+
+
+## 2. Indefinite integration
+
+**Problem 2.1 (B)** Implement backward differences to approximate
+indefinite-integration. How does the error compare to forward
+and mid-point versions  for $f(x) = \cos x$ on the interval $[0,1]$?
+Use the method to approximate the integrals of
+$$
+\exp(\exp x \cos x + \sin x), \prod_{k=1}^{1000} \left({x \over k}-1\right), \hbox{ and } f^{\rm s}_{1000}(x)
+$$
+to 3 digits, where $f^{\rm s}_{1000}(x)$ was defined in PS2.
+
+
+**Problem 2.2 (A)** Implement indefinite-integration 
 where we take the average of the two grid points:
 $$
-{u_{k+1} - u_k \over h} = {f(x_k) + f(x_{k+1}) \over 2}
+{u'(x_{k+1}) + u'(x_k) \over 2} ≈ {u_{k+1} - u_k \over h}
 $$
-What is the observed rate-of-convergence using the ∞-norm for $f(x) = \cos x$?
-Does the method converge in the $1$-norm?
+What is the observed rate-of-convergence using the ∞-norm for $f(x) = \cos x$
+on the interval $[0,1]$?
+Does the method converge if the error is measured in the $1$-norm?
 
 **SOLUTION**
 
@@ -63,3 +91,157 @@ norm(uₙ - sin.(x),1)
 ```
 
 **END**
+
+## 3. Euler methods
+
+**Problem 3.1 (B)** Solve the following ODEs 
+using forward and/or backward Euler and increasing $n$, the number of time-steps, 
+until $u(1)$ is determined to 3 digits:
+$$
+\begin{align*}
+u(0) &= 1, u'(t) = \cos(t) u(t) + t \\
+v(0) &= 1, v'(0) = 0, v''(t) = \cos(t) v(t) + t \\
+w(0) &= 1, w'(0) = 0, w''(t) = t w(t) + 2 w(t)^2
+\end{align*}
+$$
+If we increase the initial condition $w(0) = c > 1$, $w'(0)$
+the solution may blow up in finite time. Find the smallest positive integer $c$
+such that the numerical approximation suggests the equation
+does not blow up.
+
+
+```julia
+n = 1000
+t = range(0, 1; length=n)
+h = step(t)
+w = zeros(2, n)
+w[:,1] = [1,0]
+for k = 1:n-1
+    w[:,k+1] = w[:,k] + h*[w[2,k]; t[k]*w[1,k]+2w[1,k]^2]
+end
+
+plot(t, w[1,:])
+```
+
+
+**Problem 3.2⋆ (B)** For an evenly spaced grid $t_1, …, t_n$, use the approximation
+$$
+{u'(t_{k+1}) + u'(t_k) \over 2} ≈ {u_{k+1} - u_k \over h}
+$$
+to recast
+$$
+\begin{align*}
+u(0) &= c \\
+u'(t) &= a(t) u(t) + f(t)
+\end{align*}
+$$
+as a lower bidiagonal linear system. Use forward-substitution to extend this to vector linear problems:
+$$
+\begin{align*}
+𝐮(0) &= 𝐜 \\
+𝐮'(t) &= A(t) 𝐮(t) + 𝐟(t)
+\end{align*}
+$$
+
+
+**Problem 3.3 (B)** Implement the method designed in Problem 3.1 for the negative time Airy equation 
+$$
+u(0) = 1, u'(0) = 0, u''(t) = -t u(t)
+$$
+on $[0,50]$.
+How many time-steps are needed to get convergence to 1% accuracy (the "eyeball norm")?
+
+**Problem 3.4 (A)** Implement Heat on a graph with $m = 50$ nodes with no forcing
+and initial condition $u_{m/2}(0) = 1$ and $u_k(0) = 0$, but where the first and last node are fixed
+to  zero, that is replace the first and last rows of the differential equation with
+the conditions:
+$$
+u_1(t) = u_m(t) = 0.
+$$
+Find the time $t$ such that  $\|𝐮(t)\|_∞ <10^{-3}$ to 2 digits.
+Hint: Differentiate to recast the conditions as a differential equation.
+Vary $n$, the number of time-steps used in Forward Euler, and increase $T$ in the interval $[0,T]$
+until the answer doesn't change.
+Do a for loop over the time-slices to find the first that satisfies the condition.
+(You may wish to call `println` to print the answer and `break` to exit the for loop).
+
+**SOLUTION**
+
+```julia
+n = 40_000 # number of time-steps
+t = range(0, 1000; length=n)
+h = step(t)
+
+m = 50 # number of nodes
+
+
+Δ = SymTridiagonal([0; fill(-2.0, m-2); 0], [0; ones(m-3); 0])
+Uᶠ = zeros(m, n) # each column is a time-slice for forward Euler
+
+Uᶠ[25,1] = 1
+
+
+for k = 1:n-1
+    Uᶠ[:,k+1] = (I + h*Δ)*Uᶠ[:,k]
+end
+
+for k = 1:n
+    if norm(Uᶠ[:,k],Inf) < 1E-3
+        println(t[k])
+        break
+    end
+end
+```
+
+
+
+**Problem 3.5 (B)** Consider the equation
+$$
+u(1) = 1, u'(t) = -10u(t)
+$$
+What behaviour do you observe on $[0,10]$ of forward, backward, and that of Problem 3.1
+with a step-size of 0.5? What happens if you decrease the step-size to $0.01$? (Hint: you may wish to do a plot and scale the $y$-axis logarithmically,)
+
+**SOLUTION**
+
+```julia
+h = 0.5
+t = range(0, 10; step=h)
+n = length(t)
+uᶠ = zeros(n)
+uᵇ = zeros(n)
+uᵗ = zeros(n)
+uᶠ[1] = uᵇ[1] = uᵗ[1] = 1
+a = -10
+for k = 1:n-1
+    uᶠ[k+1] = (1+h*a) * uᶠ[k]
+    uᵇ[k+1] = (1-h*a) \ uᵇ[k]
+    uᵗ[k+1] = (1-h*a/2) \ (1 + h*a/2) * uᵗ[k]
+end
+
+plot(t, abs.(uᶠ); yscale=:log10)
+plot!(t, abs.(uᵇ); yscale=:log10)
+plot!(t, abs.(uᵗ); yscale=:log10)
+```
+
+
+```julia
+h = 0.01
+t = range(0, 10; step=h)
+n = length(t)
+uᶠ = zeros(n)
+uᵇ = zeros(n)
+uᵗ = zeros(n)
+uᶠ[1] = uᵇ[1] = uᵗ[1] = 1
+for k = 1:n-1
+    uᶠ[k+1] = (1+h*a) * uᶠ[k]
+    uᵇ[k+1] = (1-h*a) \ uᵇ[k]
+    uᵗ[k+1] = (1-h*a/2) \ (1 + h*a/2) * uᵗ[k]
+end
+
+nanabs(x) = iszero(x) ? NaN : abs(x)
+
+plot(t, nanabs.(uᶠ); yscale=:log10)
+plot!(t, nanabs.(uᵇ); yscale=:log10)
+plot!(t, nanabs.(uᵗ); yscale=:log10)
+```
