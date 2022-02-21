@@ -94,7 +94,7 @@ Use this to prove convergence of Euler with a variable coefficient.
 
 ## 3. Fourier series
 
-**Problem 3.1⋆** Show that if $f(θ)$ and $g(θ)$ both have absolutely
+**Problem 3.1⋆ (B)** Show that if $f(θ)$ and $g(θ)$ both have absolutely
 summable Fourier coefficients then so does their product $h(θ) = f(θ)g(θ)$.
 Deduce that the set of functions with absolutely summable Fourier coefficients
 (named the _Wiener algebra_)
