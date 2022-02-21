@@ -178,7 +178,7 @@ function bandedqr(A::Tridiagonal)
 end
 ```
 
-**Problem 4.4⋆** Could one redesign the above to only use IEEE operatations (addition, multiplication, square-roots, 
+**Problem 4.4⋆** Could one redesign the above to only use IEEE operations (addition, multiplication, square-roots, 
 avoiding calls `atan`, `cos`, and `sin`)?
 Would it have been possible to implement this algorithm using reflections?
 If so, what would be the structure of a matrix whose columns are the vectors of reflections?
