@@ -146,15 +146,14 @@ $$
 
 **Proof**
 
-Consider $ω := {\rm e}^{{\rm i} θ_1} = {\rm e}^{2 π {\rm i} \over n}$.  
-This is an $n$ th root of unity: $ω^n = 1$.  Note that ${\rm e}^{{\rm i} θ_j} ={\rm e}^{2 π {\rm i} j \over n}= ω^j$.  
+Consider $ω := {\rm e}^{{\rm i} θ_1} = {\rm e}^{2 π {\rm i} \over n}$. This is an $n$ th root of unity: $ω^n = 1$.  Note that ${\rm e}^{{\rm i} θ_j} ={\rm e}^{2 π {\rm i} j \over n}= ω^j$.  
 
-(Case 1) Suppose $k$ is a multiple of $n$, that is, $k = p n$ for an integer $p$.  
-Then we have 
+(Case 1: $k = pn$ for an integer $p$)
+We have 
 $$
 ∑_{j=1}^n {\rm e}^{i k θ_j} = ∑_{j=1}^n ω^{kj} = ∑_{j=1}^n ({ω^{pn}})^j =   ∑_{j=1}^n 1 = n
 $$
-(Case 2)  Recall that
+(Case 2 $k ≠ pn$ for an integer $p$)  Recall that
 $$
 ∑_{j=0}^{n-1} z^j = {z^n-1 \over z-1}.
 $$
@@ -190,7 +189,7 @@ Note that there is redundancy:
 For all $p ∈ ℤ$, $f̂_k^n = f̂_{k+pn}^n$.
 
 
-In other words if we know $f̂_0^n, …, f̂_{n-1}^n$, we know all $f̂_k^n$. 
+In other words if we know $f̂_0^n, …, f̂_{n-1}^n$, we know $f̂_k^n$ for all $k$. 
 We first discuss the case when all negative coefficients are zero,
 noting that the Fourier series is in fact a Taylor series if we let $z = {\rm e}^{{\rm i} θ}$:
 $$
@@ -226,8 +225,8 @@ $$
 which goes to zero as $n → ∞$.
 ∎
 
-For the general case we need to choose a range of coefficients that includes roughly equally:
-if $n$ is odd we use
+For the general case we need to choose a range of coefficients that includes roughly an equal number of
+negative and positive coefficients (preferring negative over positive in a tie as a convention):
 $$
 f_n(θ) = ∑_{k=-⌈n/2⌉}^{⌊n/2⌋} f̂ₖ {\rm e}^{{\rm i} k θ}
 $$
@@ -279,8 +278,7 @@ Q_n^⋆ &= {1 \over √n} \begin{bmatrix}
 1 & ω^{2} & ω^{4} & ⋯ & ω^{2(n-1)}\\
 ⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
 1 & ω^{(n-1)} & ω^{2(n-1)} & ⋯ & ω^{(n-1)^2}
-\end{bmatrix} \\
-&= {1 \over √n} [𝟏 | \exp({\rm i} 𝛉^n) | … | \exp({\rm i}(n-1) 𝛉^n)] 
+\end{bmatrix} 
 \end{align*}
 $$
 
@@ -372,16 +370,20 @@ scatter!(θ, f.(θ); label="samples")
 ## 4. Fast Fourier Transform
 
 Applying $Qₙ$ or its adjoint $Q_n^⋆$ to a vector naively takes $O(n^2)$ operations.
-Both can be reduced to $O(n \log n)$ using the celebrated _Fast Fourier Transform_,
+Both can be reduced to $O(n \log n)$ using the celebrated _Fast Fourier Transform_ (FFT),
 which is one of the [Top 10 Algorithms of the 20th Century](https://pi.math.cornell.edu/~web6140/)
 (You won't believe number 7!).
 
-The key observation is that, if $n$ is even, then contained in $Q_n$ is
+The key observation is that, if $n$ is even, then hidden in $Q_n$ are 4 copies of
 $Q_{n ÷ 2}$. It is convenient here to drop the $√n$ so define $F_n := √n Q_n$
 and as we will work with multiple grids denote the evenly spaced grid with $n$ points
-as $θ_j^n := {2π j \over n}$. First note that if $n$ is even the grids interlace:
+as $θ_j^n := {2π j \over n}$ and
 $$
-𝛉^{2n} = P_σ^⊤ \begin{bmatrix}  𝛉^n \\ 𝛉^n + {π \over n} \end{bmatrix}
+\vec{θ}^n := \begin{bmatrix} θ_0^n \\ ⋮ \\ θ_{n-1}^n \end{bmatrix}
+$$
+First note that if $n$ is even the grids interlace:
+$$
+\vec{θ}^{2n} = P_σ^⊤ \begin{bmatrix}  \vec{θ}^n \\ \vec{θ}^n + {π \over n} \end{bmatrix}
 $$
 where $σ$ has the Cauchy notation
 $$
@@ -400,7 +402,7 @@ P_σ = I(2n)[σ,:]
 ```
 Note that we therefore have:
 $$
-𝛚_{2n}^k = P_σ^⊤ \begin{pmatrix} \exp(im*k*𝛉^{n}) \\  \exp(im*k*(𝛉^{n} + {π \over n})) \end{pmatrix} 
+𝛚_{2n}^k = P_σ^⊤ \begin{pmatrix} \exp(im*k*\vec{θ}^{n}) \\  \exp(im*k*(\vec{θ}^{n} + {π \over n})) \end{pmatrix} 
 = P_σ^⊤ \begin{bmatrix} I_n \\  ω_{2n}^k I_n \end{bmatrix}  𝛚_{n}^k
 $$
 Thus we have
