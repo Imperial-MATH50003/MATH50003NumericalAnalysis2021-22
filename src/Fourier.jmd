@@ -376,14 +376,14 @@ which is one of the [Top 10 Algorithms of the 20th Century](https://pi.math.corn
 
 The key observation is that, if $n$ is even, then hidden in $Q_n$ are 4 copies of
 $Q_{n ÷ 2}$. It is convenient here to drop the $√n$ so define $F_n := √n Q_n$
-and as we will work with multiple grids denote the evenly spaced grid with $n$ points
-as $θ_j^n := {2π j \over n}$ and
+and as we will work with multiple grids denote the evenly spaced grid denote the $n$-th
+root as $ω_n := {2π j \over n}$ and
 $$
-\vec{θ}^n := \begin{bmatrix} θ_0^n \\ ⋮ \\ θ_{n-1}^n \end{bmatrix}
+\vec{ω}^n := \begin{bmatrix} \exp({\rm i} θ_0^n) \\ ⋮ \\ \exp({\rm i} θ_{n-1}^n) \end{bmatrix}
 $$
 First note that if $n$ is even the grids interlace:
 $$
-\vec{θ}^{2n} = P_σ^⊤ \begin{bmatrix}  \vec{θ}^n \\ \vec{θ}^n + {π \over n} \end{bmatrix}
+\vec{θ}^{2n} = P_σ^⊤ \begin{bmatrix}  \vec{ω}^n \\ \vec{ω}^n + {π \over n} \end{bmatrix}
 $$
 where $σ$ has the Cauchy notation
 $$
