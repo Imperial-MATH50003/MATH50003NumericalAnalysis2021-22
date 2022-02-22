@@ -3,15 +3,19 @@
 
 ## 1. Two-point boundary value problems
 
-**Problem 1.1** Construct a finite-difference approximation to the forced Helmholtz equation
+**Problem 1.1** Construct a finite-difference approximation to the
+forced Helmholtz equation
 $$
-u(0) = 0 \\
-u(1) = 0 \\
-u'' + k^2 u = \E^{x}
+\begin{align*}
+u(0) &= 0 \\
+u(1) &= 0 \\
+u'' + k^2 u &= {\rm e}^x
+\end{align*}
 $$
-Compare the error with the true solution:
+and find an $n$ such  the error is less than $10^{-5}$ when compared
+with the true solution for $k=10$:
 $$
-u(x) = (-cos(k x) + {\rm e}^x cos(k x)^2 + cot(k) sin(k x) - {\rm e} cos(k) cot(k) sin(k x) - {\rm e} sin(k) sin(k x) + E^x sin(k x)^2)/(1 + k^2)
+u(x) = (-\cos(k x) + {\rm e}^x \cos(k x)^2 + \cot(k) \sin(k x) - {\rm e} \cos(k) \cot(k) \sin(k x) - {\rm e} \sin(k) \sin(k x) + {\rm e}^x \sin(k x)^2)/(1 + k^2)
 $$
 
 ```
@@ -28,40 +32,19 @@ end
 k = 10
 u = x -> (-cos(k*x) + exp(x)cos(k*x)^2 + cot(k)sin(k*x) - ℯ*cos(k)cot(k)sin(k*x) - ℯ*sin(k)sin(k*x) + exp(x)sin(k*x)^2)/(1 + k^2)
 
-
-helm(k, 100)
+x = range(0, 1; length=1000)
+@test norm(helm(k, n) - u.(x)) # TODO: choose n to get convergence
 
 ```
 
 
-helm_err(k, u, 0, 0, one, 10_000_000)
-
-ns = 10 .^ (1:8) # solve up to n = 10 million
-scatter(ns, poisson_err.(u, 1, cos(1), f, ns); xscale=:log10, yscale=:log10, label="error")
-plot!(ns, ns .^ (-2); label="1/n^2")
-
-
-
-function helm_err(k, u, c_0, c_1, f, n)
-    x = range(0, 1; length = n)
-    h = step(x)
-    T = Tridiagonal([fill(1/h^2, n-2); 0], [1; fill(k^2-2/h^2, n-2); 1], [0; fill(1/h^2, n-2)])
-    uᶠ = T \ [c_0; f.(x[2:end-1]); c_1]
-    norm(uᶠ - u.(x), Inf)
-end
-
-let k = -10
-    u = x -> (1 - cos(k*x) + cot(k)sin(k*x) - csc(k)sin(k*x))/k^2
-
-    helm_err(k, u, 0, 0, one, 100_000_000)
-end
-```
-
-**Problem 1.1** Consider the heat equation:
+**Problem 1.1 (A)** Consider the heat equation:
 $$
 u_t = u_{xx}
 $$
-
+Use finite-differences on the spacial derivative $u_{xx}$
+to convert this into a system of ODEs. Use Forward Euler
+to solve the resulting system.
 
 
 
@@ -123,14 +106,16 @@ $$
 
 
 
-**Problem 3.4⋆** For the general (non-Taylor) case, prove convergence for
+**Problem 3.4 (B)⋆** For the general (non-Taylor) case and $n = 2m+1$, prove convergence for
 $$
-f_n(θ) = ∑_{k=-\ceil{n/2}}^{\floor{n/2}} f̂ₖ {\rm e}^{{\rm i} k θ}
+f_{-m:m}(θ) := ∑_{k=-m}^m f̂_k^n {\rm e}^{{\rm i} k θ}
 $$
-to $f(θ)$.
+to $f(θ)$ as $n \rightarrow ∞$.
 What is the rate of convergence if the first $λ-1$ derivatives $f(θ), f'(θ), …, f^{(λ-1)}(θ)$ 
 are 2π-periodic and $f^{(λ)}$ is uniformly bounded?
 
+
+**Problem 3.5 (C)⋆** What are $f
 
 
 ## 4. Cosine series

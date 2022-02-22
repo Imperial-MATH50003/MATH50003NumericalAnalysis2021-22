@@ -189,7 +189,31 @@ Note that there is redundancy:
 For all $p ∈ ℤ$, $f̂_k^n = f̂_{k+pn}^n$.
 
 
-In other words if we know $f̂_0^n, …, f̂_{n-1}^n$, we know $f̂_k^n$ for all $k$.
+In other words if we know $f̂_0^n, …, f̂_{n-1}^n$, we know $f̂_k^n$ for all $k$ via a permutation,
+for example if $n = 2m+1$ we have
+$$
+\begin{bmatrix}
+f̂_{-m}^n \\
+⋮\\
+f̂_m^n
+\end{bmatrix} = \underbrace{\begin{bmatrix} &&& 1 \\ &&& ⋱ \\ &&&& 1 \\
+    1 \\ & ⋱ \\ && 1 \end{bmatrix}}_{P_σ}
+\begin{bmatrix}
+f̂_0^n \\
+⋮\\
+f̂_{n-1}^n
+\end{bmatrix}
+$$
+where $σ$ has Cauchy notation (_Careful_: we are using 1-based indexing here):
+$$
+\begin{pmatrix}
+1 & 2 & ⋯ & m & m+1 & m+2 & ⋯ & n  \\
+m+2 & m+3 & ⋯ & n & 1 & 2 & ⋯ & m+1
+\end{pmatrix}.
+$$
+
+
+
 We first discuss the case when all negative coefficients are zero,
 noting that the Fourier series is in fact a Taylor series if we let $z = {\rm e}^{{\rm i} θ}$:
 $$
@@ -231,7 +255,6 @@ $$
 f_n(θ) = ∑_{k=-⌈n/2⌉}^{⌊n/2⌋} f̂ₖ {\rm e}^{{\rm i} k θ}
 $$
 In the problem sheet we will prove this converges provided the coefficients are absolutely convergent.
-
 
 
 
@@ -367,6 +390,36 @@ plot!(g, real.(tₙ.(g)); label="Taylor")
 scatter!(θ, f.(θ); label="samples")
 ```
 
+We now demonstrate the relationship of Taylor and Fourier coefficients
+and their discrete approximations for some examples:
+
+**Example** Consider the function
+$$
+f(θ) = {2 \over 2 - {\rm e}^{{\rm i} θ}}
+$$
+Under the change of variables $z = {\rm e}^{{\rm i} θ}$ we know for
+$z$ on the unit circle this becomes (using the geometric series with $z/2$)
+$$
+{2 \over 2-z} = ∑_{k=0}^∞ {z^k \over 2^k}
+$$
+i.e., $f̂_k = 1/2^k$ which is absolutely summable:
+$$
+∑_{k=0}^∞ |f̂_k| = f(0) = 2.
+$$
+If we use an $n$ point discretisation we get (using the geoemtric series with $2^{-n}$)
+$$
+̂f̂_k^n = f̂_k + f̂_{k+n} + f̂_{k+n} + ⋯ = ∑_{p=0}^∞ {1 \over 2^{k+pn}} = {2^{n-k} \over 2^n - 1}
+$$
+We can verify this numerically:
+```julia
+f = θ -> 2/(2 - exp(im*θ))
+n = 7
+θ = range(0,2π; length=n+1)[1:end-1] # θ_0, …,θ_{n-1}, dropping θ_n == 2π
+Qₙ = 1/sqrt(n) * [exp(-im*(k-1)*θ[j]) for k = 1:n, j=1:n]
+
+Qₙ/sqrt(n)*f.(θ) ≈ 2 .^ (n .- (0:n-1)) / (2^n-1)
+```
+
 ## 4. Fast Fourier Transform
 
 Applying $Qₙ$ or its adjoint $Q_n^⋆$ to a vector naively takes $O(n^2)$ operations.
@@ -484,5 +537,34 @@ plot(abs.(fc); yscale=:log10, legend=:bottomright, label="default")
 plot!(abs.(f̂); yscale=:log10, label="reordered")
 ```
 
+We can use the FFT to compute some mathematical objects efficiently.
+Here is a simple example.
+
+**Example** Define the following infinite sum (which has no name apparently,
+according to Mathematica):
+$$
+S_n(k) := ∑_{p=0}^∞ {1 \over (k+pn)!}
+$$
+We can use the FFT to compute $S_n(0), …, S_n(n-1)$ in $O(n \log n)$ operations.
+Consider
+$$
+f(θ) = \exp({\rm e}^{{\rm i} θ}) = ∑_{k=0}^∞ {{\rm e}^{{\rm i} θ} \over k!}
+$$
+where we know the Fourier coefficients from the Taylor series of ${\rm e}^z$. 
+The discrete Fourier coefficients satisfy for $0 ≤ k ≤ n-1$:
+$$
+f̂_k^n = f̂_k + f̂_{k+n} + f̂_{k+2n} + ⋯ = S_n(k)
+$$
+Thus we have
+$$
+\begin{bmatrix}
+S_n(0) \\ 
+⋮ \\
+S_n(n-1)
+\end{bmatrix} = {1 \over \sqrt{n}} Q_n \begin{bmatrix} 1 \\
+                                \exp({\rm e}^{2{\rm i} π/n}) \\
+                                ⋮ \\
+                                \exp({\rm e}^{2{\rm i} (n-1) π/n}) \end{bmatrix}
+$$
 
 

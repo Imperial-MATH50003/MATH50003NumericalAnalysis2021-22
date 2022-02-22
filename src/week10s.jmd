@@ -1,0 +1,36 @@
+## Multiplication circulant matrices
+
+**Problem 1⋆** Show that circulant matrices can be inverted in $O(n \log n)$ time.
+
+
+**Problem 2⋆** Consider the Poisson equation with periodic conditions:
+$$
+u''(θ) = f(θ)
+$$
+where  $f(θ + 2π) = f(θ)$ and assume that $u(θ + 2π) = u(θ)$.
+Approximate $u(θⱼ) ≈ uⱼ$ on the grid $θⱼ = 2πj/n$ using a periodic version of the finite-difference approximation
+$$
+\begin{align*}
+u''(θ_0) ≈ (u_{n-1} -2 u_0 + u_1)/2 \\
+u''(θ_k) ≈ (u_{k-1} -2 u_k + u_{k+1})/2 \\
+u''(θ_{n-1}) ≈ (u_{n-2} -2 u_n + u_{k+1})/2
+$$
+where the discretisation is a circulant matrix.
+
+
+
+
+Consider a circulant graph with $n$ nodes, that is node $k$ is connected to
+nodes $k-1$ and $k+1$ for $1 < k < n$, whilst node $1$ is connected to nodes $n$ and $2$ and
+node $n$ is connected to nodes $n-1$ and $1$. Write the graph Laplacian $Δ$ as a Circulant
+matrix and determine its diagonalisation. Use the matrix exponential for diagonalisable matrices
+$A = QΛQ^⋆$
+$$
+\exp(A) = Q \exp(Λ) Q^⋆
+$$
+to write an explicit formula for the solution to the heat equation on this graph:
+$$
+u_t = 
+$$
+
+
