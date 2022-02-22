@@ -49,7 +49,7 @@ This can be thought of as an approximate Taylor expansion using the change-of-va
 
 
 In analysis one typically works with continuous functions and relates results to continuity.
-In numerical analysis we inheritely have to work with _vectors_, so it is more natural 
+In numerical analysis we inheritely have to work with _vectors_, so it is more natural
 to  focus on the case where the _Fourier coefficients_ $f̂_k$ are _absolutely convergent_,
 or in otherwords, the $1$-norm of $𝐟̂$ is bounded:
 $$
@@ -87,7 +87,7 @@ $$
 Integrate by parts twice using the fact that $f(0) = f(2π)$, $f'(0) = f(2π)$:
 $$
 \begin{align*}
-f̂ₖ &= ∫_0^{2π} f(θ) {\rm e}^{-{\rm i} k θ} {\rm d}θ = 
+f̂ₖ &= ∫_0^{2π} f(θ) {\rm e}^{-{\rm i} k θ} {\rm d}θ =
 [f(θ) {\rm e}^{-{\rm i} k θ}]_0^{2π} + {1 \over {\rm i} k} ∫_0^{2π} f'(θ) {\rm e}^{-{\rm i} k θ} {\rm d}θ \\
 &= {1 \over {\rm i} k} [f'(θ) {\rm e}^{-{\rm i} k θ}]_0^{2π} - {1 \over k^2} ∫_0^{2π} f''(θ) {\rm e}^{-{\rm i} k θ} {\rm d}θ \\
 &= - {1 \over k^2} ∫_0^{2π} f''(θ) {\rm e}^{-{\rm i} k θ} {\rm d}θ
@@ -102,9 +102,9 @@ using the dominant convergence test.
 ∎
 
 This condition can be weakened to Lipschitz continuity but the proof is  beyond the scope
-of this module. 
+of this module.
 Of more practical importance is the other direction: the more times differentiable a function the
-faster the coefficients decay, and thence the faster Fourier series converges. 
+faster the coefficients decay, and thence the faster Fourier series converges.
 In fact, if a function is smooth and 2π-periodic its Fourier coefficients decay
 faster than algebraically: they decay like $O(k^{-λ})$ for any $λ$. This will be explored in the
 problem sheet.
@@ -146,12 +146,12 @@ $$
 
 **Proof**
 
-Consider $ω := {\rm e}^{{\rm i} θ_1} = {\rm e}^{2 π {\rm i} \over n}$. This is an $n$ th root of unity: $ω^n = 1$.  Note that ${\rm e}^{{\rm i} θ_j} ={\rm e}^{2 π {\rm i} j \over n}= ω^j$.  
+Consider $ω := {\rm e}^{{\rm i} θ_1} = {\rm e}^{2 π {\rm i} \over n}$. This is an $n$ th root of unity: $ω^n = 1$.  Note that ${\rm e}^{{\rm i} θ_j} ={\rm e}^{2 π {\rm i} j \over n}= ω^j$.
 
 (Case 1: $k = pn$ for an integer $p$)
-We have 
+We have
 $$
-∑_{j=1}^n {\rm e}^{i k θ_j} = ∑_{j=1}^n ω^{kj} = ∑_{j=1}^n ({ω^{pn}})^j =   ∑_{j=1}^n 1 = n
+∑_{j=0}^{n-1} {\rm e}^{i k θ_j} = ∑_{j=0}^{n-1} ω^{kj} = ∑_{j=0}^{n-1} ({ω^{pn}})^j =   ∑_{j=0}^{n-1} 1 = n
 $$
 (Case 2 $k ≠ pn$ for an integer $p$)  Recall that
 $$
@@ -159,14 +159,14 @@ $$
 $$
 Then we have
 $$
-∑_{j=1}^n {\rm e}^{i k θ_j} = ∑_{j=1}^n (ω^k)^j = {ω^{kn} -1 \over ω^k -1} = 0.
+∑_{j=0}^{n-1} {\rm e}^{i k θ_j} = ∑_{j=0}^{n-1} (ω^k)^j = {ω^{kn} -1 \over ω^k -1} = 0.
 $$
 where we use the fact that $k$ is not a multiple of $n$ to guarantee that $ω^k ≠ 1$.
 
 ∎
 
 
-**Theorem (discrete Fourier coefficients)** 
+**Theorem (discrete Fourier coefficients)**
 If $𝐟̂$ is absolutely convergent then
 $$
 f̂_k^n = ⋯ + f̂_{k-2n} + f̂_{k-n} + f̂_k + f̂_{k+n} + f̂_{k+2n} + ⋯
@@ -175,8 +175,8 @@ $$
 **Proof**
 $$
 \begin{align*}
-f̂_k^n &= Σ_n[f(θ) {\rm e}^{-i k θ}] = ∑_{j=-∞}^∞ f̂ⱼ Σ_n[f(θ) {\rm e}^{i (j-k) θ}] \\
-&= ∑_{j=-∞}^∞ f̂ⱼ \begin{cases} 1 & j-k = \ldots,-2n,-n,0,n,2n,\ldots  \cr
+f̂_k^n &= Σ_n[f(θ) {\rm e}^{-i k θ}] = ∑_{j=-∞}^∞ f̂_j Σ_n[f(θ) {\rm e}^{i (j-k) θ}] \\
+&= ∑_{j=-∞}^∞ f̂_j \begin{cases} 1 & j-k = \ldots,-2n,-n,0,n,2n,\ldots  \cr
 0 & \hbox{otherwise}
 \end{cases}
 \end{align*}
@@ -189,7 +189,7 @@ Note that there is redundancy:
 For all $p ∈ ℤ$, $f̂_k^n = f̂_{k+pn}^n$.
 
 
-In other words if we know $f̂_0^n, …, f̂_{n-1}^n$, we know $f̂_k^n$ for all $k$. 
+In other words if we know $f̂_0^n, …, f̂_{n-1}^n$, we know $f̂_k^n$ for all $k$.
 We first discuss the case when all negative coefficients are zero,
 noting that the Fourier series is in fact a Taylor series if we let $z = {\rm e}^{{\rm i} θ}$:
 $$
@@ -206,12 +206,12 @@ We will prove the result here in the special case where the negative
 coefficients are zero.
 
 
-**Theorem (Taylor series converges)** 
+**Theorem (Taylor series converges)**
 If $0 = f̂_{-1} = f̂_{-2} = ⋯$ and $𝐟̂$ is absolutely convergent then
 $$
 f_n(θ) = ∑_{k=0}^{n-1} f̂_k^n {\rm e}^{{\rm i} k θ}
 $$
-converges uniformly to $f(θ)$. 
+converges uniformly to $f(θ)$.
 
 **Proof**
 
@@ -244,7 +244,7 @@ In the problem sheet we will prove this converges provided the coefficients are 
 We note that the map from values to coefficients can be defined as a matrix-vector product using the DFT:
 
 
-**Definition (DFT)** 
+**Definition (DFT)**
 The _Discrete Fourier Transform (DFT)_ is defined as:
 $$
 \begin{align*}
@@ -265,20 +265,20 @@ $$
 for the $n$-th root of unity $ω = {\rm e}^{{\rm i} π/n}$. Note that
 $$
 \begin{align*}
-Q_n^⋆ &= {1 \over √n} \begin{bmatrix} 
+Q_n^⋆ &= {1 \over √n} \begin{bmatrix}
 1 & 1 & 1&  ⋯ & 1 \\
-1 & {\rm e}^{{\rm i} θ_1} & {\rm e}^{{\rm i} 2 θ_1} & ⋯ {\rm e}^{{\rm i} (n-1) θ_1} \\
-1 &  {\rm e}^{{\rm i} θ_2}  & {\rm e}^{{\rm i} 2 θ_2} & ⋯ {\rm e}^{{\rm i} (n-1)θ_2} \\
+1 & {\rm e}^{{\rm i} θ_1} & {\rm e}^{{\rm i} 2 θ_1} & ⋯ & {\rm e}^{{\rm i} (n-1) θ_1} \\
+1 &  {\rm e}^{{\rm i} θ_2}  & {\rm e}^{{\rm i} 2 θ_2} & ⋯ & {\rm e}^{{\rm i} (n-1)θ_2} \\
 ⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
-1 & {\rm e}^{{\rm i} θ_{n-1}} & {\rm e}^{{\rm i} 2 θ_{n-1}} & ⋯ {\rm e}^{{\rm i} (n-1) θ_{n-1}}
+1 & {\rm e}^{{\rm i} θ_{n-1}} & {\rm e}^{{\rm i} 2 θ_{n-1}} & ⋯ & {\rm e}^{{\rm i} (n-1) θ_{n-1}}
 \end{bmatrix} \\
-&= {1 \over √n} \begin{bmatrix} 
+&= {1 \over √n} \begin{bmatrix}
 1 & 1 & 1&  ⋯ & 1 \\
 1 & ω^{1} & ω^{2} & ⋯ & ω^{(n-1)}\\
 1 & ω^{2} & ω^{4} & ⋯ & ω^{2(n-1)}\\
 ⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
 1 & ω^{(n-1)} & ω^{2(n-1)} & ⋯ & ω^{(n-1)^2}
-\end{bmatrix} 
+\end{bmatrix}
 \end{align*}
 $$
 
@@ -293,10 +293,10 @@ The choice of normalisation constant is motivated by the following:
 
 **Proof**
 $$
-Q_n Q_n^⋆  = \begin{bmatrix} Q_n[1] & Q_n[{\rm e}^{{\rm i} θ}] & ⋯ & Q_n[{\rm e}^{{\rm i} (n-1) θ}] \\
-                            Q_n[{\rm e}^{-{\rm i} θ}] & Q_n[1] & ⋯ & Q_n[{\rm e}^{{\rm i} (n-2) θ}] \\
+Q_n Q_n^⋆  = \begin{bmatrix} Σ_n[1] & Σ_n[{\rm e}^{{\rm i} θ}] & ⋯ & Σ_n[{\rm e}^{{\rm i} (n-1) θ}] \\
+                            Σ_n[{\rm e}^{-{\rm i} θ}] & Σ_n[1] & ⋯ & Σ_n[{\rm e}^{{\rm i} (n-2) θ}] \\
                             ⋮ & ⋮ & ⋱ & ⋮ \\
-                            Q_n[{\rm e}^{-{\rm i}(n-1) θ}] & Q_n[{\rm e}^{-{\rm i}(n-2) θ}] & ⋯ & Q_n[1] 
+                            Σ_n[{\rm e}^{-{\rm i}(n-1) θ}] & Σ_n[{\rm e}^{-{\rm i}(n-2) θ}] & ⋯ & Σ_n[1]
                             \end{bmatrix} = I
 $$
 ∎
@@ -307,15 +307,15 @@ $$
 $$
 
 **Corollary (Interpolation)**
-$f_n(θ)$ interpolates $f$ at $θⱼ$:
+$f_n(θ)$ interpolates $f$ at $θ_j$:
 $$
-f_n(θⱼ) = f(θ_j)
+f_n(θ_j) = f(θ_j)
 $$
 
 **Proof**
 We have
 $$
-f_n(θⱼ) = ∑_{k=0}^{n-1} f̂ₖⁿ {\rm e}^{{\rm i} k θ_j} = √n 𝐞_j^⊤ Q_n^⋆ 𝐟̂ⁿ = 𝐞_j^⊤ Q_n^⋆ Q_n 𝐟ⁿ = f(θⱼ).
+f_n(θ_j) = ∑_{k=0}^{n-1} f̂_k^n {\rm e}^{{\rm i} k θ_j} = √n 𝐞_j^⊤ Q_n^⋆ 𝐟̂ⁿ = 𝐞_j^⊤ Q_n^⋆ Q_n 𝐟ⁿ = f(θ_j).
 $$
 
 ∎
@@ -374,16 +374,12 @@ Both can be reduced to $O(n \log n)$ using the celebrated _Fast Fourier Transfor
 which is one of the [Top 10 Algorithms of the 20th Century](https://pi.math.cornell.edu/~web6140/)
 (You won't believe number 7!).
 
-The key observation is that, if $n$ is even, then hidden in $Q_n$ are 4 copies of
-$Q_{n ÷ 2}$. It is convenient here to drop the $√n$ so define $F_n := √n Q_n$
-and as we will work with multiple grids denote the evenly spaced grid denote the $n$-th
-root as $ω_n := {2π j \over n}$ and
+The key observation is that hidden in $Q_{2n}$ are 2 copies of
+$Q_n$. We will work with multiple $n$ we denote the $n$-th root as $ω_n = \exp(2π/n)$.
+Note that we can relate a vector of powers of $ω_{2n}$ to two copies of vectors of powers of $ω_n$:
 $$
-\vec{ω}^n := \begin{bmatrix} \exp({\rm i} θ_0^n) \\ ⋮ \\ \exp({\rm i} θ_{n-1}^n) \end{bmatrix}
-$$
-First note that if $n$ is even the grids interlace:
-$$
-\vec{θ}^{2n} = P_σ^⊤ \begin{bmatrix}  \vec{ω}^n \\ \vec{ω}^n + {π \over n} \end{bmatrix}
+\underbrace{\begin{bmatrix} 1 \\ ω_{2n} \\ ⋮ \\ ω_{2n}^{2n-1} \end{bmatrix}}_{\vec{ω}_{2n}} =
+P_σ^⊤ \begin{bmatrix} I_n \\ ω_{2n} I_n \end{bmatrix} \underbrace{\begin{bmatrix} 1 \\ ω_n \\ ⋮ \\ ω_n^{n-1} \end{bmatrix}}_{\vec{ω}_n}
 $$
 where $σ$ has the Cauchy notation
 $$
@@ -400,20 +396,19 @@ n = 4
 σ = [1:2:2n-1; 2:2:2n]
 P_σ = I(2n)[σ,:]
 ```
-Note that we therefore have:
-$$
-𝛚_{2n}^k = P_σ^⊤ \begin{pmatrix} \exp(im*k*\vec{θ}^{n}) \\  \exp(im*k*(\vec{θ}^{n} + {π \over n})) \end{pmatrix} 
-= P_σ^⊤ \begin{bmatrix} I_n \\  ω_{2n}^k I_n \end{bmatrix}  𝛚_{n}^k
-$$
+and so $P_σ^⊤$ reverses the process.
 Thus we have
 $$
-F_{2n} = \begin{bmatrix} 𝟏_{2n} | 𝛚_{2n} | 𝛚_{2n}^2 | ⋯ | 𝛚_{2n}^{2n-1} \end{bmatrix} =
-P_σ^⊤ \begin{bmatrix} 𝟏_{n} &   𝛚_n        & 𝛚_n^2          & ⋯ & 𝛚_n^{n-1}          & 𝛚_n^n  & ⋯ & 𝛚_n^{2n-1}  \\
-                        𝟏_{n} & ω_{2n} 𝛚_n & ω_{2n}^2 𝛚_n^2 & ⋯ & ω_{2n}^{n-1} 𝛚_n^{n-1} & ω_{2n}^n 𝛚_n^n  & ⋯ & ω_{2n}^{2n-1} 𝛚_n^{2n-1}
-\end{bmatrix} =P_σ^⊤ \begin{bmatrix} F_n & F_n \\
-                                     F_n D_n & -F_n D_n
-                                     \end{bmatrix} = 
-                                     P_σ^⊤ \begin{bmatrix} F_n \\ &F_n \end{bmatrix} \begin{bmatrix} I_n & I_n \\ D_n & -D_n \end{bmatrix}å
+\begin{align*}
+Q_{2n} &= {1 \over \sqrt{2n}} \begin{bmatrix} 𝟏_{2n} | \vec{ω}_{2n} | \vec{ω}_{2n}^2 | ⋯ | \vec{ω}_{2n}^{2n-1} \end{bmatrix}
+= {1 \over \sqrt{2n}} P_σ^⊤ \begin{bmatrix} 𝟏_{n} &   \vec{ω}_n        & \vec{ω}_n^2          & ⋯ & \vec{ω}_n^{n-1}          & \vec{ω}_n^n  & ⋯ & \vec{ω}_n^{2n-1}  \\
+                        𝟏_{n} & ω_{2n} \vec{ω}_n & ω_{2n}^2 \vec{ω}_n^2 & ⋯ & ω_{2n}^{n-1} \vec{ω}_n^{n-1} & ω_{2n}^n \vec{ω}_n^n  & ⋯ & ω_{2n}^{2n-1} \vec{ω}_n^{2n-1}
+\end{bmatrix} \\
+&= {1 \over \sqrt{2}} P_σ^⊤ \begin{bmatrix} Q_n & Q_n \\
+                                     Q_n D_n & -Q_n D_n
+                                     \end{bmatrix} =
+                                     {1 \over \sqrt{2}}P_σ^⊤ \begin{bmatrix} Q_n \\ &Q_n \end{bmatrix} \begin{bmatrix} I_n & I_n \\ D_n & -D_n \end{bmatrix}
+\end{align*}
 $$
 In other words, we reduced the DFT to two DFTs applied to vectors of half the dimension.
 
@@ -421,13 +416,13 @@ We can see this formula in code:
 ```julia
 function fftmatrix(n)
     θ = range(0,2π; length=n+1)[1:end-1] # θ_0, …,θ_{n-1}, dropping θ_n == 2π
-    [exp(-im*(k-1)*θ[j]) for k = 1:n, j=1:n]
+    [exp(-im*(k-1)*θ[j]) for k = 1:n, j=1:n]/sqrt(n)
 end
 
-F₂ₙ = fftmatrix(2n)'
-Fₙ = fftmatrix(n)'
+Q₂ₙ = fftmatrix(2n)'
+Qₙ = fftmatrix(n)'
 Dₙ = Diagonal([exp(im*k*π/n) for k=0:n-1])
-(P_σ'*[Fₙ Fₙ; Fₙ*Dₙ -Fₙ*Dₙ])[1:n,1:n] ≈ F₂ₙ[1:n,1:n]
+(P_σ'*[Qₙ Qₙ; Qₙ*Dₙ -Qₙ*Dₙ])[1:n,1:n] ≈ sqrt(2)Q₂ₙ[1:n,1:n]
 ```
 
 
@@ -437,10 +432,10 @@ Thus we have $3nq + 3n = 3n(q+1) = 3 n \log_2(2n)$ additions/multiplications, sh
 
 
 
-**Remark** The FFTW.jl package wraps the FFTW (Fastest Fourier Transform in the West) library, 
+**Remark** The FFTW.jl package wraps the FFTW (Fastest Fourier Transform in the West) library,
 which is a highly optimised implementation
 of the FFT that also works well even when $n$ is not a power of 2.
-(As an aside, the creator of FFTW [Steven Johnson](https://math.mit.edu/~stevenj/) is now a 
+(As an aside, the creator of FFTW [Steven Johnson](https://math.mit.edu/~stevenj/) is now a
 Julia contributor and user.)
  Here we approximate $\exp(\cos(θ-0.1))$ using
 31 nodes:
@@ -468,10 +463,10 @@ plot(abs.(fₙ.(g) - f.(g)))
 ```
 Thus we have successfully approximate the function to roughly machine precision.
 The magic of the FFT is because it's $O(n \log n)$ we can scale it to very high orders.
-Here we plot the Fourier coefficients for a function that requires `n = 100_001`
+Here we plot the Fourier coefficients for a function that requires around 100k
 coefficients to resolve:
 ```julia
-f = θ -> exp(sin(θ))/(1+1e9cos(θ)^2)
+f = θ -> exp(sin(θ))/(1+1e6cos(θ)^2)
 n = 100_001
 m = n÷2
 # evenly spaced points from 0:2π, dropping last node
@@ -497,13 +492,13 @@ Fourier series present an effective way of computing derivatives and solving dif
 This is seen naturally as follows:
 $$
 \begin{align*}
-f'(θ) = {{\rm d} \over {\rm d}θ} F(θ) 𝐟 &= 
+f'(θ) = {{\rm d} \over {\rm d}θ} F(θ) 𝐟 &=
  [⋯ | -2{\rm i}{\rm e}^{-2{\rm i}θ} -{\rm i}|{\rm e}^{-{\rm i}θ} | \underline 0 | {\rm i} {\rm e}^{{\rm i}θ} | 2{\rm i}{\rm e}^{2{\rm i}θ} | ⋯]
 𝐟 \\
 &= F(θ) \underbrace{{\rm i} \begin{bmatrix} ⋱ \\ &-2 \\ && -1 \\ &&&\underline{0} \\ &&&& 1 \\  &&&&& 2 \\ &&&&&& ⋱\end{bmatrix}}_{D} 𝐟.
 \end{align*}
 $$
-This translates naturally to the finite expansions: 
+This translates naturally to the finite expansions:
 $$
 \begin{align*}
 f_n'(θ) = {{\rm d} \over {\rm d}θ} F_{-m:m}(θ) 𝐟\\
@@ -512,14 +507,16 @@ f_n'(θ) = {{\rm d} \over {\rm d}θ} F_{-m:m}(θ) 𝐟\\
 $$
 
 
-Differentiating with Fourier series is _much_ more accurate than finite differences:
+Differentiating with Fourier series is _much_ more accurate than finite differences,
+getting error on the order proportional to $nϵ_{\rm m}$ instead of $√{ϵ_{\rm m}}$.
 ```julia
-n = 31
+n = 51
 m = n÷2
 # evenly spaced points from 0:2π, dropping last node
 θ = range(0, 2π; length=n+1)[1:end-1]
 
 # fft returns discrete Fourier coefficients n*[f̂ⁿ_0, …, f̂ⁿ_(n-1)]
+f = θ -> exp(cos(θ))
 fc = fft(f.(θ))/n
 
 # We reorder using [f̂ⁿ_(-m), …, f̂ⁿ_(-1)] == [f̂ⁿ_(n-m), …, f̂ⁿ_(n-1)]
@@ -527,10 +524,10 @@ fc = fft(f.(θ))/n
 f̂ = [fc[m+2:end]; fc[1:m+1]]
 
 D = im*Diagonal(-m:m)
-f = θ -> exp(cos(θ))
 fpₙ = θ -> transpose([exp(im*k*θ) for k=-m:m]) * D * f̂
 fp = θ -> -sin(θ)*exp(cos(θ))
 
+g = range(0, 2π; length=1000) # plotting grid
 plot(g, abs.(fpₙ.(g) .- fp.(g)); label="f' error")
 ```
 We can also compose derivatives to compute higher order derivatives:
@@ -539,7 +536,15 @@ fppₙ = θ -> transpose([exp(im*k*θ) for k=-m:m]) * D^2 * f̂
 fpp = θ -> (-cos(θ) + sin(θ)^2)*exp(cos(θ))
 plot(g, abs.(fppₙ.(g) .- fpp.(g)); label="f'' error")
 ```
-Note there is a limit to how much accuracy is maintained: the derivatve `D^λ` will magnify errors like `n^λ`. 
+Note that there is a limit to how much accuracy is maintained: the derivative `D^λ` will magnify errors like `n^λ`.
+This can be explained using the condition number:
+$$
+κ_2(Q_n^⋆ D_n^λ Q_n) = κ_2(D_n^λ) = (n/2)^λ
+$$
+where
+$$
+D_n = \begin{bmatrix} -(n-1)/2 \\ &⋱ \\ && (n-1)/2 \end{bmatrix}.
+$$
 
 This is not as accurate as using dual numbers, but only requires the ability to evaluate a function pointwise.
 Further, we can use this construction for solving differential equations, something that is not possible with
@@ -554,7 +559,7 @@ That is why above we use `transpose`.
 
 
 We are now going to consider an application of FFTs: fast multiplication of polynomials. We will do this by relating in to
-To utilise the FFT we first need to change this rectangular Toeplitz matrix to a square Circulant 
+To utilise the FFT we first need to change this rectangular Toeplitz matrix to a square Circulant
 matrix:
 
 **Definition (Circulant)** A _Circulant matrix_
@@ -570,7 +575,6 @@ $$
 
 Here is an example construction:
 ```julia
-
 function circulantmatrix(𝐚)
     n = length(𝐚)
     C = zeros(eltype(𝐚), n, n)
@@ -655,19 +659,19 @@ we can pad their coefficients to be of the same size), which we can write in mat
 matrix (one with constant diagonals):
 $$
 \begin{align*}
-a(z)b(z) = \left(∑_{k=0}^{n-1} a_k z^k\right) \left(∑_{j=0}^{n-1} b_j z^j\right) = 
+a(z)b(z) = \left(∑_{k=0}^{n-1} a_k z^k\right) \left(∑_{j=0}^{n-1} b_j z^j\right) =
 ∑_{k=0}^{n-1} ∑_{j=0}^{n-1} a_k b_j z^{k+j}  \\
 = \underbrace{
 \begin{bmatrix}
-a_0 \\ 
-a_1 & a_0 \\ 
-⋮ & ⋱ & ⋱ \\ 
+a_0 \\
+a_1 & a_0 \\
+⋮ & ⋱ & ⋱ \\
 a_{n-2} & ⋯ & a_1 & a_0\\
 a_{n-1} & a_{n-2} & ⋯ & a_1 & a_0\\
  &⋱ & ⋱ & ⋱ & a_1 \\
  && a_{n-1} & a_{n-2} & ⋮\\
  &&& a_{n-1} & a_{n-2} \\
- &&&& a_{n-1} 
+ &&&& a_{n-1}
 \end{bmatrix}}_T
  \underbrace{\begin{bmatrix} b_0 \\ ⋮ \\ b_{n-1} \end{bmatrix}}_𝐛
 \end{align*}
@@ -681,10 +685,10 @@ see that the FFT can reduce this to $O(n \log n)$.
 In particular, we pad $b$ with zeros and pad $T$ on the right to obtain:
 $$
 a(z) b(z) = T 𝐛 = \underbrace{\begin{bmatrix}
-a_0 & & &  & & a_{n-1} & ⋯ & a_2 & a_1 \\ 
+a_0 & & &  & & a_{n-1} & ⋯ & a_2 & a_1 \\
 a_1 & a_0 &&&&& a_{n-1} & ⋯ & a_2 \\
-⋮ & ⋱ & ⋱ &&&&& ⋱ &  ⋮ \\ 
-a_{n-2} & ⋯ & a_1 & a_0 &&&&& a_{n-1}  \\ 
+⋮ & ⋱ & ⋱ &&&&& ⋱ &  ⋮ \\
+a_{n-2} & ⋯ & a_1 & a_0 &&&&& a_{n-1}  \\
 a_{n-1} & a_{n-2} & ⋯ & a_1 & a_0\\
  &⋱ & ⋱ & ⋱ & a_1 & a_0 \\
  && a_{n-1} & a_{n-2} & ⋮ & ⋱ & ⋱ \\
@@ -695,14 +699,14 @@ $$
 that is, $C ∈ ℂ^{2n-1 × 2n-1}$ satisfies
 $$
 \begin{align*}
-C[1:2n-1,1:n] = T \\
-C[1:n-1,n+1:2n-1] = T[n+1:2n-2,1:n-1] \\
-C[n+1:2n-1,n+1:2n-1] = T[1:n-1,1:n-1] 
+C[1:2n-1,1:n] &= T \\
+C[1:n-1,n+1:2n-1] &= T[n+1:2n-2,1:n-1] \\
+C[n+1:2n-1,n+1:2n-1] &= T[1:n-1,1:n-1].
 \end{align*}
+$$
 
-$$A = T[1:n,1:n]$ and $B = T[n+1:2n,1:n]$.
 
-Here is a low dimensional example. Suppose we want to multiply 
+Here is a low dimensional example. Suppose we want to multiply
 $$
 c(z) = (∑_{k=0}^5 (k+1) z^k) (∑_{k=0}^5 (k+1)^2 z^k)
 $$
@@ -746,4 +750,4 @@ necessary to use FFTs.
 **Remark (advanced)** The FFT is built on the fact that $ω$ is a root of unity,
 and this observation can be used to extend the FFT to other algebraic structures
 such as finite fields or groups. This connection can also be used to design a method for multiplying
-large integers with $n$ digits in $O(n \log n)$ operations. 
+large integers with $n$ digits in $O(n \log n)$ operations.
