@@ -1,0 +1,271 @@
+# Applications
+
+
+
+## 1. Differentiation
+
+Fourier series present an effective way of computing derivatives and solving differential equations.
+This is seen naturally as follows:
+$$
+\begin{align*}
+f'(θ) = {{\rm d} \over {\rm d}θ} F(θ) 𝐟 &=
+ [⋯ | -2{\rm i}{\rm e}^{-2{\rm i}θ} -{\rm i}|{\rm e}^{-{\rm i}θ} | \underline 0 | {\rm i} {\rm e}^{{\rm i}θ} | 2{\rm i}{\rm e}^{2{\rm i}θ} | ⋯]
+𝐟 \\
+&= F(θ) \underbrace{{\rm i} \begin{bmatrix} ⋱ \\ &-2 \\ && -1 \\ &&&\underline{0} \\ &&&& 1 \\  &&&&& 2 \\ &&&&&& ⋱\end{bmatrix}}_{D} 𝐟.
+\end{align*}
+$$
+This translates naturally to the finite expansions:
+$$
+\begin{align*}
+f_n'(θ) = {{\rm d} \over {\rm d}θ} F_{-m:m}(θ) 𝐟\\
+&=F_{-m:m}(θ) \underbrace{{\rm i} \begin{bmatrix} -m \\ &⋱ \\ && m\end{bmatrix}}_{D[-m:m,-m:m]} 𝐟.
+\end{align*}
+$$
+
+
+Differentiating with Fourier series is _much_ more accurate than finite differences,
+getting error on the order proportional to $nϵ_{\rm m}$ instead of $√{ϵ_{\rm m}}$.
+```julia
+n = 51
+m = n÷2
+# evenly spaced points from 0:2π, dropping last node
+θ = range(0, 2π; length=n+1)[1:end-1]
+
+# fft returns discrete Fourier coefficients n*[f̂ⁿ_0, …, f̂ⁿ_(n-1)]
+f = θ -> exp(cos(θ))
+fc = fft(f.(θ))/n
+
+# We reorder using [f̂ⁿ_(-m), …, f̂ⁿ_(-1)] == [f̂ⁿ_(n-m), …, f̂ⁿ_(n-1)]
+#  == [f̂ⁿ_(m+1), …, f̂ⁿ_(n-1)]
+f̂ = [fc[m+2:end]; fc[1:m+1]]
+
+D = im*Diagonal(-m:m)
+fpₙ = θ -> transpose([exp(im*k*θ) for k=-m:m]) * D * f̂
+fp = θ -> -sin(θ)*exp(cos(θ))
+
+g = range(0, 2π; length=1000) # plotting grid
+plot(g, abs.(fpₙ.(g) .- fp.(g)); label="f' error")
+```
+We can also compose derivatives to compute higher order derivatives:
+```julia
+fppₙ = θ -> transpose([exp(im*k*θ) for k=-m:m]) * D^2 * f̂
+fpp = θ -> (-cos(θ) + sin(θ)^2)*exp(cos(θ))
+plot(g, abs.(fppₙ.(g) .- fpp.(g)); label="f'' error")
+```
+Note that there is a limit to how much accuracy is maintained: the derivative `D^λ` will magnify errors like `n^λ`.
+This can be explained using the condition number:
+$$
+κ_2(Q_n^⋆ D_n^λ Q_n) = κ_2(D_n^λ) = (n/2)^λ
+$$
+where
+$$
+D_n = \begin{bmatrix} -(n-1)/2 \\ &⋱ \\ && (n-1)/2 \end{bmatrix}.
+$$
+
+This is not as accurate as using dual numbers, but only requires the ability to evaluate a function pointwise.
+Further, we can use this construction for solving differential equations, something that is not possible with
+dual numbers.
+
+**WARNING** `x'` is actually the _conjugate transpose_ and `dot` automatically conjugates the first argument.
+That is why above we use `transpose`.
+
+
+
+## 6. Multiplication and Circulant matrices
+
+
+We are now going to consider an application of FFTs: fast multiplication of polynomials. We will do this by relating in to
+To utilise the FFT we first need to change this rectangular Toeplitz matrix to a square Circulant
+matrix:
+
+**Definition (Circulant)** A _Circulant matrix_
+is an $n × n$ Toeplitz matrix
+which "wraps around":
+$$
+\underbrace{\begin{bmatrix}
+a_0 & a_{n-1} & ⋯ & a_1 \\
+a_1 & a_0 & ⋱ & a_2 \\
+⋮ & ⋱ & ⋱ & ⋮  \\
+a_{n-1} & ⋯ & a_1 & a_0 \end{bmatrix}}_C
+$$
+
+Here is an example construction:
+```julia
+function circulantmatrix(𝐚)
+    n = length(𝐚)
+    C = zeros(eltype(𝐚), n, n)
+    for k = 1:n, j = 1:n
+        C[k,j] = 𝐚[mod(k-j,n)+1]
+    end
+    C
+end
+𝐚 = [1,3,2,5,9] # coefficients
+C  = circulantmatrix(𝐚)
+```
+
+
+**Theorem (Circulant diagonalization)**
+The DFT matrix diagonalises a Circulant matrix:
+$$
+C Q_n = Q_n \begin{bmatrix} a(1) \\ & ⋱ \\ && a(ω^{n-1}) \end{bmatrix}
+$$
+where
+$$
+a(z) = ∑_{k=0}^{n-1} a_k z^k
+$$
+and $ω = \exp(2π{\rm i}/n)$.
+
+**Proof**
+Consider the circulant shift matrix:
+$$
+\underbrace{
+\begin{bmatrix}
+0   &&& 1
+\\ 1 \\
+& ⋱ \\ &&1 & 0
+\end{bmatrix}
+}_S
+$$
+so that $C = a_0 I  + a_1 S + ⋯ + a_{n-1} S^{n-1}$. Note $S$ is a permutation matrix, hence it is orthogonal ($S^⊤ S = I$),
+normal, and is diagonalisable. We verify directly that $Q_n$ is its eigenvector matrix (use the fact that $ω^{-(n-j)} = ω^j$):
+$$
+\begin{align*}
+S Q_n &= {1 \over √n} \begin{bmatrix} 1 & ω^{-(n-1)} & ω^{-2(n-1)} & ⋯ & ω^{-(n-1)^2} \\
+                                        1 & 1 & 1&  ⋯ & 1 \\
+                                    1 & ω^{-1} & ω^{-2} & ⋯ & ω^{-(n-1)}\\
+                                    1 & ω^{-2} & ω^{-4} & ⋯ & ω^{-2(n-1)}\\
+                                    ⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
+                                    1 & ω^{-(n-2)} & ω^{-2(n-2)} & ⋯ & ω^{-(n-2)^2} \end{bmatrix} \\
+&= Q_n \underbrace{\begin{bmatrix} 1 \\ & ω \\ && ⋱ \\ &&& ω^{n-1} \end{bmatrix}}_Λ
+\end{align*}
+$$
+Thus we get:
+$$
+C Q_n = \sum_{k=0}^{n-1} a_k S^k Q_n = Q_n \sum_{k=0}^{n-1} a_k Λ^k = Q_n \begin{bmatrix} ∑_{k=0}^{n-1} a_k \\ & ∑_{k=0}^{n-1} a_k ω^k  \\ &&⋱ \\  & & ∑_{k=0}^{n-1} a_k ω^{(n-1)k} \end{bmatrix}
+$$
+
+∎
+
+Here is a numerical example using `fft` and `ifft` to
+apply $Q_n$ and $Q_n^⊤$ fast:
+```julia
+n = 1000
+𝐚 = randn(n)
+𝐛 = randn(n)
+C = circulantmatrix(𝐚)
+
+a =  θ -> transpose([exp(im*k*θ) for k=0:n-1])*𝐚
+
+θ = range(0, 2π; length=n+1)[1:end-1]
+
+Λ = Diagonal(a.(θ))
+norm(C*𝐛 - fft(Λ * ifft(𝐛)))
+```
+It has worked! (Though unfortunately has introduced more numerical error
+than `C*𝐛`.)
+
+
+
+
+### Polynomial multiplication
+
+
+Consider multiplication of two polynomials of at most degree $n-1$ (if we have polynomials of different degree
+we can pad their coefficients to be of the same size), which we can write in matrix form in terms of a Toeplitz
+matrix (one with constant diagonals):
+$$
+\begin{align*}
+a(z)b(z) = \left(∑_{k=0}^{n-1} a_k z^k\right) \left(∑_{j=0}^{n-1} b_j z^j\right) =
+∑_{k=0}^{n-1} ∑_{j=0}^{n-1} a_k b_j z^{k+j}  \\
+= \underbrace{
+\begin{bmatrix}
+a_0 \\
+a_1 & a_0 \\
+⋮ & ⋱ & ⋱ \\
+a_{n-2} & ⋯ & a_1 & a_0\\
+a_{n-1} & a_{n-2} & ⋯ & a_1 & a_0\\
+ &⋱ & ⋱ & ⋱ & a_1 \\
+ && a_{n-1} & a_{n-2} & ⋮\\
+ &&& a_{n-1} & a_{n-2} \\
+ &&&& a_{n-1}
+\end{bmatrix}}_T
+ \underbrace{\begin{bmatrix} b_0 \\ ⋮ \\ b_{n-1} \end{bmatrix}}_𝐛
+\end{align*}
+$$
+where $T ∈ ℂ^{2n-1 × n}$. (Note the roles of $a$ and $b$ can be swapped due to commutativity,
+but for concreteness
+we define $T$ in terms of $a$.)
+Each row takes $O(n)$ operations to apply so the total cost is $O(n^2)$ operations. We will
+see that the FFT can reduce this to $O(n \log n)$.
+
+In particular, we pad $b$ with zeros and pad $T$ on the right to obtain:
+$$
+a(z) b(z) = T 𝐛 = \underbrace{\begin{bmatrix}
+a_0 & & &  & & a_{n-1} & ⋯ & a_2 & a_1 \\
+a_1 & a_0 &&&&& a_{n-1} & ⋯ & a_2 \\
+⋮ & ⋱ & ⋱ &&&&& ⋱ &  ⋮ \\
+a_{n-2} & ⋯ & a_1 & a_0 &&&&& a_{n-1}  \\
+a_{n-1} & a_{n-2} & ⋯ & a_1 & a_0\\
+ &⋱ & ⋱ & ⋱ & a_1 & a_0 \\
+ && a_{n-1} & a_{n-2} & ⋮ & ⋱ & ⋱ \\
+ &&& a_{n-1} & a_{n-2}  & ⋯ & a_1 & a_0\\
+ &&&& a_{n-1} & a_{n-2} & ⋯ & a_1 & a_0
+\end{bmatrix}}_C \begin{bmatrix} 𝐛 \\ 𝟎 \end{bmatrix}
+$$
+that is, $C ∈ ℂ^{2n-1 × 2n-1}$ satisfies
+$$
+\begin{align*}
+C[1:2n-1,1:n] &= T \\
+C[1:n-1,n+1:2n-1] &= T[n+1:2n-2,1:n-1] \\
+C[n+1:2n-1,n+1:2n-1] &= T[1:n-1,1:n-1].
+\end{align*}
+$$
+
+
+Here is a low dimensional example. Suppose we want to multiply
+$$
+c(z) = (∑_{k=0}^5 (k+1) z^k) (∑_{k=0}^5 (k+1)^2 z^k)
+$$
+The coefficients are given by:
+```julia
+n = 6
+T = zeros(Int, 2n-1, n)
+for j = 1:n, k = j:j+n-1
+    T[k,j] = k-j+1
+end
+T
+```
+And the coefficients of $c$ are given by
+```julia
+T * (1:6).^2
+```
+To do this fast we extend it to be circulant:
+```julia
+𝐚 = [1:6; zeros(Int,5)]
+C = circulantmatrix(𝐚)
+```
+And indeed we recover the same coefficients via:
+```julia
+C * [(1:6).^2; zeros(Int, 5)]
+```
+This is therefore efficiently computable using the fft
+(at the expense of converting integer arithmetic to complex
+floating point):
+```julia
+m = length(𝐚)
+a =  θ -> transpose([exp(im*k*θ) for k=0:m-1])*𝐚
+θ = range(0,2π; length=m+1)[1:end-1]
+
+Λ = Diagonal(a.(θ))
+fft(Λ*ifft([(1:6).^2; zeros(Int, 5)]))
+```
+For multiplying polynomials with 6 coefficients this is not
+essential, but if we have polynomials with millions of coefficients it is
+necessary to use FFTs.
+
+**Remark (advanced)** The FFT is built on the fact that $ω$ is a root of unity,
+and this observation can be used to extend the FFT to other algebraic structures
+such as finite fields or groups. This connection can also be used to design a method for multiplying
+large integers with $n$ digits in $O(n \log n)$ operations.
+
+## 

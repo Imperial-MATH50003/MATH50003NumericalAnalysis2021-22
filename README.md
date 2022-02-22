@@ -41,7 +41,8 @@ including both time-dependent ordinary differential equations and boundary value
 via the fast Fourier transform.
 2. Orthogonal Polynomials: we discuss orthogonal polynomials—polynomials orthogonal 
 with respect to a prescribed weight—and their usage in numerical computations.
-3. Integration: we discuss ways to approximate integrals, both definite and indefinite, using orthogonal polynomials and interpolation.
+3. Applications: we discuss applications of Fourier series and orthogonal polynomials to
+interpolation, fast multiplication of polynomials, computing derivatives, solving differential equations.
 
 ## Assessment
 
