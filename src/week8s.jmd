@@ -12,3 +12,37 @@ Conjecture where the approximation converges. (This is known as
 Gibb's phenomena.)
 
 
+
+## Orthogonal polynomials
+
+**Problem (A)** Prove the Christoffel-Darboux Formula:
+$$
+∑_{k = 0}^n q_k(x) q_k(y) =  {k_n \over k_{n+1}} {q_{n+1}(x) q_n(y) - q_n(x) q_{n+1}(y) \over x-y}
+$$
+Hint: Consider
+$$
+(x-y) [q_0(x) | ⋯ | q_n(x)] \begin{bmatrix} q_0(y) \\ ⋮ \\ q_n(y) \end{bmatrix}
+$$
+and translating the formula
+$$
+x Q(x) = Q(x) X
+$$
+to finite-dimensions.
+
+**Proof**
+
+We have
+$$
+x [q_0(x) | ⋯ | q_n(x)] = [q_0(x) | ⋯ | q_{n+1}(x)] \underbrace{\begin{bmatrix}
+a_0 & c_0 \\
+b_0 & ⋱ & ⋱
+& ⋱ & a_n & \end{bmatrix}}_{X_n}
+$$
+Thus
+$$
+(x-y) [q_0(x) | ⋯ | q_n(x)] \begin{bmatrix} q_0(y) \\ ⋮ \\ q_n(y) \end{bmatrix}
+= [q_0(x) | ⋯ | q_{n+1}(x)] X_n \begin{bmatrix} q_0(y) \\ ⋮ \\ q_n(y) \end{bmatrix}
+ - [q_0(x) | ⋯ | q_n(x)] X_n^⊤ \begin{bmatrix} q_0(y) \\ ⋮ \\ q_{n+1}(y) \end{bmatrix}
+$$
+
+

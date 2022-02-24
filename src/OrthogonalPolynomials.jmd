@@ -1,1 +1,302 @@
 # Orthogonal Polynomials
+
+Fourier series proved very powerful for approximating periodic functions.
+If periodicity is lost, however, uniform convergence is lost. In this chapter
+we introduce alternative bases, _orthogonal polynomials (OPs)_ built on polynomials that are applicable in
+the non-periodic setting. In addition to numerics, OPs play a very important role in many mathematical areas
+including functional analysis, integrable systems, singular integral equations,
+complex analysis, and random matrix theory.
+
+1. General properties of OPs: we define orthogonal polynomials, three-term recurrences and Jacobi operators
+2. Classical OPs: we define Chebyshev, Legendre, Jacobi, Laguerre, and Hermite. 
+3. Recurrence relationships: we see that classical OPs have many simple recurrences that
+are of importance in computation.
+
+
+## 1. General properties of orthogonal polynomials 
+
+**Definition (graded polynomial basis)** 
+A set of polynomials $\{p_0(x), p_1(x), … \}$ is _graded_ if $p_n$ is
+precisely degree $n$: i.e.,
+$$
+p_n(x) = k_n x^n + k_n^{(n-1)} x^{n-1} + ⋯ + k_n^{(1)} x + k_n^{(0)}
+$$
+for $k_n ≠ 0$. 
+
+Note that if $p_n$ are graded then $\{p_0(x), …, p_n(x) \}$
+are a basis of all polynomials of degree $n$.
+
+
+**Definition (orthogonal polynomials)** 
+Given a _weight_ $w(x) > 0$ for $x ∈ (a,b)$,
+and a continuous inner product
+$$
+⟨f,g⟩ = ∫_a^b  f(x) g(x) w(x) {\rm d} x
+$$
+a graded polynomial basis $\{p_0(x), p_1(x), … \}$
+are _orthogonal polynomials (OPs)_ if
+$$
+⟨p_n,p_m⟩ = 0
+$$
+whenever $n ≠ m$.
+
+
+Note in the above
+$$
+h_n := ⟨p_n,p_n⟩ = \|p_n\|^2 = ∫_a^b  p_n(x)^2 w(x) {\rm d} x > 0.
+$$
+
+**Definition (orthonormal polynomials)**
+A set of orthogonal polynomials $\{q_0(x), q_1(x), … \}$
+are orthonormal if $\|q_n\| = 1$.
+
+
+**Proposition (expansion)**
+If $r(x) is a degree $n$ polynomial, $\{p_n\}$ are orthogonal
+and $\{q_n \}$ are orthonormal then
+$$
+\begin{align*}
+r(x) &= ∑_{k=0}^n {⟨p_k,r⟩ \over \|p_k\|^2} p_k(x) \\
+     &    = ∑_{k=0}^n ⟨q_k,r⟩ q_k(x)
+\end{align*}
+$$
+
+**Proof**
+Because $\{p_0,…,p_n \}$ are a basis of polynomials we can
+write
+$$
+r(x) = ∑_{k=0}^n r_k p_k(x)
+$$
+for constants $r_k ∈ ℝ$.
+By linearity we have
+$$
+⟨p_m,r⟩ = ∑_{k=0}^n r_k ⟨p_m,p_k⟩= r_m ⟨p_m,p_m⟩
+$$
+∎
+
+**Corollary (zero inner product)**
+If a degree $n$ polynomial $r$ satisfies
+$$
+0 = ⟨p_0,r⟩ = … = ⟨p_n,r⟩
+$$
+then $r = 0$.
+
+
+OPs are uniquely defined (up to a constant) by the
+property that they are orthogonal to all lower degree polynomials.
+
+**Proposition (orthogonal to lower degree)** 
+A polynomial $p$ of precisely degree $n$ satisfies
+$$
+⟨p,r⟩ = 0
+$$
+for all degree $m < n$ polynomials $r$ if and only if
+$p = c q_n$. Therefore an orthogonal polynomial is uniquely
+defined by $k_n$. 
+
+**Proof**
+As $\{p_0,…,p_n\}$ are a basis of all polynomials of degree $n$,
+we can write
+$$
+r(x) = ∑_{k=0}^m a_k p_k(x)
+$$
+Thus by linearity of inner products we have
+$$
+⟨cp_n,∑_{k=0}^m a_k p_k⟩ = ∑_{k=0}^m ca_k ⟨p_n, p_k⟩ = 0.
+$$
+
+Now for
+$$
+p(x) = c x^n + O(x^{n-1})
+$$
+consider $p(x) - c p_n(x)$ which is of degree $n-1$. It satisfies
+for $k ≤ n-1
+$$
+⟨p_k, p - c p_n⟩ = ⟨p_k, p⟩ - c ⟨p_k, p_n⟩ = 0.
+$$
+Thus it is zero, i.e., $p(x) = c p_n(x)$.
+
+∎
+
+A consequence of this is that orthonormal polynomials are always a
+constant multiple of orthogonal polynomials.
+
+The most _fundamental_ property of orthogonal polynomials is their three-term
+recurrence.
+
+**Theorem (3-term recurrence, 2nd form)**
+If $\{p_n\}$ are OPs then there exist real constants
+$a_n, b_n ≠0,c_{n-1} ≠0$
+such that
+$$
+\begin{align*}
+x p_0(x) &= a_0 p_0(x) + b_0 p_1(x)  \\
+x p_n(x) &= c_{n-1} p_{n-1}(x) + a_n p_n(x) + b_n p_{n+1}(x) 
+\end{align*}
+$$
+**Proof**
+The $n=0$ case is immediate since $\{p_0,p_1}$ are a basis of degree 1 polynomials.
+The $n >0$ case follows from 
+$$
+⟨x p_n, p_k⟩ = ⟨ p_n, xp_k⟩ = 0
+$$
+for $k < n-1$ as $x p_k$ is of degree $k+1 < n$.
+
+Note that
+$$
+b_n = {⟨p_{n+1}, x p_n⟩ \over \|p_{n+1} \|^2} ≠ 0
+$$
+since $x p_n = k_n x^{n+1} + O(x^n)$ is precisely degree
+$n$. Further,
+$$
+c_{n-1} = {⟨p_{n-1}, x p_n⟩ \over \|p_{n-1}\|^2 } = 
+{⟨p_n, x p_{n-1}⟩  \over \|p_{n-1}\|^2 } =  b_{n-1}{\|p_n\|^2  \over \|p_{n-1}\|^2 } ≠ 0.
+$$
+
+
+
+∎
+
+**Corollary (orthonormal 3-term recurrence)** If
+$\{q_n\}$ are orthonormal then $c_n = b_n$.
+
+**Proof**
+$$
+b_n = ⟨x q_n, q_{n+1}⟩ = ⟨q_n, x q_{n+1}⟩ = c_{n-1}.
+$$
+∎
+
+
+
+**Corollary (3-term recurrence, 1st form)**
+If $\{p_n\}$ are OPs then there exist real constants $A_n ≠ 0$, $B_n, $and C_n$
+such that
+$$
+\begin{align*}
+p_1(x) &= (A_1 x + B_1) p_0(x) \\
+p_{n+1}(x) &= (A_1 x + B_1) p_n(x) - C_n p_{n-1}(x)
+\end{align*}
+$$
+
+**Proof**
+
+Follows from
+$$
+\begin{align*}
+p_1(x) &= ({x \over b_0}  - {a_0  \over b_0}) p_0 \\
+p_{n+1}(x) &= ({x \over b_n}  - {a_n  \over b_n}) p_n(x) - {c_{n-1} \over b_n} p_{n-1}(x)
+\end{align*}
+$$
+
+∎
+
+The three-term recurrence can also be interpreted as a matrix known
+as the Jacobi matrix:
+
+**Corollary (Jacobi matrix)**
+For
+$$
+P(x) := [p_0(x) | p_1(x) | ⋯]
+$$
+then we have
+$$
+x P(x) = P(x) \underbrace{\begin{bmatrix} a_0 \\ c_0 \\
+                                                        b_0 & a_1 & c_1 \\
+                                                        & ⋱ & ⋱ & ⋱
+                                                        \end{bmatrix}}_X
+$$
+More generally, for any polynomial $a(x)$ we have
+$$
+a(x) P(x) = P(x) a(X).
+$$
+
+**Remark** If you are worried about multiplication of infinite matrices/vectors
+note it is well-defined by the standard definition because it is banded.
+It can also be defined in terms of functional analysis.
+
+**Remark** Typically the Jacobi matrix is the transpose $J = X^⊤$. 
+If the basis are orthonormal then $X$ is symmetric and they are the same.
+
+
+## 2. Classical orthogonal polynomials
+
+Classical orthogonal polynomials are special cases with a number
+of beautiful properties, for example
+1. Their derivatives are also OPs
+2. The are eigenfunctions of simple differential operators
+
+As stated above orthogonal polynomials are uniquely defined by the weight
+$w(x)$ and the constant $k_n$. We consider:
+
+1. Chebyshev polynomials $T_n(x)$/$U_n(x)$: $w(x) = 1/\sqrt{1-x^2}$ or $\sqrt{1-x^2}$  on $[-1,1]$
+2. Legendre polynomials $P_n(x)$: $w(x) = 1$ on $[-1,1]$.
+3. Hermite polynomials $H_n(x): $w(x) = \exp(-x^2)$  on $[-∞,∞]$.
+
+Other important families discussed are
+
+1. Ultrapsherical polynomials
+2. Jacobi polynomials
+3. Laguerre polynomials
+
+
+## Chebyshev
+
+**Definition (Chebyshev polynomials, 1st kind)** $T_n(x)$ are orthogonal with respect to $1/sqrt{1-x^2}$
+and satisfy:
+$$
+T_0(x) = 1, T_n(x) = 2^{n-1} x^n + O(x^{n-1})
+$$
+
+
+**Definition (Chebyshev polynomials, 2nd kind)** $T_n(x)$ are orthogonal with respect to $1/sqrt{1-x^2}$.
+$$
+U_n(x) = 2^n x^n + O(x^{n-1})
+$$
+
+
+**Theorem**
+$$
+T_n(x) = \cos n \acos x
+$$
+In other words
+$$
+T_n(cos(θ)) = \cos n θ.
+$$
+
+
+**Proof**
+
+We need to show that $p_n(x) := \cos n \acos x$ are (1) graded polynomials,
+(2) orthogonal w.r.t $1/\sqrt{1-x^2}$ on $[-1,1]$, and 
+(3) have the right constant. Property (2) is immediate:
+$$
+\int_{-1}^1 {p_n(x) p_m(x) \over \sqrt{1-x^2}} {\rm d} x = 
+\int_{-π}^π {cos(nθ) cos(mθ) \over \sqrt{1-cos^2 θ}} \sin θ {\rm d} θ =
+\int_{-π}^π cos(nθ) cos(mθ) {\rm d} x = 0
+$$
+if $n ≠ m$. 
+
+To see that they are graded we use the fact that
+$$
+x p_n(x) = \cos θ \cos n θ = {\cos(n-1)θ + cos(n+1)θ \over 2} = {p_{n-1}(x) + p_{n+1}(x) \over 2}
+$$
+In other words $p_{n+1}(x) = 2x p_n(x) - p_{n-1}(x)$.
+Since each time we multiply by $2x$ and $p_0(x) = 1$ we have
+$$
+p_n(x) = (2x)^n + O(x^{n-1})
+$$
+which completes the proof.
+
+∎
+
+Buried in the proof is the 3-term recurrence:
+
+**Corollary**
+$$
+x 𝐓(x) = 𝐓(x) \begin{bmatrix} 0 & 1/2 \\ 1 & 0 & 1/2 \end{bmatrix} 
+$$
+
+## Legendre
+
+Legendre: $P_n(x)$ are orthogonal polynomials with respect to $w(x) = 1$ on $[-1,1]$, with
+$k_n = $
