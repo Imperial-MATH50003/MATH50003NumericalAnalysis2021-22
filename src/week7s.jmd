@@ -8,7 +8,7 @@ Problems are denoted A/B/C to indicate their difficulty.
 
 
 ```julia
-using LinearAlgebra, Plots
+using LinearAlgebra, Plots, Test
 ```
 
 
@@ -25,7 +25,7 @@ u(1) &= 0 \\
 u'' + k^2 u &= {\rm e}^x
 \end{align*}
 $$
-and find an $n$ such  the error is less than $10^{-5}$ when compared
+and find an $n$ such  the error is less than $10^{-4}$ when compared
 with the true solution for $k=10$:
 $$
 u(x) = (-\cos(k x) + {\rm e}^x \cos(k x)^2 + \cot(k) \sin(k x) - {\rm e} \cos(k) \cot(k) \sin(k x) - {\rm e} \sin(k) \sin(k x) + {\rm e}^x \sin(k x)^2)/(1 + k^2)
@@ -45,9 +45,9 @@ end
 k = 10
 u = x -> (-cos(k*x) + exp(x)cos(k*x)^2 + cot(k)sin(k*x) - ℯ*cos(k)cot(k)sin(k*x) - ℯ*sin(k)sin(k*x) + exp(x)sin(k*x)^2)/(1 + k^2)
 
-x = range(0, 1; length=1000)
-@test norm(helm(k, n) - u.(x)) # TODO: choose n to get convergence
-
+n = 10 # TODO: choose n to get convergence
+x = range(0, 1; length=n)
+@test norm(helm(k, n) - u.(x)) ≤ 1E-4
 ```
 
 
@@ -55,12 +55,13 @@ x = range(0, 1; length=1000)
 
 
 
-**Problem (A)** Discretisations can also be used to solve eigenvalue equations.
+**Problem 1.2 (B)** Discretisations can also be used to solve eigenvalue equations.
 Consider the Schrödinger equation with quadratic oscillator:
 $$
 u(-L) = u(L) = 0, -u'' + x^2 u = λ u
 $$
-with zero Dirichlet conditions, where $L = 10$. Approximate the eigenvalues using `eigvals`.
+Approximate the eigenvalues using `eigvals(A)` (which returns the eigenvalues of a
+matrix `A`) with $L = 10$.
 Can you conjecture their exact value if $L = ∞$? (Hint: they are integers and the eigenvalues
 closest to zero are most accurate.)
 
@@ -72,7 +73,7 @@ h = step(x)
 eigvals(SymTridiagonal(fill(2/h^2,n-2)  + x[2:end-1].^2, fill(-1/h^2, n-3)))
 ```
 
-**Problem 1.1⋆ (A)** Consider Helmholtz with Neumann conditions:
+**Problem 1.3⋆ (A)** Consider Helmholtz with Neumann conditions:
 $$
 u'(0) = c_0 \\
 u'(1) = c_1 \\
@@ -93,36 +94,44 @@ symmetric tridiagonal matrix.
 
 ## 2. Convergence
 
-**Problem 2.1 (B)** For the equation
+**Problem 2.1⋆ (B)** For the equation
 $$
 \begin{align*}
 u(0) &= c_0 \\
 u' + au &= f(x)
 \end{align*}
 $$
-Prove convergence for the method constructed in PS6 using the approximation
+where $a ∈ ℝ$ and $0 ≤ x ≤ 1$,
+prove convergence as $n → ∞$ for the method constructed in PS6 using the approximation
 where we take the average of the two grid points:
 $$
 {u'(x_{k+1}) + u'(x_k) \over 2} ≈ {u_{k+1} - u_k \over h}.
 $$
 
-**Problem 2.2 (B)** Consider the matrices
+**Problem 2.2⋆ (A)** Consider the matrices
 $$
 L = \begin{bmatrix} 1 \\
     -a_1 & 1 \\
         & -a_2 & 1\\
         && ⋱ & ⋱ \\
         &&& -a_{n-1} & 1
-\end{bmatrix} \qquad R = \begin{bmatrix} 1 \\
+\end{bmatrix}, \qquad T = \begin{bmatrix} 1 \\
     -a & 1 \\
         & -a & 1\\
         && ⋱ & ⋱ \\
         &&& -a & 1
-\end{bmatrix}
+\end{bmatrix}.
 $$
 By writing down the inverse explicitly prove that if $|a_k| ≤ a$ then
 $$
-\|L^{-1}\|_1 ≤ \|T^{-1}\|_1, \|L^{-1}\|_∞ ≤ \|T^{-1}\|_∞
+\|L^{-1}\|_{1 → ∞} ≤ \|T^{-1}\|_{1 → ∞}.
+$$
+Use this to prove convergence as $n → ∞$ of forward Euler for
+$$
+\begin{align*}
+u(0) &= c_0 \\
+u'(x) - a(x)u(x) &= f(x)
+\end{align*}
 $$
 
 
@@ -131,13 +140,13 @@ $$
 
 ## 3. Fourier series
 
-**Problem 3.5 (C)⋆** Give explicit formulae for $f̂_k$ and $f̂_k^n$ for the following functions:
+**Problem 3.1⋆ (C)** Give explicit formulae for $f̂_k$ and $f̂_k^n$ for the following functions:
 $$
-\cos θ, \cos 4θ, \cos^4θ, {3 \over 3 - {\rm e}^{\rm i θ}}, {1 \over 1 - 2{\rm e}^{\rm i θ}}
+\cos θ, \cos 4θ, \sin^4θ, {3 \over 3 - {\rm e}^{\rm i θ}}, {1 \over 1 - 2{\rm e}^{\rm i θ}}
 $$
 Hint: You may wish to try the change of variables $z = {\rm e}^{-{\rm i}θ}$.
 
-**Problem 3.2 (B)⋆** Prove that if the first $λ-1$ derivatives $f(θ), f'(θ), …, f^{(λ-1)}(θ)$ 
+**Problem 3.2⋆ (B)** Prove that if the first $λ-1$ derivatives $f(θ), f'(θ), …, f^{(λ-1)}(θ)$ 
 are 2π-periodic and $f^{(λ)}$ is uniformly bounded  that
 $$
 |f̂_k| = O(|k|^{-λ})\qquad \hbox{as $|k| → ∞$}
@@ -148,7 +157,7 @@ $$
 $$
 
 
-**Problem 3.3 (C)⋆**
+**Problem 3.3⋆ (C)**
 If $f$ is a trigonometric polynomial  ($f̂_k = 0$ for $|k| > m$) show
 for $n ≥ 2m+1$ we can exactly recover $f$:
 $$
@@ -157,14 +166,11 @@ $$
 
 
 
-**Problem 3.4 (B)⋆** For the general (non-Taylor) case and $n = 2m+1$, prove convergence for
+**Problem 3.4⋆ (B)** For the general (non-Taylor) case and $n = 2m+1$, prove convergence for
 $$
 f_{-m:m}(θ) := ∑_{k=-m}^m f̂_k^n {\rm e}^{{\rm i} k θ}
 $$
 to $f(θ)$ as $n \rightarrow ∞$.
 What is the rate of convergence if the first $λ-1$ derivatives $f(θ), f'(θ), …, f^{(λ-1)}(θ)$ 
 are 2π-periodic and $f^{(λ)}$ is uniformly bounded?
-
-
-
 

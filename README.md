@@ -60,6 +60,8 @@ interpolation, fast multiplication of polynomials, computing derivatives, solvin
 4. [Week 5](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week5.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week5s.ipynb)): positive definite matrices, Cholesky, and SVD
 4. [Week 6](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week6.ipynb): 
 Condition numbers, indefinite integration, and Euler methods
+5. [Week 7](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week7.ipynb): 
+Two point boundary value problems, convergence, and Fourier series
 
 
 ## Reading List
