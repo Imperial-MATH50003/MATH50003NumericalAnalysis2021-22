@@ -1,0 +1,62 @@
+**Problem 3.1⋆ (B)** Show that if $f(θ)$ and $g(θ)$ both have absolutely
+summable Fourier coefficients then so does their product $h(θ) = f(θ)g(θ)$.
+Deduce that the set of functions with absolutely summable Fourier coefficients
+(named the _Wiener algebra_)
+$$
+W := \{f : \| 𝐟̂ \|_1 < ∞ \}
+$$
+forms a commutative ring (recalling the definition of a commutative ring from PS2).
+
+
+
+## 4. Cosine series
+
+The following problems consider approximating Cosine series
+$$
+f(θ) = ∑_{k=0}^∞ f̌_k \cos k θ
+$$
+where $f(θ) = f(-θ)$ and $f : [0,π] → ℝ$, where
+$$
+f̌_k := {1 \over 2π} \int_0^π f(θ) \cos k θ {\rm d}θ \begin{cases} 2 & k = 0 \\ 1 & otherwise \end{cases}
+$$
+We will use an $n+1$ grid
+with $θ_j = jπ/n$. 
+
+**Problem 4.1⋆** Show that any function $f̃ : [0,π] → ℝ$
+can be extended to  $f : ℝ → ℝ$ satisfying $f(θ) = f(θ+2π)$,
+$f(θ) = f(-θ)$, and $f(θ) = f̃(θ)$ for $θ ∈ [0,π]$. 
+Draw a picture of your extension for $f(θ) = \exp(θ)$.
+Show that if $f̃$ is continuous then so is $f$. 
+
+
+
+**Problem 4.1⋆**  Define
+$$
+Σ̃_n[f] := {1 \over n}[f(0) + 2\sum_{j=1}^{n-1} f(θ_j) + f(π)]
+$$
+Show that
+$$
+Σ̃_n[f \cos k θ] = Σ_{2n}[f \cos k θ]
+$$
+
+**Problem 4.2⋆** Show that
+$$
+Σ̃_n[\cos ℓ θ \cos k θ] = \begin{cases} 1 & k - j = 0 or k + j = 0 \\
+                                        0 & otherwise
+                                        \end{cases}
+$$
+
+**Problem 4.3⋆** Define
+$$
+f̌_k^n := Σ̃_n[f(θ) \cos k θ]
+$$
+Show that
+$$
+\begin{align*}
+f̌_0^n = f̌_0 + f̌_{2n} + f̌_{4n} + ⋯ \\
+f̌_k^n = f̌_k + (f̌_{k+2n} + f̌_{k+4n} + ⋯) + (f̌_{-k+2n} + f̌_{-k+4n} + ⋯)  \\
+f̌_n^n = f̌_n + f̌_{3n} + f̌_{5n} + ⋯ 
+\end{align*}
+where $1 ≤ k ≤ n-1$.
+$$
+
