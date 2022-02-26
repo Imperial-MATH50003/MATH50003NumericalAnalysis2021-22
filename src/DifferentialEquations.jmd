@@ -337,9 +337,9 @@ $$
 D_h -  I_n^{\rm b}  A_n
 \end{bmatrix} 𝐮^{\rm b} = \underbrace{ \begin{bmatrix}
 1 \\
--a(t_1)-1/h & 1/h\\
+-1/h & 1/h -a(t_2)\\
 & \ddots & \ddots \\
-&& -a(t_{n-1})-1/h & 1/h
+&& -1/h & 1/h-a(t_n)
 \end{bmatrix}}_L 𝐮^{\rm b} = \begin{bmatrix} c \\ I_n^{\rm b} 𝐟 \end{bmatrix}
 $$
 Again this is a bidiagonal forward-substitution:
@@ -385,7 +385,7 @@ at each time-step:
 $$
 \begin{align*}
 𝐮_1 &= c \\
-𝐮_{k+1} &= (I- h A(t_{k+1})^{-1} (𝐮_k  + h 𝐟(t_{k+1}))
+𝐮_{k+1} &= (I- h A(t_{k+1}))^{-1} (𝐮_k  + h 𝐟(t_{k+1}))
 \end{align*}
 $$
 
