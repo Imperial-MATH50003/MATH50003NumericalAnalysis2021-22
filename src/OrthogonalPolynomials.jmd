@@ -28,8 +28,8 @@ complex analysis, and random matrix theory.
 1. General properties of OPs: we define orthogonal polynomials, three-term recurrences and Jacobi operators
 2. Classical OPs: we define Chebyshev, Legendre, Jacobi, Laguerre, and Hermite. 
 3. Gaussian quadrature: we see that OPs can be used to construct effective numerical methods for singular integrals
-4. Recurrence relationships: we see that classical OPs have many simple recurrences that
-are of importance in computation.
+4. Recurrence relationships and Sturm–Liouville equations: we see that classical OPs have many simple recurrences that
+are of importance in computation, which also show they are eigenfunctions of simple differential operators.
 
 
 ## 1. General properties of orthogonal polynomials 
@@ -47,8 +47,8 @@ are a basis of all polynomials of degree $n$.
 
 
 **Definition (orthogonal polynomials)** 
-Given a _weight_ $w(x) > 0$ for $x ∈ (a,b)$,
-and a continuous inner product
+Given an (integrable) _weight_ $w(x) > 0$ for $x ∈ (a,b)$,
+which defines a continuous inner product
 $$
 ⟨f,g⟩ = ∫_a^b  f(x) g(x) w(x) {\rm d} x
 $$
@@ -68,6 +68,10 @@ $$
 **Definition (orthonormal polynomials)**
 A set of orthogonal polynomials $\{q_0(x), q_1(x), … \}$
 are orthonormal if $\|q_n\| = 1$.
+
+**Definition (monic orthogonal polynomials)**
+A set of orthogonal polynomials $\{q_0(x), q_1(x), … \}$
+are orthonormal if $k_n = 1$.
 
 
 **Proposition (expansion)**
@@ -185,6 +189,9 @@ b_n = ⟨x q_n, q_{n+1}⟩ = ⟨q_n, x q_{n+1}⟩ = c_{n-1}.
 $$
 ∎
 
+**Corollary (monic 3-term recurrence)** If
+$\{p_n\}$ are monic then $b_n = 1$.
+
 
 
 **Corollary (3-term recurrence, 1st form)**
@@ -235,6 +242,24 @@ It can also be defined in terms of functional analysis.
 
 **Remark** Typically the Jacobi matrix is the transpose $J = X^⊤$. 
 If the basis are orthonormal then $X$ is symmetric and they are the same.
+
+**Example** What are the first 4 monic $p_n(x)$ polynomials with respect to $w(x) = 1$ on $[0,1]$?
+We can construct these using Gram–Schmidt, but exploiting the 3-term recurrence to reduce the computational cost.
+We have $p_0(x) = q_0(x) = 1$, which we see is orthogonal:
+$$
+\|p_0\|^2 = ⟨p_0,p_0⟩ = ∫_0^1 {\rm d x} = 1.
+$$
+We know from the 3-term recurrence that
+$$
+x p_0(x) = a_0 p_0(x) +  p_1(x)
+$$
+where
+$$
+a_0 = ⟨x p_0,p_0⟩ = ∫_0^1 x {\rm d} x = 1/2.
+$$
+Thus $x p_0(x) - a_0 p_0(x) =  p_1(x)$, i.e., a constant multiple of 
+
+
 
 
 ## 2. Classical orthogonal polynomials
