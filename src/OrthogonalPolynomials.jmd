@@ -158,7 +158,7 @@ x p_n(x) &= c_{n-1} p_{n-1}(x) + a_n p_n(x) + b_n p_{n+1}(x)
 \end{align*}
 $$
 **Proof**
-The $n=0$ case is immediate since $\{p_0,p_1}$ are a basis of degree 1 polynomials.
+The $n=0$ case is immediate since $\{p_0,p_1\}$ are a basis of degree 1 polynomials.
 The $n >0$ case follows from 
 $$
 ⟨x p_n, p_k⟩ = ⟨ p_n, xp_k⟩ = 0
@@ -180,22 +180,10 @@ $$
 
 ∎
 
-**Corollary (orthonormal 3-term recurrence)** If
-$\{q_n\}$ are orthonormal then $c_n = b_n$.
-
-**Proof**
-$$
-b_n = ⟨x q_n, q_{n+1}⟩ = ⟨q_n, x q_{n+1}⟩ = c_{n-1}.
-$$
-∎
-
-**Corollary (monic 3-term recurrence)** If
-$\{p_n\}$ are monic then $b_n = 1$.
-
 
 
 **Corollary (3-term recurrence, 1st form)**
-If $\{p_n\}$ are OPs then there exist real constants $A_n ≠ 0$, $B_n, $and C_n$
+If $\{p_n\}$ are OPs then there exist real constants $A_n ≠ 0$, $B_n$, and C_n$
 such that
 $$
 \begin{align*}
@@ -236,14 +224,38 @@ $$
 a(x) P(x) = P(x) a(X).
 $$
 
+For the special cases of orthonormal and monic polynomials we have extra structure:
+
+**Corollary (orthonormal 3-term recurrence)** If
+$\{q_n\}$ are orthonormal then $c_n = b_n$. That is, the Jacobi matrix is symmetric:
+$$
+X = \begin{bmatrix}
+a_0 & b_0 \\
+b_0 & ⋱ & ⋱
+ & ⋱
+\end{bmatrix}
+$$
+
+**Proof**
+$$
+b_n = ⟨x q_n, q_{n+1}⟩ = ⟨q_n, x q_{n+1}⟩ = c_{n-1}.
+$$
+∎
+
+**Corollary (monic 3-term recurrence)** If
+$\{p_n\}$ are monic then $b_n = 1$.
+
+
+
 **Remark** If you are worried about multiplication of infinite matrices/vectors
 note it is well-defined by the standard definition because it is banded.
-It can also be defined in terms of functional analysis.
+It can also be defined in terms of functional analysis where one considers these
+as linear operators (functions of functions) between vector spaces.
 
-**Remark** Typically the Jacobi matrix is the transpose $J = X^⊤$. 
+**Remark** Typically the Jacobi matrix is the transpose $J := X^⊤$. 
 If the basis are orthonormal then $X$ is symmetric and they are the same.
 
-**Example** What are the first 4 monic $p_n(x)$ polynomials with respect to $w(x) = 1$ on $[0,1]$?
+**Example** What are the  monic OPs $p_0(x),…,p_3(x)$ with respect to $w(x) = 1$ on $[0,1]$?
 We can construct these using Gram–Schmidt, but exploiting the 3-term recurrence to reduce the computational cost.
 We have $p_0(x) = q_0(x) = 1$, which we see is orthogonal:
 $$
@@ -255,9 +267,41 @@ x p_0(x) = a_0 p_0(x) +  p_1(x)
 $$
 where
 $$
-a_0 = ⟨x p_0,p_0⟩ = ∫_0^1 x {\rm d} x = 1/2.
+a_0 = {⟨p_0,x p_0⟩  \over \|p_0\|^2} = ∫_0^1 x {\rm d} x = 1/2.
 $$
-Thus $x p_0(x) - a_0 p_0(x) =  p_1(x)$, i.e., a constant multiple of 
+Thus
+$$
+\begin{align*}
+p_1(x) = x p_0(x) - a_0 p_0(x) = x-1/2 \\
+\|p_1(x)\|^2 = ∫_0^1 (x^2 - x + 1/4) {\rm d x} = 1/12
+\end{align*}
+$$
+From
+$$
+x p_1(x) = c_0 p_0(x) + a_1 p_1(x) +  p_2(x)
+$$
+we have
+$$
+\begin{align*}
+c_0 &= {⟨p_0,x p_1⟩  \over \|p_0\|^2} = ∫_0^1 (x^2 - x/2) {\rm d} x = 1/12 \\
+a_1 &= {⟨p_1,x p_1⟩  \over \|p_1\|^2} = 12 ∫_0^1 (x^3 - x^2 + x/4) {\rm d} x = 1/2 \\
+p_2(x) &= x p_1(x) - c_0 - a_1 p_1(x) = x^2 - x + 1/6 \\
+\|p_2\|^2 = \int_0^1 (x^4 - 2x^3 + 4x^2/3 - x/3 + 1/36) {\rm d} x = {1 \over 180}
+\end{align*}
+$$
+Finally, from
+$$
+x p_2(x) = c_1 p_1(x) + a_2 p_2(x) +  p_3(x)
+$$
+we have
+$$
+\begin{align*}
+c_1 &= {⟨p_1,x p_2⟩  \over \|p_1\|^2} = 12 ∫_0^1 (x^4 - 3x^3/2 +2x^2/3 -x/12)  {\rm d} x = 1/15 \\
+a_2 &= {⟨p_2,x p_2⟩  \over \|p_2\|^2} = 180 ∫_0^1 (x^5 - 2x^4 +4x^3/3 - x^2/3 + x/36) {\rm d} x = 1/2 \\
+p_3(x) &= x p_2(x) - c_1 p_1(x)- a_2 p_2(x) = x^3 - x^2 + x/6 - x/15 + 1/30 -x^2/2 + x/2 - 1/12 \\
+&= x^3 - 3x^2/2 + 3x/5 -1/20
+\end{align*}
+$$
 
 
 
