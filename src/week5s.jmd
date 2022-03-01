@@ -199,10 +199,10 @@ $$A=\left[\begin{array}{c|ccc}
 where $K$ is again tridiagonal. Denote the Cholesky decomposition of $A$ by $A=LL^\top$. Recalling the proof of the *Theorem (Cholesky & SPD)* from the lecture, we can write
 
 $$L=\left[\begin{array}{c|ccc}
-\sqrt{\alpha}               & \frac{\beta}{\sqrt{\alpha}} & 0         & \cdots \\\hline
-\frac{\beta}{\sqrt{\alpha}} &                             &           &        \\
-0                           &                             & \tilde{L} &        \\
-\vdots                      &                             &           &         
+\sqrt{\alpha}               & & 0         & \\\hline
+\frac{\beta}{\sqrt{\alpha}} & &           &        \\
+0                           & & \tilde{L} &        \\
+\vdots                      & &           &         
 \end{array}\right]$$
 where $\tilde{L}$ satisfies $\tilde{L}\tilde{L}^\top=K-\begin{bmatrix} \beta^2/\alpha & \mathbf{0} \\ \mathbf{0} & \mathbf{0} \end{bmatrix}$ which is a tridiagonal matrix smaller than $A$. Since $L$ is lower bidiagonal when $A$ is $1\times 1$, we know by induction that $L$ is lower bidiagonal for $A$ of any size.
 
