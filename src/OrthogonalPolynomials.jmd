@@ -8,7 +8,7 @@ $$
 f(x) = \sum_{k=0}^∞ c_k p_k(x) ≈ \sum_{k=0}^{n-1} c_k^n p_k(x)
 $$
 where $p_k(x)$ are special families of polynomials, $c_k$ are expansion coefficients and
-$c_k^n$ are approximate coefficients. 
+$c_k^n$ are approximate coefficients.
 
 Why not use monomials as in Taylor series? Hidden in the previous lecture was that we could effectively
 compute Taylor coefficients by evaluating on the unit circle in the complex plane, _only_ if the radius of convergence
@@ -26,27 +26,27 @@ including functional analysis, integrable systems, singular integral equations,
 complex analysis, and random matrix theory.
 
 1. General properties of OPs: we define orthogonal polynomials, three-term recurrences and Jacobi operators
-2. Classical OPs: we define Chebyshev, Legendre, Jacobi, Laguerre, and Hermite. 
+2. Classical OPs: we define Chebyshev, Legendre, Jacobi, Laguerre, and Hermite.
 3. Gaussian quadrature: we see that OPs can be used to construct effective numerical methods for singular integrals
 4. Recurrence relationships and Sturm–Liouville equations: we see that classical OPs have many simple recurrences that
 are of importance in computation, which also show they are eigenfunctions of simple differential operators.
 
 
-## 1. General properties of orthogonal polynomials 
+## 1. General properties of orthogonal polynomials
 
-**Definition (graded polynomial basis)** 
+**Definition (graded polynomial basis)**
 A set of polynomials $\{p_0(x), p_1(x), … \}$ is _graded_ if $p_n$ is
 precisely degree $n$: i.e.,
 $$
 p_n(x) = k_n x^n + k_n^{(n-1)} x^{n-1} + ⋯ + k_n^{(1)} x + k_n^{(0)}
 $$
-for $k_n ≠ 0$. 
+for $k_n ≠ 0$.
 
 Note that if $p_n$ are graded then $\{p_0(x), …, p_n(x) \}$
 are a basis of all polynomials of degree $n$.
 
 
-**Definition (orthogonal polynomials)** 
+**Definition (orthogonal polynomials)**
 Given an (integrable) _weight_ $w(x) > 0$ for $x ∈ (a,b)$,
 which defines a continuous inner product
 $$
@@ -75,8 +75,8 @@ are orthonormal if $k_n = 1$.
 
 
 **Proposition (expansion)**
-If $r(x) is a degree $n$ polynomial, $\{p_n\}$ are orthogonal
-and $\{q_n \}$ are orthonormal then
+If $r(x)$ is a degree $n$ polynomial, $\{p_n\}$ are orthogonal
+and $\{q_n\}$ are orthonormal then
 $$
 \begin{align*}
 r(x) &= ∑_{k=0}^n {⟨p_k,r⟩ \over \|p_k\|^2} p_k(x) \\
@@ -108,14 +108,14 @@ then $r = 0$.
 OPs are uniquely defined (up to a constant) by the
 property that they are orthogonal to all lower degree polynomials.
 
-**Proposition (orthogonal to lower degree)** 
+**Proposition (orthogonal to lower degree)**
 A polynomial $p$ of precisely degree $n$ satisfies
 $$
 ⟨p,r⟩ = 0
 $$
 for all degree $m < n$ polynomials $r$ if and only if
 $p = c q_n$. Therefore an orthogonal polynomial is uniquely
-defined by $k_n$. 
+defined by $k_n$.
 
 **Proof**
 As $\{p_0,…,p_n\}$ are a basis of all polynomials of degree $n$,
@@ -133,7 +133,7 @@ $$
 p(x) = c x^n + O(x^{n-1})
 $$
 consider $p(x) - c p_n(x)$ which is of degree $n-1$. It satisfies
-for $k ≤ n-1
+for $k ≤ n-1$
 $$
 ⟨p_k, p - c p_n⟩ = ⟨p_k, p⟩ - c ⟨p_k, p_n⟩ = 0.
 $$
@@ -154,12 +154,12 @@ such that
 $$
 \begin{align*}
 x p_0(x) &= a_0 p_0(x) + b_0 p_1(x)  \\
-x p_n(x) &= c_{n-1} p_{n-1}(x) + a_n p_n(x) + b_n p_{n+1}(x) 
+x p_n(x) &= c_{n-1} p_{n-1}(x) + a_n p_n(x) + b_n p_{n+1}(x)
 \end{align*}
 $$
 **Proof**
 The $n=0$ case is immediate since $\{p_0,p_1\}$ are a basis of degree 1 polynomials.
-The $n >0$ case follows from 
+The $n >0$ case follows from
 $$
 ⟨x p_n, p_k⟩ = ⟨ p_n, xp_k⟩ = 0
 $$
@@ -172,7 +172,7 @@ $$
 since $x p_n = k_n x^{n+1} + O(x^n)$ is precisely degree
 $n$. Further,
 $$
-c_{n-1} = {⟨p_{n-1}, x p_n⟩ \over \|p_{n-1}\|^2 } = 
+c_{n-1} = {⟨p_{n-1}, x p_n⟩ \over \|p_{n-1}\|^2 } =
 {⟨p_n, x p_{n-1}⟩  \over \|p_{n-1}\|^2 } =  b_{n-1}{\|p_n\|^2  \over \|p_{n-1}\|^2 } ≠ 0.
 $$
 
@@ -214,9 +214,10 @@ P(x) := [p_0(x) | p_1(x) | ⋯]
 $$
 then we have
 $$
-x P(x) = P(x) \underbrace{\begin{bmatrix} a_0 \\ c_0 \\
-                                                        b_0 & a_1 & c_1 \\
-                                                        & ⋱ & ⋱ & ⋱
+x P(x) = P(x) \underbrace{\begin{bmatrix} a_0 & c_0 \\
+                                                        b_0 & a_1 & c_1\\
+                                                        & b_1 & a_2 & ⋱ \\
+                                                        && ⋱ & ⋱
                                                         \end{bmatrix}}_X
 $$
 More generally, for any polynomial $a(x)$ we have
@@ -227,13 +228,14 @@ $$
 For the special cases of orthonormal and monic polynomials we have extra structure:
 
 **Corollary (orthonormal 3-term recurrence)** If
-$\{q_n\}$ are orthonormal then $c_n = b_n$. That is, the Jacobi matrix is symmetric:
+$\{q_n\}$ are orthonormal then its recurrence coefficients satisfy $c_n = b_n$.
+That is, the Jacobi matrix is symmetric:
 $$
-X = \begin{bmatrix}
-a_0 & b_0 \\
-b_0 & ⋱ & ⋱
- & ⋱
-\end{bmatrix}
+X = \begin{bmatrix} a_0 & b_0 \\
+                                                        b_0 & a_1 & b_1\\
+                                                        & b_1 & a_2 & ⋱ \\
+                                                        && ⋱ & ⋱
+                                                        \end{bmatrix}
 $$
 
 **Proof**
@@ -252,7 +254,7 @@ note it is well-defined by the standard definition because it is banded.
 It can also be defined in terms of functional analysis where one considers these
 as linear operators (functions of functions) between vector spaces.
 
-**Remark** Typically the Jacobi matrix is the transpose $J := X^⊤$. 
+**Remark** Typically the Jacobi matrix is the transpose $J := X^⊤$.
 If the basis are orthonormal then $X$ is symmetric and they are the same.
 
 **Example** What are the  monic OPs $p_0(x),…,p_3(x)$ with respect to $w(x) = 1$ on $[0,1]$?
@@ -303,22 +305,20 @@ p_3(x) &= x p_2(x) - c_1 p_1(x)- a_2 p_2(x) = x^3 - x^2 + x/6 - x/15 + 1/30 -x^2
 \end{align*}
 $$
 
+## 2. Classical orthogonal polynomials
 
-
-
-## 2. Classical orthogonal polynomials
-
-Classical orthogonal polynomials are special cases with a number
+Classical orthogonal polynomials are special families of orthogonal polynomials with a number
 of beautiful properties, for example
 1. Their derivatives are also OPs
-2. The are eigenfunctions of simple differential operators
+2. They are eigenfunctions of simple differential operators
 
 As stated above orthogonal polynomials are uniquely defined by the weight
 $w(x)$ and the constant $k_n$. We consider:
 
-1. Chebyshev polynomials $T_n(x)$/$U_n(x)$: $w(x) = 1/\sqrt{1-x^2}$ or $\sqrt{1-x^2}$  on $[-1,1]$
+1. Chebyshev polynomials (1st kind) $T_n(x)$: $w(x) = 1/\sqrt{1-x^2}$ on $[-1,1]$.
+2.  Chebyshev polynomials (2nd kind) $U_n(x)$: $\sqrt{1-x^2}$ on $[-1,1]$.
 2. Legendre polynomials $P_n(x)$: $w(x) = 1$ on $[-1,1]$.
-3. Hermite polynomials $H_n(x): $w(x) = \exp(-x^2)$  on $[-∞,∞]$.
+3. Hermite polynomials $H_n(x): $w(x) = \exp(-x^2)$  on $(-∞,∞)$.
 
 Other important families discussed are
 
@@ -327,7 +327,7 @@ Other important families discussed are
 3. Laguerre polynomials
 
 
-## Chebyshev
+### Chebyshev
 
 **Definition (Chebyshev polynomials, 1st kind)** $T_n(x)$ are orthogonal with respect to $1/sqrt{1-x^2}$
 and satisfy:
@@ -342,7 +342,7 @@ U_n(x) = 2^n x^n + O(x^{n-1})
 $$
 
 
-**Theorem**
+**Theorem (Chebyshev T are cos)**
 $$
 T_n(x) = \cos n \acos x
 $$
@@ -354,15 +354,18 @@ $$
 
 **Proof**
 
-We need to show that $p_n(x) := \cos n \acos x$ are (1) graded polynomials,
-(2) orthogonal w.r.t $1/\sqrt{1-x^2}$ on $[-1,1]$, and 
-(3) have the right constant. Property (2) is immediate:
+We need to show that $p_n(x) := \cos n \acos x$ are
+1. graded polynomials
+2. orthogonal w.r.t. $1/\sqrt{1-x^2}$ on $[-1,1]$, and
+3. have the right normalisation constant $k_n = 2^{n-1}$ for $n = 2,…$.
+
+Property (2) follows under a change of variables:
 $$
-\int_{-1}^1 {p_n(x) p_m(x) \over \sqrt{1-x^2}} {\rm d} x = 
+\int_{-1}^1 {p_n(x) p_m(x) \over \sqrt{1-x^2}} {\rm d} x =
 \int_{-π}^π {cos(nθ) cos(mθ) \over \sqrt{1-cos^2 θ}} \sin θ {\rm d} θ =
 \int_{-π}^π cos(nθ) cos(mθ) {\rm d} x = 0
 $$
-if $n ≠ m$. 
+if $n ≠ m$.
 
 To see that they are graded we use the fact that
 $$
@@ -381,13 +384,88 @@ Buried in the proof is the 3-term recurrence:
 
 **Corollary**
 $$
-x 𝐓(x) = 𝐓(x) \begin{bmatrix} 0 & 1/2 \\ 1 & 0 & 1/2 \end{bmatrix} 
+\begin{align*}
+x T_0(x) = T_1(x) \\
+x T_n(x) = {T_{n-1}(x) + T_{n+1}(x) \over 2}
+\end{align*}
 $$
 
-## Legendre
+In the problem sheet you will show the following:
 
-Legendre: $P_n(x)$ are orthogonal polynomials with respect to $w(x) = 1$ on $[-1,1]$, with
-$k_n = $
+**Theorem (Chebyshev U are sin)**
+For $x = \cos θ$,
+$$
+U_n(x) = {\sin(n+1) θ \over \sin θ}
+$$
+which satisfy:
+$$
+\begin{align*}
+x U_0(x) &= U_1(x)/2 \\
+x U_n(x) &= {U_{n-1}(x) \over 2} + {U_{n+1}(x) \over 2}.
+\end{align*}
+$$
+
+### Legendre
+
+**Definition (Pochammer symbol)** The Pochammer symbol is
+$$
+\begin{align*}
+(a)_0 &= 1 \\
+(a)_n &= a (a+1) (a+2) ⋯ (a+n-1).
+$$
+
+**Definition (Legendre)** Legendre polynomials
+$P_n(x)$ are orthogonal polynomials with respect to $w(x) = 1$ on $[-1,1]$, with
+$$
+k_n = {2^n (1/2)_n \over n!}
+$$
+
+The reason for this complicated normalisation constant is both historical and
+that it leads to simpler formulae for recurrence relationships.
+
+
+Classical orthogonal polynomials have _Rodriguez formulae_, defining orthogonal
+polynomials as high order derivatives of simple functions. In this case we have:
+
+**Theorem (Legendre Rodriguez)**
+$$
+P_n(x) = {1 \over (-2)^n n!}{{\rm d}^n \over {\rm d} x^n} (1-x^2)^n
+$$
+
+**Proof**
+We need to verify:
+1. graded polynomials
+2. orthogonal to all lower degree polynomials on $[-1,1]$, and
+3. have the right normalisation constant $k_n = {2^n (1/2)_n \over n!}$.
+
+(1) follows since its a degree $n$ polynomial (the $n$-th derivative of a degree $2n$ polynomial).
+(2) follows by integration by parts. Note that $(1-x^2)^n$ and its first $n-1$ derivatives vanish at ±1$.
+If $r_m$ is a degree $m < n$ polynomial we have:
+$$
+∫_{-1}^1 {{\rm d}^n \over {\rm d} x^n} (1-x^2)^n r_m(x) {\rm d}x
+= -∫_{-1}^1 {{\rm d}^{n-1} \over {\rm d} x^{n-1}} (1-x^2)^n r_m'(x) {\rm d}x =
+⋯ = (-1)^n ∫_{-1}^1 (1-x^2) r_m^{(n)}(x) {\rm d}x = 0.
+$$
+(3) follows since:
+$$
+{{\rm d}^n \over {\rm d} x^n}[(-1)^n x^{2n} + O(x^{2n-1})] =
+(-1)^n 2n {{\rm d}^{n-1} \over {\rm d} x^{n-1}} x^{2n-1}+ O(x^{2n-1})] =
+(-1)^n 2n (2n-1) {{\rm d}^{n-2} \over {\rm d} x^{n-2}} x^{2n-2}+ O(x^{2n-2})] = ⋯ =
+(-1)^n 2n (2n-1) ⋯ (n+1) x^n + O(x^{n-1})
+$$
+which satisfies:
+$$
+(1/2)(1/2+1) ⋯ (n-1/2) = {1 \over 2^n} (1+2) ⋯ (2n-1)
+$$
+
+∎
+
+**Theorem (Legendre 3-term recurrence)**
+
+
+
+
+
 
 ## 3. Gaussian quadrature
 
@@ -459,8 +537,8 @@ This is only possible if $j = n$.
 
 **Lemma (zeros)** The zeros $x_1, …,x_n$ of $q_n(x)$ are the eigenvalues of the truncated Jacobi matrix
 $$
-X_n := \begin{bmatrix} a_0 & b_0 \\ 
-                         b_0 & ⋱ & ⋱ \\ 
+X_n := \begin{bmatrix} a_0 & b_0 \\
+                         b_0 & ⋱ & ⋱ \\
                          & ⋱ & a_{n-2} & b_{n-2} \\
                          && b_{n-2} & a_{n-1} \end{bmatrix} ∈ ℝ^{n × n}.
 $$
@@ -473,8 +551,8 @@ $$
 Q_n = \begin{bmatrix}
 p_0(x_1) & ⋯ & p_0(x_n) \\
 ⋮  & ⋯ & ⋮  \\
-p_{n-1}(x_1) & ⋯ & p_{n-1}(x_n) 
-\end{bmatrix} 
+p_{n-1}(x_1) & ⋯ & p_{n-1}(x_n)
+\end{bmatrix}
 $$
 
 **Proof**
@@ -484,18 +562,14 @@ $$
 X_n \begin{bmatrix} p_0(x_j) \\ ⋮ \\ p_{n-1}(x_j) \end{bmatrix} =
 \begin{bmatrix} a_0 p_0(x_j) + b_0 p_1(x_j) \\
  b_0 p_0(x_j) + a_1 p_1(x_j) + b_1 p_2(x_j) \\
-⋮ \\ 
+⋮ \\
 b_{n-3} p_{n-3}(x_j) + a_{n-2} p_{n-2}(x_j) + b_{n-2} p_{n-1}(x_j) \\
 b_{n-2} p_{n-2}(x_j) + a_{n-1} p_{n-1}(x_j) + b_{n-1} p_n(x_j)
 \end{bmatrix} = x_j \begin{bmatrix} p_0(x_j) \\
  p_1(x_j) \\
-⋮ \\ 
+⋮ \\
 p_n(x_j)
 \end{bmatrix}
 $$
 
 ∎
-
-
-
-

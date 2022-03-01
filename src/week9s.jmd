@@ -1,0 +1,14 @@
+
+
+**Theorem (Chebyshev U are sin)**
+For $x = \cos θ$,
+$$
+U_n(x) = {\sin(n+1) θ \over \sin θ}
+$$
+which satisfy:
+$$
+\begin{align*}
+x U_0(x) &= U_1(x)/2 \\
+x U_n(x) &= {U_{n-1}(x) \over 2} + {U_{n+1}(x) \over 2}.
+\end{align*}
+$$
