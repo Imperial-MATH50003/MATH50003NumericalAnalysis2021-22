@@ -15,13 +15,30 @@ Gibb's phenomena.)
 
 ## Orthogonal polynomials
 
+**Problem B** Construct  $p_0(x),p_1(x),p_2(x),p_3(x)$, OPs
+for the weight $\sqrt{1-x^2}$ on $[-1,1]$.
+Hint: first compute $\int_{-1}^1 x^k \sqrt{1-x^2} {\rm d} x$ for $0 ≤ k ≤ 2$
+using a change-of-variables.
 
-**Problem** Prove that family of orthogonal
+
+
+**Problem** Prove that a family of orthogonal
 polynomials are multiples of orthonormal
 $$
 p_n(x) = D_n q_n(x)
 $$
 for $D_n ∈ ℝ$ such that $|D_n| = |D|$ if and only if $c_n = b_n$.
+
+**Problem** Prove that if $∫_a^b w(x) {\rm d}x$ then and $p_n(x)$ are OPs
+satisfying
+$$
+
+$$
+then the orthonormal polynomials are:
+$$
+q_n(x)
+$$
+
 
 
 
@@ -54,5 +71,6 @@ $$
 = [q_0(x) | ⋯ | q_{n+1}(x)] X_n \begin{bmatrix} q_0(y) \\ ⋮ \\ q_n(y) \end{bmatrix}
  - [q_0(x) | ⋯ | q_n(x)] X_n^⊤ \begin{bmatrix} q_0(y) \\ ⋮ \\ q_{n+1}(y) \end{bmatrix}
 $$
+
 
 
