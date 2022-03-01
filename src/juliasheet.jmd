@@ -10,24 +10,27 @@ if you can do for loops.
 
 
 
-## Array creation and broadcasting
+## 1. Array creation and broadcasting
 
-**Problem** Create a vector of length 5 whose entries are `Int` which is
-zero in all entries. 
+**Problem 1.1** Create a vector of length 5 whose entries are `Int` which is
+zero in all entries.
 
 **SOLUTIONS**
 
+1. `zeros`
 ```julia
 zeros(Int, 5)
 ```
+2. `fill`
 ```julia
 fill(0, 5)
 ```
+3. Comprehension
 ```julia
 [0 for k=1:5]
 ```
 
-**Problem** Create a 5×6 matrix whose entries are `Int` which is
+**Problem 1.2** Create a 5×6 matrix whose entries are `Int` which is
 one in all entries.
 
 **SOLUTIONS**
@@ -53,7 +56,7 @@ fill(1, 5, 6)
 [1 for k=1:5, j=1:6]
 ```
 
-**Problem** Create a 1 × 5 `Matrix{Int}` with entries `A[k,j] = j`.
+**Problem 1.3** Create a 1 × 5 `Matrix{Int}` with entries `A[k,j] = j`.
 
 1. For-loop
 ```julia
@@ -72,7 +75,7 @@ end
 Matrix((1:5)')
 ```
 
-**Problem** Create a vector of length 5 whose entries are `Float64`
+**Problem 1.4** Create a vector of length 5 whose entries are `Float64`
 approximations of `exp(-k)`. (Two solutions: one using a for loop and
 one using broadcasting.)
 
@@ -99,9 +102,7 @@ broadcast(k -> exp(-k), 1:5)
 ```
 
 
-**Problem** Create a 5 × 6 matrix `A` whose entries `A[k,j] == cos(k+j)`.
- (Two solutions: one using a for loop and
-one using broadcasting.)
+**Problem 1.5** Create a 5 × 6 matrix `A` whose entries `A[k,j] == cos(k+j)`.
 
 **SOLUTIONS**
 
@@ -124,5 +125,47 @@ cos.(k .+ j')
 broadcast((k,j) -> cos(k+j), 1:5, (1:6)')
 ```
 
-## Types
+## 2. Types
+
+**Problem 2.1** Create a type `Rat` with two `Int` fields, `p` and `q`,
+representing a rational function including `+`, `*`, `-`, and `/`.
+Bonus points: Use `gcd` and `div` to reduce.
+
+**SOLUTION**
+```julia
+# import allows us to overload basic operations
+import Base: +, *, -, /
+
+# struct creates a new type called `Rational`
+struct Rat
+    # Here the two fields are both Int
+    p::Int
+    q::Int
+end
+
+# overload + for adding two rationals.
+function +(a::Rat, b::Rat)
+    p = a.p*b.q + b.p*a.q
+    q = a.q*b.q
+    d = gcd(p,q)
+    Rat(p ÷ d, q ÷ d)
+end
+
+-(a::Rat) = Rat(-a.p, a.q)
+-(a::Rat, b::Rat) = a + (-b)
+
+function *(a::Rat, b::Rat)
+    p = a.p * b.p
+    q = a.q * b.q
+    d = gcd(p,q)
+    Rat(p ÷ d, q ÷ d)
+end
+
+/(a::Rat, b::Rat) = a * Rat(b.q, b.p)
+
+
+@test Rat(1,2) + Rat(2,3) == Rat(7,6)
+@test Rat(1,2) * Rat(2,3) == Rat(1,3)
+@test Rat(1,2) / Rat(2,3) == Rat(3,4)
+```
 

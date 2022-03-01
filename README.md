@@ -64,6 +64,11 @@ Condition numbers, indefinite integration, and Euler methods
 Two point boundary value problems, convergence, and Fourier series
 
 
+Additional problem sheets:
+
+1. [Julia Problem Sheet](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/juliasheet.ipynb)
+
+
 ## Reading List
 
 1. Nicholas J. Higham, [Accuracy and Stability of Numerical Algorithms](https://epubs.siam.org/doi/book/10.1137/1.9780898718027?mobileUi=0), Chapters 1–3
