@@ -144,6 +144,9 @@ Thus it is zero, i.e., $p(x) = c p_n(x)$.
 A consequence of this is that orthonormal polynomials are always a
 constant multiple of orthogonal polynomials.
 
+
+### 3-term recurrence
+
 The most _fundamental_ property of orthogonal polynomials is their three-term
 recurrence.
 
@@ -182,80 +185,12 @@ $$
 
 
 
-**Corollary (3-term recurrence, 1st form)**
-If $\{p_n\}$ are OPs then there exist real constants $A_n ≠ 0$, $B_n$, and C_n$
-such that
-$$
-\begin{align*}
-p_1(x) &= (A_0 x + B_0) p_0(x) \\
-p_{n+1}(x) &= (A_n x + B_n) p_n(x) - C_n p_{n-1}(x)
-\end{align*}
-$$
 
-**Proof**
-
-Follows from
-$$
-\begin{align*}
-p_1(x) &= ({x \over b_0}  - {a_0  \over b_0}) p_0 \\
-p_{n+1}(x) &= ({x \over b_n}  - {a_n  \over b_n}) p_n(x) - {c_{n-1} \over b_n} p_{n-1}(x)
-\end{align*}
-$$
-
-∎
-
-The three-term recurrence can also be interpreted as a matrix known
-as the Jacobi matrix:
-
-**Corollary (Jacobi matrix)**
-For
-$$
-P(x) := [p_0(x) | p_1(x) | ⋯]
-$$
-then we have
-$$
-x P(x) = P(x) \underbrace{\begin{bmatrix} a_0 & c_0 \\
-                                                        b_0 & a_1 & c_1\\
-                                                        & b_1 & a_2 & ⋱ \\
-                                                        && ⋱ & ⋱
-                                                        \end{bmatrix}}_X
-$$
-More generally, for any polynomial $a(x)$ we have
-$$
-a(x) P(x) = P(x) a(X).
-$$
-
-For the special cases of orthonormal and monic polynomials we have extra structure:
-
-**Corollary (orthonormal 3-term recurrence)** If
-$\{q_n\}$ are orthonormal then its recurrence coefficients satisfy $c_n = b_n$.
-That is, the Jacobi matrix is symmetric:
-$$
-X = \begin{bmatrix} a_0 & b_0 \\
-                                                        b_0 & a_1 & b_1\\
-                                                        & b_1 & a_2 & ⋱ \\
-                                                        && ⋱ & ⋱
-                                                        \end{bmatrix}
-$$
-
-**Proof**
-$$
-b_n = ⟨x q_n, q_{n+1}⟩ = ⟨q_n, x q_{n+1}⟩ = c_{n-1}.
-$$
-∎
+Clearly if $p_n$ is monic then so is $x p_n$ which leads to the following:
 
 **Corollary (monic 3-term recurrence)** If
-$\{p_n\}$ are monic then $b_n = 1$.
+$\{p_n\}$ are monic then $b_n =  1$.
 
-
-
-**Remark** If you are worried about multiplication of infinite matrices/vectors
-note it is well-defined by the standard definition because it is banded.
-It can also be defined in terms of functional analysis where one considers these
-as linear operators (functions of functions) between vector spaces.
-
-**Remark** Typically the Jacobi matrix is the transpose $J := X^⊤$.
-If the basis are orthonormal then $X$ is symmetric and they are the same.
 
 **Example** What are the  monic OPs $p_0(x),…,p_3(x)$ with respect to $w(x) = 1$ on $[0,1]$?
 We can construct these using Gram–Schmidt, but exploiting the 3-term recurrence to reduce the computational cost.
@@ -304,6 +239,59 @@ p_3(x) &= x p_2(x) - c_1 p_1(x)- a_2 p_2(x) = x^3 - x^2 + x/6 - x/15 + 1/30 -x^2
 &= x^3 - 3x^2/2 + 3x/5 -1/20
 \end{align*}
 $$
+
+
+### Jacobi matrix
+
+
+The three-term recurrence can also be interpreted as a matrix known
+as the Jacobi matrix:
+
+**Corollary (Jacobi matrix)**
+For
+$$
+P(x) := [p_0(x) | p_1(x) | ⋯]
+$$
+then we have
+$$
+x P(x) = P(x) \underbrace{\begin{bmatrix} a_0 & c_0 \\
+                                                        b_0 & a_1 & c_1\\
+                                                        & b_1 & a_2 & ⋱ \\
+                                                        && ⋱ & ⋱
+                                                        \end{bmatrix}}_X
+$$
+More generally, for any polynomial $a(x)$ we have
+$$
+a(x) P(x) = P(x) a(X).
+$$
+
+For the special cases of orthonormal and monic polynomials we have extra structure:
+
+**Corollary (orthonormal 3-term recurrence)** If
+$\{q_n\}$ are orthonormal then its recurrence coefficients satisfy $c_n = b_n$.
+That is, the Jacobi matrix is symmetric:
+$$
+X = \begin{bmatrix} a_0 & b_0 \\
+                                                        b_0 & a_1 & b_1\\
+                                                        & b_1 & a_2 & ⋱ \\
+                                                        && ⋱ & ⋱
+                                                        \end{bmatrix}
+$$
+
+**Proof**
+$$
+b_n = ⟨x q_n, q_{n+1}⟩ = ⟨q_n, x q_{n+1}⟩ = c_{n-1}.
+$$
+∎
+
+**Remark** If you are worried about multiplication of infinite matrices/vectors
+note it is well-defined by the standard definition because it is banded.
+It can also be defined in terms of functional analysis where one considers these
+as linear operators (functions of functions) between vector spaces.
+
+**Remark** Typically the Jacobi matrix is the transpose $J := X^⊤$.
+If the basis are orthonormal then $X$ is symmetric and they are the same.
+
 
 ## 2. Classical orthogonal polynomials
 

@@ -22,6 +22,18 @@ using a change-of-variables.
 
 
 
+**Problem (3-term recurrence, 1st form)**
+Show that f $\{p_n\}$ are OPs then there exist real constants $A_n ≠ 0$, $B_n$, and C_n$
+such that
+$$
+\begin{align*}
+p_1(x) &= (A_0 x + B_0) p_0(x) \\
+p_{n+1}(x) &= (A_n x + B_n) p_n(x) - C_n p_{n-1}(x)
+\end{align*}
+$$
+
+
+
 **Problem** Prove that a family of orthogonal
 polynomials are multiples of orthonormal
 $$
