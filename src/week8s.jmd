@@ -1,21 +1,90 @@
+# MATH50003 Numerical Analysis: Problem Sheet 8
 
-## DFT
+This problem sheet explores the Discrete Fourier Transform (DFT),
+the Fast Fourier Transform (FFT), and orthogonal polynomials,
 
-**Problem** Show that $Q_n$ is symmetric ($Q_n = Q_n^⊤$) but not Hermitian ($Q_n ≠ Q_n^⋆$).
+Questions marked with a ⋆ are meant to be completed without using a computer.
+Problems are denoted A/B/C to indicate their difficulty.
 
-**Problem** Show that $Q_n^⋆$ can also be applied in $O(n \log n)$ operations.
+
+```julia
+using LinearAlgebra, Plots, Test
+```
 
 
-**Problem 3.4**  A function with a jump does not have uniformly
+
+## 1. DFT
+
+**Problem 1.1⋆ (C)** Show that the DFT $Q_n$ is symmetric ($Q_n = Q_n^⊤$) but not Hermitian ($Q_n ≠ Q_n^⋆$).
+
+**Problem 1.2⋆ (A)** Show that
+$$
+\sum_{j=1}^n \cos k θ_j \cos ℓ θ_j = \begin{cases} n & k = ℓ = 0 \\
+                                                  n/2 & k = ℓ \\
+                                                  0 & \hbox{otherwise}
+                                                  \end{cases}
+$$
+for $θ_j = π(j-1/2)/n$. Hint: this can be shown either replacing $\cos$ with 
+complex exponentials or using trigonometric identities.
+
+**Problem 1.3⋆ (B)** Consider the Discrete Cosine Transform (DCT)
+$$
+C_n := \begin{bmatrix}
+\sqrt{1/n} \\
+ & \sqrt{2/n} \\ 
+ && ⋱ \\
+ &&& \sqrt{2n}
+ \end{bmatrix}
+\begin{bmatrix}
+    1 & ⋯ & 1\\
+    \cos θ_1 & ⋯ & \cos θ_n \\
+    ⋮ & ⋱ & ⋮ \\
+    \cos (n-1)θ_1 & ⋯ & \cos (n-1)θ_n
+\end{bmatrix}
+$$
+for $θ_j = π(j-1/2)/n$. Prove that $C_n$ is orthogonal: $C_n^⊤ C_n = C_n C_n^⊤ = I$.
+Hint: $C_n C_n^⊤ = I$ might be easier to show than $C_n^⊤ C_n = I$ using the previous problem.
+
+
+
+
+**SOLUTION**
+
+For 
+$$
+\begin{bmatrix}
+    1 & ⋯ & 1\\
+    \cos θ_1 & ⋯ & \cos θ_n \\
+    ⋮ & ⋱ & ⋮ \\
+    \cos (n-1)θ_1 & ⋯ & \cos (n-1)θ_n
+\end{bmatrix}
+$$
+
+
+Here is a computer-based demonstration:
+```julia
+n = 10
+θ = range(π/(2n); step=π/n, length=n) # n evenly spaced points starting at π/(2n) with step size π/n
+C = Diagonal([1/sqrt(n); fill(sqrt(2/n), n-1)]) * [cos((k-1)*θ[j]) for k=1:n, j=1:n]
+C'C
+```
+
+
+**Problem 1.4 (B)**  A function with a jump does not have uniformly
 converging coefficients. Plot interpolant for $\sign(θ-1/2)$.
 Conjecture where the approximation converges. (This is known as
-Gibb's phenomena.)
+Gibb's phenomena.) **Note** This is non-examinable as it is computer-based,
+but may be good practice for implementing algorithms that is useful in the computer-based exam.
+
+## 2. FFT 
+
+**Problem 2.1⋆ (B)** Show that $Q_n$ can also be applied in $O(n \log n)$ operations.
 
 
 
-## Orthogonal polynomials
+## 3. Orthogonal polynomials
 
-**Problem B** Construct  $p_0(x),p_1(x),p_2(x),p_3(x)$, OPs
+**Problem 3.1 (B)** Construct  $p_0(x),p_1(x),p_2(x),p_3(x)$, OPs
 for the weight $\sqrt{1-x^2}$ on $[-1,1]$.
 Hint: first compute $\int_{-1}^1 x^k \sqrt{1-x^2} {\rm d} x$ for $0 ≤ k ≤ 2$
 using a change-of-variables.
@@ -51,38 +120,6 @@ $$
 q_n(x)
 $$
 
-
-
-
-**Problem (A)** Prove the Christoffel-Darboux Formula:
-$$
-∑_{k = 0}^n q_k(x) q_k(y) =  {k_n \over k_{n+1}} {q_{n+1}(x) q_n(y) - q_n(x) q_{n+1}(y) \over x-y}
-$$
-Hint: Consider
-$$
-(x-y) [q_0(x) | ⋯ | q_n(x)] \begin{bmatrix} q_0(y) \\ ⋮ \\ q_n(y) \end{bmatrix}
-$$
-and translating the formula
-$$
-x Q(x) = Q(x) X
-$$
-to finite-dimensions.
-
-**Proof**
-
-We have
-$$
-x [q_0(x) | ⋯ | q_n(x)] = [q_0(x) | ⋯ | q_{n+1}(x)] \underbrace{\begin{bmatrix}
-a_0 & c_0 \\
-b_0 & ⋱ & ⋱
-& ⋱ & a_n & \end{bmatrix}}_{X_n}
-$$
-Thus
-$$
-(x-y) [q_0(x) | ⋯ | q_n(x)] \begin{bmatrix} q_0(y) \\ ⋮ \\ q_n(y) \end{bmatrix}
-= [q_0(x) | ⋯ | q_{n+1}(x)] X_n \begin{bmatrix} q_0(y) \\ ⋮ \\ q_n(y) \end{bmatrix}
- - [q_0(x) | ⋯ | q_n(x)] X_n^⊤ \begin{bmatrix} q_0(y) \\ ⋮ \\ q_{n+1}(y) \end{bmatrix}
-$$
 
 
 

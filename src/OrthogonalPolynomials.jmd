@@ -327,10 +327,11 @@ q_3(x) &= \sqrt{2800} p_3(x) = \sqrt{7} (20x^3-30x^2 + 12x - 1)
 $$
 which have the Jacobi matrix
 $$
-x [q_0(x)| q_1(x)| ⋯] = x [p_0(x)| p_1(x)| ⋯] \underbrace{\begin{bmatrix} 1 \\ & 2\sqrt{3} \\ && 6 \sqrt{5} \\ &&& 20 \sqrt{7}
+x [q_0(x)| q_1(x)| ⋯] = x [p_0(x)| p_1(x)| ⋯] \underbrace{\begin{bmatrix} 1 \\ & 2\sqrt{3} \\ && 6 \sqrt{5} \\ &&& 20 \sqrt{7} \\
+&&&& ⋱
 \end{bmatrix}}_D = [q_0(x)| q_1(x)| ⋯] D^{-1} X D = 
      \begin{bmatrix} 1/2 & 1/\sqrt{12} \\
-                    1/(2\sqrt{3}) & 1/2 &  1/\sqrt{15} \\
+                    1/\sqrt{12} & 1/2 &  1/\sqrt{15} \\
                     & 1/\sqrt{15} & 1/2 & ⋱ \\
                     & ⋱ & ⋱ \end{bmatrix}
 $$
@@ -347,11 +348,14 @@ Thus we have:
 $$
 f(x) = {p_0(x) \over 3} + p_1(x) + p_2(x) = [p_0(x) | p_1(x) | p_2(x) | ⋯] \begin{bmatrix} 1/3 \\ 1 \\ 1 \\ 0 \\ ⋮ \end{bmatrix}
 $$
-Thus we know the coefficients of $x f(x)$:
+We multiply (using that $b_2 = 1$ for monic OPs) to deduce:
 $$
-x f(x) = x[p_0(x) | p_1(x) | p_2(x) | ⋯] \begin{bmatrix} 1/3 \\ 1 \\ 1 \\ 0 \\ ⋮ \end{bmatrix}
-= [p_0(x) | p_1(x) | p_2(x) | ⋯] X \begin{bmatrix} 1/3 \\ 1 \\ 1 \\ 0 \\ ⋮ \end{bmatrix}
-= [p_0(x) | p_1(x) | p_2(x) | ⋯]  \begin{bmatrix} 1/4 \\ 9/10 \\ 1 \\ 0 \\ ⋮ \end{bmatrix}
+\begin{align*}
+x f(x) = x[p_0(x) | p_1(x) | p_2(x) | ⋯] \begin{bmatrix} 1/3 \\ 1 \\ 1 \\ 0 \\ ⋮ \end{bmatrix} \\
+&= [p_0(x) | p_1(x) | p_2(x) | ⋯] X \begin{bmatrix} 1/3 \\ 1 \\ 1 \\ 0 \\ ⋮ \end{bmatrix}
+= [p_0(x) | p_1(x) | p_2(x) | ⋯]  \begin{bmatrix} 1/4 \\ 9/10 \\ 3/2 \\ 1 \\ 0 \\ ⋮ \end{bmatrix} \\
+&= {p_0(x) \over 4} + {9 p_1(x) \over 10} + {3 p_2(x) \over 2} + p_3(x)
+\end{align*}
 $$
 
 
@@ -396,7 +400,7 @@ $$
 
 **Theorem (Chebyshev T are cos)**
 $$
-T_n(x) = \cos n \acos x
+T_n(x) = \cos n {\rm acos}\, x
 $$
 In other words
 $$
@@ -406,7 +410,7 @@ $$
 
 **Proof**
 
-We need to show that $p_n(x) := \cos n \acos x$ are
+We need to show that $p_n(x) := \cos n {\rm acos}\, x$ are
 1. graded polynomials
 2. orthogonal w.r.t. $1/\sqrt{1-x^2}$ on $[-1,1]$, and
 3. have the right normalisation constant $k_n = 2^{n-1}$ for $n = 2,…$.
@@ -459,7 +463,7 @@ $$
 
 ### Legendre
 
-**Definition (Pochammer symbol)** The Pochammer symbol is
+**Definition (Pochhammer symbol)** The Pochhammer symbol is
 $$
 \begin{align*}
 (a)_0 &= 1 \\

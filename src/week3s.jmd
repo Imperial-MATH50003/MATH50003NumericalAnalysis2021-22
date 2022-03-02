@@ -545,7 +545,7 @@ end
 ```
 
 **Problem 5.5 (C)** Complete the following implementation of a Housholder reflection  so that the
-unit tests pass.
+unit tests pass. Here `s == true` means the Householder reflection is sent to the positive axis and `s == false` is the negative axis.
 
 ```julia
 function householderreflection(s::Bool, x::AbstractVector)
