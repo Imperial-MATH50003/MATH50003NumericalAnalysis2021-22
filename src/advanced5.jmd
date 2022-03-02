@@ -1,0 +1,14 @@
+**Problem** A 2D function can also be factored in a low rank form:
+$$
+f(x,y) = ∑_{k=1}^r a_k(x) b_k(y)
+$$
+Explain how one can use the SVD to rewrite a 2D polynomial
+$$
+f(x,y) = ∑_{k=1}^n ∑_{j=1}^m f_{kj} x^{k-1} y^{j-1}
+$$
+as a rank $r$ function.
+
+Hint: write
+$$
+f(x,y) = [1 | x | ⋯ | x^{n-1}] F \begin{bmatrix}1 \\ y \\ ⋮ \\ y^{m-1} \end{bmatrix}
+$$
