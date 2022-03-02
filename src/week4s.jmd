@@ -9,7 +9,7 @@ Problems are denoted A/B/C to indicate their difficulty.
 
 
 ```julia
-using LinearAlgebra, Plots
+using LinearAlgebra, Plots, Test
 ```
 
 
@@ -25,6 +25,7 @@ x = range(0, 1; length=1000)
 pl = plot()
 f = 1 ./ (5x.^2 .+ 1)
 for n = 0:10
+    # Creates 1000 x n+1 matrix with entries x[k]^(j-1)
     A = x .^ (0:n)'
     c = A \ f
     plot!(x, A*c)
@@ -37,13 +38,15 @@ x = range(0, 1; length=1000)
 pl = plot()
 f = 1 ./ (5x.^2 .+ 1)
 for n = 0:10
+    # Creates 1000 x n+1 matrix with entries x[k]^(j-1)
     A = x .^ (0:n)'
-    (Q,R)=qr(A)
-    c = R \ Q[:,1:n+1]'*f
-    plot!(x, A*c)
+    (Q, R) = qr(A)
+    c = R \ Q[:, 1:n+1]' * f
+    plot!(x, A * c)
 end
 pl
 ```
+**END**
 
 **Problem 1.2⋆ (B)** Show that every matrix has a QR decomposition such that the diagonal of $R$ is non-negative.
 Make sure to include the case of more columns than rows.
@@ -75,6 +78,7 @@ R = [-1 3 7 8 2 1; 0 2 9 2 1 9; 0 0 -7 2 1 9; 0 0 0 7 5 2]
 ```julia
 E*R
 ```
+**END**
 
 **Problem 1.3⋆ (B)** Show that the QR decomposition of a square invertible matrix is unique,
 provided that the diagonal of $R$ is positive.
@@ -92,6 +96,7 @@ Q^⊤ \tilde{Q} = R \tilde{R}^{-1}
 $$
 Note $Q^⊤ \tilde{Q}$ is orthogonal, and $R \tilde{R}^{-1}$ has positive eigenvalues (the diagonal), hence all $m$ eigenvalues of
 $Q^⊤ \tilde{Q}$ are 1. This means that $Q^⊤ \tilde{Q} = I$ and hence $\tilde{Q} = Q$, which then implies $\tilde{R} = R$.∎
+**END**
 
 ## 2. Gram–Schmidt
 
@@ -117,6 +122,8 @@ $$
 𝐯^i_j := 𝐚_j - \sum_{k=1}^{i-2}{q_k^\top 𝐚_j} q_k - {q_{i-1}^\top 𝐚_j} q_{i-1}
 $$
 
+**END**
+
 **Problem 2.2 (B)** Complete the following
 function implementing the modified Gram–Schmidt algorithm:
 ```julia
@@ -130,6 +137,11 @@ function modifiedgramschmidt(A)
     end
     Q,R
 end
+
+A = randn(300,300)
+Q,R = modifiedgramschmidt(A)
+@test A ≈ Q*R
+@test Q'Q ≈ I
 ```
 
 **SOLUTION**
@@ -139,11 +151,14 @@ function modifiedgramschmidt(A)
     m ≥ n || error("Not supported")
     R = zeros(n,n)
     Q = zeros(m,n)
+    # looping through the columns
     for j = 1:n
         v = A[:,j]
+        # now go through each row
         for k = 1:j-1
-            R[k,j] = Q[:,k]'*v
-            v = A[:,j] - Q[:,1:j-1]*R[1:j-1,j]
+            # take inner product with q_k and v
+            R[k, j] = Q[:, k]' * v
+            v = v - R[k, j] * Q[:, k]
         end
         R[j,j] = norm(v)
         Q[:,j] = v/R[j,j]
@@ -153,8 +168,11 @@ end
 
 A = randn(300,300)
 Q,R = modifiedgramschmidt(A)
-A-Q*R
+@test A ≈ Q*R
+@test Q'Q ≈ I
 ```
+
+**END**
 
 **Problem 2.3 (B)** Compare the orthogonality of `Q` between `gramschmidt` and `modifiedgramschmidt`
 when applied to a `300 × 300` random matrix.
@@ -188,9 +206,11 @@ Qm,Rm = modifiedgramschmidt(A)
 
 maximum(abs.(Q*Q')-I)
 ```
+Modified Gram–Schmidt is more accurate for constructing an orthogonal matrix:
 ```julia
 maximum(abs.(Qm*Qm')-I)
 ```
+**END**
 
 ## 3. Householder reflections
 
@@ -212,80 +232,77 @@ end
 
 import Base: *, size, getindex
 
-size(Q::Reflections) = (size(Q.v,1), size(Q.v,1))
+size(Q::Reflections) = (size(Q.V,1), size(Q.V,1))
 
 
 function *(Q::Reflections, x::AbstractVector)
-    # TODO: Apply Q in O(mn) operations
+    T = eltype(Q)
+    r = Vector{T}(x) # convert x to a vector of type T
+    # TODO: Apply Q in O(mn) operations by applying
+    # the reflection corresponding to each column of Q.V to r
+    
+    ## SOLUTION
+    for j = size(Q.V, 2):-1:1
+        v = Q.V[:, j]
+        r = r - 2 * v * dot(v, r)
+    end
+    ## END
+
+    r
 end
 
 function getindex(Q::Reflections, k::Int, j::Int)
     # TODO: Return Q[k,j] in O(mn) operations (hint: use *)
-end
-```
 
-**SOLUTION**
-```julia
-struct Reflections{T} <: AbstractMatrix{T}
-    V::Matrix{T}
-end
-
-import Base: *, size, getindex
-
-size(Q::Reflections) = (size(Q.V,1),size(Q.V,1))
-
-function *(Q::Reflections, x::AbstractVector)
-    M = x-2*Q.V[1:end,end]*Q.V[1:end,end]'*x
-    for j = size(Q.V,2)-1:-1:1
-        M = M-2*Q.V[1:end,j]*Q.V[1:end,j]'*M
-    end
-    return M
-end
-
-function getindex(Q::Reflections, k::Int, j::Int)
+    ## SOLUTION
     T = eltype(Q.V)
-    ej = zeros(T,size(Q,1))
+    ej = zeros(T, size(Q, 1))
     ej[j] = one(T)
     return (Q*ej)[k]
+    ## END
 end
+
+Y = randn(5,3)
+V = Y * Diagonal([1/norm(Y[:,j]) for j=1:3])
+Q = Reflections(V)
+@test Q ≈ (I - 2V[:,1]*V[:,1]')*(I - 2V[:,2]*V[:,2]')*(I - 2V[:,3]*V[:,3]')
+@test Q'Q ≈ I
 ```
 
 
 **Problem 3.2 (B)** Complete the following function that implements
- Householder QR using only $O(mn^2)$ operations:
+ Householder QR using only $O(mn^2)$ operations.
 ```julia
 function householderqr(A)
     m,n = size(A)
+    if m < n
+        error("Only support more rows than columns")
+    end
+    # R begins as A, modify it in place
     R = copy(A)
     Q = Reflections(Matrix(1.0I, m, n))
     for j = 1:n
         # TODO: populate Q and R using O(m*(n-j)) operations
+        ## SOLUTION
+        y = copy(R[j:end, j])
+        y[1] += ((y[1] ≥ 0) ? 1 : -1) * norm(y)
+        w = y / norm(y)
+        Q.V[j:end, j] = w
+        R[j:end, :] = R[j:end, :] - 2 * w * (w' * R[j:end, :])
+        ## END
     end
     Q,R
 end
+
+A = randn(4,6)
+Q,R = householderqr(A)
+@test Q*R ≈ A
+@test Q'Q ≈ I
 ```
 
 **SOLUTION**
-```julia
-function householderqr(A)
-    m,n = size(A)
-    R = copy(A)
-    Q = Reflections(Matrix(0.0I, m, n))
-    for j = 1:min(n,m)
-        y = copy(R[j:end,j])
-        y[1] += ((y[1] ≥ 0) ? 1 : -1)*norm(y)
-        w = y/norm(y)
-        Q.V[j:end,j] = w
-        R[j:end,:] = R[j:end,:]-2*w*(w'*R[j:end,:])
-    end
-    return Q,R
-end
 
-# Some testing:
-A = randn(4,6)
-Q,R = householderqr(A)
-Q*R-A
-```
+Here we sketch some additional notes comparing performance.
 
 ```julia
 # Here's a performance comparison with what we saw in the lecture notes:
@@ -322,6 +339,8 @@ for j = 1:5
 end
 ```
 
+**END**
+
 
 ## 4. Banded QR with Given's rotations
 
@@ -334,122 +353,122 @@ column-by-column.
 Let $A$ be a tridiagonal matrix:
 
 $$
-A = \left[\begin{matrix}
+A = \begin{bmatrix}
 a_{11} & a_{12} & 0 & \cdots  &0\\
 a_{21} & a_{22} & a_{23} & \ddots  &\vdots\\
 0      & a_{32} & a_{33} & \ddots  &0\\
        & 0      & \ddots & \ddots  &a_{n-1,n}\\
        &        & 0      & a_{n,n-1}  & a_{nn}
-\end{matrix}\right] =
-\left[ \begin{matrix}
+\end{bmatrix} =
+\begin{bmatrix}
 \mathbf{a}_1 & \mathbf{a}_2 &\cdots & \mathbf{a}_n
-\end{matrix}\right],
+\end{bmatrix},
 $$
 where each $\mathbf{a}_j \in \mathbb{R}^n$ and $[\mathbf{a}_j]_k = 0$ for $|j-k| > 1$.
 
 Recall that,
 $$
-\frac{1}{\sqrt{a^2 + b^2}} \left[\begin{matrix}
+\frac{1}{\sqrt{a^2 + b^2}} \begin{bmatrix}
 a & b \\
 -b & a
-\end{matrix}\right] \left[\begin{matrix}
+\end{bmatrix} \begin{bmatrix}
 a \\ b
-\end{matrix}\right] = \left[\begin{matrix}
+\end{bmatrix} = \begin{bmatrix}
 \sqrt{a^2 + b^2} \\ 0
-\end{matrix}\right],
+\end{bmatrix},
 $$
 and that,
 $$
-\frac{1}{\sqrt{a^2 + b^2}} \left[\begin{matrix}
+\frac{1}{\sqrt{a^2 + b^2}} \begin{bmatrix}
 a & b \\
 -b & a
-\end{matrix}\right] = \left[\begin{matrix}
+\end{bmatrix} = \begin{bmatrix}
 \cos \theta & -\sin\theta \\
 \sin\theta & \cos\theta
-\end{matrix}\right],
+\end{bmatrix},
 $$
 is a rotation matrix where $\theta = -\arctan(b/a)$. With this in mind, consider multiplying $A$ from the left by,
 $$
-Q_1 = \left[\begin{matrix}
+Q_1 = \begin{bmatrix}
 \frac{a_{11}}{r_{11}} & \frac{a_{21}}{r_{11}} \\
 -\frac{a_{21}}{r_{11}} & \frac{a_{11}}{r_{11}} \\
 &&1\\
 &&&\ddots\\
 &&&&1
-\end{matrix}\right],
+\end{bmatrix},
 $$
 where $r_{11} = \sqrt{a_{11}^2 + a_{21}^2}$. This rotates dimensions 1 and 2 through angle $\theta=-\arctan(a_{21}/a_{11})$. We have,
 $$
-Q_1 \mathbf{a}_1 = \left[\begin{matrix}
+Q_1 \mathbf{a}_1 = \begin{bmatrix}
 r_{11} \\0 \\ \vdots \\ 0
-\end{matrix}\right],\hspace{10mm}
-Q_1 \mathbf{a}_2 = \left[\begin{matrix}
+\end{bmatrix},\hspace{10mm}
+Q_1 \mathbf{a}_2 = \begin{bmatrix}
 r_{12} := \frac{1}{r_{11}}(a_{11}a_{12} + a_{21}a_{22}) \\
 t_1    := \frac{1}{r_{11}}(a_{11}a_{22} - a_{21}a_{12}) \\
 a_{32} \\
 0 \\
 \vdots \\ 0
-\end{matrix}\right],\hspace{10mm}
-Q_1 \mathbf{a}_3 = \left[\begin{matrix}
+\end{bmatrix},\hspace{10mm}
+Q_1 \mathbf{a}_3 = \begin{bmatrix}
 r_{13} := \frac{1}{r_{11}}a_{21}a_{23} \\
 s_1    := \frac{1}{r_{11}}a_{11}a_{23} \\
 a_{33} \\
 a_{43} \\
 0 \\
 \vdots \\ 0
-\end{matrix}\right],\hspace{10mm}
+\end{bmatrix},\hspace{10mm}
 Q_1 \mathbf{a}_k = \mathbf{a}_k \textrm{ for } k > 3.
 $$
 Then we take,
 $$
-Q_2 = \left[ \begin{matrix}
+Q_2 = \begin{bmatrix}
 1 \\
 & \frac{t_1}{r_{22}} & \frac{a_{32}}{r_{22}} \\
 & -\frac{a_{32}}{r_{22}} & \frac{t_1}{r_{22}} \\
 &&&1 \\
 &&&&\ddots\\
 &&&&&1
-\end{matrix}\right],
+\end{bmatrix},
 $$
 where $r_{22} = \sqrt{t_1^2 + a_{32}^2}$, a matrix which rotates dimensions 2 and 3 through angle $\theta_2 = -\arctan(a_{32}/t_1)$. Then,
 $$
-Q_2 Q_1 \mathbf{a}_{1} = Q_1\mathbf{a}_1 = \left[\begin{matrix}
+Q_2 Q_1 \mathbf{a}_{1} = Q_1\mathbf{a}_1 = \begin{bmatrix}
 r_{11} \\0 \\ \vdots \\ 0
-\end{matrix}\right],\hspace{10mm}
-Q_2 Q_1 \mathbf{a}_{2} = Q_2\left[\begin{matrix}
+\end{bmatrix},\hspace{10mm}
+Q_2 Q_1 \mathbf{a}_{2} = Q_2\begin{bmatrix}
 r_{12} \\
 t_1    \\
 a_{32} \\
 0 \\
 \vdots \\ 0
-\end{matrix}\right] = \left[\begin{matrix}
+\end{bmatrix} = \begin{bmatrix}
 r_{12} \\
 r_{22} \\
 0 \\
 0 \\
 \vdots \\
 0
-\end{matrix}\right],\hspace{10mm}
-Q_2Q_1\mathbf{a}_3 = Q_2 \left[\begin{matrix}
+\end{bmatrix},\hspace{10mm}
+Q_2Q_1\mathbf{a}_3 = Q_2 \begin{bmatrix}
 r_{13} \\
 s_1    \\
 a_{33} \\
 a_{43} \\
 0 \\
 \vdots \\ 0
-\end{matrix}\right]
-=\left[\begin{matrix}
+\end{bmatrix}
+=\begin{bmatrix}
 r_{13} \\
 r_{23} := \frac{1}{r_{22}}(t_1s_1 + a_{32}a_{33})  \\
 t_2 := \frac{1}{r_{22}}(t_1a_{33} - a_{32}s_1) \\
 a_{43} \\
 0 \\
 \vdots \\ 0
-\end{matrix}\right]
+\end{bmatrix}
 $$
 
 $$
-Q_2Q_1\mathbf{a}_4 = Q_2\left[\begin{matrix}
+Q_2Q_1\mathbf{a}_4 = Q_2\begin{bmatrix}
 0 \\
 0 \\
 a_{34} \\
@@ -458,7 +477,7 @@ a_{54} \\
 0 \\
 \vdots \\
 0
-\end{matrix}\right] = \left[\begin{matrix}
+\end{bmatrix} = \begin{bmatrix}
 0 \\
 r_{24} := \frac{1}{r_{22}}a_{32}a_{34} \\
 s_2 := \frac{1}{r_{22}} t_1 a_{34} \\
@@ -467,35 +486,35 @@ a_{54} \\
 0 \\
 \vdots \\
 0
-\end{matrix}\right], \hspace{10mm}
+\end{bmatrix}, \hspace{10mm}
 Q_2Q_1 \mathbf{a}_k = \mathbf{a}_k \textrm{ for } k > 4.
 $$
 
 Now, for $j=3\rightarrow n-1$ we take,
 $$
-Q_j := \left[\begin{matrix}
+Q_j := \begin{bmatrix}
 \mathbf{I}_{j-1} \\
 & \frac{t_{j-1}}{r_{jj}} & \frac{a_{j+1, j}}{r_{jj}} \\
 & \frac{a_{j+1, j}}{r_{jj}} & \frac{t_{j-1}}{r_{jj}} \\
 &&& \mathbf{I}_{n-j-1}
-\end{matrix}\right],
+\end{bmatrix},
 $$
 where $r_{jj} := \sqrt{t_{j-1}^2 + a_{j+1, j}^2}$.
 
 This gives,
 $$
-Q_j \dots Q_1 \mathbf{a}_k =  \left[\begin{matrix}
+Q_j \dots Q_1 \mathbf{a}_k =  \begin{bmatrix}
 \mathbf{0}_{k-3} \\
 r_{k-2,k} \\
 r_{k-1, k} \\
 r_{k,k} \\
 \mathbf{0}_{n-k}
-\end{matrix}\right],
+\end{bmatrix},
 $$
 for $k \leq j$,
 and,
 $$
-Q_j \dots Q_1 \mathbf{a}_{j+1} = \left[\begin{matrix}
+Q_j \dots Q_1 \mathbf{a}_{j+1} = \begin{bmatrix}
 \mathbf{0} \\
 r_{j-1,j+1} \\
 r_{j,j+1} := \frac{1}{r_{jj}}(t_{j-1}s_{j-1} + a_{j+1,j}a_{j+1,j+1}) \\
@@ -503,8 +522,8 @@ t_j := \frac{1}{r_{jj}}(t_{j-1}a_{j+1,j+1} - s_{j-1}a_{j+1,j})\\
 a_{j+2,j+1} \\
 0 \\
 \vdots \\ 0
-\end{matrix}\right],\hspace{10mm}
-Q_j \dots Q_1 \mathbf{a}_{j+2} = \left[\begin{matrix}
+\end{bmatrix},\hspace{10mm}
+Q_j \dots Q_1 \mathbf{a}_{j+2} = \begin{bmatrix}
 \mathbf{0} \\
 r_{j,j+2} := \frac{1}{r_{jj}}a_{j+1,j}a_{j+1,j+2} \\
 s_j := \frac{1}{r_{jj}}t_{j-1} a_{j+1,j+2} \\
@@ -512,26 +531,35 @@ a_{j+2,j+2} \\
 0 \\
 \vdots \\
 0
-\end{matrix}\right].
+\end{bmatrix}.
 $$
 Finally we define, $r_{nn} = \frac{1}{r_{n-1,n-1}}(t_{n-2}a_{n,n} - a_{n, n-1}s_{n-2})$, to obtain,
 
 $$
-Q_{n-1}\dots Q_1 A = \left[\begin{matrix}
+Q_{n-1}\dots Q_1 A = \begin{bmatrix}
 r_{11} & r_{12} & r_{13} & 0      & \dots & 0\\
 0      & r_{22} & r_{23} & r_{24} &       & 0\\
        & \ddots      & \ddots & \ddots & \ddots  & \vdots\\
        &             &    0    &  r_{n-2,n-2} & r_{n-2, n-1}     & r_{n-2,n}\\
        &             &        &    0    &     r_{n-1,n-1}    & r_{n-1,n}\\
        &             &        &        &     0    & r_{n,n}\\
-\end{matrix}\right] =: R
+\end{bmatrix} =: R
 $$
 
 so that $A = QR$, for $Q = Q_1^{-1}\dots Q_{n-1}^{-1}$, where each matrix $Q_j$ rotates the coordinates $(j,j+1)$ through the angle $\theta_j = -\arctan(a_{j+1, j}/t_{j-1})$, and thus each matrix $Q_j^{-1}$ rotates the coordinates $(j, j+1)$ through the angle $\arctan(a_{j+1, j}/t_{j-1})$. This will be important for Problem 4.3.
 
+**END**
 
 **Problem 4.2 (B)** Implement `Rotations` which represents an orthogonal matrix `Q` that is a product
- of rotations of angle `θ[k]`, each acting on the entries `k:k+1`.
+of rotations of angle `θ[k]`, each acting on the entries `k:k+1`. That is, it returns $Q = Q_1⋯Q_k$ such that
+$$
+Q_k[k:k+1,k:k+1] = 
+\begin{bmatrix}
+cos(θ[k]) -sin(θ[k])
+sin(θ[k]) cos(θ[k])
+\end{bmatrix}
+$$
+
 ```julia
 struct Rotations{T} <: AbstractMatrix{T}
     θ::Vector{T}
@@ -543,85 +571,53 @@ size(Q::Rotations) = (length(Q.θ)+1, length(Q.θ)+1)
 
 
 function *(Q::Rotations, x::AbstractVector)
-    # TODO: Apply Q in O(n) operations
-end
+    T = eltype(Q)
+    y = convert(Vector{T}, x)
+    # TODO: Apply Q in O(n) operations, modifying y in-place
 
-function getindex(Q::Rotations, k::Int, j::Int)
-    # TODO: Return Q[k,j] in O(n) operations (hint: use *)
-end
-```
-
-**SOLUTION**
-
-Implement Rotations which represents an orthogonal matrix ```Q``` that is a product of rotations of angle ```θ[k]```, each acting on the entries ```k:k+1```.
-
-Note that this can be interpreted in two ways. We can either:
-
-1. Rotate coordinates ```1:2``` through angle ```θ[1]```, then rotate coordinates ```2:3``` through angle ```θ[2]```, $\dots$, then rotate coordinates ```n-1:n``` through angle ```θ[n-1]```. Or we could,
-2. Rotate coordinates ```n-1:n``` through angle ```θ[n-1]```, then rotate coordinates ```n-2:n-1``` through angle ```θ[n-2]```, $\dots$, then rotate coordinates ```1:2``` through angle ```θ[1]```.
-
-Observe that the the form of the matrix $Q$ above would work best with the second implementation, so that is the one we choose to implement below (though technically both answers are correct).
-
-```julia
-struct Rotations{T} <: AbstractMatrix{T}
-    θ::Vector{T}
-end
-
-import Base: *, size, getindex
-
-size(Q::Rotations) = (length(Q.θ)+1, length(Q.θ)+1)
-
-function *(Q::Rotations, x::AbstractVector)
-    # TODO: Apply Q in O(n) operations
-    y = convert(Vector{AbstractFloat},x)
+    ## SOLUTION
     θ = Q.θ
     #Does Q1....Qn x
-    for k=length(Q.θ):-1:1
+    for k = length(θ):-1:1
         #below has 4 ops to make the matrix and 12 to do the matrix-vector multiplication,
         #total operations will be 48n = O(n)
-       y[k:(k+1)] = [cos(θ[k]) (-sin(θ[k])); sin(θ[k]) cos(θ[k])]*y[k:(k+1)]
+        c, s = cos(θ[k]), sin(θ[k])
+        y[k:(k+1)] = [c -s; s c] * y[k:(k+1)]
     end
+    ## END
+
     y
 end
 
 function getindex(Q::Rotations, k::Int, j::Int)
+    # TODO: Return Q[k,j] in O(n) operations (hint: use *)
+
+    ## SOLUTION
     #recall that A_kj = e_k'*A*e_j for any matrix A
     #so if we use * above, this will take O(n) operations
     n = size(Q)[1]
-    ej = zeros(n)
+    ej = zeros(eltype(Q), n)
     ej[j] = 1
     #note, must be careful to ensure that ej is a VECTOR
     #not a MATRIX, otherwise * above will not be used
-    Qj = Q*ej
+    Qj = Q * ej
     Qj[k]
+    ## END
 end
-```
 
-For example:
-```julia
-θ1 = [0.5, 1, 1.5, 2]
-R = Rotations(θ1)
+θ1 = randn(5)
+Q = Rotations(θ1)
+@test Q'Q ≈ I
+@test Rotations([π/2, -π/2]) ≈ [0 0 -1; 1 0 0; 0 -1 0]
 ```
 
 **Problem 4.3 (A)** Combine `Rotations` and `UpperTridiagonal` from last problem sheet
-to implement a banded QR decomposition that only takes $O(n)$ operations:
+to implement a banded QR decomposition, `bandedqr`, that only takes $O(n)$ operations. Hint: use `atan(y,x)`
+to determine the angle.
 ```julia
-function bandedqr(A::Tridiagonal)
-    n = size(A,1)
-    Q = Rotations(zeros(n-1)) # Assume Float64
-    R = UpperTridiagonal(zeros(n), zeros(n-1), zeros(n-2))
-    for j = 1:n-1
-        # TODO: populate Q and R
-    end
-    Q,R
-end
-```
-
-**SOLUTION**
-
-First we make sure that the ```UpperTridiagonal``` class is defined, this will be where we store our values $r_{i,j}$:
-
-```julia
+# First we include UpperTridiagonal from last problem sheet.
+# bandedqr is below.
+import Base: *, size, getindex, setindex!
 struct UpperTridiagonal{T} <: AbstractMatrix{T}
     d::Vector{T}   # diagonal entries
     du::Vector{T}  # super-diagonal enries
@@ -664,89 +660,45 @@ function setindex!(U::UpperTridiagonal, v, k::Int, j::Int)
 
     U # by convention we return the matrix
 end
-```
-Now we implement the algorithm described above. Note that at each stage it is sufficient to compute and store the following six quantities:
-\begin{align}
-\theta_j &= \arctan(a_{j+1,j}/t_{j-1})\\
-r_{jj} &= \sqrt{t_{j-1}^2 + a_{j+1,j}^2}, \\
-r_{j,j+1} &= \frac{1}{r_{jj}}(t_{j-1}s_{j-1} + a_{j+1,j}a_{j+1,j+1}) \\
-r_{j,j+2} &= \frac{1}{r_{jj}}a_{j+1,j}a_{j+1,j+2} \\
-t_{j} &= \frac{1}{r_{jj}}(t_{j-1}a_{j+1,j+1}) - s_{j-1}a_{j+1, j} \\
-s_j &= \frac{1}{r_{jj}}t_{j-1}a_{j+1,j+2}
-\end{align}
-Note that we store $\arctan(a_{j+1,j}/t_{j-1})$ as we are interested in $Q = Q_1^{-1}\dots Q_n^{-1}$, where each $Q_j^{-1}$ rotates the coordinates ```j:j+1``` through angle $\arctan(a_{j+1,j}/t_{j-1})$. We don't have to store any values for $Q$ as our implementation of ```Rotations``` above will construct $Q$ from the list of angles that we store.
-```julia
-using LinearAlgebra
+
 function bandedqr(A::Tridiagonal)
-    n = size(A,1)
-    Q = Rotations(zeros(n-1)) # Assume Float64
-    R = UpperTridiagonal(zeros(n), zeros(n-1), zeros(n-2))
-    t = zeros(n-1)
-    s = zeros(n-1)
+    n = size(A, 1)
+    Q = Rotations(zeros(n - 1)) # Assume Float64
+    R = UpperTridiagonal(zeros(n), zeros(n - 1), zeros(n - 2))
+    R[1, 1:2] = A[1, 1:2]
+        
+    for j = 1:n-1
+        # angle of rotation
+        Q.θ[j] = atan(A[j+1, j], R[j, j])
+        θ = -Q.θ[j] # rotate in oppoiste direction 
 
-    #we will do the first iteration outside of the loop as t and s have special values here
-    #find the first angle, note we take the negative as we want the inverse of Q where QA = R
-    Q.θ[1] = atan(A[2,1], A[1,1])
+        c, s = cos(θ), sin(θ)
+        # [c -s; s c] represents the rotation that introduces a zero.
 
-    #update values for R
-    #R_11
-    v = sqrt(A[1,1]^2 + A[2,1]^2)
-    R[1, 1] = v
-    #R_12
-    v = 1/R[1,1] * (A[1,1]*A[1,2] + A[2,1]*A[2,2])
-    R[1, 2] = v
-    #R_13
-    v = A[2,1]*A[2,3]/R[1,1]
-    R[1, 3] = v
+        ## TODO: modify rows k and k+1 of R to represent
+        # applying the rotation. Note you will need to use row k+1 of A.
+        
+        ## SOLUTION
+        # This is [c -s; s c] to j-th column, but ignore second row
+        # which is zero
+        R[j, j] = c * R[j, j] - s * A[j+1, j]
+        # This is [c -s; s c] to (j+1)-th column
+        R[j:j+1, j+1] = [c -s; s c] * [R[j, j+1]; A[j+1, j+1]]
 
-    #create initial storage values
-    t[1] = (-A[2,1]*A[1,2] + A[1,1]*A[2,2])/R[1,1]
-    s[1] = A[1,1]*A[2,3]/R[1,1]
-
-    if n==2
-       Q, R
-    end
-
-    for j = 2:(n-1)
-        Q.θ[j] = atan(A[j+1,j],t[j-1])
-
-        v = sqrt(A[j+1,j]^2 + t[j-1]^2)
-        R[j, j] = v
-
-        v=1/R[j,j]*(t[j-1]*s[j-1] + A[j+1,j]*A[j+1,j+1])
-        R[j, j+1] = v
-
-        #only compute this if j+2 <= n
-        #equivalently.        j < n-1
-        if j < n-1
-            v=1/R[j,j]*A[j+1,j]*A[j+1, j+2]
-            R[j, j+2] = v
+        if j < n - 1
+            # This is [c -s; s c] to (j+2)-th column, where R is still zero
+            R[j:j+1, j+2] = [-s; c] * A[j+1, j+2]
         end
-
-        t[j] = 1/R[j,j]*(-A[j+1,j]*s[j-1] + t[j-1]*A[j+1, j+1])
-
-        #only compute this if j < n-1
-        if j < n-1
-            s[j] = 1/R[j,j]*t[j-1]*A[j+1, j+2]
-        end
+        ## END
     end
-    v = (-A[n, n-1]*s[n-2] + t[n-2]*A[n,n])/R[n-1,n-1]
-    R[n, n] = v
-    #now we just need to invert Q
-
-    Q,R
+    Q, R
 end
-```
-We can check an example:
-```julia
+
 A = Tridiagonal([1, 2, 3, 4], [1, 2, 3, 4, 5], [1, 2, 3, 4])
-```
-```julia
 Q, R = bandedqr(A)
+@test Q*R ≈ A
 ```
-```julia
-Q*R - A
-```
+
 
 **Problem 4.4⋆ (B)** Could one redesign the above to only use IEEE operatations (addition, multiplication, square-roots,
 avoiding calls `atan`, `cos`, and `sin`)?
@@ -757,6 +709,8 @@ If so, what would be the structure of a matrix whose columns are the vectors of 
 
 Yes, one could avoid using ```atan```, ```cos```, and ```sin```. At each stage of the algorithm, we only use ```atan``` to compute ```θ[i]``` which we then use to compute $Q_i^{-1}$ and thus $Q$ at the end. Instead, one could simply compute $Q_i^{-1}$ directly from $t_{i-1}$ and $a_{i+1, i}$ and save it at each stage. An efficient implementation of $Q_1^{-1}\dots Q_n^{-1}$ would then compute $Q$ at the end.
 One could implement this using Householder Reflections as well. Interpreting the 'vectors of reflections' to mean the vectors which define each Householder reflection (padded with 0s at the front so that they are the same dimension and fit into a matrix), the matrix with these columns would be a lower bidiagonal matrix with bandwidths $(l, u) = (1, 0)$.
+
+**END**
 
 ## 5. PLU decomposition
 
@@ -778,75 +732,77 @@ $$
 **SOLUTION**
 **Part 1**
 Compute the PLU decomposition of,
-$$ \left[ \begin{matrix}
+$$
+\begin{bmatrix}
 0 & 2 & 1 \\
 2 & 6 & 1 \\
 1 & 1 & 4
-\end{matrix} \right]$$
+\end{bmatrix}
+$$
 We begin by permuting the first and second row as |2| > |0|, hence,
-$$P_1 =  \left[ \begin{matrix}
+$$P_1 =  \begin{bmatrix}
 0 & 1 & 0 \\
 1 & 0 & 0 \\
 0 & 0 & 1
-\end{matrix} \right], \hspace{10mm}
-P_1A =  \left[ \begin{matrix}
+\end{bmatrix}, \hspace{10mm}
+P_1A =  \begin{bmatrix}
 2 & 6 & 1 \\
 0 & 2 & 1 \\
 1 & 1 & 4
-\end{matrix} \right]
+\end{bmatrix}
 $$
 We then choose,
 $$
-L_1 = \left[ \begin{matrix}
+L_1 = \begin{bmatrix}
 1 & 0 & 0 \\
 0 & 1 & 0 \\
 -\frac{1}{2} & 0 & 1
-\end{matrix} \right], \hspace{10mm}
-L_1P_1A =  \left[ \begin{matrix}
+\end{bmatrix}, \hspace{10mm}
+L_1P_1A =  \begin{bmatrix}
 2 & 6 & 1 \\
 0 & 2 & 1 \\
 0 & -2 & \frac{7}{2}
-\end{matrix} \right]
+\end{bmatrix}
 $$
 There is no need to permute at this stage, so $P_2 = I_3$, the $3-$dimensional identity. Then we can choose,
 $$
-L_2 = \left[ \begin{matrix}
+L_2 = \begin{bmatrix}
 1 & 0 & 0 \\
 0 & 1 & 0 \\
 0 & 1 & 1
-\end{matrix} \right], \hspace{10mm}
-L_2 P_2 L_1 P_1 A =  \left[ \begin{matrix}
+\end{bmatrix}, \hspace{10mm}
+L_2 P_2 L_1 P_1 A =  \begin{bmatrix}
 2 & 6 & 1 \\
 0 & 2 & 1 \\
 0 & 0 & 9/2
-\end{matrix} \right] =: U
+\end{bmatrix} =: U
 $$
 Since $P_2 = I_3$, this reduces to $L_2L_1P_1A = U \Rightarrow A = P_1^{-1}L_1^{-1}L_2^{-1}U$. Since $P_1$ simply permutes two rows, it is its own inverse, and $L_1^{-1}L_2^{-1}$ is simply,
 $$
 L := L_1^{-1}L_2^{-1} =
-\left[ \begin{matrix}
+\begin{bmatrix}
 1 & 0 & 0 \\
 0 & 1 & 0 \\
 \frac{1}{2} & -1 & 1
-\end{matrix} \right]
+\end{bmatrix}
 $$
 Hence, we have $A = PLU$, where,
 $$
-P = P_1^{-1}= \left[ \begin{matrix}
+P = P_1^{-1}= \begin{bmatrix}
 0 & 1 & 0 \\
 1 & 0 & 0 \\
 0 & 0 & 1
-\end{matrix} \right], \hspace{10mm}
-L = \left[ \begin{matrix}
+\end{bmatrix}, \hspace{10mm}
+L = \begin{bmatrix}
 1 & 0 & 0 \\
 0 & 1 & 0 \\
 \frac{1}{2} & -1 & 1
-\end{matrix} \right], \hspace{10mm}
-U=\left[ \begin{matrix}
+\end{bmatrix}, \hspace{10mm}
+U=\begin{bmatrix}
 2 & 6 & 1 \\
 0 & 2 & 1 \\
 0 & 0 & 9/2
-\end{matrix} \right]
+\end{bmatrix}
 $$
 We can quickly check:
 ```julia
@@ -856,200 +812,189 @@ U = [2 6 1; 0 2 1; 0 0 9/2]
 
 P*L*U
 ```
+
 **Part 2**
 
 Find the $PLU$ decomposition of,
 $$
-A = \left[\begin{matrix}
+A = \begin{bmatrix}
 1 & 2 & -1 & 0 \\
 2 & 4 & -2 & 1 \\
 -3 & -5 & 6 & 1 \\
 -1 & 2 & 8 & -2
-\end{matrix}
-\right]
+\end{bmatrix}
 $$
 We see that we must start with the permutation,
 $$
-P_1 :=\left[\begin{matrix}
+P_1 :=\begin{bmatrix}
 0 & 0 & 1 & 0 \\
 0 & 1 & 0 & 0 \\
 1 & 0 & 0 & 0 \\
 0 & 0 & 0 & 1
-\end{matrix}
-\right], \hspace{10mm}
-P_1A = \left[\begin{matrix}
+\end{bmatrix}, \hspace{10mm}
+P_1A = \begin{bmatrix}
 -3 & -5 & 6 & 1 \\
 2 & 4 & -2 & 1 \\
 1 & 2 & -1 & 0 \\
 -1 & 2 & 8 & -2
-\end{matrix}
-\right]
+\end{bmatrix}
 $$
 We then choose $L_1$,
 $$
-L_1 := \left[\begin{matrix}
+L_1 := \begin{bmatrix}
 1 & 0 & 0 & 0 \\
 \frac{2}{3} & 1 & 0 & 0 \\
 \frac{1}{3} & 0 & 1 & 0 \\
 -\frac{1}{3} & 0 & 0 & 1
-\end{matrix}
-\right], \hspace{10mm}
-L_1P_1A = \left[\begin{matrix}
+\end{bmatrix}, \hspace{10mm}
+L_1P_1A = \begin{bmatrix}
 -3 & -5 & 6 & 1 \\
 0 & \frac{2}{3} & 2 & \frac{5}{3} \\
 0 & \frac{1}{3} & 1 & \frac{1}{3} \\
 0 & \frac{11}{3} & 6 & -\frac{7}{3}
-\end{matrix}
-\right]
+\end{bmatrix}
 $$
 We then choose $P_2$,
 $$
-P_2 :=\left[\begin{matrix}
+P_2 :=\begin{bmatrix}
 1 & 0 & 0 & 0 \\
 0 & 0 & 0 & 1 \\
 0 & 0 & 1 & 0 \\
 0 & 1 & 0 & 0
-\end{matrix}
-\right], \hspace{10mm}
-P_2L_1P_1A = \left[\begin{matrix}
+\end{bmatrix}, \hspace{10mm}
+P_2L_1P_1A = \begin{bmatrix}
 -3 & -5 & 6 & 1 \\
 0 & \frac{11}{3} & 6 & -\frac{7}{3} \\
 0 & \frac{1}{3} & 1 & \frac{1}{3} \\
 0 & \frac{2}{3} & 2 & \frac{5}{3}
-\end{matrix}
-\right]
+\end{bmatrix}
 $$
 We then choose $L_2$,
 $$
-L_2 := \left[\begin{matrix}
+L_2 := \begin{bmatrix}
 1 & 0 & 0 & 0 \\
 0 & 1 & 0 & 0 \\
 0 & -\frac{1}{11} & 1 & 0 \\
 0 & -\frac{2}{11} & 0 & 1
-\end{matrix}
-\right], \hspace{10mm}
-L_2P_2L_1P_1A = \left[\begin{matrix}
+\end{bmatrix}, \hspace{10mm}
+L_2P_2L_1P_1A = \begin{bmatrix}
 -3 & -5 & 6 & 1 \\
 0 & \frac{11}{3} & 6 & -\frac{7}{3} \\
 0 & 0 & \frac{5}{11} & \frac{6}{11} \\
 0 & 0 & \frac{10}{11} & \frac{23}{11}
-\end{matrix}
-\right]
+\end{bmatrix}
 $$
 We then choose $P_3$ to swap the third and fourth rows,
 $$
-P_3 :=\left[\begin{matrix}
+P_3 :=\begin{bmatrix}
 1 & 0 & 0 & 0 \\
 0 & 1 & 0 & 0 \\
 0 & 0 & 0 & 1 \\
 0 & 0 & 1 & 0
-\end{matrix}
-\right], \hspace{10mm}
-P_3L_2P_2L_1P_1A = \left[\begin{matrix}
+\end{bmatrix}, \hspace{10mm}
+P_3L_2P_2L_1P_1A = \begin{bmatrix}
 -3 & -5 & 6 & 1 \\
 0 & \frac{11}{3} & 6 & -\frac{7}{3} \\
 0 & 0 & \frac{10}{11} & \frac{23}{11} \\
 0 & 0 & \frac{5}{11} & \frac{6}{11}
-\end{matrix}
-\right]
+\end{bmatrix}
 $$
 We complete the triangularisation by choosing $L_3$,
 $$
-L_3 := \left[\begin{matrix}
+L_3 := \begin{bmatrix}
 1 & 0 & 0 & 0 \\
 0 & 1 & 0 & 0 \\
 0 & 0 & 1 & 0 \\
 0 & 0 & -\frac{1}{2} & 1
-\end{matrix}
-\right], \hspace{10mm}
-L_3P_3L_2P_2L_1P_1A = \left[\begin{matrix}
+\end{bmatrix}, \hspace{10mm}
+L_3P_3L_2P_2L_1P_1A = \begin{bmatrix}
 -3 & -5 & 6 & 1 \\
 0 & \frac{11}{3} & 6 & -\frac{7}{3} \\
 0 & 0 & \frac{10}{11} & \frac{23}{11} \\
 0 & 0 & 0 & -\frac{1}{2}
-\end{matrix}
-\right]
+\end{bmatrix}
 $$
 We now consider,
 $$L_3P_3L_2P_2L_1P_1 = L_3\tilde{L_2}\tilde{L_1}P_3P_2P_1,$$
 where $\tilde{L_1}$ and $\tilde{L_1}$ satisfy,
-
-\begin{align}
+$$
+\begin{align*}
 P_3P_2L_1 &= \tilde{L_1}P_3P_2 \\
 P_3L_2 &= \tilde{L_2}P_3
-\end{align}
-
+\end{align*}
+$$
 These can be computed via,
-\begin{align}
+$$
+\begin{align*}
 \tilde{L_1} &= P_3P_2L_1P_2^{-1}P_3^{-1} \\
 \tilde{L_2} &= P_3L_2P_3^{-1}
-\end{align}
+\end{align*}
+$$
 to obtain,
-\begin{align}
-\tilde{L_1} &= \left[\begin{matrix}
+$$
+\begin{align*}
+\tilde{L_1} &= \begin{bmatrix}
 1 & 0 & 0 & 0 \\
 -\frac{1}{3} & 1 & 0 & 0 \\
 \frac{2}{3} & 0 & 1 & 0 \\
-\frac{1}{3} & 0 & 0 & 1 \\
-\end{matrix}
-\right] \\
-\tilde{L_2} &= \left[\begin{matrix}
+\frac{1}{3} & 0 & 0 & 1 
+\end{bmatrix} \\
+\tilde{L_2} &= \begin{bmatrix}
 1 & 0 & 0 & 0 \\
 0 & 1 & 0 & 0 \\
 0 & -\frac{2}{11} & 1 & 0 \\
-0 & -\frac{1}{11} & 0 & 1 \\
-\end{matrix}
-\right]
-\end{align}
-
+0 & -\frac{1}{11} & 0 & 1 
+\end{bmatrix}
+\end{align*}
+$$
 This gives us,
-$$L^{-1} = L_3 \tilde{L_2} \tilde{L_1} = \left[\begin{matrix}
+$$
+L^{-1} = L_3 \tilde{L_2} \tilde{L_1} = \begin{bmatrix}
 1 & 0 & 0 & 0 \\
 -\frac{1}{3} & 1 & 0 & 0 \\
 \frac{2}{3} & -\frac{2}{11} & 1 & 0 \\
 \frac{1}{3} & -\frac{1}{11} & -\frac{1}{2} & 1
-\end{matrix}
-\right],$$
+\end{bmatrix},
+$$
 from which it is clear that,
-$$L =  \left[\begin{matrix}
+$$
+L =  \begin{bmatrix}
 1 & 0 & 0 & 0 \\
 \frac{1}{3} & 1 & 0 & 0 \\
 -\frac{2}{3} & \frac{2}{11} & 1 & 0 \\
 -\frac{1}{3} & \frac{1}{11} & \frac{1}{2} & 1
-\end{matrix}
-\right]$$
+\end{bmatrix}
+$$
 
 Finally, we have that,
 $$
-P = P_1^{-1} P_2^{-1} P_3^{-1} = \left[ \begin{matrix}
+P = P_1^{-1} P_2^{-1} P_3^{-1} = \begin{bmatrix}
 0 & 0 & 0 & 1 \\
 0 & 0 & 1 & 0 \\
 1 & 0 & 0 & 0 \\
 0 & 1 & 0 & 0
-\end{matrix}\right],
+\end{bmatrix},
 $$
 so that $A = PLU,$ with,
 $$
-P = P_1^{-1} P_2^{-1} P_3^{-1} = \left[ \begin{matrix}
+P = P_1^{-1} P_2^{-1} P_3^{-1} = \begin{bmatrix}
 0 & 0 & 0 & 1 \\
 0 & 0 & 1 & 0 \\
 1 & 0 & 0 & 0 \\
 0 & 1 & 0 & 0
-\end{matrix}\right], \hspace{10mm}
-L =  \left[\begin{matrix}
+\end{bmatrix}, \hspace{10mm}
+L =  \begin{bmatrix}
 1 & 0 & 0 & 0 \\
 \frac{1}{3} & 1 & 0 & 0 \\
 -\frac{2}{3} & \frac{2}{11} & 1 & 0 \\
 -\frac{1}{3} & \frac{1}{11} & \frac{1}{2} & 1
-\end{matrix}
-\right], \hspace{10mm}
-U=\left[\begin{matrix}
+\end{bmatrix}, \hspace{10mm}
+U=\begin{bmatrix}
 -3 & -5 & 6 & 1 \\
 0 & \frac{11}{3} & 6 & -\frac{7}{3} \\
 0 & 0 & \frac{10}{11} & \frac{23}{11} \\
 0 & 0 & 0 & -\frac{1}{2}
-\end{matrix}
-\right]
+\end{bmatrix}
 $$
 To check:
 ```julia
@@ -1058,3 +1003,5 @@ L=[1 0 0 0;1/3 1 0 0; -2/3 2/11 1 0; -1/3 1/11 1/2 1]
 U=[-3 -5 6 1;0 11/3 6 -7/3;0 0 10/11 23/11;0 0 0 -1/2]
 P*L*U
 ```
+
+**END**

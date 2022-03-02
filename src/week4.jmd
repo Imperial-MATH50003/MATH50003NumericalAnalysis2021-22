@@ -1,0 +1,295 @@
+# MATH50003 Numerical Analysis: Problem Sheet 4
+
+This problem sheet explores least squares, the QR decomposition including for
+tridiagonal matrices,
+and the PLU decompositions.
+
+Questions marked with a ⋆ are meant to be completed without using a computer.
+Problems are denoted A/B/C to indicate their difficulty.
+
+
+```julia
+using LinearAlgebra, Plots, Test
+```
+
+
+
+## 1. Least squares and QR decompositions
+
+**Problem 1.1 (B)** Find and plot the best least squares fit of ${1 \over 5x^2 + 1}$ by degree $n$
+polynomials for $n = 0,\ldots,10$ at 1000 evenly spaced points between $0$ and $1$.
+
+
+
+**Problem 1.2⋆ (B)** Show that every matrix has a QR decomposition such that the diagonal of $R$ is non-negative.
+Make sure to include the case of more columns than rows.
+
+
+
+**Problem 1.3⋆ (B)** Show that the QR decomposition of a square invertible matrix is unique,
+provided that the diagonal of $R$ is positive.
+
+
+
+
+## 2. Gram–Schmidt
+
+**Problem 2.1⋆ (B)** The modified Gram–Schmidt algorithm is a slight variation of Gram–Schmidt where
+instead of computing
+$$
+𝐯_j := 𝐚_j - \sum_{k=1}^{j-1} \underbrace{𝐪_k^\top 𝐚_j}_{r_{kj}} 𝐪_k
+$$
+we compute it step-by-step:
+$$
+\begin{align*}
+𝐯_j^1 &:= 𝐚_j \\
+𝐯_j^{k+1} &:= 𝐯_j^k - 𝐪_k^\top 𝐯_j^k 𝐪_k
+\end{align*}
+$$
+Show that $𝐯_j^j = 𝐯_j$.
+
+
+
+**Problem 2.2 (B)** Complete the following
+function implementing the modified Gram–Schmidt algorithm:
+```julia
+function modifiedgramschmidt(A)
+    m,n = size(A)
+    m ≥ n || error("Not supported")
+    R = zeros(n,n)
+    Q = zeros(m,n)
+    for j = 1:n
+        # TODO: Implement the Modified Gram–Schmidt algorthm
+    end
+    Q,R
+end
+
+A = randn(300,300)
+Q,R = modifiedgramschmidt(A)
+@test A ≈ Q*R
+@test Q'Q ≈ I
+```
+
+
+
+**Problem 2.3 (B)** Compare the orthogonality of `Q` between `gramschmidt` and `modifiedgramschmidt`
+when applied to a `300 × 300` random matrix.
+
+
+
+## 3. Householder reflections
+
+**Problem 3.1 (B)**
+Complete the definition of `Reflections` which supports a sequence of reflections,
+that is,
+$$
+Q = Q_{𝐯_1} \cdots Q_{𝐯_n}
+$$
+where the vectors are stored as a matrix `V` whose $j$-th column is $𝐯_j$, and
+$$
+Q_{𝐯_j} = I - 2 𝐯_j 𝐯_j^\top.
+$$
+
+```julia
+struct Reflections{T} <: AbstractMatrix{T}
+    V::Matrix{T}
+end
+
+import Base: *, size, getindex
+
+size(Q::Reflections) = (size(Q.V,1), size(Q.V,1))
+
+
+function *(Q::Reflections, x::AbstractVector)
+    T = eltype(Q)
+    r = Vector{T}(x) # convert x to a vector of type T
+    # TODO: Apply Q in O(mn) operations by applying
+    # the reflection corresponding to each column of Q.V to r
+
+    r
+end
+
+function getindex(Q::Reflections, k::Int, j::Int)
+    # TODO: Return Q[k,j] in O(mn) operations (hint: use *)
+end
+
+Y = randn(5,3)
+V = Y * Diagonal([1/norm(Y[:,j]) for j=1:3])
+Q = Reflections(V)
+@test Q ≈ (I - 2V[:,1]*V[:,1]')*(I - 2V[:,2]*V[:,2]')*(I - 2V[:,3]*V[:,3]')
+@test Q'Q ≈ I
+```
+
+
+**Problem 3.2 (B)** Complete the following function that implements
+ Householder QR using only $O(mn^2)$ operations.
+```julia
+function householderqr(A)
+    m,n = size(A)
+    if m < n
+        error("Only support more rows than columns")
+    end
+    # R begins as A, modify it in place
+    R = copy(A)
+    Q = Reflections(Matrix(1.0I, m, n))
+    for j = 1:n
+        # TODO: populate Q and R using O(m*(n-j)) operations
+    end
+    Q,R
+end
+
+A = randn(4,6)
+Q,R = householderqr(A)
+@test Q*R ≈ A
+@test Q'Q ≈ I
+```
+
+
+
+
+## 4. Banded QR with Given's rotations
+
+**Problem 4.1⋆ (A)**  Describe an algorithm for computing the QR decomposition
+of a tridiagonal matrix using rotations instead of reflections to upper-triangularise
+column-by-column.
+
+
+
+**Problem 4.2 (B)** Implement `Rotations` which represents an orthogonal matrix `Q` that is a product
+of rotations of angle `θ[k]`, each acting on the entries `k:k+1`. That is, it returns $Q = Q_1⋯Q_k$ such that
+$$
+Q_k[k:k+1,k:k+1] = 
+\begin{bmatrix}
+cos(θ[k]) -sin(θ[k])
+sin(θ[k]) cos(θ[k])
+\end{bmatrix}
+$$
+
+```julia
+struct Rotations{T} <: AbstractMatrix{T}
+    θ::Vector{T}
+end
+
+import Base: *, size, getindex
+
+size(Q::Rotations) = (length(Q.θ)+1, length(Q.θ)+1)
+
+
+function *(Q::Rotations, x::AbstractVector)
+    T = eltype(Q)
+    y = convert(Vector{T}, x)
+    # TODO: Apply Q in O(n) operations, modifying y in-place
+
+    y
+end
+
+function getindex(Q::Rotations, k::Int, j::Int)
+    # TODO: Return Q[k,j] in O(n) operations (hint: use *)
+end
+
+θ1 = randn(5)
+Q = Rotations(θ1)
+@test Q'Q ≈ I
+@test Rotations([π/2, -π/2]) ≈ [0 0 -1; 1 0 0; 0 -1 0]
+```
+
+**Problem 4.3 (A)** Combine `Rotations` and `UpperTridiagonal` from last problem sheet
+to implement a banded QR decomposition, `bandedqr`, that only takes $O(n)$ operations. Hint: use `atan(y,x)`
+to determine the angle.
+```julia
+# First we include UpperTridiagonal from last problem sheet.
+# bandedqr is below.
+import Base: *, size, getindex, setindex!
+struct UpperTridiagonal{T} <: AbstractMatrix{T}
+    d::Vector{T}   # diagonal entries
+    du::Vector{T}  # super-diagonal enries
+    du2::Vector{T} # second-super-diagonal entries
+end
+
+size(U::UpperTridiagonal) = (length(U.d),length(U.d))
+
+function getindex(U::UpperTridiagonal, k::Int, j::Int)
+    d,du,du2 = U.d,U.du,U.du2
+    # TODO: return U[k,j]
+    if j - k == 0
+        d[j]
+    elseif j - k == 1
+        du[k]
+    elseif j - k == 2
+        du2[k]
+    else
+        0
+    end
+end
+
+function setindex!(U::UpperTridiagonal, v, k::Int, j::Int)
+    d,du,du2 = U.d,U.du,U.du2
+    if j > k+2
+        error("Cannot modify off-band")
+    end
+
+    # TODO: modify d,du,du2 so that U[k,j] == v
+    if j - k == 0
+        d[k] = v
+    elseif j - k == 1
+        du[k] = v
+    elseif j - k == 2
+        du2[k] = v
+    else
+        error("Cannot modify off-band")
+    end
+    U = UpperTridiagonal(d,du,du2)
+
+    U # by convention we return the matrix
+end
+
+function bandedqr(A::Tridiagonal)
+    n = size(A, 1)
+    Q = Rotations(zeros(n - 1)) # Assume Float64
+    R = UpperTridiagonal(zeros(n), zeros(n - 1), zeros(n - 2))
+    R[1, 1:2] = A[1, 1:2]
+        
+    for j = 1:n-1
+        # angle of rotation
+        Q.θ[j] = atan(A[j+1, j], R[j, j])
+        θ = -Q.θ[j] # rotate in oppoiste direction 
+
+        c, s = cos(θ), sin(θ)
+        # [c -s; s c] represents the rotation that introduces a zero.
+
+        ## TODO: modify rows k and k+1 of R to represent
+        # applying the rotation. Note you will need to use row k+1 of A.
+    end
+    Q, R
+end
+
+A = Tridiagonal([1, 2, 3, 4], [1, 2, 3, 4, 5], [1, 2, 3, 4])
+Q, R = bandedqr(A)
+@test Q*R ≈ A
+```
+
+
+**Problem 4.4⋆ (B)** Could one redesign the above to only use IEEE operatations (addition, multiplication, square-roots,
+avoiding calls `atan`, `cos`, and `sin`)?
+Would it have been possible to implement this algorithm using reflections?
+If so, what would be the structure of a matrix whose columns are the vectors of reflections?
+
+
+
+## 5. PLU decomposition
+
+**Problem 5.1⋆ (C)** Compute the PLU decompositions for the following matrices:
+$$
+\begin{bmatrix}
+0 & 2 & 1 \\
+2 & 6 & 1 \\
+1 & 1 & 4
+\end{bmatrix},
+\begin{bmatrix}
+1 & 2 & -1 & 0 \\
+2 & 4 & -2 & 1 \\
+-3 & -5 & 6 & 1 \\
+-1 & 2 & 8 & -2
+\end{bmatrix}
+$$
+
