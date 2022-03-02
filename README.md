@@ -46,8 +46,8 @@ interpolation, fast multiplication of polynomials, computing derivatives, solvin
 
 ## Assessment
 
-1. Practice late-term exam (computer-based Julia exam, not for credit, released on TurnItIn): 4 March 2022, 3–5pm (1 hour exam, 1 hour upload/download)
-2. Late-term exam (computer-based Julia exam, released on TurnItIn): 18 March 2022, 3–5pm (1 hour exam, 1 hour upload/download)
+1. Practice late-term exam (computer-based Julia exam, not for credit, released on Blackboard): 4 March 2022, 3–5pm (1 hour exam, 1 hour upload/download)
+2. Late-term exam (computer-based Julia exam, released on Blackboard): 18 March 2022, 3–5pm (1 hour exam, 1 hour upload/download)
 3. Practice final exam (pen-and-paper, not for credit): Summer Term (TBC)
 3. Final exam (pen-and-paper): Summer Term (TBC)
 
