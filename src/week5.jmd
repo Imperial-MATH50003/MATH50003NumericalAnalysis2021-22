@@ -1,0 +1,181 @@
+# MATH50003 Numerical Analysis: Problem Sheet 5
+
+This problem sheet explores positive definite matrices,
+Cholesky decompositions, matrix norms, and the singular value decomposition.
+
+Questions marked with a ⋆ are meant to be completed without using a computer.
+Problems are denoted A/B/C to indicate their difficulty.
+
+
+```julia
+using LinearAlgebra, Plots, Test
+```
+
+## 1. Positive definite matrices and Cholesky decompositions
+
+
+**Problem 1.1⋆ (C)** Use the Cholesky decomposition to determine
+which of the following matrices are symmetric positive definite:
+$$
+\begin{bmatrix} 1 & -1  \\
+-1 & 3
+\end{bmatrix}, \begin{bmatrix} 1 & 2 & 2  \\
+2 & 1 & 2\\
+2 & 2 & 1
+\end{bmatrix}, \begin{bmatrix} 3 & 2 & 1  \\
+2 & 4 & 2\\
+1 & 2 & 5
+\end{bmatrix}, 
+\begin{bmatrix} 4 & 2 & 2 & 1  \\
+2 & 4 & 2 & 2\\
+2 & 2 & 4 & 2 \\
+1 & 2 & 2 & 4
+\end{bmatrix}
+$$
+
+
+
+**Problem 1.2⋆ (B)** Recall that an inner product $⟨𝐱, 𝐲⟩$ on $ℝ^n$
+over the reals $ℝ$ satisfies, for all $𝐱,𝐲,𝐳 ∈ ℝ$ and $a,b ∈ ℝ$:
+1. Symmetry: $⟨𝐱, 𝐲⟩ = ⟨𝐲, 𝐱⟩$
+2. Linearity: $⟨a𝐱+b𝐲, 𝐳⟩ = a ⟨𝐱, 𝐳⟩+ b⟨𝐲, 𝐳⟩$
+3. Posive-definite: $⟨𝐱, 𝐱⟩ > 0$
+Prove that $⟨𝐱, 𝐲⟩$ is an inner product if and only if
+$$
+⟨𝐱, 𝐲⟩ = 𝐱^⊤ K 𝐲
+$$
+where $K$ is a symmetric positive definite matrix.
+
+
+
+**Problem 1.3⋆ (A)** Show that a matrix is symmetric positive definite if and only if it has a Cholesky
+decomposition of the form
+$$
+A = U U^⊤
+$$
+where $U$ is upper triangular with positive entries on the diagonal.
+
+
+
+**Problem 1.4⋆ (A)** Prove that the following $n × n$ matrix is symmetric positive definite
+for any $n$:
+$$
+Δ_n := \begin{bmatrix}
+2 & -1 \\
+-1 & 2 & -1 \\
+& -1 & 2 & ⋱ \\
+&& ⋱ & ⋱ & -1 \\
+&&& -1 & 2
+\end{bmatrix}
+$$
+Deduce its two Cholesky decompositions: $Δ_n = L_n L_n^⊤ = U_n U_n^⊤$ where
+$L_n$ is lower triangular and $U_n$ is upper triangular.
+
+
+
+**Problem 1.5 (B)** `SymTridiagonal(dv, eu)` is a type for representing symmetric tridiagonal
+matrices (that is, `SymTridiagonal(dv, ev) == Tridiagonal(ev, dv, ev)`). Complete the following
+implementation of `cholesky` to return a `Bidiagonal` cholesky factor in $O(n)$ operations, 
+and check your result
+compared to your solution of Problem 1.3 for `n = 1_000_000`.
+```julia
+import LinearAlgebra: cholesky
+
+# return a Bidiagonal L such that L'L == A (up to machine precision)
+cholesky(A::SymTridiagonal) = cholesky!(copy(A))
+
+# return a Bidiagonal L such that L'L == A (up to machine precision)
+# You are allowed to change A
+function cholesky!(A::SymTridiagonal)
+    d = A.dv # diagonal entries of A
+    u = A.ev # sub/super-diagonal entries of A
+    T = float(eltype(A)) # return type, make float in case A has Ints
+    n = length(d)
+    ld = zeros(T, n) # diagonal entries of L
+    ll = zeros(T, n-1) # sub-diagonal entries of L
+
+    Bidiagonal(ld, ll, :L)
+end
+
+n = 1000
+A = SymTridiagonal(2*ones(n),-ones(n-1))
+L = cholesky(A)
+@test L ≈ cholesky(Matrix(A)).L
+```
+
+## 2. Matrix norms
+
+**Problem 2.1⋆ (B)** Prove the following:
+$$
+\begin{align*}
+\|A\|_∞ &= \max_k \|A[k,:]\|_1 \\
+\|A\|_{1 → ∞} &= \|\hbox{vec}(A)\|_∞ = \max_{kj} |a_{kj}|
+\end{align*}
+$$
+
+
+
+
+**Problem 2.2⋆ (B)** For a rank-1 matrix $A = 𝐱 𝐲^⊤$ prove that
+$$
+\|A \|_2 = \|𝐱\|_2 \|𝐲\|_2.
+$$
+Hint: use the Cauchy–Schwartz inequality.
+
+
+
+**Problem 2.3⋆ (B)** Show for any orthogonal matrix $Q ∈ ℝ^m$ and
+matrix $A ∈ ℝ^{m × n}$ that
+$$
+\|Q A\|_F = \|A\|_F
+$$
+by first showing that $\|A \|_F = \sqrt{\hbox{tr}(A^⊤ A)}$ using the
+_trace_ of an $m × m$ matrix:
+$$
+\hbox{tr}(A) = a_{11} + a_{22} + ⋯ + a_{mm}.
+$$
+
+
+
+## 3. Singular value decomposition
+
+**Problem 3.1⋆ (B)** Show that $\|A \|_2 ≤ \|A\|_F ≤ \sqrt{r} \|A \|_2$ where
+$r$ is the rank of $A$.
+
+
+
+**Problem 3.2 (A)** Consider functions sampled on a $(n+1) × (n+1)$ 2D grid 
+$(x_k,y_j) = (k/n, j/n)$ where $k,j = 0,…,n$. 
+For $n = 100$, what is the lowest rank $r$ such that
+the  best rank-$r$ approximation to the samples 
+that is accurate to within $10^{-5}$ accuracy for the following functions:
+$$
+(x + 2y)^2, \cos(\sin x {\rm e}^y), 1/(x + y + 1), \hbox{sign}(x-y)
+$$
+For which examples does the answer change when $n = 1000$?
+
+
+
+**Problem 3.3⋆ (B)** Define the _pseudo-inverse_:
+$$
+A^+ := V Σ^{-1} U^⊤.
+$$
+Show that it satisfies the _Moore-Penrose conditions_:
+1. $A A^+ A = A$
+2. $A^+ A A^+ = A^+$
+3. $(A A^+)^⊤  = A A^+$ and $(A^+ A)^⊤ = A^+ A$
+
+
+
+**Problem 3.4⋆ (A)** Show for $A ∈ ℝ^{m × n}$ with $m ≥ n$ and ⊤ rank
+that $𝐱 =  A^+ 𝐛$ is the least squares solution, i.e., minimises $\| A 𝐱 - 𝐛 \|_2$.
+Hint: extend $U$ in the SVD to be a square orthogonal matrix.
+
+
+
+**Problem 3.5⋆ (A)**
+If $A ∈ ℝ^{m × n}$ has a non-empty kernel there are multiple solutions to the least
+squares problem as 
+we can add any element of the kernel. Show that $𝐱 = A^+ 𝐛$ gives the least squares solution
+such that $\| 𝐱 \|_2$ is minimised.
+

@@ -8,7 +8,7 @@ Problems are denoted A/B/C to indicate their difficulty.
 
 
 ```julia
-using LinearAlgebra, Plots
+using LinearAlgebra, Plots, Test
 ```
 
 ## 1. Positive definite matrices and Cholesky decompositions
@@ -117,7 +117,6 @@ $3A_3=9-\frac{3\times 3}{8}>0$, so Matrix 4 is SPD.
 We can check that we did this correctly by running the following in Julia:
 
 ```julia
-using LinearAlgebra
 cholesky([1 -1; -1 3])
 ```
 ```julia
@@ -130,6 +129,7 @@ cholesky([3 2 1; 2 4 2; 1 2 5])
 ```julia
 cholesky([4 2 2 1; 2 4 2 2; 2 2 4 2; 1 2 2 4])
 ```
+**END**
 
 **Problem 1.2⋆ (B)** Recall that an inner product $⟨𝐱, 𝐲⟩$ on $ℝ^n$
 over the reals $ℝ$ satisfies, for all $𝐱,𝐲,𝐳 ∈ ℝ$ and $a,b ∈ ℝ$:
@@ -148,11 +148,13 @@ We begin by showing that $⟨𝐱, 𝐲⟩ = 𝐱^⊤ K 𝐲$ with $K$ spd defin
 $$ ⟨𝐱, 𝐲⟩ = 𝐱^⊤ K𝐲 = 𝐱 \cdot (K𝐲) = (K𝐲) \cdot 𝐱$$
 $$=  (K𝐲)^⊤ 𝐱 = 𝐲^⊤ K^⊤𝐱 = 𝐲^⊤ K 𝐱 = ⟨𝐲, 𝐱⟩.$$
 For linearity:
-$$ ⟨a𝐱+b𝐲, 𝐳⟩ = (a𝐱+b𝐲)^⊤ K𝐳 = (a𝐱^T+b𝐲^⊤)K𝐳$$
+$$ ⟨a𝐱+b𝐲, 𝐳⟩ = (a𝐱+b𝐲)^⊤ K𝐳 = (a𝐱^⊤+b𝐲^⊤)K𝐳$$
 $$ = a𝐱^⊤ K𝐳 + b𝐲^⊤ K𝐳 = a⟨𝐱, 𝐳⟩ + b⟨𝐲, 𝐳⟩.$$
 Positive-definiteness of the matrix $K$ immediately yields $⟨𝐱, 𝐱⟩ = 𝐱^⊤ K 𝐱 >0$. Now we turn to the converse result, i.e. that there exists a symmetric positive definite matrix $K$ for any inner product ⟨𝐱, 𝐲⟩ such that it can be written as $⟨𝐱, 𝐲⟩ = 𝐱^⊤ K 𝐲$. Define the entries of $K$ by $K_{ij} = ⟨e_i, e_j⟩$ where $e_j$ is the $j$-th standard basis vector. Note that by linearity of the inner product any inner product on $ℝ^n$ can be written as $⟨𝐱, 𝐲⟩ = \sum_{k=0}^n \sum_{l=0}^n x_k y_l ⟨e_k, e_l⟩$ by linearity. But with the elements of $K$ defined as above this is precisely 
 $$⟨𝐱, 𝐲⟩ = \sum_{k=0}^n \sum_{l=0}^n x_k K_{kl} y_l = 𝐱^⊤ K 𝐲.$$
 What remains is to show that this $K$ is symmetric positive definite. Symmetry is an immediate conseqence of the symmetry of its elements, i.e. $K_{ij} = ⟨e_i, e_j⟩ = ⟨e_j, e_i⟩ = K_{ji}$. Finally, positive definiteness follows from the positive definiteness of the inner product $⟨𝐱, 𝐱⟩ > 0$ with $⟨𝐱, 𝐱⟩ = 𝐱^⊤ K 𝐱$.
+
+**END**
 
 **Problem 1.3⋆ (A)** Show that a matrix is symmetric positive definite if and only if it has a Cholesky
 decomposition of the form
@@ -170,7 +172,9 @@ eigenvector we have
 $$
 λ = λ𝐯^⊤ 𝐯 = 𝐯^⊤ K 𝐯 > 0.
 $$
-Thus they are always invertible. Then note that any such matrix has a Cholesky decomposition of standard form $A = L L^T$ where $L$ is lower triangular. The inverse of this standard form Cholesky decomposition is then $A^{-1} = L^{-T} L^{-1}$, which is of the desired form since $L$ is lower triangular and $L^{-T}$ is upper triangular. The positive entries on the diagonal follow directly because this is the case for the Cholesky decomposition factors of the original matrix. Thus, since all symmetric positive definite matrices can be written as the inverses of a symmetric positive definite matrix, this shows that they all have a decomposition $A = U U^⊤$ (using the Cholesky factors of its inverse).
+Thus they are always invertible. Then note that any such matrix has a Cholesky decomposition of standard form $A = L L^⊤$ where $L$ is lower triangular. The inverse of this standard form Cholesky decomposition is then $A^{-1} = L^{-T} L^{-1}$, which is of the desired form since $L$ is lower triangular and $L^{-T}$ is upper triangular. The positive entries on the diagonal follow directly because this is the case for the Cholesky decomposition factors of the original matrix. Thus, since all symmetric positive definite matrices can be written as the inverses of a symmetric positive definite matrix, this shows that they all have a decomposition $A = U U^⊤$ (using the Cholesky factors of its inverse).
+
+**END**
 
 **Problem 1.4⋆ (A)** Prove that the following $n × n$ matrix is symmetric positive definite
 for any $n$:
@@ -232,13 +236,14 @@ Recalling that $c_1=1$, we know that $\frac{1}{c_k-1}=k$. As a result, $c_k=(k+1
 We can apply the same process to $U_n$, but this is a special case since flipping $\Delta_n$ horizontally and vertically gives itself: $P\Delta_nP^\top=\Delta_n$ where $P=\begin{bmatrix} & & 1 \\ & ⋰ & \\ 1 & & \end{bmatrix}$. So we can also flip $L_n$ to get $U_n$:
 $$U_n=PL_n.$$
 
+**END**
+
 **Problem 1.5 (B)** `SymTridiagonal(dv, eu)` is a type for representing symmetric tridiagonal
 matrices (that is, `SymTridiagonal(dv, ev) == Tridiagonal(ev, dv, ev)`). Complete the following
 implementation of `cholesky` to return a `Bidiagonal` cholesky factor in $O(n)$ operations, 
 and check your result
 compared to your solution of Problem 1.3 for `n = 1_000_000`.
 ```julia
-using LinearAlgebra
 import LinearAlgebra: cholesky
 
 # return a Bidiagonal L such that L'L == A (up to machine precision)
@@ -254,48 +259,21 @@ function cholesky!(A::SymTridiagonal)
     ld = zeros(T, n) # diagonal entries of L
     ll = zeros(T, n-1) # sub-diagonal entries of L
 
-    # TODO: populate ld and ll
-
-    Bidiagonal(ld, l, :L)
-end
-```
-
-**SOLUTION**
-
-```julia
-using LinearAlgebra
-import LinearAlgebra: cholesky
-
-# return a Bidiagonal L such that L'L == A (up to machine precision)
-cholesky(A::SymTridiagonal) = cholesky!(copy(A))
-
-# return a Bidiagonal L such that L'L == A (up to machine precision)
-# You are allowed to change A
-function cholesky!(A::SymTridiagonal)
-    d = A.dv # diagonal entries of A
-    u = A.ev # sub/super-diagonal entries of A
-    T = float(eltype(A)) # return type, make float in case A has Ints
-    n = length(d)
-    ld = zeros(T, n) # diagonal entries of L
-    ll = zeros(T, n-1) # sub-diagonal entries of L
-
+    ## SOLUTION
     ld[1]=sqrt(d[1])
     for k=1:n-1
         ll[k]=u[k]/ld[k]
         ld[k+1]=sqrt(d[k+1]-ll[k]^2)
     end
+    ## END
 
     Bidiagonal(ld, ll, :L)
 end
-```
 
-```julia
-n=1000000
-A=SymTridiagonal(2*ones(n),-ones(n-1))
-```
-
-```julia
-L=cholesky(A)
+n = 1000
+A = SymTridiagonal(2*ones(n),-ones(n-1))
+L = cholesky(A)
+@test L ≈ cholesky(Matrix(A)).L
 ```
 
 ## 2. Matrix norms
@@ -339,11 +317,14 @@ $$\|\mathbf{x}\|_\infty\max\limits_k\|A[k,:]\|_1=1\cdot\max\limits_k\|A[k,:]\|_1
 
 In both cases, equality can hold, so the upper bounds are actually maxima.
 
+**END**
+
 
 **Problem 2.2⋆ (B)** For a rank-1 matrix $A = 𝐱 𝐲^⊤$ prove that
 $$
 \|A \|_2 = \|𝐱\|_2 \|𝐲\|_2.
 $$
+Hint: use the Cauchy–Schwartz inequality.
 
 **SOLUTION**
 
@@ -353,6 +334,8 @@ so it remains to prove that $\|\mathbf{y}\|_2=\sup_{\mathbf{z}}\frac{|\mathbf{y}
 By Cauchy-Schwartz inequality,
 $$|\mathbf{y}^\top\mathbf{z}|=|(\mathbf{y},\mathbf{z})|\le\|\mathbf{y}\|_2\|\mathbf{z}\|_2$$
 with the two sides being equal when $\mathbf{y}$ and $\mathbf{z}$ are linearly dependent, in which case the bound is tight.
+
+**END**
 
 **Problem 2.3⋆ (B)** Show for any orthogonal matrix $Q ∈ ℝ^m$ and
 matrix $A ∈ ℝ^{m × n}$ that
@@ -373,6 +356,8 @@ On the other hand,
 $$\text{tr}(A^\top A)=\text{tr}(A^\top Q^\top QA)=\text{tr}((QA)^\top (QA))=\|QA\|_F^2,$$
 so $\|Q A\|_F = \|A\|_F$.
 
+**END**
+
 ## 3. Singular value decomposition
 
 **Problem 3.1⋆ (B)** Show that $\|A \|_2 ≤ \|A\|_F ≤ \sqrt{r} \|A \|_2$ where
@@ -386,7 +371,7 @@ Hence,
 
 $$\|A \|_F^2 = \hbox{tr}(A^⊤ A) = \sigma_1^2 +...+\sigma_m^2$$
 
-where $\sigma_1\ge...\ge \sigma_n \ge 0$ are the singular values of $A$ and $\sigma_i^2$ are the eigenvalues of $A^T A$
+where $\sigma_1\ge...\ge \sigma_n \ge 0$ are the singular values of $A$ and $\sigma_i^2$ are the eigenvalues of $A^⊤ A$
 
 Knowing that $\|A\|_2^2 = \sigma_1^2$ we have $\|A \|_2^2 ≤ \|A\|_F^2$
 
@@ -395,8 +380,11 @@ Moreover, since if the rank of $A$ is $r$ we have that $\sigma_{r+1}=...=\sigma_
 $\|A\|_F^2 = \sigma_1^2 +...+\sigma_m^2 =\sigma_1^2 +...+\sigma_r^2 \le r \sigma_1^2 =r \|A \|_2^2$
 
 Hence,
+$$
+\|A \|_2 ≤ \|A\|_F ≤ \sqrt{r} \|A \|_2.
+$$
 
-$\|A \|_2 ≤ \|A\|_F ≤ \sqrt{r} \|A \|_2$
+**END**
 
 **Problem 3.2 (A)** Consider functions sampled on a $(n+1) × (n+1)$ 2D grid 
 $(x_k,y_j) = (k/n, j/n)$ where $k,j = 0,…,n$. 
@@ -454,6 +442,8 @@ println("Rank for f₃ = ", find_min_rank(f₃, n, error))
 println("Rank for f₄ = ", find_min_rank(f₄, n, error))
 ```
 
+**END**
+
 **Problem 3.3⋆ (B)** Define the _pseudo-inverse_:
 $$
 A^+ := V Σ^{-1} U^⊤.
@@ -465,21 +455,23 @@ Show that it satisfies the _Moore-Penrose conditions_:
 
 **SOLUTION**
 
-Let $A=UΣ V^T$ and $A^+ := V Σ^{-1} U^⊤$. Note that $UU^T = U^TU = I$ ($U$ orthonormal) and $V^T V =I$
+Let $A=UΣ V^⊤$ and $A^+ := V Σ^{-1} U^⊤$. Note that $UU^⊤ = U^⊤U = I$ ($U$ orthonormal) and $V^⊤ V =I$
 
 1. We have
-$$A A^+ A = U \Sigma V^T V \Sigma^{-1} U^T U \Sigma V^T = U \Sigma \Sigma^{-1} \Sigma V^T = U\Sigma V^T = A$$
+$$A A^+ A = U \Sigma V^⊤ V \Sigma^{-1} U^⊤ U \Sigma V^⊤ = U \Sigma \Sigma^{-1} \Sigma V^⊤ = U\Sigma V^⊤ = A$$
 
 2. Moreover,
-$$A^+ A A^+ = V \Sigma^{-1}U^T U \Sigma V^T V \Sigma^{-1} U^T = V \Sigma^{-1}\Sigma \Sigma^{-1} U^T = V \Sigma^{-1} U^T = A^+$$
+$$A^+ A A^+ = V \Sigma^{-1}U^⊤ U \Sigma V^⊤ V \Sigma^{-1} U^⊤ = V \Sigma^{-1}\Sigma \Sigma^{-1} U^⊤ = V \Sigma^{-1} U^⊤ = A^+$$
 
-3. Furthermore, $AA^+ = U \Sigma V^T V \Sigma^{-1} U^T = U U^T = I$, thus
+3. Furthermore, $AA^+ = U \Sigma V^⊤ V \Sigma^{-1} U^⊤ = U U^⊤ = I$, thus
 
-$$(AA^+)^T = I^T = I = AA^+$$
+$$(AA^+)^⊤ = I^⊤ = I = AA^+$$
 
-Moreover, $A^+A = V \Sigma^{-1} U^T U \Sigma V^T = VV^T$, hence,
+Moreover, $A^+A = V \Sigma^{-1} U^⊤ U \Sigma V^⊤ = VV^⊤$, hence,
 
-$$(A^+A)^T = (VV^T)^T=VV^T=A^+A$$
+$$(A^+A)^⊤ = (VV^⊤)^⊤=VV^⊤=A^+A$$
+
+**END**
 
 **Problem 3.4⋆ (A)** Show for $A ∈ ℝ^{m × n}$ with $m ≥ n$ and ⊤ rank
 that $𝐱 =  A^+ 𝐛$ is the least squares solution, i.e., minimises $\| A 𝐱 - 𝐛 \|_2$.
@@ -493,15 +485,19 @@ Ũ = [U K]
 $$
 so that $Ũ$ is orthogonal. We use the fact orthogonal matrices do not change norms:
 $$
+\begin{align*}
 \|A 𝐱 - 𝐛 \|_2^2 &= \|U Σ V^⊤ 𝐱 - 𝐛 \|_2^2 = \|Ũ^⊤ U Σ V^⊤ 𝐱 - Ũ^⊤ 𝐛 \|_2^2 = \|\underbrace{\begin{bmatrix}I_m \\ O \end{bmatrix}}_{∈ ℝ^{m × n}} Σ V^⊤ 𝐱 - \begin{bmatrix} U^⊤ \\ K^⊤ \end{bmatrix} 𝐛 \|_2^2 \\
 &= \|Σ V^⊤ 𝐱 - U^⊤ 𝐛 \|_2^2 + \|K^⊤ 𝐛\|^2
+\end{align*}
 $$
 The second term is independent of $𝐱$. The first term is minimised when zero:
 $$
  \|Σ V^⊤ 𝐱 - U^⊤ 𝐛 \|_2 =\|Σ V^⊤ V Σ^{-1} U^⊤ 𝐛  - U^⊤ 𝐛 \|_2 = 0
 $$
 
-**Problem 3.5⋆ (B)**
+**END**
+
+**Problem 3.5⋆ (A)**
 If $A ∈ ℝ^{m × n}$ has a non-empty kernel there are multiple solutions to the least
 squares problem as 
 we can add any element of the kernel. Show that $𝐱 = A^+ 𝐛$ gives the least squares solution
@@ -517,10 +513,12 @@ $$Qx = A^+Ax=A^+AA^+b= A^+b=x$$
 
 and
 
-$$Q^T = (A^+A)^T = A^+A$$
+$$Q^⊤ = (A^+A)^⊤ = A^+A$$
 
 $$\|y\|_2^2 =  \|x -(x-y)\|_2^2= \|x\|_2^2 - 2(x, x-y) +  \|x-y\|_2^2 =  \|x\|_2^2 + \|x-y\|_2^2\ge \|x\|_2^2$$
 
 since 
 
-$$(x, x-y)= (Qx, x-y)=x^TQ^T(x-y)=x^TQ(x-y)=x^T(x-Qy)=x^T(x-A^+Ay)=x^T(x-A^+b)=x^T 0 =0$$
+$$(x, x-y)= (Qx, x-y)=x^⊤Q^⊤(x-y)=x^⊤Q(x-y)=x^⊤(x-Qy)=x^⊤(x-A^+Ay)=x^⊤(x-A^+b)=x^⊤ 0 =0$$
+
+**END**
