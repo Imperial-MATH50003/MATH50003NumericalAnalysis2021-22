@@ -709,7 +709,40 @@ $$
 
 ### Poisson
 
-For 2D problems we consider Poisson. The first stage is to
+For 2D problems we consider a particularly easy case of Poisson equation with a left Dirichlet and a right Neumann condition:
+$$
+\begin{align*}
+u(0) &= c_0 \\
+u'(1) &= c_1 \\
+u''(x) &= f(x)
+\end{align*}
+$$
+Using Finite differences, with the approximation of the derivative on the right as
+$$
+{u_n - u_{n-1} \over h} = c_1
+$$
+we get the linear system:
+$$
+ \begin{bmatrix}
+    1 \\
+    1/h^2 & -2/h^2 & 1/h^2 \\
+        & ⋱ & ⋱ & ⋱ \\
+        && 1/h^2 & -2/h^2 & 1/h^2 \\
+        &&& -1/h & 1/h \end{bmatrix} 
+\begin{bmatrix}
+               u_1 \\ ⋮ \\ u_n \end{bmatrix}  = \begin{bmatrix} c_0 \\ f(x_2) \\ ⋮ \\ f(x_{n-1}) \\ c_1
+               \end{bmatrix}
+$$
+
+
+**Theorem (Poisson convergence)** Suppose that $u$ is four-times differentiable with uniformly
+bounded fourth derivative. Then the finite difference approximation to Poisson converges like $O(n^2)$.
+
+
+**Proof**
+
+
+The first stage is to
 row-reduce to get a symmetric tridiagonal (pos. def.) matrix:
 $$
 \begin{bmatrix} 
@@ -717,19 +750,20 @@ $$
 -1/h^2 & 1 \\
     && 1 \\ 
     &&& ⋱ \\
-    &&&& 1 & -1/h^2 \\
+    &&&& 1 & -1/h \\
     &&&&& 1\end{bmatrix} \begin{bmatrix}
     1 \\
     1/h^2 & -2/h^2 & 1/h^2 \\
         & ⋱ & ⋱ & ⋱ \\
         && 1/h^2 & -2/h^2 & 1/h^2 \\
-        &&&& 1 \end{bmatrix} = 
+        &&&-1/h & 1/h \end{bmatrix} = 
 \begin{bmatrix}
     1 \\
     0 & -2/h^2 & 1/h^2 \\
-        & ⋱ & ⋱ & ⋱ \\
-        && 1/h^2 & -2/h^2 & 0 \\
-        &&&& 1 \end{bmatrix}.
+        & 1/h^2 & ⋱ & ⋱ \\
+        && ⋱ & -2/h^2 & 1/h^2 \\
+        &&& 1/h^2 & -1/h^2 & 0 \\
+        &&&&-1/h& 1/h \end{bmatrix}.
 $$
 Considering the right-hand side and dropping
 the first and last rows our equation becomes:
@@ -738,25 +772,12 @@ $$
  -2 & 1 \\
         1 & -2 & ⋱ \\
         & ⋱ &  ⋱ & 1 \\
-        && 1 & -2  
+        && 1 & -2 & 1 \\
+        &&& 1 & -1 
         \end{bmatrix}}_Δ \begin{bmatrix}
-                u_2 \\ ⋮ \\ u_{n-1} \end{bmatrix} = \underbrace{\begin{bmatrix} f(x_2) - c_0/h^2 \\ f(x_3) \\ ⋮ \\ f(x_{n-2}) \\ f(x_{n-1}) - c_1/h^2 \end{bmatrix}}_{𝐟ᵖ}
+                u_2 \\ ⋮ \\ u_{n-1} \end{bmatrix} = \underbrace{\begin{bmatrix} f(x_2) - c_0/h^2 \\ f(x_3) \\ ⋮ \\ f(x_{n-2}) \\ f(x_{n-1}) - c_1/h \end{bmatrix}}_{𝐟ᵖ}
 $$
 
-
-**Remark (advanced)** You may recognise $Δ$ as a discrete Laplacian corresponding to a graph with
-Dirichlet conditions,
-as discussed in first year applied mathematics.
-Thus one can interpret finite-differences as approximating a continuous differential equation by
-a graph. This view-point extends naturally to higher-dimensional equations. In the problem sheet we also
-discuss Neumann series.
-
-
-**Theorem (Poisson convergence)** Suppose that $u$ is four-times differentiable with uniformly
-bounded fourth derivative. Then the finite difference approximation to Poisson converges like $O(n^2)$.
-
-
-**Proof**
 
 
 For consistency we need the Taylor series error of second-order finite differences. We have
@@ -772,6 +793,24 @@ $$
 {u(x+h) - 2u(x) + u(x-h) \over h^2} = u''(x) + h^2 {u^{(4)}(t_+) + u^{(4)}(t_-) \over 24} = u''(x) + O(h^2)
 $$
 (Note this is a slightly stronger result than used in the solution of PS2.)
+
+The first and last row are special. For the first row we have:
+$$
+{-2u(x_2) + u(x_3) \over h^2} = 
+{u(0)-2u(h) + u(2h) \over h^2} - {u(0) \over h^2} = 
+u'(h) -{c_0 \over h^2} + O(h^2)
+$$
+For the the last row we have:
+$$
+{u(x_{n-2}) - u(x_{n-1}) \over h^2} = 
+{u(x_{n-2}) - 2u(x_{n-1}) + u(x_n) \over h^2} - {u(x_n) - u(x_{n-1}) \over h^2} = 
+f(x_{n-1}) - {c_1 \over h} + 
+{-u'(x_{n-1})h + u''(x_{n-1}) h^2/2 - u'''(x_{n-1}) h^3/6 \over h^2} + {u'(x_{n-1}) + h u''(x_{n-1}) + h^2/2 u'''(x_{n-1}) \over h} - {u'(x_n) \ over h} = 
+
+u'(h) -{c_0 \over h^2} + O(h^2)
+$$
+
+
 Thus we have _consistency_:
 $$
 {Δ \over h^2} \begin{bmatrix} u_2 \\ ⋮ \\ u_{n-1} \end{bmatrix} = 𝐟ᵖ + {\bf\delta}
@@ -779,7 +818,7 @@ $$
 where $\|{\bf\delta}\|_∞ = O(h^2)$.
 
 
-Following PS5 we deduce that it has the Cholesky-like decomposition
+It has a particularly simply Cholesky decomposition
 $$
 Δ = -\underbrace{\begin{bmatrix} 1 & -1 \\  & ⋱ & ⋱ \\ && 1 & -1 \\ &&& 1 \end{bmatrix}}_U \underbrace{\begin{bmatrix} 1 \\ -1 & 1 \\ & ⋱ & ⋱ \\ && -1 & 1 \end{bmatrix} }_{U^⊤}
 $$
@@ -804,3 +843,10 @@ $$
 $$
 One can show by looking at $Δ^{-1}$ directly that the condition number is indeed growing like $n^2$.
 Thus we _expect_ floating-point errors to magnified propotional to $n^2$ in the linear solve.
+
+u = x -> exp(x) + 2x - ℯ*x
+f = exp
+n = 1_000
+x = range(0,1; length=n); h = step(x)
+u_n = SymTridiagonal([fill(-2,n-3); -1], fill(1,n-3))/h^2 \ [f(x[2]) - 1/h^2; f.(x[3:end-2]); f(x[end-1]) - 2/h]
+norm(u_n - u.(x[2:end-1]),Inf)
