@@ -135,7 +135,8 @@ cholesky([4 2 2 1; 2 4 2 2; 2 2 4 2; 1 2 2 4])
 over the reals $ℝ$ satisfies, for all $𝐱,𝐲,𝐳 ∈ ℝ$ and $a,b ∈ ℝ$:
 1. Symmetry: $⟨𝐱, 𝐲⟩ = ⟨𝐲, 𝐱⟩$
 2. Linearity: $⟨a𝐱+b𝐲, 𝐳⟩ = a ⟨𝐱, 𝐳⟩+ b⟨𝐲, 𝐳⟩$
-3. Posive-definite: $⟨𝐱, 𝐱⟩ > 0$
+3. Posive-definite: $⟨𝐱, 𝐱⟩ > 0, x \neq 0$
+
 Prove that $⟨𝐱, 𝐲⟩$ is an inner product if and only if
 $$
 ⟨𝐱, 𝐲⟩ = 𝐱^⊤ K 𝐲
@@ -231,7 +232,7 @@ Let $c_k=a_k^2$:
 $$\frac{1}{c_k}+c_{k+1}=2.$$
 Consider the fixing point of this recurrence: $\frac{1}{x}+x=2\Longrightarrow(x-1)^2=0$ has the double root $x=1$ which hints us to consider $\frac{1}{c_k-1}$. In fact, the recurrence is equivalent to
 $$\frac{1}{c_{k+1}-1}=\frac{1}{c_k-1}+1.$$
-Recalling that $c_1=1$, we know that $\frac{1}{c_k-1}=k$. As a result, $c_k=(k+1)/k$, $a_k=\sqrt{(k+1)/k}$ and $b_k=-\sqrt{k/(k+1)}$, hence we know $L_n$.
+Recalling that $c_1=2$, we know that $\frac{1}{c_k-1}=k$. As a result, $c_k=(k+1)/k$, $a_k=\sqrt{(k+1)/k}$ and $b_k=-\sqrt{k/(k+1)}$, hence we know $L_n$.
 
 We can apply the same process to $U_n$, but this is a special case since flipping $\Delta_n$ horizontally and vertically gives itself: $P\Delta_nP^\top=\Delta_n$ where $P=\begin{bmatrix} & & 1 \\ & ⋰ & \\ 1 & & \end{bmatrix}$. So we can also flip $L_n$ to get $U_n$:
 $$U_n=PL_n.$$
