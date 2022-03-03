@@ -174,6 +174,23 @@ $$
 $$
 Thus they are always invertible. Then note that any such matrix has a Cholesky decomposition of standard form $A = L L^⊤$ where $L$ is lower triangular. The inverse of this standard form Cholesky decomposition is then $A^{-1} = L^{-T} L^{-1}$, which is of the desired form since $L$ is lower triangular and $L^{-T}$ is upper triangular. The positive entries on the diagonal follow directly because this is the case for the Cholesky decomposition factors of the original matrix. Thus, since all symmetric positive definite matrices can be written as the inverses of a symmetric positive definite matrix, this shows that they all have a decomposition $A = U U^⊤$ (using the Cholesky factors of its inverse).
 
+Alternatively, we can replicate the procedure of computing the Cholesky decomposition beginning in the bottom right
+instead of the top left. Write:
+$$
+A = \begin{bmatrix} K & 𝐯\\
+                    𝐯^⊤ & α \end{bmatrix} = 
+                    \underbrace{\begin{bmatrix} I & {𝐯 \over \sqrt{α}} \\
+                                        & \sqrt{α}
+                                        \end{bmatrix}}_{U_1}
+                    \begin{bmatrix} K - {𝐯 𝐯^⊤ \over α}  & \\
+                     & 1 \end{bmatrix}
+                     \underbrace{\begin{bmatrix} I \\
+                      {𝐯^⊤ \over \sqrt{α}} & \sqrt{α}
+                                        \end{bmatrix}}_{U_1^⊤}
+$$
+The induction proceeds as in the lower triangular case.
+
+
 **END**
 
 **Problem 1.4⋆ (A)** Prove that the following $n × n$ matrix is symmetric positive definite
@@ -233,8 +250,31 @@ Consider the fixing point of this recurrence: $\frac{1}{x}+x=2\Longrightarrow(x-
 $$\frac{1}{c_{k+1}-1}=\frac{1}{c_k-1}+1.$$
 Recalling that $c_1=1$, we know that $\frac{1}{c_k-1}=k$. As a result, $c_k=(k+1)/k$, $a_k=\sqrt{(k+1)/k}$ and $b_k=-\sqrt{k/(k+1)}$, hence we know $L_n$.
 
-We can apply the same process to $U_n$, but this is a special case since flipping $\Delta_n$ horizontally and vertically gives itself: $P\Delta_nP^\top=\Delta_n$ where $P=\begin{bmatrix} & & 1 \\ & ⋰ & \\ 1 & & \end{bmatrix}$. So we can also flip $L_n$ to get $U_n$:
-$$U_n=PL_n.$$
+We can apply the same process to $U_n$, but this is a special case since flipping $\Delta_n$ horizontally and vertically gives itself: $P\Delta_nP^\top=\Delta_n$ where
+$$
+P=\begin{bmatrix} & & 1 \\ & ⋰ & \\ 1 & & \end{bmatrix}
+$$
+is the permutation that reverses a vector. 
+So we can also flip $L_n$ to get $U_n$:
+$$
+U_n=PL_nP
+$$
+so that $U_n U_n^⊤ = P L_n P P L_n^⊤ P = P Δ_n P = Δ_n$.
+
+Alternatively one can use the procedure from Problem 1.3. That is, write:
+$$
+Δ_n = \begin{bmatrix} Δ_{n-1} & -𝐞_n \\
+                    -𝐞_n^⊤ & 2 \end{bmatrix} = 
+                    \underbrace{\begin{bmatrix} I & {-𝐞_n \over \sqrt{2}} \\
+                                        & \sqrt{2}
+                                        \end{bmatrix}}_{U_1}
+                    \begin{bmatrix} Δ_{n-1} - {𝐞_n 𝐞_n^⊤ \over 2}  & \\
+                     & 1 \end{bmatrix}
+                     \underbrace{\begin{bmatrix} I \\
+                      {𝐯^⊤ \over \sqrt{α}} & \sqrt{α}
+                                        \end{bmatrix}}_{U_1^⊤}
+$$
+Continuing proceeds as above.
 
 **END**
 
