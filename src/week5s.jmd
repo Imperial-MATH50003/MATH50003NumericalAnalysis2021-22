@@ -442,6 +442,36 @@ println("Rank for f₃ = ", find_min_rank(f₃, n, error))
 println("Rank for f₄ = ", find_min_rank(f₄, n, error))
 ```
 
+```julia
+# you can also do it in a more costly but perhaps more intuitive way:
+function find_min_rank_alt(f, n, ϵ)
+    F = samples(f,n)
+    U,σ,V = svd(F)
+    for k=1:n
+        Σ_k = Diagonal(σ[1:k])
+        U_k = U[:,1:k]
+        V_k = V[:,1:k]
+        if norm(U_k * Σ_k * V_k' - F) <= ϵ
+            return k
+        end
+    end
+end
+
+n=100
+println("Error ≤ ", error, " with n = ", n)
+println("Rank for f₁ = ", find_min_rank(f₁, n, error))
+println("Rank for f₂ = ", find_min_rank(f₂, n, error))
+println("Rank for f₃ = ", find_min_rank(f₃, n, error))
+println("Rank for f₄ = ", find_min_rank(f₄, n, error))
+
+n=1000
+println("Error ≤ ", error, " with n = ", n)
+println("Rank for f₁ = ", find_min_rank(f₁, n, error))
+println("Rank for f₂ = ", find_min_rank(f₂, n, error))
+println("Rank for f₃ = ", find_min_rank(f₃, n, error))
+println("Rank for f₄ = ", find_min_rank(f₄, n, error))
+``` 
+
 **END**
 
 **Problem 3.3⋆ (B)** Define the _pseudo-inverse_:
