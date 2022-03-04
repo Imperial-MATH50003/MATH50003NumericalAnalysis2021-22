@@ -2,7 +2,7 @@
 
 Fourier series proved very powerful for approximating periodic functions.
 If periodicity is lost, however, uniform convergence is lost. In this chapter
-we introduce alternative bases, _orthogonal polynomials (OPs)_ built on polynomials that are applicable in
+we introduce alternative bases, _Orthogonal Polynomials (OPs)_ built on polynomials that are applicable in
 the non-periodic setting. That is we consider expansions of the form
 $$
 f(x) = \sum_{k=0}^∞ c_k p_k(x) ≈ \sum_{k=0}^{n-1} c_k^n p_k(x)
@@ -351,7 +351,7 @@ $$
 We multiply (using that $b_2 = 1$ for monic OPs) to deduce:
 $$
 \begin{align*}
-x f(x) = x[p_0(x) | p_1(x) | p_2(x) | ⋯] \begin{bmatrix} 1/3 \\ 1 \\ 1 \\ 0 \\ ⋮ \end{bmatrix} \\
+x f(x) &= x[p_0(x) | p_1(x) | p_2(x) | ⋯] \begin{bmatrix} 1/3 \\ 1 \\ 1 \\ 0 \\ ⋮ \end{bmatrix} \\
 &= [p_0(x) | p_1(x) | p_2(x) | ⋯] X \begin{bmatrix} 1/3 \\ 1 \\ 1 \\ 0 \\ ⋮ \end{bmatrix}
 = [p_0(x) | p_1(x) | p_2(x) | ⋯]  \begin{bmatrix} 1/4 \\ 9/10 \\ 3/2 \\ 1 \\ 0 \\ ⋮ \end{bmatrix} \\
 &= {p_0(x) \over 4} + {9 p_1(x) \over 10} + {3 p_2(x) \over 2} + p_3(x)
@@ -374,14 +374,12 @@ $w(x)$ and the constant $k_n$. We consider:
 1. Chebyshev polynomials (1st kind) $T_n(x)$: $w(x) = 1/\sqrt{1-x^2}$ on $[-1,1]$.
 2.  Chebyshev polynomials (2nd kind) $U_n(x)$: $\sqrt{1-x^2}$ on $[-1,1]$.
 2. Legendre polynomials $P_n(x)$: $w(x) = 1$ on $[-1,1]$.
-3. Hermite polynomials $H_n(x): $w(x) = \exp(-x^2)$  on $(-∞,∞)$.
+4. Ultrapsherical polynomials (my fav!): $C_n^{(λ)}(x)$: $w(x) = (1-x^2)^{λ-1/2}$ on $[-1,1]$, $λ ≠ 0$, $λ > -1/2$.
+2. Jacobi polynomials: $P_n^{(a,b)}(x)$: $w(x) = (1-x)^a (1+x)^b$ on $[-1,1]$, $a,b > -1$.
+2. Laguerre polynomials: $L_n(x)$: $w(x) = \exp(-x)$ on $[0,∞)$.
+3. Hermite polynomials $H_n(x)$: $w(x) = \exp(-x^2)$  on $(-∞,∞)$.
 
-Other important families discussed are
-
-1. Ultrapsherical polynomials
-2. Jacobi polynomials
-3. Laguerre polynomials
-
+In the notes we will discuss properties of $T_n(x)$ and $P_n(x)$.
 
 ### Chebyshev
 
@@ -446,6 +444,16 @@ x T_n(x) = {T_{n-1}(x) + T_{n+1}(x) \over 2}
 \end{align*}
 $$
 
+Chebyshev polynomials are particularly powerful as their expansions are cosine series in disguise: for
+$$
+f(x) = ∑_{k=0}^∞ f̌_k T_k(x)
+$$
+we have
+$$
+f(\cos θ) = ∑_{k=0}^∞ f̌_k \cos k θ.
+$$
+Thus the coefficients can be recovered fast using FFT-based techniques.
+
 In the problem sheet you will show the following:
 
 **Theorem (Chebyshev U are sin)**
@@ -461,19 +469,15 @@ x U_n(x) &= {U_{n-1}(x) \over 2} + {U_{n+1}(x) \over 2}.
 \end{align*}
 $$
 
+
+
 ### Legendre
 
-**Definition (Pochhammer symbol)** The Pochhammer symbol is
-$$
-\begin{align*}
-(a)_0 &= 1 \\
-(a)_n &= a (a+1) (a+2) ⋯ (a+n-1).
-$$
 
 **Definition (Legendre)** Legendre polynomials
 $P_n(x)$ are orthogonal polynomials with respect to $w(x) = 1$ on $[-1,1]$, with
 $$
-k_n = {2^n (1/2)_n \over n!}
+k_n = {1 \over 2^n} \pmatrix{2n \\ n} = {(2n)! \over 2^n (n!)^2}
 $$
 
 The reason for this complicated normalisation constant is both historical and
@@ -483,7 +487,7 @@ that it leads to simpler formulae for recurrence relationships.
 Classical orthogonal polynomials have _Rodriguez formulae_, defining orthogonal
 polynomials as high order derivatives of simple functions. In this case we have:
 
-**Theorem (Legendre Rodriguez)**
+**Lemma (Legendre Rodriguez formula)**
 $$
 P_n(x) = {1 \over (-2)^n n!}{{\rm d}^n \over {\rm d} x^n} (1-x^2)^n
 $$
@@ -500,28 +504,78 @@ If $r_m$ is a degree $m < n$ polynomial we have:
 $$
 ∫_{-1}^1 {{\rm d}^n \over {\rm d} x^n} (1-x^2)^n r_m(x) {\rm d}x
 = -∫_{-1}^1 {{\rm d}^{n-1} \over {\rm d} x^{n-1}} (1-x^2)^n r_m'(x) {\rm d}x =
-⋯ = (-1)^n ∫_{-1}^1 (1-x^2) r_m^{(n)}(x) {\rm d}x = 0.
+⋯ = (-)^n ∫_{-1}^1 (1-x^2) r_m^{(n)}(x) {\rm d}x = 0.
 $$
 (3) follows since:
 $$
-{{\rm d}^n \over {\rm d} x^n}[(-1)^n x^{2n} + O(x^{2n-1})] =
-(-1)^n 2n {{\rm d}^{n-1} \over {\rm d} x^{n-1}} x^{2n-1}+ O(x^{2n-1})] =
-(-1)^n 2n (2n-1) {{\rm d}^{n-2} \over {\rm d} x^{n-2}} x^{2n-2}+ O(x^{2n-2})] = ⋯ =
-(-1)^n 2n (2n-1) ⋯ (n+1) x^n + O(x^{n-1})
+\begin{align*}
+{{\rm d}^n \over {\rm d} x^n}[(-)^n x^{2n} + O(x^{2n-1})] &=
+(-)^n 2n {{\rm d}^{n-1} \over {\rm d} x^{n-1}} x^{2n-1}+ O(x^{2n-1})] \\
+&=
+(-)^n 2n (2n-1) {{\rm d}^{n-2} \over {\rm d} x^{n-2}} x^{2n-2}+ O(x^{2n-2})] = ⋯ 
+&= (-)^n 2n (2n-1) ⋯ (n+1) x^n + O(x^{n-1}) = 
+(-)^n {(2n)! \over n!} x^n + O(x^{n-1})
+\end{align*}
 $$
-which satisfies:
+
+
+∎
+
+This allows us to determine the coefficients $k_n^{(λ)}$ which are useful in proofs. In particular we
+will use $k_n^{(1)}$:
+
+**Lemma (Legendre monomial coefficients)**
 $$
-(1/2)(1/2+1) ⋯ (n-1/2) = {1 \over 2^n} (1+2) ⋯ (2n-1)
+\begin{align*}
+P_0(x) &= 1 \\
+P_1(x) &= x \\
+P_n(x) &= \underbrace{{(2n)! \over 2^n (n!)^2}}_{k_n} x^n - \underbrace{(2n-2)! \over 2^n (n-2)! (n-1)!}_{k_n^{(1)}} x^{n-2} + O(x^{n-4})
+\end{align*}
 $$
+(Here the $O(x^{n-4})$ is as $x → ∞$ but is really just code for polynomials of degree $≤ n-4$. For $n = 2,3$ the $O(x^{n-4})$ term is therefore precisely zero.)
+
+**Proof**
+
+The $n=0$ and $1$ case are immediate. For the other case we expand $(1-x^2)^n$ to get:
+$$
+\begin{align*}
+(-)^n {{\rm d}^n \over {\rm d} x^n} (1-x^2)^n &=
+{{\rm d}^n \over {\rm d} x^n} [ x^{2n} - n x^{2n-2} + O(x^{2n-4})]\\
+&= (2n)⋯(2n-n+1) x^n - n (2n-2)⋯(2n-2-n+1) x^{n-2} + O(x^{n-4}) \\
+&= {(2n)! \over n!} x^n - {n (2n-2)! \over (n-2)!} x^{n-2} + O(x^{n-4})
+\end{align*}
+$$
+Multiplying through by ${1 \over 2^n (n!)}$ completes the derivation.
 
 ∎
 
 **Theorem (Legendre 3-term recurrence)**
+$$
+\begin{align*}
+xP_0(x) &= P_{n+1}(x) \\
+(2n+1) xP_n(x) &= nP_{n-1}(x) + (n+1)P_{n+1}(x)
+\end{align*}
+$$
 
-
-
-
-
+**Proof** 
+The $n = 0$ case is immediate (since $w(x) = w(-x)$ $a_n = 0$, from PS8).
+For the other cases we match terms:
+$$
+(2n+1)xP_n(x) - n P_{n-1}(x) - (n+1)P_{n+1}(x) = [(2n+1)k_n - (n+1) k_{n+1}] x^{n+1} + [(2n+1) k_n^{(1)} -n k_{n-1} - (n+1) k_{n+1}^{(1)}] x^{n-1} + O(x^{n-3})
+$$
+Using the expressions for $k_n$ and $k_n^{(1)}$ above we have (leaving the manipulations as an exercise):
+$$
+\begin{align*}
+(2n+1)k_n - (n+1) k_{n+1} = {(2n+1)! \over 2^n (n!)^2} - (n+1) {(2n+2)! \over 2^(n+1) ((n+1)!)^2} = 0 \\
+(2n+1) k_n^{(1)} -n k_{n-1}  - (n+1) k_{n+1}^{(1)} =  -(2n+1) {(2n-2)! \over 2^n (n-2)! (n-1)!} - n {(2n-2)! \over 2^{n-1} ((n-1)!)^2} + (n+1){(2n)! \over 2^{n+1} (n-1)! n!} = 0
+\end{align*}
+$$
+Thus
+$$
+(2n+1)xP_n(x) - n P_{n-1}(x) - (n+1)P_{n+1}(x) = O(x^{n-3})
+$$
+But as it is orthogonal to $P_k(x)$ for $0 ≤ k ≤ n-3$ it must be zero.
+∎
 
 ## 3. Gaussian quadrature
 
@@ -566,6 +620,9 @@ $$
 3. It converges fast for smooth functions $f$.
 We will focus on properties (1) and (2) as property (3) is more involved.
 
+
+### Roots of orthogonal polynomials and truncated Jacobi matrices
+
 The key to property (1) is to use _roots (zeros) of $q_n(x)$_.
 
 **Lemma** $q_n(x)$ has exactly $n$ distinct roots.
@@ -589,15 +646,19 @@ This is only possible if $j = n$.
 
 ∎
 
-
-
-**Lemma (zeros)** The zeros $x_1, …,x_n$ of $q_n(x)$ are the eigenvalues of the truncated Jacobi matrix
+**Definition (truncated Jacobi matrix)** Given a symmetric Jacobi matrix $X$,
+(or the weight $w(x)$ whose orthonormal polynomials are associated with $X$)
+ the _truncated Jacobi matrix_ is
 $$
 X_n := \begin{bmatrix} a_0 & b_0 \\
                          b_0 & ⋱ & ⋱ \\
                          & ⋱ & a_{n-2} & b_{n-2} \\
-                         && b_{n-2} & a_{n-1} \end{bmatrix} ∈ ℝ^{n × n}.
+                         && b_{n-2} & a_{n-1} \end{bmatrix} ∈ ℝ^{n × n}
 $$
+
+
+
+**Lemma (zeros)** The zeros $x_1, …,x_n$ of $q_n(x)$ are the eigenvalues of the truncated Jacobi matrix $X_n$.
 More precisely,
 $$
 X_n Q_n = Q_n \begin{bmatrix} x_1 \\ & ⋱ \\ && x_n \end{bmatrix}
@@ -629,3 +690,27 @@ p_n(x_j)
 $$
 
 ∎
+
+### Gauss quadrature rules
+
+
+**Definition (Gauss quadrature)** Given a weight $w(x)$, the Gauss quadrature rule is:
+$$
+∫_a^b f(x)w(x) {\rm d}x ≈ \underbrace{∑_{k=1}^n w_k f(x_k)}_{Q_n^w[f]}
+$$
+where $x_1,…,x_n$ are the eigenvalues of $X_n$ and
+$$
+w_k = Q_n[k,1]^2.
+$$
+
+**Theorem (Exactness of Gauss quadrature)** If $f(x)$ is a degree 2n-1 polynomial then
+Gauss quadrature is exact:
+$$
+∫_a^b f(x)w(x) {\rm d}x = Q_n^w[f].
+$$
+
+**Corollary (Discrete orthogonality)**
+$$
+Q_n^w[p_n p_m] = 0
+$$
+if $n ≠ m$.
