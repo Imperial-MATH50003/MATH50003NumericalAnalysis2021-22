@@ -39,10 +39,10 @@ including both time-dependent ordinary differential equations and boundary value
 
 1. [Fourier series](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/Fourier.ipynb): we discuss Fourier series and their usage in numerical computations
 via the fast Fourier transform.
-2. Orthogonal Polynomials: we discuss orthogonal polynomials—polynomials orthogonal 
-with respect to a prescribed weight—and their usage in numerical computations.
-3. Applications: we discuss applications of Fourier series and orthogonal polynomials to
-interpolation, fast multiplication of polynomials, computing derivatives, solving differential equations.
+2. [Orthogonal Polynomials](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/OrthogonalPolynomials.ipynb): we discuss orthogonal polynomials—polynomials orthogonal 
+with respect to a prescribed weight.
+2. Interpolation and Gaussian quadrature: we discuss polynomial interpolation,
+ Gaussian quadrature, and expansions in orthogonal polynomials.
 
 ## Assessment
 

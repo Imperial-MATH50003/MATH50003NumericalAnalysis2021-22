@@ -5,10 +5,10 @@ If periodicity is lost, however, uniform convergence is lost. In this chapter
 we introduce alternative bases, _Orthogonal Polynomials (OPs)_ built on polynomials that are applicable in
 the non-periodic setting. That is we consider expansions of the form
 $$
-f(x) = \sum_{k=0}^∞ c_k p_k(x) ≈ \sum_{k=0}^{n-1} c_k^n p_k(x)
+f(x) = \sum_{k=0}^∞ c_k p_k(x)
 $$
-where $p_k(x)$ are special families of polynomials, $c_k$ are expansion coefficients and
-$c_k^n$ are approximate coefficients.
+where $p_k(x)$ are special families of polynomials, $c_k$ are expansion coefficients. 
+The computation of the coefficients $c_k ≈ c_k^n$ will wait until the next section.
 
 Why not use monomials as in Taylor series? Hidden in the previous lecture was that we could effectively
 compute Taylor coefficients by evaluating on the unit circle in the complex plane, _only_ if the radius of convergence
@@ -27,9 +27,12 @@ complex analysis, and random matrix theory.
 
 1. General properties of OPs: we define orthogonal polynomials, three-term recurrences and Jacobi operators
 2. Classical OPs: we define Chebyshev, Legendre, Jacobi, Laguerre, and Hermite.
-3. Gaussian quadrature: we see that OPs can be used to construct effective numerical methods for singular integrals
-4. Recurrence relationships and Sturm–Liouville equations: we see that classical OPs have many simple recurrences that
-are of importance in computation, which also show they are eigenfunctions of simple differential operators.
+
+**Remark (advanced)** Going beyond what we discuss here are many other beautiful properties of orthogonal 
+polynomials that are useful in computation, analysis, representation theory,
+quantum mechanics, etc. These include sparse recurrence relationships for derivatives,
+that they are eigenfunctions of differential equations, their asymptotics, 
+generating functions, etc. 
 
 
 ## 1. General properties of orthogonal polynomials
@@ -64,6 +67,13 @@ Note in the above
 $$
 h_n := ⟨p_n,p_n⟩ = \|p_n\|^2 = ∫_a^b  p_n(x)^2 w(x) {\rm d} x > 0.
 $$
+The existence of orthogonal polynomials follows immediately from the Gram–Schmidt algorithm
+applied to this basis and inner product. There is additional structure (3-term recurrence) that
+will be discussed later.
+
+Multiplying any orthogonal polynomial necessarily is also an orthogonal
+polynomial. We have two standard normalisations:
+
 
 **Definition (orthonormal polynomials)**
 A set of orthogonal polynomials $\{q_0(x), q_1(x), … \}$
@@ -73,6 +83,8 @@ are orthonormal if $\|q_n\| = 1$.
 A set of orthogonal polynomials $\{q_0(x), q_1(x), … \}$
 are orthonormal if $k_n = 1$.
 
+We are primarly concerned with the usage of orthogonal polynomials in
+approximating functions. First we observe the following:
 
 **Proposition (expansion)**
 If $r(x)$ is a degree $n$ polynomial, $\{p_n\}$ are orthogonal
@@ -327,13 +339,16 @@ q_3(x) &= \sqrt{2800} p_3(x) = \sqrt{7} (20x^3-30x^2 + 12x - 1)
 $$
 which have the Jacobi matrix
 $$
-x [q_0(x)| q_1(x)| ⋯] = x [p_0(x)| p_1(x)| ⋯] \underbrace{\begin{bmatrix} 1 \\ & 2\sqrt{3} \\ && 6 \sqrt{5} \\ &&& 20 \sqrt{7} \\
+\begin{align*}
+x [q_0(x)| q_1(x)| ⋯] &= x [p_0(x)| p_1(x)| ⋯] \underbrace{\begin{bmatrix} 1 \\ & 2\sqrt{3} \\ && 6 \sqrt{5} \\ &&& 20 \sqrt{7} \\
 &&&& ⋱
-\end{bmatrix}}_D = [q_0(x)| q_1(x)| ⋯] D^{-1} X D = 
+\end{bmatrix}}_D \\
+&= [q_0(x)| q_1(x)| ⋯] D^{-1} X D = 
      \begin{bmatrix} 1/2 & 1/\sqrt{12} \\
                     1/\sqrt{12} & 1/2 &  1/\sqrt{15} \\
                     & 1/\sqrt{15} & 1/2 & ⋱ \\
                     & ⋱ & ⋱ \end{bmatrix}
+\end{align*}
 $$
 which is indeed symmetric. The problem sheet explores a more elegant way of doing this.
 
@@ -383,14 +398,17 @@ In the notes we will discuss properties of $T_n(x)$ and $P_n(x)$.
 
 ### Chebyshev
 
-**Definition (Chebyshev polynomials, 1st kind)** $T_n(x)$ are orthogonal with respect to $1/sqrt{1-x^2}$
+**Definition (Chebyshev polynomials, 1st kind)** $T_n(x)$ are orthogonal with respect to $1/\sqrt{1-x^2}$
 and satisfy:
 $$
-T_0(x) = 1, T_n(x) = 2^{n-1} x^n + O(x^{n-1})
+\begin{align*}
+T_0(x) &= 1, \\
+T_n(x) &= 2^{n-1} x^n + O(x^{n-1})
+\end{align*}
 $$
 
 
-**Definition (Chebyshev polynomials, 2nd kind)** $T_n(x)$ are orthogonal with respect to $1/sqrt{1-x^2}$.
+**Definition (Chebyshev polynomials, 2nd kind)** $U_n(x)$ are orthogonal with respect to $sqrt{1-x^2}$.
 $$
 U_n(x) = 2^n x^n + O(x^{n-1})
 $$
@@ -452,9 +470,9 @@ we have
 $$
 f(\cos θ) = ∑_{k=0}^∞ f̌_k \cos k θ.
 $$
-Thus the coefficients can be recovered fast using FFT-based techniques.
+Thus the coefficients can be recovered fast using FFT-based techniques as discussed in the problem sheet.
 
-In the problem sheet you will show the following:
+In the problem sheet we will also show the following:
 
 **Theorem (Chebyshev U are sin)**
 For $x = \cos θ$,
@@ -477,7 +495,8 @@ $$
 **Definition (Legendre)** Legendre polynomials
 $P_n(x)$ are orthogonal polynomials with respect to $w(x) = 1$ on $[-1,1]$, with
 $$
-k_n = {1 \over 2^n} \pmatrix{2n \\ n} = {(2n)! \over 2^n (n!)^2}
+k_n = {1 \over 2^n} \begin{pmatrix} 2n \\ n \end{pmatrix} = 
+{(2n)! \over 2^n (n!)^2}
 $$
 
 The reason for this complicated normalisation constant is both historical and
@@ -512,7 +531,7 @@ $$
 {{\rm d}^n \over {\rm d} x^n}[(-)^n x^{2n} + O(x^{2n-1})] &=
 (-)^n 2n {{\rm d}^{n-1} \over {\rm d} x^{n-1}} x^{2n-1}+ O(x^{2n-1})] \\
 &=
-(-)^n 2n (2n-1) {{\rm d}^{n-2} \over {\rm d} x^{n-2}} x^{2n-2}+ O(x^{2n-2})] = ⋯ 
+(-)^n 2n (2n-1) {{\rm d}^{n-2} \over {\rm d} x^{n-2}} x^{2n-2}+ O(x^{2n-2})] = ⋯ \\
 &= (-)^n 2n (2n-1) ⋯ (n+1) x^n + O(x^{n-1}) = 
 (-)^n {(2n)! \over n!} x^n + O(x^{n-1})
 \end{align*}
@@ -532,7 +551,7 @@ P_1(x) &= x \\
 P_n(x) &= \underbrace{{(2n)! \over 2^n (n!)^2}}_{k_n} x^n - \underbrace{(2n-2)! \over 2^n (n-2)! (n-1)!}_{k_n^{(1)}} x^{n-2} + O(x^{n-4})
 \end{align*}
 $$
-(Here the $O(x^{n-4})$ is as $x → ∞$ but is really just code for polynomials of degree $≤ n-4$. For $n = 2,3$ the $O(x^{n-4})$ term is therefore precisely zero.)
+(Here the $O(x^{n-4})$ is as $x → ∞$, which implies that the term is a polynomial of degree $≤ n-4$. For $n = 2,3$ the $O(x^{n-4})$ term is therefore precisely zero.)
 
 **Proof**
 
@@ -576,141 +595,3 @@ $$
 $$
 But as it is orthogonal to $P_k(x)$ for $0 ≤ k ≤ n-3$ it must be zero.
 ∎
-
-## 3. Gaussian quadrature
-
-Consider integration
-$$
-\int_a^b f(x) w(x) {\rm d}x.
-$$
-For periodic integration we approximated (using the Trapezium rule) an integral by a sum.
-We can think of it as a weighted sum:
-$$
-{1 \over 2π} \int_0^{2π} f(θ) {\rm d} θ ≈  ∑_{j=0}^{n-1} w_j f(θ_j)
-$$
-where $w_j = 1/n$. Replacing an integral by a weighted sum is a known as a _quadrature_ rule.
-This quadrature rule had several important properties:
-1. It was _exact_ for integrating trigonometric polynomials with 2n-1 coefficients
-$$
-p(θ) = \sum_{k=1-n}^{n-1} p̂_k \exp({\rm i}k θ)
-$$
-as seen by the formula
-$$
-∑_{j=0}^{n-1} w_j f(θ_j) = p̂_0^n = … + p̂_{n-1} + p̂_0 + p̂_n + ⋯ = p̂_0 = {1 \over 2π} \int_0^{2π} p(θ) {\rm d} θ
-$$
-2. It exactly recovered the coefficients ($p̂_k^n = p̂_k$) for expansions of trigonometric polynomials with $n$ coeffiicents:
-$$
-p(θ) = \sum_{k=-⌈(n-1)/2⌉}^{⌊(n-1)/2⌋} p̂_k \exp({\rm i}k θ)
-$$
-3. It converged fast for smooth, periodic functions $f$.
-
-In this section we consider other quadrature rules
-$$
-\int_a^b f(x) w(x) {\rm d}x ≈ \sum_{j=1}^n w_j f(x_j)
-$$
-We want to choose $w_j$ and $x_j$ so that the following properties are satisfied:
-1. It is _exact_ for integrating polynomials up to degree $2n-1$:
-$$
-p(θ) = \sum_{k=0}^{2n-1} c_k q_k(x)
-$$
-2. It exactly recovers the coefficients for expansions:
-$$
-p(θ) = \sum_{k=0}^{n-1} c_k q_k(x)
-$$
-3. It converges fast for smooth functions $f$.
-We will focus on properties (1) and (2) as property (3) is more involved.
-
-
-### Roots of orthogonal polynomials and truncated Jacobi matrices
-
-The key to property (1) is to use _roots (zeros) of $q_n(x)$_.
-
-**Lemma** $q_n(x)$ has exactly $n$ distinct roots.
-
-**Proof**
-
-Suppose $x_1, …,x_j$ are the roots where $q_n(x)$ changes sign, that is,
-$$
-q_n(x) = c_j (x-x_j) + O((x-x_j)^2)
-$$
-for $c_j ≠ 0$. Then
-$$
-q_n(x) (x-x_1) ⋯(x-x_j)
-$$
-does not change sign.
-In other words:
-$$
-⟨q_n,(x-x_1) ⋯(x-x_j) ⟩ = \int_a^b q_n(x) (x-x_1) ⋯(x-x_j) {\rm d} x ≠ 0.
-$$
-This is only possible if $j = n$.
-
-∎
-
-**Definition (truncated Jacobi matrix)** Given a symmetric Jacobi matrix $X$,
-(or the weight $w(x)$ whose orthonormal polynomials are associated with $X$)
- the _truncated Jacobi matrix_ is
-$$
-X_n := \begin{bmatrix} a_0 & b_0 \\
-                         b_0 & ⋱ & ⋱ \\
-                         & ⋱ & a_{n-2} & b_{n-2} \\
-                         && b_{n-2} & a_{n-1} \end{bmatrix} ∈ ℝ^{n × n}
-$$
-
-
-
-**Lemma (zeros)** The zeros $x_1, …,x_n$ of $q_n(x)$ are the eigenvalues of the truncated Jacobi matrix $X_n$.
-More precisely,
-$$
-X_n Q_n = Q_n \begin{bmatrix} x_1 \\ & ⋱ \\ && x_n \end{bmatrix}
-$$
-for the orthogonal matrix
-$$
-Q_n = \begin{bmatrix}
-p_0(x_1) & ⋯ & p_0(x_n) \\
-⋮  & ⋯ & ⋮  \\
-p_{n-1}(x_1) & ⋯ & p_{n-1}(x_n)
-\end{bmatrix}
-$$
-
-**Proof**
-
-We construct the eigenvector (noting $b_{n-1} p_n(x_j) = 0$):
-$$
-X_n \begin{bmatrix} p_0(x_j) \\ ⋮ \\ p_{n-1}(x_j) \end{bmatrix} =
-\begin{bmatrix} a_0 p_0(x_j) + b_0 p_1(x_j) \\
- b_0 p_0(x_j) + a_1 p_1(x_j) + b_1 p_2(x_j) \\
-⋮ \\
-b_{n-3} p_{n-3}(x_j) + a_{n-2} p_{n-2}(x_j) + b_{n-2} p_{n-1}(x_j) \\
-b_{n-2} p_{n-2}(x_j) + a_{n-1} p_{n-1}(x_j) + b_{n-1} p_n(x_j)
-\end{bmatrix} = x_j \begin{bmatrix} p_0(x_j) \\
- p_1(x_j) \\
-⋮ \\
-p_n(x_j)
-\end{bmatrix}
-$$
-
-∎
-
-### Gauss quadrature rules
-
-
-**Definition (Gauss quadrature)** Given a weight $w(x)$, the Gauss quadrature rule is:
-$$
-∫_a^b f(x)w(x) {\rm d}x ≈ \underbrace{∑_{k=1}^n w_k f(x_k)}_{Q_n^w[f]}
-$$
-where $x_1,…,x_n$ are the eigenvalues of $X_n$ and
-$$
-w_k = Q_n[k,1]^2.
-$$
-
-**Theorem (Exactness of Gauss quadrature)** If $f(x)$ is a degree 2n-1 polynomial then
-Gauss quadrature is exact:
-$$
-∫_a^b f(x)w(x) {\rm d}x = Q_n^w[f].
-$$
-
-**Corollary (Discrete orthogonality)**
-$$
-Q_n^w[p_n p_m] = 0
-$$
-if $n ≠ m$.
