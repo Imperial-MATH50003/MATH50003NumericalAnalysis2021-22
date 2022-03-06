@@ -424,6 +424,7 @@ for k = 1:n-1
     U[:,k+1] = (I + h*A(t[k]))*U[:,k]
 end
 
+# We plot both the value and its derivative
 plot(t, U')
 ```
 
@@ -485,6 +486,7 @@ for k = 1:n-1
     Uᵇ[:,k+1] = (I - h*Δ)\(Uᵇ[:,k] + h*f(t[k+1])𝐞)
 end
 
+# Uᶠ[:,end] is the solution at the last time step
 scatter(Uᶠ[:,end]; label="forward")
 scatter!(Uᵇ[:,end]; label="backward")
 ```
@@ -508,31 +510,38 @@ $$
 $$
 becomes:
 $$
-𝐮_{k+1} = 𝐮_k + h f(x_k, 𝐮_k)
+𝐮_{k+1} = 𝐮_k + h f(t_k, 𝐮_k)
 $$
 Here we show a simple solution to a nonlinear Pendulum:
 $$
-u'' = \sin u
+u'' = -\sin u
 $$
-by writing $𝐮 = [u,u']$ we have:
+by writing $𝐮(t) := [u_1(t),u_2(t)] :=[u(t),u'(t)]$ we have:
 $$
+𝐮'(t) =  \underbrace{\begin{bmatrix} u_2(t) \\ -\sin u_1(t) \end{bmatrix}}_{f(t, 𝐮(t))}
+$$
+Again we put the time slices into a $2 × n$ matrix:
 
 ```julia
-n = 1000
-𝐮 = fill(zeros(2), n)
-x = range(0, 20; length=n)
-h = step(x) # same as x[k+1]-x[k]
+n = 10_000
+Uᶠ = zeros(2, n)
+t = range(0, 20; length=n)
+h = step(t) # same as x[k+1]-x[k]
 
-𝐮[1] = [1,0]
+Uᶠ[:,1] = [1,0] # initial condition
 for k = 1:n-1
-    𝐮[k+1] = 𝐮[k] + h * [𝐮[k][2],-sin(𝐮[k][1])]
+    u₁, u₂ = Uᶠ[:,k]
+    Uᶠ[:,k+1] = [u₁, u₂] + h * [u₂,-sin(u₁)]
 end
 
-plot(x, first.(𝐮))
+# just plot solution
+plot(t, Uᶠ[1,:]; label="Pendulum angle")
 ```
-As we see it correctly predicts the oscillatory behaviour of
+As we see it roughly predicts the oscillatory behaviour of
 a pendulum, and matches the simulation using DifferentialEquations.jl
-above.
+above. However, over time there is an increase as we have not
+resolved the solution. Increasing `n` further will cause the error
+to decrease as the method does indeed converge.
 
 
 
