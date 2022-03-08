@@ -548,7 +548,7 @@ $$
 \begin{align*}
 P_0(x) &= 1 \\
 P_1(x) &= x \\
-P_n(x) &= \underbrace{{(2n)! \over 2^n (n!)^2}}_{k_n} x^n - \underbrace{(2n-2)! \over 2^n (n-2)! (n-1)!}_{k_n^{(1)}} x^{n-2} + O(x^{n-4})
+P_n(x) &= \underbrace{{(2n)! \over 2^n (n!)^2}}_{k_n} x^n - \underbrace{(2n-2)! \over 2^n (n-2)! (n-1)!}_{k_n^{(2)}} x^{n-2} + O(x^{n-4})
 \end{align*}
 $$
 (Here the $O(x^{n-4})$ is as $x → ∞$, which implies that the term is a polynomial of degree $≤ n-4$. For $n = 2,3$ the $O(x^{n-4})$ term is therefore precisely zero.)

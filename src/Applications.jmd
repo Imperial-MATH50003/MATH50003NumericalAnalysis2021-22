@@ -18,7 +18,8 @@ This translates naturally to the finite expansions:
 $$
 \begin{align*}
 f_n'(θ) = {{\rm d} \over {\rm d}θ} F_{-m:m}(θ) 𝐟\\
-&=F_{-m:m}(θ) \underbrace{{\rm i} \begin{bmatrix} -m \\ &⋱ \\ && m\end{bmatrix}}_{D[-m:m,-m:m]} 𝐟.
+&=F_{-m:m}(θ) \underbrace{{\rm i} \begin{bmatrix
+} -m \\ &⋱ \\ && m\end{bmatrix}}_{D[-m:m,-m:m]} 𝐟.
 \end{align*}
 $$
 

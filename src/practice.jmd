@@ -1,0 +1,269 @@
+# MATH50003 Numerical Analysis (2021–2022) Practice Computer-based Exam
+
+
+For each problem, replace the `# TODO` to complete the question.
+The unit tests are provided to help you test your answers.
+You have 1 hour to complete the exam, as well as 1 hour for downloading/uploading.
+
+Problems are marked A/B/C to indicate difficulty ("A" being most difficult).
+Partial credit will be awarded for reasonable attempts even if the tests
+are not passed.
+
+You may use existing code from anywhere
+but you are **REQUIRED** to cite the source if it is not part of the module material,
+ideally by including a weblink in a comment. You **MUST NOT** ask for help online or
+communicate with others within or outside the module.
+Failure to follow these rules will be considered misconduct.
+
+
+
+You should use the following packages:
+```julia
+using LinearAlgebra, SetRounding, Test
+```
+**WARNING** It may be necessary to restart the kernel if issues arise. Remember to reload the packages
+when you do so.
+
+## 1. Numbers
+
+**Problem 1.1 (C)** Complete the following function `divideby3(x)` that
+returns a tuple `a,b` such that `a` is the largest `Float64` less 
+than or equal to `x/3` and `b` is the smallest `Float64` greater than or equal to `x/3`.
+
+
+```julia
+function divideby3(x)
+    # TODO: assign a,b so that a ≤ x ≤ b where b is either equal to a or the next float
+    
+    a,b
+end
+```
+```julia
+x = 0.1 # arbitary x
+a,b = divideby3(x)
+@test a ≤ big(x)/3 ≤ b
+@test b == a || b == nextfloat(a)
+```
+
+
+
+## 2. Differentiation
+
+**Problem 2.1 (C)** Use the following off-center finite-difference approximation
+$$
+f'(x) ≈ {f(x+2h) - f(x-h) \over 3h}
+$$
+with an appropriately chosen $h$ to approximate
+$$
+f(x) = \cos(x^2)
+$$
+at $x = 0.1$ to 5 digits accuracy.
+
+```julia
+function fd(x)
+    # TODO: implement a finite-difference rule 
+    # to approximate f'(x)
+    # for f(x) = cos(x^2)
+    # with step-size h chosen to get sufficient accuracy
+    
+end
+```
+```julia
+@test abs(fd(0.1) + 2*0.1*sin(0.1^2)) ≤ 1E-5
+```
+
+**Problem 2.2 (A)** Consider a 2D version of a dual number:
+$$
+a + b ϵ_x + c ϵ_y
+$$
+such that
+$$
+ϵ_x^2 = ϵ_y^2 = ϵ_x ϵ_y =  0.
+$$
+Complete the following implementation supporting `+` and `*` (and
+assuming `a,b,c` are `Float64`). Hint: you may need to work out on paper
+how to multiply `(s.a + s.b ϵ_x + s.c ϵ_y)*(t.a + t.b ϵ_x + t.c ϵ_y)` using the
+relationship above.
+```julia
+import Base: *, +, ^
+struct Dual2D
+    a::Float64
+    b::Float64
+    c::Float64
+end
+
+
+function +(s::Dual2D, t::Dual2D)
+    ## TODO: Implement +, returning a Dual2D
+end
+
+function *(c::Number, s::Dual2D)
+    ## TODO: Implement c * Dual2D(...), returning a Dual2D
+    
+end
+
+function *(s::Dual2D, t::Dual2D)
+    ## TODO: Implement Dual2D(...) * Dual2D(...), returning a Dual2D
+    
+    
+end
+```
+```julia
+f = function (x, y) # (x+2y^2)^3 using only * and +
+    z = (x + 2y * y)
+    z * z * z
+end
+
+x,y = 1., 2.
+@test f(Dual2D(x,1.,0.), Dual2D(y,0.,1.)) == Dual2D(f(x,y), 3(x+2y^2)^2, 12y*(x+2y^2)^2)
+
+# This has computed the gradient as f(x,y) + f_x*ϵ_x + f_y*ϵ_y
+# == (x+2y^2)^3 + 3(x+2y^2)^2*ϵ_x + 12y(x+2y^2)^2*ϵ_y
+```
+
+
+
+## 3. Structured Matrices
+
+**Problem 3.1 (C)** Add an implementation of `inv(::PermutationMatrix)`
+to return the inverse permutation as a `PermutationMatrix`. Hint: use
+`invperm`.
+```julia
+import Base: getindex, size, *, inv
+
+struct PermutationMatrix <: AbstractMatrix{Int}
+    p::Vector{Int} # represents the permutation whose action is v[p]
+    function PermutationMatrix(p::Vector)
+        sort(p) == 1:length(p) || error("input is not a valid permutation")
+        new(p)
+    end
+end
+
+size(P::PermutationMatrix) = (length(P.p),length(P.p))
+getindex(P::PermutationMatrix, k::Int, j::Int) = P.p[k] == j ? 1 : 0
+*(P::PermutationMatrix, x::AbstractVector) = x[P.p]
+
+function inv(P::PermutationMatrix)
+    # TODO: return a PermutationMatrix representing the inverse permutation
+    
+end
+```
+```julia
+P = PermutationMatrix([3,4,2,1])
+@test inv(P) isa PermutationMatrix
+@test P*inv(P) == I
+```
+
+
+## 4. Decompositions
+
+**Problem 4.1 (C)** For $𝐱 ∈ ℝ^n$ implement the reflection defined by
+$$
+\begin{align*}
+𝐲 &:= 𝐱 + \|𝐱\| 𝐞_n \\
+𝐰 &:= 𝐲/\|𝐲\| \\
+Q_𝐱 &:= I - 2𝐰𝐰^⊤
+\end{align*}
+$$
+in `lowerhouseholderreflection(x)`, which should return a `Matrix{Float64}`.
+You may assume that `x` is a `Vector{Float64}`.
+
+
+
+```julia
+function lowerhouseholderreflection(x)
+    ## TODO: implement the householder reflector defined above
+    
+end
+```
+```julia
+x = [1.0,2,3,4]
+Q = lowerhouseholderreflection(x)
+@test Q*x ≈ [zeros(3); -norm(x)]
+@test Q'Q ≈ I
+@test Q ≈ Q'
+```
+
+**Problem 4.2 (A)** Complete the function `ql(A)` that
+returns a QL decomposition, that is, `Q` is an orthogonal
+matrix and `L` is lower triangular. You may assume that `A`
+is a square `Matrix{Float64}`. Hint: use Problem 4.1 to lower triangularise.
+
+```julia
+function ql(A)
+    m,n = size(A)
+    m == n || error("not square")
+    ## TODO Create Q and L such that Q'Q == I and L is lower triangular
+    
+end
+```
+```julia
+A = [1.0 2 3; 1 4 9; 1 1 1]
+Q,L = ql(A)
+@test Q'Q ≈ I
+@test Q*L ≈ A
+@test L ≈ tril(L) # it is acceptable to have small non-zero entries in L
+```
+
+
+## 5. Singular Value Decomposition
+
+**Problem 5.1 (C)** Find the best rank-4 approximation (in the $2$-norm) to
+$$
+f(x,y) = \cos(x - y)/(x+y+1)
+$$
+evaluated at an evenly spaced 100 × 100 grid on the square $[0,1]^2$.
+
+```julia
+function bestrank4()
+    # TODO: return best rank-4 approximation
+    
+end
+
+Fr = bestrank4()
+```
+```julia
+x = 9/99
+y = 10/99
+@test rank(Fr) == 4
+@test abs(Fr[10,11] - cos(x - y)/(x + y + 1)) ≤ 2E-6
+```
+
+
+## 6. Differential Equations
+
+**Problem 6.1 (A)** Complete the function `airyai(n)` that returns a length-$n$ `Vector{Float64}`
+$$
+\begin{bmatrix}
+u_1 \\
+⋮ \\
+u_n
+\end{bmatrix}
+$$
+such that $u_k$ approximates the solution to the equation
+$$
+\begin{align*}
+u(0) &= 1 \\
+u(1) &= 0 \\
+u'' - x u &= 0
+\end{align*}
+$$
+at the point $x_k = (k-1)/(n-1)$ using the second order finite-difference approximation:
+$$
+u''(x_k) ≈ {u_{k-1} - 2u_k + u{k+1} \over h^2}
+$$
+for $k = 2, …, n-1$, in $O(n)$ operations.
+
+```julia
+function airy(n)
+    # TODO: return a Vector{Float64} approximating the solution to the ODE
+    
+end
+```
+```julia
+u = airy(1000)
+@test u[1] == 1
+@test u[end] == 0
+# this compares agianst the exact formula
+@test abs(u[500] - 0.4757167332829094) ≤ 2E-8
+```

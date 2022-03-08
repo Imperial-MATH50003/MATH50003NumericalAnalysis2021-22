@@ -46,8 +46,8 @@ with respect to a prescribed weight.
 
 ## Assessment
 
-1. Practice late-term exam (computer-based Julia exam, not for credit, released on Blackboard): 4 March 2022, 3–5pm (1 hour exam, 1 hour upload/download)
-2. Late-term exam (computer-based Julia exam, released on Blackboard): 18 March 2022, 3–5pm (1 hour exam, 1 hour upload/download)
+1. [Practice computer-based exam](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/practice.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/practices.ipynb))
+2. Computer-based exam (released on Blackboard): 18 March 2022, 3–5pm (1 hour exam, 1 hour upload/download)
 3. Practice final exam (pen-and-paper, not for credit): Summer Term (TBC)
 3. Final exam (pen-and-paper): Summer Term (TBC)
 
