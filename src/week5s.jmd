@@ -417,7 +417,7 @@ end
 ```
 
 ```julia
-function find_min_rank_alt(f, n, ϵ)
+function find_min_rank(f, n, ϵ)
     F = samples(f,n)
     U,σ,V = svd(F)
     for k=1:n
