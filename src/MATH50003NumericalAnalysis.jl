@@ -23,6 +23,7 @@ notebook("src/DifferentialEquations.jmd"; nkwds...)
 
 notebook("src/Fourier.jmd"; nkwds...)
 notebook("src/OrthogonalPolynomials.jmd"; nkwds...)
+notebook("src/Quadrature.jmd"; nkwds...)
 notebook("src/Applications.jmd"; nkwds...)
 
 

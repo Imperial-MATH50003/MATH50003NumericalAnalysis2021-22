@@ -405,29 +405,26 @@ exp(x::Dual) = Dual(exp(x.a), exp(x.a) * x.b)
 
 function cos(x::Dual)
     # TODO: implement cos for Duals
+    ## SOLUTION
+    Dual(cos(x.a), -sin(x.a) * x.b)
+    ## END
 end
 
 function sin(x::Dual)
     # TODO: implement sin for Duals
+    ## SOLUTION
+    Dual(sin(x.a), cos(x.a) * x.b)
+    ## END
 end
 
 function /(x::Dual, y::Dual)
     # TODO: implement division for Duals
-end
-```
-
-**SOLUTION**
-
-```julia
-cos(x::Dual) = Dual(cos(x.a), -sin(x.a) * x.b)
-
-sin(x::Dual) = Dual(sin(x.a), cos(x.a) * x.b)
-
-function /(x::Dual, y::Dual)
+    ## SOLUTION
     if iszero(y.a)
         error("Division for dual numbers is ill-defined when denonimator real part is zero.")
     end
-    return Dual(x.a / y.a, (y.a*x.b - x.a*y.b)/y.a^2)
+    return Dual(x.a / y.a, (y.a * x.b - x.a * y.b) / y.a^2)
+    ## END
 end
 ```
 
@@ -465,21 +462,19 @@ $$
 ```julia
 function newton(f, x0, n)
     ## TODO: compute x_n 
+    ## SOLUTION
+    xk = x0
+    for k = 1:n
+        fd = f(xk + ϵ)
+        xk = xk - fd.a / fd.b
+    end
+    return xk
+    ## END
 end
 ```
 
 **SOLUTION**
 
-```julia
-function newton(f, x0, n)
-    xk = x0
-    for k = 1:n
-        fd = f(xk+ϵ)
-        xk = xk - fd.a/fd.b
-    end
-    return xk
-end
-```
 Here is a simple test case for the above function:
 ```julia
 # example
@@ -491,6 +486,8 @@ xn = newton(f_ex,x0,n)
 # check that obtained point is an approximate root
 f_ex(xn)
 ```
+
+**END**
 
 
 **Problem 3.2 (B)** Compute points $y$ such that $|f(y)| \leq 10^{-13}$ (i.e., approximate roots):

@@ -1,3 +1,19 @@
+## Interpolation
+
+**Problem** 
+Consider the expansion of Lagrange basis functions in monomials:
+$$
+ℓ_k(x) = ∑_{j=0}^{n-1} ℓ_{kj} x^j
+$$
+Write an explicit formula for the entries of the inverse of the Vandermonde
+matrix $V^{-1}$ in terms of $ℓ_{kj}$.
+
+**Problem** Show that
+$$
+{\rm det}(V) = ∏_{k=1}^n ∏_{j=k+1}^n (x_j - x_k)
+$$
+
+
 ## Multiplication circulant matrices
 
 **Problem 1⋆** Show that circulant matrices can be inverted in $O(n \log n)$ time.

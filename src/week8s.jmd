@@ -121,5 +121,30 @@ q_n(x)
 $$
 
 
+**Problem** If $w(-x) = w(x)$ for a weight supported on $[-b,b]$ show that $a_n = 0$.
+Hint: first show that the (monic) polynomials $p_{2n}(x)$ are even and $p_{2n+1}(x) are odd.
 
+**SOLUTION**
+
+Note that $p_0(x)$ is even. $a_0$ is zero:
+$$
+⟨p_0,x p_0(x)⟩ = \int_{-b}^b x w(x) {\rm d} x = 0
+$$
+which shows that
+$$
+p_1(x) = xp_0(x)
+$$
+is odd. We now proceed by induction. We have:
+$$
+⟨p_{2n},x p_{2n}(x)⟩ = \int_{-b}^b x w(x) p_{2n}(x)^2 {\rm d} x = 0
+$$
+since $x w(x) p_{2n}(x)^2$ is odd$. Meanwhile. This show that if $p_{2n}$ and
+$p_{2n-1}(x)$ is odd then
+$$
+p_{2n+1}(x) 
+$$
+
+
+
+**END**
 

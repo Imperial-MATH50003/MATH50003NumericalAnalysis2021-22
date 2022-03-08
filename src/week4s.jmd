@@ -242,7 +242,8 @@ function *(Q::Reflections, x::AbstractVector)
     # the reflection corresponding to each column of Q.V to r
     
     ## SOLUTION
-    for j = size(Q.V, 2):-1:1
+    m,n = size(Q.V)
+    for j = n:-1:1
         v = Q.V[:, j]
         r = r - 2 * v * dot(v, r)
     end
@@ -256,7 +257,8 @@ function getindex(Q::Reflections, k::Int, j::Int)
 
     ## SOLUTION
     T = eltype(Q.V)
-    ej = zeros(T, size(Q, 1))
+    m,n = size(Q)
+    ej = zeros(T, m)
     ej[j] = one(T)
     return (Q*ej)[k]
     ## END
@@ -309,9 +311,13 @@ Here we sketch some additional notes comparing performance.
 function householderreflection(x)
     y = copy(x)
     # we cannot use sign(x[1]) in case x[1] == 0
-    y[1] += (x[1] ≥ 0 ? 1 : -1)*norm(x)
-    w = y/norm(y)
-    I - 2*w*w'
+    if x[1] ≥ 0
+        y[1] += norm(x)
+    else
+        y[1] -= norm(x)
+    end
+    w = y / norm(y)
+    I - 2 * w * w'
 end
 function lecturehouseholderqr(A)
     m,n = size(A)
