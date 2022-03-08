@@ -76,7 +76,7 @@ $\|B\|_1=12/35$, $\|B^{-1}\|_1=21\times 8/15=56/5$, so $\kappa_1(B)=96/25$.
 $\|B\|_\infty=8/15$, $\|B^{-1}\|_\infty=21\times 12/35$, so $\kappa_\infty(B)=96/25$
 
 Finally, for the $2$-norms:
-$\kappa_2(A)$:***
+$\kappa_2(A)$:
 For $A = \left[\begin{matrix}
 1 & 2 \\
 3 & 4
