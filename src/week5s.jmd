@@ -135,7 +135,8 @@ cholesky([4 2 2 1; 2 4 2 2; 2 2 4 2; 1 2 2 4])
 over the reals $ℝ$ satisfies, for all $𝐱,𝐲,𝐳 ∈ ℝ$ and $a,b ∈ ℝ$:
 1. Symmetry: $⟨𝐱, 𝐲⟩ = ⟨𝐲, 𝐱⟩$
 2. Linearity: $⟨a𝐱+b𝐲, 𝐳⟩ = a ⟨𝐱, 𝐳⟩+ b⟨𝐲, 𝐳⟩$
-3. Posive-definite: $⟨𝐱, 𝐱⟩ > 0$
+3. Posive-definite: $⟨𝐱, 𝐱⟩ > 0, x \neq 0$
+
 Prove that $⟨𝐱, 𝐲⟩$ is an inner product if and only if
 $$
 ⟨𝐱, 𝐲⟩ = 𝐱^⊤ K 𝐲
@@ -248,7 +249,7 @@ Let $c_k=a_k^2$:
 $$\frac{1}{c_k}+c_{k+1}=2.$$
 Consider the fixing point of this recurrence: $\frac{1}{x}+x=2\Longrightarrow(x-1)^2=0$ has the double root $x=1$ which hints us to consider $\frac{1}{c_k-1}$. In fact, the recurrence is equivalent to
 $$\frac{1}{c_{k+1}-1}=\frac{1}{c_k-1}+1.$$
-Recalling that $c_1=1$, we know that $\frac{1}{c_k-1}=k$. As a result, $c_k=(k+1)/k$, $a_k=\sqrt{(k+1)/k}$ and $b_k=-\sqrt{k/(k+1)}$, hence we know $L_n$.
+Recalling that $c_1=2$, we know that $\frac{1}{c_k-1}=k$. As a result, $c_k=(k+1)/k$, $a_k=\sqrt{(k+1)/k}$ and $b_k=-\sqrt{k/(k+1)}$, hence we know $L_n$.
 
 We can apply the same process to $U_n$, but this is a special case since flipping $\Delta_n$ horizontally and vertically gives itself: $P\Delta_nP^\top=\Delta_n$ where
 $$
@@ -453,18 +454,21 @@ function samples(f, n)
     x = y = range(0, 1; length=n)
     return f.(x,y')
 end
+```
 
-#find minimum rank of f with precision ϵ
+```julia
 function find_min_rank(f, n, ϵ)
-    σ = svdvals(samples(f, n))
-    for i in 1:length(σ)
-        if sum(σ[i:end]) <= ϵ
-            return i-1
+    F = samples(f,n)
+    U,σ,V = svd(F)
+    for k=1:n
+        Σ_k = Diagonal(σ[1:k])
+        U_k = U[:,1:k]
+        V_k = V[:,1:k]
+        if norm(U_k * Σ_k * V_k' - F) <= ϵ
+            return k
         end
     end
-    return length(σ)
 end
-
 
 n=100
 println("Error ≤ ", error, " with n = ", n)
@@ -473,14 +477,13 @@ println("Rank for f₂ = ", find_min_rank(f₂, n, error))
 println("Rank for f₃ = ", find_min_rank(f₃, n, error))
 println("Rank for f₄ = ", find_min_rank(f₄, n, error))
 
-
 n=1000
 println("Error ≤ ", error, " with n = ", n)
 println("Rank for f₁ = ", find_min_rank(f₁, n, error))
 println("Rank for f₂ = ", find_min_rank(f₂, n, error))
 println("Rank for f₃ = ", find_min_rank(f₃, n, error))
 println("Rank for f₄ = ", find_min_rank(f₄, n, error))
-```
+``` 
 
 **END**
 
