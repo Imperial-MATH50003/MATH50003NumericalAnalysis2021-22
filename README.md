@@ -62,6 +62,8 @@ with respect to a prescribed weight.
 Condition numbers, indefinite integration, and Euler methods
 5. [Week 7](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week7.ipynb): 
 Two point boundary value problems, convergence, and Fourier series
+5. [Week 8](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week8.ipynb): 
+Discrete Fourier Transform (DFT), Fast Fourier Transform (FFT), and Orthogonal Polynomials.
 
 
 Additional problem sheets:

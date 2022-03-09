@@ -33,19 +33,7 @@ $$
 $$
 
 
-**SOLUTION**
-We have
-$$
-{1 \over n} \sum_{j=1}^n \cos k θ_j \cos ℓ θ_j = Σ_n[{\rm e}^{{\rm i} (k+ℓ) θ_j}] + 
-Σ_n[{\rm e}^{{\rm i} (k-ℓ) θ_j}] + 
-Σ_n[{\rm e}^{{\rm i} (ℓ-k) θ_j}] + Σ_n[{\rm e}^{{\rm i} (-k-ℓ) θ_j}] = 
-\begin{cases}
-1 & k+ \\
-0
-\end{cases}
-$$
 
-**END**
 
 **Problem 1.3⋆ (B)** Consider the Discrete Cosine Transform (DCT)
 $$
@@ -68,28 +56,7 @@ Hint: $C_n C_n^⊤ = I$ might be easier to show than $C_n^⊤ C_n = I$ using the
 
 
 
-**SOLUTION**
 
-For 
-$$
-\begin{bmatrix}
-    1 & ⋯ & 1\\
-    \cos θ_1 & ⋯ & \cos θ_n \\
-    ⋮ & ⋱ & ⋮ \\
-    \cos (n-1)θ_1 & ⋯ & \cos (n-1)θ_n
-\end{bmatrix}
-$$
-
-
-Here is a computer-based demonstration:
-```julia
-n = 10
-θ = range(π/(2n); step=π/n, length=n) # n evenly spaced points starting at π/(2n) with step size π/n
-C = Diagonal([1/sqrt(n); fill(sqrt(2/n), n-1)]) * [cos((k-1)*θ[j]) for k=1:n, j=1:n]
-C'C
-```
-
-**END**
 
 **Problem 1.4 (B)**  A function with a jump does not have uniformly
 converging coefficients. Plot interpolant for ${\rm sign}(θ-1/2)$.
@@ -140,27 +107,5 @@ $$
 **Problem 3.4⋆  (B)** If $w(-x) = w(x)$ for a weight supported on $[-b,b]$ show that $a_n = 0$.
 Hint: first show that the (monic) polynomials $p_{2n}(x)$ are even and $p_{2n+1}(x)$ are odd.
 
-**SOLUTION**
 
-Note that $p_0(x)$ is even. $a_0$ is zero:
-$$
-⟨p_0,x p_0(x)⟩ = \int_{-b}^b x w(x) {\rm d} x = 0
-$$
-which shows that
-$$
-p_1(x) = xp_0(x)
-$$
-is odd. We now proceed by induction. We have:
-$$
-⟨p_{2n},x p_{2n}(x)⟩ = \int_{-b}^b x w(x) p_{2n}(x)^2 {\rm d} x = 0
-$$
-since $x w(x) p_{2n}(x)^2$ is odd$. Meanwhile. This show that if $p_{2n}$ and
-$p_{2n-1}(x)$ is odd then
-$$
-p_{2n+1}(x) 
-$$
-
-
-
-**END**
 
