@@ -524,7 +524,7 @@ Hint: extend $U$ in the SVD to be a square orthogonal matrix.
 
 The proof mimics that of the QR decomposition. Write $A =  U Σ V^⊤$ and let
 $$
-Ũ = [U K]
+Ũ = \begin{bmatrix}U & K \end{bmatrix}
 $$
 so that $Ũ$ is orthogonal. We use the fact orthogonal matrices do not change norms:
 $$
@@ -548,20 +548,19 @@ such that $\| 𝐱 \|_2$ is minimised.
 
 **SOLUTION**
 
-Let $x=A^+b$ and take $y$ to be another solution i.e. $Ay=b$.
-
-Define $Q=A^+A$, then using 3.3
-
-$$Qx = A^+Ax=A^+AA^+b= A^+b=x$$
-
-and
-
-$$Q^⊤ = (A^+A)^⊤ = A^+A$$
-
-$$\|y\|_2^2 =  \|x -(x-y)\|_2^2= \|x\|_2^2 - 2(x, x-y) +  \|x-y\|_2^2 =  \|x\|_2^2 + \|x-y\|_2^2\ge \|x\|_2^2$$
-
-since 
-
-$$(x, x-y)= (Qx, x-y)=x^⊤Q^⊤(x-y)=x^⊤Q(x-y)=x^⊤(x-Qy)=x^⊤(x-A^+Ay)=x^⊤(x-A^+b)=x^⊤ 0 =0$$
+Let $𝐱     =A^+b$ and let $𝐱 + 𝐤$ to be another solution i.e.
+$$
+\|A𝐱 - b \| = \|A (𝐱 +𝐤) - b \|
+$$
+Following the previous part we deduce:
+$$
+Σ V^⊤ (𝐱 +𝐤) = U^⊤ 𝐛 \Rightarrow V^⊤ 𝐤 = 0
+$$
+As $𝐱 = V 𝐜$ lies in the span of the columns of $V$ we have
+$𝐱^⊤ 𝐤 = 0$. Thus
+$$
+\| 𝐱 + 𝐤 \|^2 = \| 𝐱 \|^2 + \| 𝐤 \|^2
+$$
+which is minimised when $𝐤 = 0$.
 
 **END**
