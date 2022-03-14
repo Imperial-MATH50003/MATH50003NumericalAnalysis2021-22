@@ -1,54 +1,24 @@
 # Interpolation and Gaussian quadrature
 
 
-Consider integration
-$$
-\int_a^b f(x) w(x) {\rm d}x.
-$$
-For periodic integration we approximated (using the Trapezium rule) an integral by a sum.
-We can think of it as a weighted sum:
-$$
-{1 \over 2π} \int_0^{2π} f(θ) {\rm d} θ ≈  ∑_{j=0}^{n-1} w_j f(θ_j)
-$$
-where $w_j = 1/n$. Replacing an integral by a weighted sum is a known as a _quadrature_ rule.
-This quadrature rule had several important properties:
-1. It was _exact_ for integrating trigonometric polynomials with 2n-1 coefficients
-$$
-p(θ) = \sum_{k=1-n}^{n-1} p̂_k \exp({\rm i}k θ)
-$$
-as seen by the formula
-$$
-∑_{j=0}^{n-1} w_j f(θ_j) = p̂_0^n = … + p̂_{n-1} + p̂_0 + p̂_n + ⋯ = p̂_0 = {1 \over 2π} \int_0^{2π} p(θ) {\rm d} θ
-$$
-2. It exactly recovered the coefficients ($p̂_k^n = p̂_k$) for expansions of trigonometric polynomials with $n$ coeffiicents:
-$$
-p(θ) = \sum_{k=-⌈(n-1)/2⌉}^{⌊(n-1)/2⌋} p̂_k \exp({\rm i}k θ)
-$$
-3. It converged fast for smooth, periodic functions $f$.
 
-In this section we consider other quadrature rules
+_Polynomial interpolation_ is the process of finding a polynomial that equals data at a precise set of points.
+_Quadrature_ is the act of approximating an integral by a weighted sum:
 $$
-\int_a^b f(x) w(x) {\rm d}x ≈ \sum_{j=1}^n w_j f(x_j)
+\int_a^b f(x) w(x) {\rm d}x ≈ \sum_{j=1}^n w_j f(x_j).
 $$
-We want to choose $w_j$ and $x_j$ so that the following properties are satisfied:
-1. It is _exact_ for integrating polynomials up to degree $2n-1$:
-$$
-p(θ) = \sum_{k=0}^{2n-1} c_k q_k(x)
-$$
-2. It exactly recovers the coefficients for expansions:
-$$
-p(θ) = \sum_{k=0}^{n-1} c_k q_k(x)
-$$
-3. It converges fast for smooth functions $f$.
-We will focus on properties (1) and (2) as property (3) is more involved.
-
+In these notes we see that the two concepts are intrinsically linked:  interpolation leads naturally
+to quadrature rules. Moreover, by using a set of points $x_j$ linked to orthogonal polynomials we get
+significantly more accurate rules, and in fact can use quadrature to compute expansions in orthogonal polynomials that
+interpolate. That is, we can mirror the link between the Trapezium rule, Fourier series, and interpolation but
+now for polynomials.
 
 
 1. Polynomial Interpolation: we describe how to interpolate a function by a polynomial.
-2. Interpolatory quadrature rule: polynomial interpolation leads naturally to ways to integrate
-functions, but onely realisable in the simplest cases.
 3. Truncated Jacobi matrices: we see that truncated Jacobi matrices are diagonalisable
 in terms of orthogonal polynomials and their zeros. 
+2. Interpolatory quadrature rule: polynomial interpolation leads naturally to ways to integrate
+functions, but onely realisable in the simplest cases.
 3. Gaussian quadrature: Using roots of orthogonal polynomials and truncated Jacobi matrices 
 leads naturally to an efficiently
 computable interpolatory quadrature rule. The _miracle_ is its exact for twice as many polynomials as
@@ -102,10 +72,10 @@ Thus a quick-and-dirty way to to do interpolation is to invert the Vandermonde m
 (which we saw in the least squares setting with more samples then coefficients):
 ```julia
 using Plots, LinearAlgebra
-f = x -> cos(3x)
-n = 10
+f = x -> cos(10x)
+n = 5
 
-x = range(0, 1; length=n-1)# evenly spaced points (BAD for interpolation)
+x = range(0, 1; length=n)# evenly spaced points (BAD for interpolation)
 V = x .^ (0:n-1)' # Vandermonde matrix
 c = V \ f.(x) # coefficients of interpolatory polynomial
 p = x -> dot(c, x .^ (0:n-1))
@@ -113,6 +83,7 @@ p = x -> dot(c, x .^ (0:n-1))
 g = range(0,1; length=1000) # plotting grid
 plot(g, f.(g); label="function")
 plot!(g, p.(g); label="interpolation")
+scatter!(x, f.(x); label="samples")
 ```
 
 But it turns out we can also construct the interpolatory polynomial directly.
@@ -153,10 +124,13 @@ that also interpolates $f$.
 
 **Example** We can interpolate $\exp(x)$ at the points $0,1,2$:
 $$
-p(x) = ℓ_1(x) + {\rm e} ℓ_2(x) + {\rm e}^2 ℓ_3(x) = 
+\begin{align*}
+p(x) &= ℓ_1(x) + {\rm e} ℓ_2(x) + {\rm e}^2 ℓ_3(x) = 
 {(x - 1) (x-2) \over (-1)(-2)} + {\rm e} {x (x-2) \over (-1)} + 
-{\rm e}^2 {x (x-1) \over 2} = (1/2 - {\rm e} +{\rm e}^2/2)x^2  
--  (-3/2 + 2 {\rm e}  - {\rm e}^2 /2)  x + 1
+{\rm e}^2 {x (x-1) \over 2} \\
+&= (1/2 - {\rm e} +{\rm e}^2/2)x^2  
++  (-3/2 + 2 {\rm e}  - {\rm e}^2 /2)  x + 1
+\end{align*}
 $$
 
 
@@ -165,37 +139,11 @@ interpolation is inheritely ill-conditioned.
 The problem sheet asks you to explore
 this experimentally.
 
-## 2. Interpolatory quadrature rules
+## 2. Roots of orthogonal polynomials and truncated Jacobi matrices
 
-**Definition (interpolatory quadrature rule)** Given a set of points $x_1,…,x_n$
-the interpolatory quadrature rule is:
-$$
-Σ_n^{\rm i}[f] := ∑_{k=1}^n w_k f(x_k)
-$$
-where
-$$
-w_k := ∫_a^b ℓ_k(x) w(x) {\rm d} x
-$$
-
-
-**Proposition (interpolatory quadrature is exact for polynomials)** 
-Interpolatory quadrature is exact for all degree $n-1$ polynomials $p$:
-$$
-∫_a^b p(x) w(x) {\rm d}x = Σ_n^{\rm i}[f]
-$$
-
-**Proof**
-The result follows since, by uniqueness of interpolatory polynomial:
-$$
-p(x) = ∑_{k=1}^n p(x_k) ℓ_k(x)
-$$
-
-∎
-
-
-## 3. Roots of orthogonal polynomials and truncated Jacobi matrices
-
-The key to property (1) is to use _roots (zeros) of $q_n(x)$_.
+We now consider _roots (zeros) of $q_n(x)$_. This is important as we shall
+see they are useful for interpolation and quadrature. For interpolation to be well-defined we
+first need to guarantee that the roots are distinct.
 
 **Lemma** $q_n(x)$ has exactly $n$ distinct roots.
 
@@ -265,6 +213,36 @@ The result follows from normalising the eigenvectors. Since $X_n$ is symmetric
 the eigenvector matrix is orthogonal.
 
 ∎
+
+
+
+## 3. Interpolatory quadrature rules
+
+**Definition (interpolatory quadrature rule)** Given a set of points $x_1,…,x_n$
+the interpolatory quadrature rule is:
+$$
+Σ_n^{\rm i}[f] := ∑_{k=1}^n w_k f(x_k)
+$$
+where
+$$
+w_k := ∫_a^b ℓ_k(x) w(x) {\rm d} x
+$$
+
+
+**Proposition (interpolatory quadrature is exact for polynomials)** 
+Interpolatory quadrature is exact for all degree $n-1$ polynomials $p$:
+$$
+∫_a^b p(x) w(x) {\rm d}x = Σ_n^{\rm i}[f]
+$$
+
+**Proof**
+The result follows since, by uniqueness of interpolatory polynomial:
+$$
+p(x) = ∑_{k=1}^n p(x_k) ℓ_k(x)
+$$
+
+∎
+
 
 
 
@@ -376,8 +354,11 @@ p(x) = q_n(x) s(x) + r(x)
 $$
 where $s$ and $r$ are degree $n-1$. Then we have:
 $$
-Σ_n^w[p] = \undebrace{Σ_n^w[q_n s]}_{$0$ since evaluating $q_n$ at zeros} + Σ_n^w[r] = ∫_a^b r(x) w(x) {\rm d}x
-= \underbrace{∫_a^b q_n(x)s(x) w(x) {\rm d}x}_{$0$ since $s$ is degree $<n$}  + ∫_a^b r(x) w(x) {\rm d}x = ∫_a^b p(x)w(x) {\rm d}x.
+\begin{align*}
+Σ_n^w[p] &= \underbrace{Σ_n^w[q_n s]}_{\hbox{$0$ since evaluating $q_n$ at zeros}} + Σ_n^w[r] = ∫_a^b r(x) w(x) {\rm d}x
+= \underbrace{∫_a^b q_n(x)s(x) w(x) {\rm d}x}_{\hbox{$0$ since $s$ is degree $<n$}}  + ∫_a^b r(x) w(x) {\rm d}x \\
+&= ∫_a^b p(x)w(x) {\rm d}x.
+\end{align*}
 $$
 ∎
 

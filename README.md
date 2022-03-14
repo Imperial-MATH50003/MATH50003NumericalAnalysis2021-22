@@ -41,7 +41,7 @@ including both time-dependent ordinary differential equations and boundary value
 via the fast Fourier transform.
 2. [Orthogonal Polynomials](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/OrthogonalPolynomials.ipynb): we discuss orthogonal polynomials—polynomials orthogonal 
 with respect to a prescribed weight.
-2. Interpolation and Gaussian quadrature: we discuss polynomial interpolation,
+2. [Interpolation and Gaussian quadrature](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/Quadrature.ipynb): we discuss polynomial interpolation,
  Gaussian quadrature, and expansions in orthogonal polynomials.
 
 ## Assessment
