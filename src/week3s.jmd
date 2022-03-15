@@ -519,7 +519,7 @@ end
 function getindex(Q::Reflection, k::Int, j::Int)
     (k == j) - 2Q.v[k]*Q.v[j] # note true is treated like 1 and false like 0
 end
-function *(P::Reflection, x::AbstractVector)
+function *(Q::Reflection, x::AbstractVector)
     x - 2*Q.v * dot(Q.v,x) # (Q.v'*x) also works instead of dot
 end
 
