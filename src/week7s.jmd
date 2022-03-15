@@ -445,3 +445,27 @@ $$
 to $f(θ)$ as $n \rightarrow ∞$.
 What is the rate of convergence if the first $λ-1$ derivatives $f(θ), f'(θ), …, f^{(λ-1)}(θ)$ 
 are 2π-periodic and $f^{(λ)}$ is uniformly bounded?
+
+**SOLUTION**
+
+Observe that by aliasing (see corollary in lecture notes) and triangle inequality we have the following 
+
+$$ |f̂_k^n - f̂_k|  \leq \sum_{p=1}^{\infty} (|f̂_{k+pm}|+|f̂_{k-pm}|) $$
+
+Using the result from Problem 3.2 yields
+
+$$ |f̂_k^n - f̂_k| \leq \frac{C}{n^\lambda} \sum_{p=1}^{\infty} \frac{1}{\left(p + \frac{k}{n}\right)^\lambda} + \frac{1}{\left(p - \frac{k}{n}\right)^\lambda} $$
+
+now we pick $|q| < \frac{1}{2}$ (such that the estimate below will hold for both summands above) and construct an integral with convex and monotonocally decreasing integrand such that
+
+$$ \left( p + q \right)^{-\lambda} < \int_{p-\frac{1}{2}}^{p+\frac{1}{2}} (x + q)^{-\lambda} dx $$
+
+more over summing over the left-hand side from $1$ to $\infty$ yields a bound by the integral:
+
+$$ \int^{\infty}_{\frac{1}{2}} (x + q)^{-\lambda} dx = \frac{1}{\lambda}(\frac{1}{2} + q)^{- \lambda + 1}$$
+
+Finally let $q = \pm \frac{k}{n}$ to achieve the rate of convergence
+
+$$ |f̂_k^n - f̂_k| \leq \frac{C_{\lambda}}{ n^{\lambda}} \left(  \left( \frac{1}{2} + k/n \right)^{ - \lambda + 1} + \left( \left( \frac{1}{2} - k/n \right) \right)^{- \lambda +1} \right)$$
+
+where $C_{\lambda}$ is a constant depending on $\lambda$. Note that it is indeed important to split the $n$ coefficients equally over the negative and positive coefficients as stated in the notes, due to the estatime we used above.
