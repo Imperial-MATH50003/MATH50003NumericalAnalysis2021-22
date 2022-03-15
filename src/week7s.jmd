@@ -36,23 +36,18 @@ function helm(k, n)
     x = range(0, 1; length = n)
     h = step(x)
     # TODO: Create a SymTridiagonal discretisation
-    ## SOLUTION
-    T = SymTridiagonal([1; fill(k^2-2/h^2, n-2); 1], [0; fill(1/h^2, n-2)])
-    T \ [0; exp.(x[2:end-1]); 1]
-    ## END
+    T = SymTridiagonal(ones(n-2)*(-2/h^2 + k^2),ones(n-3)*1/h^2)
+    u = T \ exp.(x[2:end-1])
+    [0; u; 0]
 end
 
 k = 10
 u = x -> (-cos(k*x) + exp(x)cos(k*x)^2 + cot(k)sin(k*x) - ℯ*cos(k)cot(k)sin(k*x) - ℯ*sin(k)sin(k*x) + exp(x)sin(k*x)^2)/(1 + k^2)
 
-n = 10 # TODO: choose n to get convergence
+n = 2048 # TODO: choose n to get convergence
 x = range(0, 1; length=n)
 @test norm(helm(k, n) - u.(x)) ≤ 1E-4
 ```
-
-
-
-
 
 
 **Problem 1.2 (B)** Discretisations can also be used to solve eigenvalue equations.
@@ -65,6 +60,8 @@ matrix `A`) with $L = 10$.
 Can you conjecture their exact value if $L = ∞$? (Hint: they are integers and the eigenvalues
 closest to zero are most accurate.)
 
+**SOLUTION**
+
 ```julia
 L = 10
 n = 1000
@@ -72,6 +69,18 @@ x = range(-L,L; length=n)
 h = step(x)
 eigvals(SymTridiagonal(fill(2/h^2,n-2)  + x[2:end-1].^2, fill(-1/h^2, n-3)))
 ```
+
+On inspection of the smallest values, it seems that the positive odd integers are the eigenvalues for $L = \infty$. Increasing $L$ (and also $n$) it becomes more obvious:
+
+```julia
+L = 100
+n = 10000
+x = range(-L,L; length = n)
+h = step(x)
+A = SymTridiagonal(x[2:end-1] .^ 2 .+ 2/h^2,ones(n-3)* (-1)/h^2)
+sort((eigvals(A)))[1:20]
+```
+
 
 **Problem 1.3⋆ (A)** Consider Helmholtz with Neumann conditions:
 $$
@@ -92,6 +101,42 @@ $$
 Use pivoting to reduce the equation to one involving a
 symmetric tridiagonal matrix.
 
+**SOLUTION**
+
+We have, with $u(x_k) = u_k$ (and using $\kappa$ instead of $k$ in the equation $u_{xx} + k^2u = f(x)$ so as to avoid confusion with the indices):
+\begin{align}
+\frac{u_2 - u_1}{h} &= c_0, \\
+\frac{u_{k-1} - 2u_k + u_{k+1}}{h^2} + \kappa^2u_k &= f(x_k), \hspace{5mm} \textrm{ for } k=2:n-1\\
+\frac{u_n - u_{n-1}}{h} &= c_1, 
+\end{align}
+which we write in matrix form as:
+
+$$
+\left[\begin{matrix}
+-\frac{1}{h} & \frac{1}{h} \\
+\frac{1}{h^2} & \kappa^2 - \frac{2}{h^2} & \frac{1}{h^2} \\
+&\ddots & \ddots & \ddots \\
+&&\frac{1}{h^2} & \kappa^2 - \frac{2}{h^2} & \frac{1}{h^2} \\
+&&& -\frac{1}{h} & \frac{1}{h}
+\end{matrix}
+\right] \mathbf{u} = \left[\begin{matrix}
+c_0 \\ f(x_2)\\ \vdots \\f(x_{n-1}) \\ c_1
+\end{matrix}\right],
+$$
+which we can make symmetric tridiagonal by multiplying the first row by $1/h$ and the final row by $-1/h$:
+$$
+\left[\begin{matrix}
+-\frac{1}{h^2} & \frac{1}{h^2} \\
+\frac{1}{h^2} & \kappa^2 - \frac{2}{h^2} & \frac{1}{h^2} \\
+&\ddots & \ddots & \ddots \\
+&&\frac{1}{h^2} & \kappa^2 - \frac{2}{h^2} & \frac{1}{h^2} \\
+&&& \frac{1}{h^2} & -\frac{1}{h^2}
+\end{matrix}
+\right] \mathbf{u} = \left[\begin{matrix}
+\frac{c_0}{h} \\ f(x_2)\\ \vdots \\f(x_{n-1}) \\ -\frac{c_1}{h}
+\end{matrix}\right],
+$$
+
 ## 2. Convergence
 
 **Problem 2.1⋆ (B)** For the equation
@@ -107,6 +152,72 @@ where we take the average of the two grid points:
 $$
 {u'(x_{k+1}) + u'(x_k) \over 2} ≈ {u_{k+1} - u_k \over h}.
 $$
+
+**SOLUTION**
+Using the approximation from PS6 we obtain
+
+$${(f(x_{k+1}) + f(x_k))\over 2} = {( u’(x_{k+1}) + u'(x_k) )\over 2} + {a(u(x_{k+1}) +  u(x_k)) \over 2}≈ {(u_{k+1} - u_k ) \over h} + {a u_{k+1}\over 2} + {a u_k \over 2}$$
+
+So we get
+
+$$\left(\frac{a}{2}-\frac{1}{h}\right)u_k + \left(\frac{a}{2}+\frac{1}{h}\right)u_{k+1} = \frac{f(x_{k+1})+f(x_k)}{2}$$
+
+We want to prove that $\sup_{k=1,...,n-1}|u(x_k) - u_{k}|$ converges to 0 as $n\to \infty$.
+
+Take $\hat u = [u_0,...,u_{n-1}]^T$ and rewrite the system as
+
+$$\hat L \hat u = \begin{bmatrix} c_0 \\ \hat fᶠ \end{bmatrix}$$
+
+where $f_k = {f(x_{k})+f(x_{k-1}) \over 2}$, $k=1,...,n-1$ and 
+
+$$\hat L =  
+\begin{bmatrix} 
+1 \\
+{a\over 2} - {1 \over h} & {a\over 2} + {1 \over h} \\
+& {a\over 2} - {1 \over h} & {a\over 2} + {1 \over h}\\
+&& \ddots & \ddots \\
+&&& {a\over 2} - {1 \over h} & {a\over 2} + {1 \over h}
+\end{bmatrix}$$
+
+Note that $\hat L$ is lower bidiagonal.
+
+Now, similarly to Euler's methods convergence theorem, we study consistency and stability.
+
+##### Consistency:
+Our discretisation approximates the true equation.
+
+$$\hat Lu = \begin{bmatrix} c_0 \\
+{u(x_1) - u(x_0) \over h} + {a\over2}(u(x_1) + u(x_0)) \\
+\vdots \\
+{u(x_{n-1}) - u(x_{n-2}) \over h}  + {a\over2}(u(x_{n-1}) + u(x_{n-2}))\end{bmatrix}
+= \begin{bmatrix} c_0 \\
+\frac{1}{2}\left({u(x_1) - u(x_0) \over h} +{u(x_1) - u(x_0) \over h} + {a}(u(x_1) + u(x_0))\right) \\
+\vdots \\
+\frac{1}{2}\left({u(x_{n-1}) - u(x_{n-2}) \over h} + {u(x_1) - u(x_0) \over h} + {a}(u(x_{n-1}) + u(x_{n-2}))\right)\end{bmatrix}
+= \begin{bmatrix} c_0 \\
+\frac{1}{2}\left(u'(x_0) + a u(x_0) + u''(τ_0) h + u'(x_1) + a u(x_1) + u''(\sigma_1) h \right)\\
+\vdots \\
+\frac{1}{2}\left(u'(x_{n-2}) + a u(x_{n-2}) + u''(τ_{n-2}) h + u'(x_{n-1}) + a u(x_{n-1}) + u''(\sigma_{n-1}) h \right) \end{bmatrix} = 
+\begin{bmatrix} c_0 \\
+{f(x_0)+f(x_1)\over 2} + {u''(τ_0)+u''(\sigma_1)\over 2} h \\
+\vdots \\
+{f(x_{n-2})+f(x_{n-1})\over 2} + {u''(τ_{n-2})+u''(\sigma_{n-1})\over 2} h \end{bmatrix} = 
+\begin{bmatrix} c_0 \\ \hat fᶠ \end{bmatrix} + \begin{bmatrix} 0 \\ δ \end{bmatrix}$$
+
+where $x_k ≤ τ_k, \sigma_k ≤ x_{k+1}$, and uniform boundedness implies that $\|δ\|_∞ = O(h)$
+
+##### Stability:
+The inverse does not blow up the error.
+
+$$\hat L = \underbrace{\begin{bmatrix} 1 \\ & \left({a\over 2} + {1 \over h}\right)^{-1} \\ && ⋱ \\ &&& \left({a\over 2} + {1 \over h}\right)^{-1}  \end{bmatrix}}_D \underbrace{\begin{bmatrix} 1 \\ \left({a\over 2} + {1 \over h}\right)\left({a\over 2} - {1 \over h}\right)  & 1 \\ & ⋱ & ⋱ \\ && \left({a\over 2} + {1 \over h}\right)\left({a\over 2} - {1 \over h}\right) &1 \end{bmatrix}}_{ L}$$
+
+Thus, we have $\| L^{-1}\|_{1 → ∞} ≤ \left|{a^2\over 4} - {1 \over h^2}\right|^{-(n-1)} ≤ \left|{a^2\over 4} - {n^2}\right|^{-(n-1)} \left|{4\over a^2 + 4n^2}\right|^{n-1}
+ = O(1)$
+ 
+Note that $\left|{a\over 2} + {1 \over h}\right|^{-1} = \left|{h \over {ah \over 2} + 1}\right|\le 2h$, as $h\to 0$ (taking $h$ small enough)
+
+Combining stability and consistency we have
+$$\|𝐮ᶠ - 𝐮\|_∞  = \|\hat L^{-1} (\hat L𝐮ᶠ - \hat L𝐮)\|_∞  = \| L^{-1} D^{-1} \begin{bmatrix} 0 \\ δ \end{bmatrix} \|_∞ ≤ 2h \| L^{-1}\|_{1 → ∞} \|δ\|_1 = O(h)$$
 
 **Problem 2.2⋆ (A)** Consider the matrices
 $$
@@ -134,6 +245,112 @@ u'(x) - a(x)u(x) &= f(x)
 \end{align*}
 $$
 
+**SOLUTION**
+
+
+Since
+
+$$L^{-1}=
+\begin{bmatrix}
+1 & 0 & 0 & 0 & 0 &... & 0\\
+a_1 & 1 & 0 & 0 & 0 &... & 0\\
+a_1a_2 & a_2 & 1 & 0 & 0 &... & 0\\
+a_1a_2a_3 & a_2a_3 & a_3 & 1 & 0 & ... & 0\\
+\vdots & \vdots & \ddots & \ddots & \ddots & \ddots & \vdots \\
+\vdots & \vdots & & \ddots & \ddots & 1 & 0 \\
+\prod_{i=1}^{n-1}a_i & \prod_{i=2}^{n-1}a_i & ... & ... & a_{n-2}a_{n-1} & a_{n-1} & 1 
+\end{bmatrix}$$
+
+and
+
+$$T^{-1}=
+\begin{bmatrix}
+1 & 0 & 0 & 0 & 0 &... & 0\\
+a & 1 & 0 & 0 & 0 &... & 0\\
+a^2 & a & 1 & 0 & 0 &... & 0\\
+a^3 & a^2 & a & 1 & 0 & ... & 0\\
+\vdots & \vdots & \ddots & \ddots & \ddots & \ddots & \vdots \\
+\vdots & \vdots & & \ddots & \ddots & 1 & 0 \\
+a^{n-1} & a^{n-2} & ... & ... & a^2 & a & 1 
+\end{bmatrix}$$
+
+Then, $\forall x$
+
+$$\|T^{-1}x\|_{\infty}=\max_i|(T^{-1}x)_i|= \max_i \left|x_i +\sum_{j=1}^{i-1}a^{i-j}x_j \right| = \begin{cases} 
+1 & if \ a\in[0,1] \\
+a^{n-1} & if \ a\ge 1
+\end{cases}$$
+
+since, given $b=\max\{1,a\}$,
+
+$$\max_i \left|x_i +\sum_{j=1}^{i-1}a^{i-j}x_j \right|\le \max_i \left(|x_i| +\sum_{j=1}^{i-1}\left|a^{i-j}x_j \right| \right) \le b^n\sum_{j=1}^n |x_j| = b^n\|x\|_1$$
+
+thus,
+
+$\|T^{-1}\|_{1\to\infty} = \sup_{x\ne 0} \frac{\|T^{-1}x\|_\infty}{\|x\|_1}\le b^n$ and, in particular,
+$$\|T^{-1}\|_{1\to\infty}= b^n$$
+
+since $$\frac{|T^{-1}x|_\infty}{\|x\|_1}=b^n$$ it is obtained using 
+$$x=\begin{cases}e_1 & b=1 \\ e_n & b=a \end{cases}$$
+
+Moreover, $|a_j|\le b$, $\forall j=1,...,n$, thus,
+
+$$\|L^{-1}x\|_{\infty}=\max_i|(L^{-1}x)_i|= \max_i \left|x_i +\sum_{j=1}^{i-1}a_{j}...a_{i-1}x_j \right| \le \max_i |x_i| +\sum_{j=1}^{i-1}|a_{j}...a_{i-1}x_j | \le b^n\|x\|_1$$
+
+Hence,
+
+$$\|L^{-1}\|_{1\to \infty}=\sup_{x} \frac{\|L^{-1}x\|_{\infty}}{\|x\|_{1}} \le b^n = \|T^{-1}\|_{1 \to \infty}$$
+
+
+Now we prove convergence for the forward Euler method as $n → ∞$ for
+
+$$
+\begin{align*}
+u(0) &= c_0 \\
+u'(x) &= a(x)u(x) + f(x)
+\end{align*}
+$$
+
+Using equidistanced (with step $h$) points $x_0,...,x_{n-1}$, we use the approximations $u(x_k) \approx u_k$, where $u_0 = c_0$ and
+$$u_{k+1} = u_k + h\left(a(x_k)u_k + f(x_k)\right)$$
+
+In order to study convergence we consider the limit as $n\to\infty$ of
+$$\sup_{i=1,...,n-1} |u_i - u(x_i)|$$
+
+Similarly to Euler's methods convergence theorem, we study consistency and stability.
+
+In order to apply the theorem we note that we can define $a_k=a(x_k)$, $k=1,...n-1$ and we have that for every $k$, $|a_k|\le a:= max_{i=1,n-1}|a_i|$.
+
+##### Consistency:
+Our discretisation approximates the true equation.
+
+$$\hat Lu = \begin{bmatrix} c_0 \\
+{u(x_1) - u(x_0) \over h} - a_1 u(x_0) \\
+\vdots \\
+{u(x_{n-1}) - u(x_{n-2}) \over h} - a_{n-1} u(x_{n-2})\end{bmatrix} = 
+\begin{bmatrix} c_0 \\
+u'(x_0) - a_1 u(x_0) + u''(τ_0) h \\
+\vdots \\
+u'(x_{n-2}) - a_{n-1} u(x_{n-2}) + u''(τ_{n-2}) h\end{bmatrix} = 
+\begin{bmatrix} c_0 \\
+f(x_0) + u''(τ_0) h \\
+\vdots \\
+f(x_{n-2}) + u''(τ_{n-2}) h \end{bmatrix} = 
+\begin{bmatrix} c_0 \\ 𝐟ᶠ \end{bmatrix} + \begin{bmatrix} 0 \\ δ \end{bmatrix}$$
+
+where $x_k ≤ τ_k ≤ x_{k+1}$, and uniform boundedness implies that $\|δ\|_∞ = O(h)$
+
+##### Stability:
+The inverse does not blow up the error.
+First write, for $l_k = 1-a_k$
+
+$$\hat L = \underbrace{\begin{bmatrix} 1 \\ & h^{-1} \\ && ⋱ \\ &&& h^{-1} \end{bmatrix}}_D \underbrace{\begin{bmatrix} 1 \\ -l_1 & 1 \\ & ⋱ & ⋱ \\ && -l_{n-1} &1 \end{bmatrix}}_{ L}$$
+
+Thus, we have $\| L^{-1}\|_{1 → ∞} ≤ \|T^{-1}\|_{1 → ∞} = O(1)$
+
+Combining stability and consistency we have
+$$\|𝐮ᶠ - 𝐮\|_∞  = \|\hat L^{-1} (\hat L𝐮ᶠ - \hat L𝐮)\|_∞  = \| L^{-1} D^{-1} \begin{bmatrix} 0 \\ δ \end{bmatrix} \|_∞ ≤ h \| L^{-1}\|_{1 → ∞} \|δ\|_1 = O(h)$$
+
 
 
 
@@ -146,6 +363,48 @@ $$
 $$
 Hint: You may wish to try the change of variables $z = {\rm e}^{-{\rm i}θ}$.
 
+**SOLUTION**
+The explicit formulae for $f̂ₖ$ can be found by direct computation. Making use of trigonometric identities and noting that cos x and sin x are even and odd respectively on a periodic interval, hence orthogonal
+
+  1) $$f̂ₖ = \frac{1}{2π} \int^{2π}_{0} \cos θ \exp^{-ikθ} dθ = \frac{1}{2π} \int^{2π}_{0} ( \cos θ \cos kθ ) dθ $$
+  For $k=1$, yields
+      $$f̂ₖ = \frac{1}{2π} \int^{2π}_{0} \cos^2 θ dθ = \frac{1}{2}$$
+  and $k \neq 1$ using standard trigonometric identity
+  $$f̂ₖ = \frac{1}{4π} \int^{2π}_{0} \cos{θ(1-k)} + \cos{θ(1+k)} dθ = 0$$
+
+  2) similar to 1), replace cases $k =,\neq 1$ by $k =, \neq 4$ 
+  
+  3) Either use Euler's formula to expand $\sin^4θ$ into exponentials or use the identity $$ sin^4 θ = \frac{3 - 4 \cos 2θ + \cos 4 θ}{8} $$
+  Noting that $\sin^4 θ$ is an even function yields $$f̂ₖ = \frac{1}{2π} \int^{2π}_{0} \sin^4 θ \exp^{-ikθ} dθ = \frac{1}{2π} \int^{2π}_{0} ( \sin^4 θ \cos kθ ) dθ $$
+  Using the above identity we need to take care of the case $k \neq 2,4$, which is zero as we have seen in 1). For special cases  $k = 2, 4$ we have $f̂_2 = - \frac{1}{4}$ and $f̂_4 = \frac{1}{16}$.
+
+  4) We will have to separate the cases $k<0$ and $k \geq 0$.
+  
+  ($k \geq 0$) Make the substition $z = {3\rm e}^{-{\rm i}θ}$ and integrating over the contour of the circle of radius 3
+  $$f̂ₖ = \frac{-i}{2π}\frac{1}{3^{k+1}} \int_{|z|=3} {z^k \over 1 - z} dz $$
+  then by the residue theorem yields $f̂ₖ = \frac{1}{3^{k}}$.
+  
+  ($k<0$) Make the substition $z = {\rm e}^{{\rm i}θ}$ and observe that the pole lies outside of the contour of radius $1$, hence $f̂ₖ = 0$ for all $k<0$.
+  
+  5) We will have to separate the cases $k<0$ and $k \geq 0$. 
+  
+  ($k \geq 0$) Make the substition $z = \frac{{\rm e}^{-{\rm i}θ}}{2}$ and observe that the pole lies outside of the contour of radius $\frac{1}{2}$ , hence $f̂ₖ = 0$ for all $k \geq 0$.
+  
+  ($k<0$) Make the substition $z = {2 \rm e}^{{\rm i}θ}$ and integrating over the contour of the circle of radius 2
+  $$f̂ₖ = \frac{i}{2π}\frac{1}{2^{k+1}} \int_{|z|=2} {z^{k-1} \over z - 1} dz $$
+  then by the residue theorem yields $f̂ₖ = \frac{-1}{2^{|k|}}$.
+  
+For the student unfamiliar with complex analysis:
+    
+   4*) Substitute for $z = \frac{{\rm e}^{-{\rm i}θ}}{3}$ such that $f(θ) = \frac{1}{1-z}$
+   then write the function as a geometric series $\Sigma_j z^j$ plug in
+   
+   $$f̂ₖ = \frac{1}{2π3^{j}} \int^{2π}_{0} \Sigma_j {\rm e}^{iθ(j-k)} dθ $$
+   
+   and finally use the Lemma "Discrete orthogonality" from the lecture notes to show the result above.
+   
+   5*) Similar idea to 4) however notice that this time we only have non-zero contributions for $k<0$.
+
 **Problem 3.2⋆ (B)** Prove that if the first $λ-1$ derivatives $f(θ), f'(θ), …, f^{(λ-1)}(θ)$ 
 are 2π-periodic and $f^{(λ)}$ is uniformly bounded  that
 $$
@@ -156,6 +415,18 @@ $$
 |f(θ) - ∑_{k=0}^{n-1} f̂_k {\rm e}^{{\rm i}kθ}| = O(n^{1-λ})
 $$
 
+**SOLUTION**
+A straightforward application of integration by parts yields the result
+
+$$f̂ₖ = \frac{1}{2π} \int^{2π}_{0} f(θ) {\rm e}^{-ikθ} dθ = \frac{(-i)^λ}{2π k^{λ}} \int^{2π}_{0} f^{(λ)}(θ) {\rm e}^{-ikθ} dθ  $$
+given that $f^{(λ)}$ is uniformly bounded, the second part follows directly from this result
+
+$$
+|∑_{k=n}^{\infty} f̂_k {\rm e}^{{\rm i}kθ}| \leq ∑_{k=n}^{\infty} |f̂_k | \leq C ∑_{k=n}^{\infty} k^{-λ} 
+$$
+
+for some constant $C$.
+
 
 **Problem 3.3⋆ (C)**
 If $f$ is a trigonometric polynomial  ($f̂_k = 0$ for $|k| > m$) show
@@ -164,7 +435,8 @@ $$
 f(θ) = \sum_{k=-m}^m f̂_k^n {\rm e}^{{\rm i} k θ}
 $$
 
-
+**SOLUTION**
+This proof is nearly identical to the proof of "Theorem (Taylor series converges)" in the lecture notes. Only now one has to also subtract the negative coefficients from the negative approximate coefficients in the chain of arguments.
 
 **Problem 3.4⋆ (B)** For the general (non-Taylor) case and $n = 2m+1$, prove convergence for
 $$
@@ -174,3 +446,26 @@ to $f(θ)$ as $n \rightarrow ∞$.
 What is the rate of convergence if the first $λ-1$ derivatives $f(θ), f'(θ), …, f^{(λ-1)}(θ)$ 
 are 2π-periodic and $f^{(λ)}$ is uniformly bounded?
 
+**SOLUTION**
+
+Observe that by aliasing (see corollary in lecture notes) and triangle inequality we have the following 
+
+$$ |f̂_k^n - f̂_k|  \leq \sum_{p=1}^{\infty} (|f̂_{k+pm}|+|f̂_{k-pm}|) $$
+
+Using the result from Problem 3.2 yields
+
+$$ |f̂_k^n - f̂_k| \leq \frac{C}{n^\lambda} \sum_{p=1}^{\infty} \frac{1}{\left(p + \frac{k}{n}\right)^\lambda} + \frac{1}{\left(p - \frac{k}{n}\right)^\lambda} $$
+
+now we pick $|q| < \frac{1}{2}$ (such that the estimate below will hold for both summands above) and construct an integral with convex and monotonocally decreasing integrand such that
+
+$$ \left( p + q \right)^{-\lambda} < \int_{p-\frac{1}{2}}^{p+\frac{1}{2}} (x + q)^{-\lambda} dx $$
+
+more over summing over the left-hand side from $1$ to $\infty$ yields a bound by the integral:
+
+$$ \int^{\infty}_{\frac{1}{2}} (x + q)^{-\lambda} dx = \frac{1}{\lambda}(\frac{1}{2} + q)^{- \lambda + 1}$$
+
+Finally let $q = \pm \frac{k}{n}$ to achieve the rate of convergence
+
+$$ |f̂_k^n - f̂_k| \leq \frac{C_{\lambda}}{ n^{\lambda}} \left(  \left( \frac{1}{2} + k/n \right)^{ - \lambda + 1} + \left( \left( \frac{1}{2} - k/n \right) \right)^{- \lambda +1} \right)$$
+
+where $C_{\lambda}$ is a constant depending on $\lambda$. Note that it is indeed important to split the $n$ coefficients equally over the negative and positive coefficients as stated in the notes, due to the estatime we used above.
