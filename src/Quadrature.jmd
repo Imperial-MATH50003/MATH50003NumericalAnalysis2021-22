@@ -141,7 +141,7 @@ this experimentally.
 
 ## 2. Roots of orthogonal polynomials and truncated Jacobi matrices
 
-We now consider _roots (zeros) of $q_n(x)$_. This is important as we shall
+We now consider roots (zeros) of orthogonal polynomials $q_n(x)$. This is important as we shall
 see they are useful for interpolation and quadrature. For interpolation to be well-defined we
 first need to guarantee that the roots are distinct.
 
@@ -160,9 +160,10 @@ $$
 does not change sign.
 In other words:
 $$
-⟨q_n,(x-x_1) ⋯(x-x_j) ⟩ = \int_a^b q_n(x) (x-x_1) ⋯(x-x_j) {\rm d} x ≠ 0.
+⟨q_n,(x-x_1) ⋯(x-x_j) ⟩ = \int_a^b q_n(x) (x-x_1) ⋯(x-x_j) w(x) {\rm d} x ≠ 0.
 $$
-This is only possible if $j = n$.
+This is only possible if $j = n$ as $q_n(x)$ is orthogonal w.r.t. all lower degree
+polynomials.
 
 ∎
 
