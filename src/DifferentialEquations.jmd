@@ -407,7 +407,7 @@ which satisfies
 $$
 \begin{align*}
 𝐮(0) = \begin{bmatrix} 1 \\ 0 \end{bmatrix} \\
-𝐮 - \begin{bmatrix} 0 & 1 \\ -t & 0 \end{bmatrix} 𝐮 = 𝟎.
+𝐮' - \begin{bmatrix} 0 & 1 \\ -t & 0 \end{bmatrix} 𝐮 = 𝟎.
 \end{align*}
 $$
 It is natural to represent the _time-slices_ $𝐮_k$ as
