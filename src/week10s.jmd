@@ -13,3 +13,9 @@ Use $U_n(x)$ and its roots to diagonalise the problem and hence deduce an explic
 
 
 ## 3. Gaussian quadrature
+
+**Problem** Show for $w(x) = 1/\sqrt{1-x^2}$ that the Gaussian quadrature rule is
+$$
+{\pi \over n} \sum_{j=1}^n f(x_j)
+$$
+where $x_j = (j-1/2)π/n$. 

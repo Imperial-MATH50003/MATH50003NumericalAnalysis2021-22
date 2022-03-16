@@ -113,7 +113,7 @@ $$
 **Proof**
 Note that
 $$
-p(x_j) = ∑_{k=1}^n f(x_k) ℓ_k(x_j) = f(x_k)
+p(x_j) = ∑_{k=1}^n f(x_k) ℓ_k(x_j) = f(x_j)
 $$
 so we just need to show it is unique. Suppose $p̃(x)$ is a  polynomial
 of degree at most $n-1$
@@ -296,9 +296,9 @@ $$
 We have:
 $$
 \begin{align*}
-w_1 = \int_0^1 w(x) ℓ_1(x) {\rm d}x = w_1 = \int_0^1 {(x-1/4)(x-1) \over (-1/4)(-1)}{\rm d}x = -1/6 \\
-w_2 = \int_0^1 w(x) ℓ_2(x) {\rm d}x = w_2 = \int_0^1 {x(x-1) \over (1/4)(-1)}{\rm d}x = 8/9 \\
-w_3 = \int_0^1 w(x) ℓ_3(x) {\rm d}x = w_3 = \int_0^1 {x(x-1/4) \over 1/4}{\rm d}x = 5/18
+w_1 = \int_0^1 w(x) ℓ_1(x) {\rm d}x  = \int_0^1 {(x-1/4)(x-1) \over (-1/4)(-1)}{\rm d}x = -1/6 \\
+w_2 = \int_0^1 w(x) ℓ_2(x) {\rm d}x  = \int_0^1 {x(x-1) \over (1/4)(-1)}{\rm d}x = 8/9 \\
+w_3 = \int_0^1 w(x) ℓ_3(x) {\rm d}x  = \int_0^1 {x(x-1/4) \over 1/4}{\rm d}x = 5/18
 \end{align*}
 $$
 That is we have
@@ -307,10 +307,10 @@ $$
 $$
 This is indeed exact for polynomials up to degree $2$ (and no more):
 $$
-Σ_n^{w,𝐱}[1] = 1, Σ_n^{w,𝐱}[x] = 1/2, Σ_n^{w,𝐱}[x^2] = 1/3, Σ_n^{w,𝐱}[x^2] = 7/24 ≂̸ 1/4.
+Σ_n^{w,𝐱}[1] = 1, Σ_n^{w,𝐱}[x] = 1/2, Σ_n^{w,𝐱}[x^2] = 1/3, Σ_n^{w,𝐱}[x^2] = 7/24 ≠ 1/4.
 $$
 
-**Example (Chebyshev points)** Find the interpolatory quadrature rule for $w(x) = 1/sqrt{1-x^2}$ on $[0,1]$ with points equal to the
+**Example (Chebyshev roots)** Find the interpolatory quadrature rule for $w(x) = 1/\sqrt{1-x^2}$ on $[-1,1]$ with points equal to the
 roots of $T_3(x)$. This is a special case of Gaussian quadrature which we will approach in another way below. We use:
 $$
 \int_{-1}^1 w(x) {\rm d}x = π, \int_{-1}^1 xw(x) {\rm d}x = 0, \int_{-1}^1 x^2 w(x) {\rm d}x = {π/2}
@@ -318,11 +318,27 @@ $$
 Recall from before that $x_1,x_2,x_3 = \sqrt{3}/2,0,-\sqrt{3}/2$. Thus we have:
 $$
 \begin{align*}
-w_1 = \int_0^1 w(x) ℓ_1(x) {\rm d}x = w_1 = \int_0^1 {(x-1/4)(x-1) \over (-1/4)(-1)}{\rm d}x = -1/6 \\
-w_2 = \int_0^1 w(x) ℓ_2(x) {\rm d}x = w_2 = \int_0^1 {x(x-1) \over (1/4)(-1)}{\rm d}x = 8/9 \\
-w_3 = \int_0^1 w(x) ℓ_3(x) {\rm d}x = w_3 = \int_0^1 {x(x-1/4) \over 1/4}{\rm d}x = 5/18
+w_1 = \int_{-1}^1 w(x) ℓ_1(x) {\rm d}x = \int_{-1}^1 {x(x+\sqrt{3}/2) \over (\sqrt{3}/2) \sqrt{3} \sqrt{1-x^2}}{\rm d}x = {π \over 3} \\
+w_2 = \int_{-1}^1 w(x) ℓ_2(x) {\rm d}x = \int_{-1}^1 {(x-\sqrt{3}/2)(x+\sqrt{3}/2) \over (-3/4)\sqrt{1-x^2}}{\rm d}x = {π \over 3} \\
+w_3 = \int_{-1}^1 w(x) ℓ_3(x) {\rm d}x = \int_{-1}^1 {(x-\sqrt{3}/2) x \over (-\sqrt{3})(-\sqrt{3}/2) \sqrt{1-x^2}}{\rm d}x = {π \over 3}
 \end{align*}
 $$
+(It's not a coincidence that they are all the same but this will differ for roots of other OPs.) 
+That is we have
+$$
+Σ_n^{w,𝐱}[f]  = {π \over 3}(f(\sqrt{3}/2) + f(0) + f(-\sqrt{3}/2)
+$$
+This is indeed exact for polynomials up to degree $n-1=2$, but it goes all the way up to $2n-1 = 5$:
+$$
+\begin{align*}
+Σ_n^{w,𝐱}[1] &= π, Σ_n^{w,𝐱}[x] = 0, Σ_n^{w,𝐱}[x^2] = {π \over 2}, \\
+Σ_n^{w,𝐱}[x^3] &= 0, Σ_n^{w,𝐱}[x^4] &= {3 π \over 8}, Σ_n^{w,𝐱}[x^5] &= 0 \\
+Σ_n^{w,𝐱}[x^6] &= {9 π \over 32} ≠ {5 π \over 16}
+\end{align*}
+$$
+We shall explain this miracle next.
+
+
 
 
 
@@ -442,3 +458,12 @@ $$
 $$
 ∎
 
+
+**Example (Chebyshev points revisited)** 
+Consider the construction of Gaussian quadrature for $n = 3$. To determine the weights we need:
+$$
+w_k^{-1} = α_k^2 = q_0(x_k)^2 + q_1(x_k)^2 + q_2(x_k)^2 = 
+{1 \over π} + {2 \over π} x_k^2 + {2 \over π} (2x_k^2-1)^2
+$$
+We can check each case and deduce that $w_k = π/3$.
+Thus we recover the interpolatory quadrature rule.
