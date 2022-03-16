@@ -39,24 +39,7 @@ $$
 (x-y) [q_0(x) | ⋯ | q_n(x)] \begin{bmatrix} q_0(y) \\ ⋮ \\ q_n(y) \end{bmatrix}.
 $$
 
-**SOLUTION**
 
-We have
-$$
-x [q_0(x) | ⋯ | q_n(x)] = [q_0(x) | ⋯ | q_{n+1}(x)] \underbrace{\begin{bmatrix}
-a_0 & c_0 \\
-b_0 & ⋱ & ⋱
-& ⋱ & a_n & \end{bmatrix}}_{X_{n+1}}
-$$
-Thus
-$$
-(x-y) [q_0(x) | ⋯ | q_n(x)] \begin{bmatrix} q_0(y) \\ ⋮ \\ q_n(y) \end{bmatrix}
-= [q_0(x) | ⋯ | q_{n+1}(x)] (X_{n+1} - X_{n+1}^⊤) \begin{bmatrix} q_0(y) \\ ⋮ \\ q_n(y) \end{bmatrix}
-+ b_n (q_{n+1}(x) q_n(y) - q_n(x) q_{n+1}(y))
-= b_n (q_{n+1}(x) q_n(y) - q_n(x) q_{n+1}(y))
-$$
-
-**END**
 
 ## 2. Chebyshev polynomials
 
