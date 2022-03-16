@@ -746,7 +746,7 @@ We can see that each time we get 902.38 to 2 decimal places, so this is our answ
 
 **Problem 3.5 (B)** Consider the equation
 $$
-u(1) = 1, u'(t) = -10u(t)
+u(0) = 1, u'(t) = -10u(t)
 $$
 What behaviour do you observe on $[0,10]$ of forward, backward, and that of Problem 3.1
 with a step-size of 0.5? What happens if you decrease the step-size to $0.01$? (Hint: you may wish to do a plot and scale the $y$-axis logarithmically,)
