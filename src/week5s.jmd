@@ -487,7 +487,7 @@ println("Rank for f₄ = ", find_min_rank(f₄, n, error))
 
 **END**
 
-**Problem 3.3⋆ (B)** Define the _pseudo-inverse_:
+**Problem 3.3⋆ (B)** For $A ∈ ℝ^{m × n}$ define the _pseudo-inverse_:
 $$
 A^+ := V Σ^{-1} U^⊤.
 $$
@@ -498,21 +498,24 @@ Show that it satisfies the _Moore-Penrose conditions_:
 
 **SOLUTION**
 
-Let $A=UΣ V^⊤$ and $A^+ := V Σ^{-1} U^⊤$. Note that $UU^⊤ = U^⊤U = I$ ($U$ orthonormal) and $V^⊤ V =I$
+Let $A=UΣ V^⊤$ and $A^+ := V Σ^{-1} U^⊤$, where $U ∈ ℝ^{m × r}$ and $V ∈ ℝ^{n × r}$. Note that $U^⊤U = I_m$ and $V^⊤V = I_r$. 
 
 1. We have
-$$A A^+ A = U \Sigma V^⊤ V \Sigma^{-1} U^⊤ U \Sigma V^⊤ = U \Sigma \Sigma^{-1} \Sigma V^⊤ = U\Sigma V^⊤ = A$$
-
+$$
+A A^+ A = U Σ V^⊤ V Σ^{-1} U^⊤ U Σ V^⊤ = U Σ Σ^{-1} Σ V^⊤ = UΣ V^⊤ = A
+$$
 2. Moreover,
-$$A^+ A A^+ = V \Sigma^{-1}U^⊤ U \Sigma V^⊤ V \Sigma^{-1} U^⊤ = V \Sigma^{-1}\Sigma \Sigma^{-1} U^⊤ = V \Sigma^{-1} U^⊤ = A^+$$
+$$
+A^+ A A^+ = V Σ^{-1}U^⊤ U Σ V^⊤ V Σ^{-1} U^⊤ = V Σ^{-1}Σ Σ^{-1} U^⊤ = V Σ^{-1} U^⊤ = A^+
+$$
+3. 
+$$
+\begin{align*}
+(A A^+)^⊤ = (A^+)^⊤ A^⊤ = U Σ^{-1} V^⊤ V Σ U^⊤ = U U^⊤ = U Σ V^⊤ V Σ^{-1} U^⊤ = A A^+ \\
+(A^+ A)^⊤ = A^⊤ (A^+)^⊤ =  V Σ U^⊤ U Σ^{-1} V^⊤ = V V^⊤ = V Σ^{-1} U^⊤ U Σ V^⊤  = A^+ A
+\end{align*}
+$$
 
-3. Furthermore, $AA^+ = U \Sigma V^⊤ V \Sigma^{-1} U^⊤ = U U^⊤ = I$, thus
-
-$$(AA^+)^⊤ = I^⊤ = I = AA^+$$
-
-Moreover, $A^+A = V \Sigma^{-1} U^⊤ U \Sigma V^⊤ = VV^⊤$, hence,
-
-$$(A^+A)^⊤ = (VV^⊤)^⊤=VV^⊤=A^+A$$
 
 **END**
 

@@ -1,6 +1,7 @@
 using Weave
 
 nkwds = (out_path = "notebooks/", jupyter_path = "$(homedir())/.julia/conda/3/bin/jupyter", nbconvert_options = "--allow-errors")
+pkwds = (out_path = "sheets/", jupyter_path = "$(homedir())/.julia/conda/3/bin/jupyter", nbconvert_options = "--allow-errors --clear-output")
 skwds = (out_path = "sheets/", jupyter_path = "$(homedir())/.julia/conda/3/bin/jupyter", nbconvert_options = "--allow-errors")
 
 ##
@@ -32,14 +33,14 @@ notebook("src/Applications.jmd"; nkwds...)
 # problem sheets
 ##
 
-notebook("src/week1.jmd"; skwds...)
-notebook("src/week2.jmd"; skwds...)
-notebook("src/week4.jmd"; skwds...)
-notebook("src/week5.jmd"; skwds...)
-notebook("src/week9.jmd"; skwds...)
-notebook("src/advanced1.jmd"; skwds...)
-notebook("src/advanced2.jmd"; skwds...)
-notebook("src/advanced3.jmd"; skwds...)
+notebook("src/week1.jmd"; pkwds...)
+notebook("src/week2.jmd"; pkwds...)
+notebook("src/week4.jmd"; pkwds...)
+notebook("src/week5.jmd"; pkwds...)
+notebook("src/week9.jmd"; pkwds...)
+notebook("src/advanced1.jmd"; pkwds...)
+notebook("src/advanced2.jmd"; pkwds...)
+notebook("src/advanced3.jmd"; pkwds...)
 
 ##
 # solutions 

@@ -156,7 +156,7 @@ For which examples does the answer change when $n = 1000$?
 
 
 
-**Problem 3.3⋆ (B)** Define the _pseudo-inverse_:
+**Problem 3.3⋆ (B)** For $A ∈ ℝ^{m × n}$ define the _pseudo-inverse_:
 $$
 A^+ := V Σ^{-1} U^⊤.
 $$

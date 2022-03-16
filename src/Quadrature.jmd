@@ -196,18 +196,18 @@ where $α_k = \sqrt{q_0(x_k)^2 + ⋯ + q_{n-1}(x_k)^2}$.
 
 **Proof**
 
-We construct the eigenvector (noting $b_{n-1} p_n(x_j) = 0$):
+We construct the eigenvector (noting $b_{n-1} q_n(x_j) = 0$):
 $$
-X_n \begin{bmatrix} p_0(x_j) \\ ⋮ \\ p_{n-1}(x_j) \end{bmatrix} =
-\begin{bmatrix} a_0 p_0(x_j) + b_0 p_1(x_j) \\
- b_0 p_0(x_j) + a_1 p_1(x_j) + b_1 p_2(x_j) \\
+X_n \begin{bmatrix} q_0(x_j) \\ ⋮ \\ q_{n-1}(x_j) \end{bmatrix} =
+\begin{bmatrix} a_0 q_0(x_j) + b_0 q_1(x_j) \\
+ b_0 q_0(x_j) + a_1 q_1(x_j) + b_1 q_2(x_j) \\
 ⋮ \\
-b_{n-3} p_{n-3}(x_j) + a_{n-2} p_{n-2}(x_j) + b_{n-2} p_{n-1}(x_j) \\
-b_{n-2} p_{n-2}(x_j) + a_{n-1} p_{n-1}(x_j) + b_{n-1} p_n(x_j)
-\end{bmatrix} = x_j \begin{bmatrix} p_0(x_j) \\
- p_1(x_j) \\
+b_{n-3} q_{n-3}(x_j) + a_{n-2} q_{n-2}(x_j) + b_{n-2} q_{n-1}(x_j) \\
+b_{n-2} q_{n-2}(x_j) + a_{n-1} q_{n-1}(x_j) + b_{n-1} q_n(x_j)
+\end{bmatrix} = x_j \begin{bmatrix} q_0(x_j) \\
+ q_1(x_j) \\
 ⋮ \\
-p_n(x_j)
+q_{n-1}(x_j)
 \end{bmatrix}
 $$
 The result follows from normalising the eigenvectors. Since $X_n$ is symmetric
@@ -215,14 +215,62 @@ the eigenvector matrix is orthogonal.
 
 ∎
 
+**Example (Chebyshev roots)** Consider $T_n(x) = \cos n {\rm acos}\, x$. The roots 
+are $x_j = \cos θ_j$ where $θ_j = (j-1/2)π/n$ for $j = 1,…,n$ are the roots of $\cos n θ$
+that are inside $[0,π]$. 
+
+Consider the $n = 3$ case where we have
+$$
+x_1,x_2,x_3 = \cos(π/6),\cos(π/2),\cos(5π/6) = \sqrt{3}/2,0,-\sqrt{3/2}
+$$
+We also have from the 3-term recurrence:
+$$
+\begin{align*}
+T_0(x) = 1 \\
+T_1(x) = x \\
+T_2(x) = 2x T_1(x) - T_0(x) = 2x^2-1 \\
+T_3(x) = 2x T_2(x) - T_1(x) = 4x^2-3x
+\end{align*}
+$$
+We orthonormalise by rescaling
+$$
+\begin{align*}
+q_0(x) &= 1/\sqrt{π} \\
+q_k(x) &= T_k(x) \sqrt{2}/\sqrt{π}
+\end{align*}
+$$
+so that the Jacobi matrix is symmetric:
+$$
+x [q_0(x)|q_1(x)|…] = [q_0(x)|q_1(x)|…] \underbrace{\begin{bmatrix} 0 & 1/\sqrt{2} \\
+                            1/\sqrt{2} & 0 & 1/2 \\
+                            1/2 & 0 & 1/2 \\
+                                & 1/2 & 0 & ⋱ \\
+                                && ⋱ & ⋱
+\end{bmatrix}}_X
+$$
+We can then confirm that we have constructed an eigenvector/eigenvalue of the $3 × 3$ truncation of the Jacobi matrix,
+e.g. at $x_2 = 0$:
+$$
+\begin{bmatrix} 
+0 & 1/\sqrt{2}
+1/\sqrt{2} & 0 & 1/2 \\
+    & 1/2 & 0\end{bmatrix} \begin{bmatrix} q_0(0) \\ q_1(0) \\ q_2(0) 
+    \end{bmatrix} = {1 \over \sqrt π} \begin{bmatrix} 
+0 & 1/\sqrt{2}
+1/\sqrt{2} & 0 & 1/2 \\
+    & 1/2 & 0\end{bmatrix} \begin{bmatrix} 1 \\ 0 \\ -{1 \over \sqrt{2}}
+    \end{bmatrix} =\begin{bmatrix} 0 \\ 0 \\ 0
+    \end{bmatrix}
+$$
+
 
 
 ## 3. Interpolatory quadrature rules
 
-**Definition (interpolatory quadrature rule)** Given a set of points $x_1,…,x_n$
+**Definition (interpolatory quadrature rule)** Given a set of points $𝐱 = [x_1,…,x_n]$
 the interpolatory quadrature rule is:
 $$
-Σ_n^{\rm i}[f] := ∑_{k=1}^n w_k f(x_k)
+Σ_n^{w,𝐱}[f] := ∑_{k=1}^n w_k f(x_k)
 $$
 where
 $$
@@ -233,7 +281,7 @@ $$
 **Proposition (interpolatory quadrature is exact for polynomials)** 
 Interpolatory quadrature is exact for all degree $n-1$ polynomials $p$:
 $$
-∫_a^b p(x) w(x) {\rm d}x = Σ_n^{\rm i}[f]
+∫_a^b p(x) w(x) {\rm d}x = Σ_n^{w,𝐱}[f]
 $$
 
 **Proof**
@@ -244,6 +292,37 @@ $$
 
 ∎
 
+**Example (arbitrary points)** Find the interpolatory quadrature rule for $w(x) = 1$ on $[0,1]$ with  points $[x_1,x_2,x_3] = [0,1/4,1]$?
+We have:
+$$
+\begin{align*}
+w_1 = \int_0^1 w(x) ℓ_1(x) {\rm d}x = w_1 = \int_0^1 {(x-1/4)(x-1) \over (-1/4)(-1)}{\rm d}x = -1/6 \\
+w_2 = \int_0^1 w(x) ℓ_2(x) {\rm d}x = w_2 = \int_0^1 {x(x-1) \over (1/4)(-1)}{\rm d}x = 8/9 \\
+w_3 = \int_0^1 w(x) ℓ_3(x) {\rm d}x = w_3 = \int_0^1 {x(x-1/4) \over 1/4}{\rm d}x = 5/18
+\end{align*}
+$$
+That is we have
+$$
+Σ_n^{w,𝐱}[f]  = -{f(0) \over 6} + {8f(1/4) \over 9} + {5 f(1) \over 18}
+$$
+This is indeed exact for polynomials up to degree $2$ (and no more):
+$$
+Σ_n^{w,𝐱}[1] = 1, Σ_n^{w,𝐱}[x] = 1/2, Σ_n^{w,𝐱}[x^2] = 1/3, Σ_n^{w,𝐱}[x^2] = 7/24 ≂̸ 1/4.
+$$
+
+**Example (Chebyshev points)** Find the interpolatory quadrature rule for $w(x) = 1/sqrt{1-x^2}$ on $[0,1]$ with points equal to the
+roots of $T_3(x)$. This is a special case of Gaussian quadrature which we will approach in another way below. We use:
+$$
+\int_{-1}^1 w(x) {\rm d}x = π, \int_{-1}^1 xw(x) {\rm d}x = 0, \int_{-1}^1 x^2 w(x) {\rm d}x = {π/2}
+$$
+Recall from before that $x_1,x_2,x_3 = \sqrt{3}/2,0,-\sqrt{3}/2$. Thus we have:
+$$
+\begin{align*}
+w_1 = \int_0^1 w(x) ℓ_1(x) {\rm d}x = w_1 = \int_0^1 {(x-1/4)(x-1) \over (-1/4)(-1)}{\rm d}x = -1/6 \\
+w_2 = \int_0^1 w(x) ℓ_2(x) {\rm d}x = w_2 = \int_0^1 {x(x-1) \over (1/4)(-1)}{\rm d}x = 8/9 \\
+w_3 = \int_0^1 w(x) ℓ_3(x) {\rm d}x = w_3 = \int_0^1 {x(x-1/4) \over 1/4}{\rm d}x = 5/18
+\end{align*}
+$$
 
 
 
