@@ -55,7 +55,7 @@ u_1 \\
 u_n
 \end{bmatrix}}_𝐮
 $$
-2. Replace the derivatives with the finite-difference approximations (here $m_k = (x_{k+1} - x_k)/2$ is the mid-point
+2. Replace the derivatives with the finite-difference approximations (here $m_k = (x_{k+1} + x_k)/2$ is the mid-point
 of the grid):
 $$
 \begin{align*}
@@ -143,7 +143,7 @@ $$
 This is a lower-triangular bidiagonal system, so can be solved using
 forward substitution in $O(n)$ operations. 
 
-We can also consider discretisation at the mid-point $m_k = {x_{k+1} - x_k \over 2}$,
+We can also consider discretisation at the mid-point $m_k = {x_{k+1} + x_k \over 2}$,
 which is the analogue of using central-differences:
 $$
 u'(m_k) ≈ {u_{k+1} - u_k \over h} = f(m_k)
