@@ -376,7 +376,7 @@ will consider a better implementation that takes $O(n^3)$ operations.
 **Example** We will now do an example by hand. Consider the $4 × 3$ matrix
 $$
 A = \begin{bmatrix} 
-1 & 2 & -1 \\ 
+4 & 2 & -1 \\ 
 0 & 15 & 18 \\
 -2 & -4 & -4 \\
 -2 & -4 & -10
