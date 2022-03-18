@@ -241,22 +241,22 @@ q_k(x) &= T_k(x) \sqrt{2}/\sqrt{π}
 $$
 so that the Jacobi matrix is symmetric:
 $$
-x [q_0(x)|q_1(x)|…] = [q_0(x)|q_1(x)|…] \underbrace{\begin{bmatrix} 0 & 1/\sqrt{2} \\
+x [q_0(x)|q_1(x)|⋯] = [q_0(x)|q_1(x)|⋯] \underbrace{\begin{bmatrix} 0 & 1/\sqrt{2} \\
                             1/\sqrt{2} & 0 & 1/2 \\
-                            1/2 & 0 & 1/2 \\
-                                & 1/2 & 0 & ⋱ \\
-                                && ⋱ & ⋱
+                            &1/2 & 0 & 1/2 \\
+                             &   & 1/2 & 0 & ⋱ \\
+                              &  && ⋱ & ⋱
 \end{bmatrix}}_X
 $$
 We can then confirm that we have constructed an eigenvector/eigenvalue of the $3 × 3$ truncation of the Jacobi matrix,
 e.g. at $x_2 = 0$:
 $$
 \begin{bmatrix} 
-0 & 1/\sqrt{2}
+0 & 1/\sqrt{2} \\
 1/\sqrt{2} & 0 & 1/2 \\
     & 1/2 & 0\end{bmatrix} \begin{bmatrix} q_0(0) \\ q_1(0) \\ q_2(0) 
     \end{bmatrix} = {1 \over \sqrt π} \begin{bmatrix} 
-0 & 1/\sqrt{2}
+0 & 1/\sqrt{2} \\
 1/\sqrt{2} & 0 & 1/2 \\
     & 1/2 & 0\end{bmatrix} \begin{bmatrix} 1 \\ 0 \\ -{1 \over \sqrt{2}}
     \end{bmatrix} =\begin{bmatrix} 0 \\ 0 \\ 0
@@ -332,7 +332,7 @@ This is indeed exact for polynomials up to degree $n-1=2$, but it goes all the w
 $$
 \begin{align*}
 Σ_n^{w,𝐱}[1] &= π, Σ_n^{w,𝐱}[x] = 0, Σ_n^{w,𝐱}[x^2] = {π \over 2}, \\
-Σ_n^{w,𝐱}[x^3] &= 0, Σ_n^{w,𝐱}[x^4] &= {3 π \over 8}, Σ_n^{w,𝐱}[x^5] &= 0 \\
+Σ_n^{w,𝐱}[x^3] &= 0, Σ_n^{w,𝐱}[x^4] &= {3 π \over 8}, Σ_n^{w,𝐱}[x^5] = 0 \\
 Σ_n^{w,𝐱}[x^6] &= {9 π \over 32} ≠ {5 π \over 16}
 \end{align*}
 $$
@@ -357,8 +357,9 @@ $$
 $$
 where $x_1,…,x_n$ are the eigenvalues of $X_n$ and
 $$
-w_k = Q_n[k,1]^2 = {1 \over α_k^2}
+w_k := ∫_a^b w(x) {\rm d}x Q_n[k,1]^2 = {1 \over α_k^2}.
 $$
+(Note we have $∫_a^b w(x) {\rm d} x q_0(x)^2 = 1$.)
 
 In analogy to how Fourier series are orthogonal with respect to Trapezium rule,
 Orthogonal polynomials are orthogonal with respect to Gaussian quadrature:
@@ -392,22 +393,24 @@ interpolates $f(x)$ at the Gaussian quadrature points $x_1,…,x_n$.
 
 **Proof**
 
-Note that we can write:
+Consider the Vandermonde-like matrix:
+$$
+Ṽ := \begin{bmatrix} q_0(x_1) & ⋯ & q_{n-1}(x_1) \\
+                ⋮ & ⋱ & ⋮ \\
+                q_0(x_n) & ⋯ & q_{n-1}(x_n) \end{bmatrix}
+$$
+and define
+$$
+Q_n^w := Ṽ^⊤ \begin{bmatrix} w_1 \\ &⋱ \\&& w_n \end{bmatrix} = \begin{bmatrix} q_0(x_1)w_1 & ⋯ &  q_0(x_n) w_n \\
+                ⋮ & ⋱ & ⋮ \\
+                w_1q_{n-1}(x_1) & ⋯ & q_{n-1}(x_n)w_n \end{bmatrix}
+$$
+so that
 $$
 \begin{bmatrix}
 c_0^n \\
 ⋮ \\
-c_{n-1}^n \end{bmatrix} = Q_n^w \begin{bmatrix}
-f_1 \\
-⋮ \\
-f_n \end{bmatrix}.
-$$
-
-Consider the Vandermonde-like matrix:
-$$
-Ṽ = \begin{bmatrix} q_0(x_1) & ⋯ & q_{n-1}(x_1) \\
-                ⋮ & ⋱ & ⋮ \\
-                q_0(x_n) & ⋯ & q_{n-1}(x_n) \end{bmatrix}
+c_{n-1}^n \end{bmatrix} = Q_n^w \begin{bmatrix} f(x_1) \\ ⋮ \\ f(x_n) \end{bmatrix}.
 $$
 Note that if $p(x) = [q_0(x) | ⋯ | q_{n-1}(x)] 𝐜$ then
 $$
@@ -459,7 +462,7 @@ $$
 ∎
 
 
-**Example (Chebyshev points revisited)** 
+**Example (Chebyshev expansions)** 
 Consider the construction of Gaussian quadrature for $n = 3$. To determine the weights we need:
 $$
 w_k^{-1} = α_k^2 = q_0(x_k)^2 + q_1(x_k)^2 + q_2(x_k)^2 = 
@@ -467,3 +470,44 @@ w_k^{-1} = α_k^2 = q_0(x_k)^2 + q_1(x_k)^2 + q_2(x_k)^2 =
 $$
 We can check each case and deduce that $w_k = π/3$.
 Thus we recover the interpolatory quadrature rule.
+Further, we can construct the transform
+$$
+\begin{align*}
+Q_3^w &= \begin{bmatrix}
+w_1 q_0(x_1) & w_2 q_0(x_2) & w_3 q_0(x_3) \\
+w_1 q_1(x_1) & w_2 q_1(x_2) & w_3 q_1(x_3) \\
+w_1 q_3(x_1) & w_2 q_3(x_2) & w_3 q_3(x_3) 
+\end{bmatrix}\\
+&= {π \over 3} \begin{bmatrix} 1/\sqrt{π} & 1/\sqrt{π} & 1/\sqrt{π} \\
+                                x_1\sqrt{2/π} & x_2\sqrt{2/π} & x_3\sqrt{2/π} \\
+                                (2x_1^2-1)\sqrt{2/π} &(2x_2^2-1)\sqrt{2/π} & (2x_3^2-1)\sqrt{2/π}
+                                \end{bmatrix} \\
+                                &= 
+                                {\sqrt{π} \over 3} \begin{bmatrix} 1 & 1 & 1 \\
+                                \sqrt{6}/2 & 0 & -\sqrt{6}/2 \\
+                                1/\sqrt{2} &-\sqrt{2} & 1/\sqrt{2}
+                                \end{bmatrix}
+\end{align*}
+$$
+We can use this to expand a polynomial, e.g. $x^2$:
+$$
+Q_3^2 \begin{bmatrix}
+x_1^2 \\
+x_2^2 \\
+x_3^2 
+\end{bmatrix} =  {\sqrt{π} \over 3} \begin{bmatrix} 1 & 1 & 1 \\
+                                \sqrt{6}/2 & 0 & -\sqrt{6}/2 \\
+                                1/\sqrt{2} &-\sqrt{2} & 1/\sqrt{2}
+                                \end{bmatrix} \begin{bmatrix} 3/4 \\ 0 \\ 3/4 \end{bmatrix}
+                                =
+                                \begin{bmatrix}
+                                {\sqrt{π} / 2} \\
+                                0 \\
+                                {\sqrt{π} / (2\sqrt{2})}
+                                \end{bmatrix}
+$$
+In other words:
+$$
+x^2 = {\sqrt π \over 2} q_0(x) + {\sqrt π \over 2\sqrt 2} q_2(x) = {1 \over 2} T_0(x) + {1 \over 2} T_2(x)
+$$
+which can be easily confirmed.

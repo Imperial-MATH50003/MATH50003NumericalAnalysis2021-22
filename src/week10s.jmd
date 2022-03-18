@@ -1,21 +1,45 @@
 ## 1. Orthogonal Polynomial Roots
 
+**Problem 1.1 (B)** Give an explicit diagonalisation of
+$$
+X_n = \begin{bmatrix} 0 & 1/2 \\ 
+                1/2 & 0 & ⋱ 
+                \end{bmatrix}
+$$
 
 
-Consider heat on a Graph
+**Problem** Consider heat on a Graph
 $$
-𝐮_t
+𝐮_t = Δ 𝐮
 $$
-Use $U_n(x)$ and its roots to diagonalise the problem and hence deduce an explicit formula. 
+Use $U_n(x)$ and its roots to diagonalise the problem and hence deduce an explicit formula.
 
 
 ## 2. Interpolatory quadrature
 
 
+**Problem 2.1** Compute the interpolatory quadrature rule for
+$w(x) = \sqrt{1-x^2}$ with the points $[-1,1/2,1]$.
+
+
+**Problem 2.2** Compute the 2-point 
+interpolatory quadrature rule for the weights $\sqrt{1-x^2}$, $1$, 
+and $1-x$ on $[-1,1]$.
+
+
+
 ## 3. Gaussian quadrature
+
+
+**Problem 3.1 (C)** Compute the 2-point and 3-point Gaussian quadrature rules associated with $w(x) = 1$ on $[-1,1]$. 
+Hint: $P_3(x)$ is cubic
+but can be reduced to a quadratic.
 
 **Problem** Show for $w(x) = 1/\sqrt{1-x^2}$ that the Gaussian quadrature rule is
 $$
 {\pi \over n} \sum_{j=1}^n f(x_j)
 $$
 where $x_j = (j-1/2)π/n$. 
+
+**Problem** Solve Problem 1.2 from PS8 using **Lemma (discrete orthogonality)** with
+$w(x) = 1/\sqrt{1-x^2}$ on $[-1,1]$.
