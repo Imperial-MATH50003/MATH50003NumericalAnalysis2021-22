@@ -55,6 +55,7 @@ notebook("src/week6s.jmd"; skwds...)
 notebook("src/week7s.jmd"; skwds...)
 notebook("src/week8s.jmd"; skwds...)
 notebook("src/week9s.jmd"; skwds...)
+notebook("src/week10s.jmd"; skwds...)
 
 
 ##

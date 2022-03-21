@@ -113,7 +113,7 @@ $$
 **Proof**
 Note that
 $$
-p(x_j) = ∑_{k=1}^n f(x_k) ℓ_k(x_j) = f(x_j)
+p(x_j) = ∑_{j=1}^n f(x_j) ℓ_k(x_j) = f(x_j)
 $$
 so we just need to show it is unique. Suppose $p̃(x)$ is a  polynomial
 of degree at most $n-1$
@@ -192,7 +192,7 @@ q_0(x_1) & ⋯ & q_0(x_n) \\
 q_{n-1}(x_1) & ⋯ & q_{n-1}(x_n)
 \end{bmatrix} \begin{bmatrix} α_1^{-1} \\ & ⋱ \\ && α_n^{-1} \end{bmatrix}
 $$
-where $α_k = \sqrt{q_0(x_k)^2 + ⋯ + q_{n-1}(x_k)^2}$.
+where $α_j = \sqrt{q_0(x_j)^2 + ⋯ + q_{n-1}(x_j)^2}$.
 
 **Proof**
 
@@ -270,11 +270,11 @@ $$
 **Definition (interpolatory quadrature rule)** Given a set of points $𝐱 = [x_1,…,x_n]$
 the interpolatory quadrature rule is:
 $$
-Σ_n^{w,𝐱}[f] := ∑_{k=1}^n w_k f(x_k)
+Σ_n^{w,𝐱}[f] := ∑_{j=1}^n w_j f(x_j)
 $$
 where
 $$
-w_k := ∫_a^b ℓ_k(x) w(x) {\rm d} x
+w_j := ∫_a^b ℓ_j(x) w(x) {\rm d} x
 $$
 
 
@@ -287,7 +287,7 @@ $$
 **Proof**
 The result follows since, by uniqueness of interpolatory polynomial:
 $$
-p(x) = ∑_{k=1}^n p(x_k) ℓ_k(x)
+p(x) = ∑_{j=1}^n p(x_j) ℓ_j(x)
 $$
 
 ∎
@@ -345,7 +345,7 @@ We shall explain this miracle next.
 ## 4. Gaussian quadrature
 
 Gaussian quadrature is the interpolatory quadrature rule corresponding
-to the grid $x_k$ defined as the roots of the orthogonal polynomial $q_n(x)$.
+to the grid $x_j$ defined as the roots of the orthogonal polynomial $q_n(x)$.
 We shall see that it is exact for polynomials up to degree $2n-1$, i.e., double
 the degree of other interpolatory quadrature rules from other grids.
 
@@ -353,11 +353,15 @@ the degree of other interpolatory quadrature rules from other grids.
 
 **Definition (Gauss quadrature)** Given a weight $w(x)$, the Gauss quadrature rule is:
 $$
-∫_a^b f(x)w(x) {\rm d}x ≈ \underbrace{∑_{k=1}^n w_k f(x_k)}_{Σ_n^w[f]}
+∫_a^b f(x)w(x) {\rm d}x ≈ \underbrace{∑_{j=1}^n w_j f(x_j)}_{Σ_n^w[f]}
 $$
-where $x_1,…,x_n$ are the eigenvalues of $X_n$ and
+where $x_1,…,x_n$ are the roots of $q_n(x)$ and 
 $$
-w_k := ∫_a^b w(x) {\rm d}x Q_n[k,1]^2 = {1 \over α_k^2}.
+w_j := {1 \over α_j^2} = {1 \over q_0(x_j)^2 + ⋯ + q_{n-1}(x_j)^2}.
+$$
+Equivalentally, $x_1,…,x_n$ are the eigenvalues of $X_n$ and
+$$
+w_j = ∫_a^b w(x) {\rm d}x Q_n[1,j]^2.
 $$
 (Note we have $∫_a^b w(x) {\rm d} x q_0(x)^2 = 1$.)
 
@@ -372,7 +376,7 @@ $$
 
 **Proof**
 $$
-Σ_n^w[q_ℓ q_m] = ∑_{k=1}^n {q_ℓ(x_k) q_m(x_k) \over α_k^2}
+Σ_n^w[q_ℓ q_m] = ∑_{j=1}^n {q_ℓ(x_j) q_m(x_j) \over α_j^2}
 = \left[q_ℓ(x_1)/ α_1 | ⋯ | {q_ℓ(x_n)/ α_n}\right] 
 \begin{bmatrix}
 q_m(x_1)/α_1 \\
@@ -430,7 +434,18 @@ $$
 
 ∎
 
-**Corollary** Gaussian quadrature is an interpolatory quadrature rule.
+**Corollary** Gaussian quadrature is an interpolatory quadrature rule
+with the interpolation points equal to the roots of $q_n$:
+$$
+Σ_n^w[f] = Σ_n^{w,𝐱}[f]
+$$
+**Proof**
+We want to show its the same as integrating the interpolatory polynomial:
+$$
+\int_a^b f_n(x) w(x) {\rm d}x = {1 \over q_0(x)} \sum_{k=0}^{n-1} c_k^n \int_a^b q_k(x) q_0(x) w(x) {\rm d}x
+= {c_0^n \over q_0} = Σ_n^w[f].
+$$
+∎
 
 
 
@@ -465,10 +480,10 @@ $$
 **Example (Chebyshev expansions)** 
 Consider the construction of Gaussian quadrature for $n = 3$. To determine the weights we need:
 $$
-w_k^{-1} = α_k^2 = q_0(x_k)^2 + q_1(x_k)^2 + q_2(x_k)^2 = 
-{1 \over π} + {2 \over π} x_k^2 + {2 \over π} (2x_k^2-1)^2
+w_j^{-1} = α_j^2 = q_0(x_j)^2 + q_1(x_j)^2 + q_2(x_j)^2 = 
+{1 \over π} + {2 \over π} x_j^2 + {2 \over π} (2x_j^2-1)^2
 $$
-We can check each case and deduce that $w_k = π/3$.
+We can check each case and deduce that $w_j = π/3$.
 Thus we recover the interpolatory quadrature rule.
 Further, we can construct the transform
 $$
@@ -512,3 +527,4 @@ $$
 x^2 = {\sqrt π \over 2} q_0(x) + {\sqrt π \over 2\sqrt 2} q_2(x) = {1 \over 2} T_0(x) + {1 \over 2} T_2(x)
 $$
 which can be easily confirmed.
+
