@@ -128,7 +128,7 @@ $$
 p(x) &= ℓ_1(x) + {\rm e} ℓ_2(x) + {\rm e}^2 ℓ_3(x) = 
 {(x - 1) (x-2) \over (-1)(-2)} + {\rm e} {x (x-2) \over (-1)} + 
 {\rm e}^2 {x (x-1) \over 2} \\
-&= (1/2 - {\rm e} +{\rm e}^2/2)x^2  
+&= (1/2 - {\rm e} +{\rm e}^2/2)x^2
 +  (-3/2 + 2 {\rm e}  - {\rm e}^2 /2)  x + 1
 \end{align*}
 $$
@@ -495,16 +495,17 @@ Q_3^2 \begin{bmatrix}
 x_1^2 \\
 x_2^2 \\
 x_3^2 
-\end{bmatrix} =  {\sqrt{π} \over 3} \begin{bmatrix} 1 & 1 & 1 \\
-                                \sqrt{6}/2 & 0 & -\sqrt{6}/2 \\
-                                1/\sqrt{2} &-\sqrt{2} & 1/\sqrt{2}
-                                \end{bmatrix} \begin{bmatrix} 3/4 \\ 0 \\ 3/4 \end{bmatrix}
-                                =
-                                \begin{bmatrix}
-                                {\sqrt{π} / 2} \\
-                                0 \\
-                                {\sqrt{π} / (2\sqrt{2})}
-                                \end{bmatrix}
+\end{bmatrix} = {\sqrt{π} \over 3} 
+\begin{bmatrix} 1 & 1 & 1 \\
+\sqrt{6}/2 & 0 & -\sqrt{6}/2 \\
+1/\sqrt{2} &-\sqrt{2} & 1/\sqrt{2}
+\end{bmatrix} 
+\begin{bmatrix} 3/4 \\ 0 \\ 3/4 \end{bmatrix} =
+\begin{bmatrix}
+{\sqrt{π} / 2} \\
+0 \\
+{\sqrt{π} / (2\sqrt{2})}
+\end{bmatrix}
 $$
 In other words:
 $$
