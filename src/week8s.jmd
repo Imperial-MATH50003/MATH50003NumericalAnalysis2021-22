@@ -17,6 +17,57 @@ using LinearAlgebra, Plots, Test
 
 **Problem 1.1⋆ (C)** Show that the DFT $Q_n$ is symmetric ($Q_n = Q_n^⊤$) but not Hermitian ($Q_n ≠ Q_n^⋆$).
 
+**SOLUTION**
+
+First we remember the definitions we introduced. The DFT is
+
+$$
+\begin{align*}
+Q_n &:= {1 \over √n} \begin{bmatrix} 1 & 1 & 1&  ⋯ & 1 \\
+                                    1 & {\rm e}^{-{\rm i} θ_1} & {\rm e}^{-{\rm i} θ_2} & ⋯ & {\rm e}^{-{\rm i} θ_{n-1}} \\
+                                    1 & {\rm e}^{-{\rm i} 2 θ_1} & {\rm e}^{-{\rm i} 2 θ_2} & ⋯ & {\rm e}^{-{\rm i} 2θ_{n-1}} \\
+                                    ⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
+                                    1 & {\rm e}^{-{\rm i} (n-1) θ_1} & {\rm e}^{-{\rm i} (n-1) θ_2} & ⋯ & {\rm e}^{-{\rm i} (n-1) θ_{n-1}}
+\end{bmatrix}
+\end{align*}
+$$
+
+where $θ_j = 2πj/n$ for $j = 0,1,…,n$ and $ω := {\rm e}^{{\rm i} θ_1} = {\rm e}^{2 π {\rm i} \over n}$ are $n$ th roots of unity in the sense that $ω^n = 1$. So ${\rm e}^{{\rm i} θ_j} ={\rm e}^{2 π {\rm i} j \over n}= ω^j$. Note that $θ_j = 2π(j-1)/n+2π/n = θ_{j-1} + θ_1$. By completing this recurrence we find that $θ_j = jθ_1$, from which the following symmetric version follows immediately
+$$
+\begin{align*}
+Q_n 
+&= {1 \over √n} \begin{bmatrix} 1 & 1 & 1&  ⋯ & 1 \\
+                                    1 & ω^{-1} & ω^{-2} & ⋯ & ω^{-(n-1)}\\
+                                    1 & ω^{-2} & ω^{-4} & ⋯ & ω^{-2(n-1)}\\
+                                    ⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
+                                    1 & ω^{-(n-1)} & ω^{-2(n-1)} & ⋯ & ω^{-(n-1)^2}
+\end{bmatrix}.
+\end{align*}
+$$
+Now $Q_n^⋆$ is found to be
+$$
+\begin{align*}
+Q_n^⋆ &= {1 \over √n} \begin{bmatrix}
+1 & 1 & 1&  ⋯ & 1 \\
+1 & {\rm e}^{{\rm i} θ_1} & {\rm e}^{{\rm i} 2 θ_1} & ⋯ & {\rm e}^{{\rm i} (n-1) θ_1} \\
+1 &  {\rm e}^{{\rm i} θ_2}  & {\rm e}^{{\rm i} 2 θ_2} & ⋯ & {\rm e}^{{\rm i} (n-1)θ_2} \\
+⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
+1 & {\rm e}^{{\rm i} θ_{n-1}} & {\rm e}^{{\rm i} 2 θ_{n-1}} & ⋯ & {\rm e}^{{\rm i} (n-1) θ_{n-1}}
+\end{bmatrix}
+= {1 \over √n} \begin{bmatrix}
+1 & 1 & 1&  ⋯ & 1 \\
+1 & ω^{1} & ω^{2} & ⋯ & ω^{(n-1)}\\
+1 & ω^{2} & ω^{4} & ⋯ & ω^{2(n-1)}\\
+⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
+1 & ω^{(n-1)} & ω^{2(n-1)} & ⋯ & ω^{(n-1)^2}
+\end{bmatrix}
+\end{align*}
+$$
+using the above arguments. Evidently, $Q_n^⋆ \neq Q_n$ since $ω \neq ω^{-1}$.
+
+**END**
+
+
 **Problem 1.2⋆ (A)** Show for $0 ≤ k,ℓ ≤ n-1$
 $$
 {1 \over n} \sum_{j=1}^n \cos k θ_j \cos ℓ θ_j = \begin{cases} 1 & k = ℓ = 0 \\
@@ -34,18 +85,61 @@ $$
 
 
 **SOLUTION**
-We have
+We have,
+
 $$
-{1 \over n} \sum_{j=1}^n \cos k θ_j \cos ℓ θ_j = Σ_n[{\rm e}^{{\rm i} (k+ℓ) θ_j}] + 
-Σ_n[{\rm e}^{{\rm i} (k-ℓ) θ_j}] + 
-Σ_n[{\rm e}^{{\rm i} (ℓ-k) θ_j}] + Σ_n[{\rm e}^{{\rm i} (-k-ℓ) θ_j}] = 
-\begin{cases}
-1 & k+ \\
-0
-\end{cases}
+\begin{align*}
+\frac{1}{n}\sum_{j=1}^n \cos(k\theta_j)\cos(l\theta_j) &= \frac{1}{4n}\sum_{j=1}^ne^{i(k+l)\theta_j} + e^{-i(k+l)\theta_j} + e^{i(k-l)\theta_j} + e^{-i(k-l)\theta_j} \\
+&=	\frac{1}{4n}\sum_{j=1}^ne^{ia_{kl}\theta_j} + e^{-ia_{kl}\theta_j} + e^{ib_{kl}\theta_j} + e^{-ib_{kl}\theta_j},
+\end{align*}
+$$
+where we have defined $a_{kl} = k+l$ and $b_{kl} = k-l$. Now consider, for $a \in \mathbb{Z}$, a $\neq 2kn$ for some $k \in \mathbb{Z}$,
+$$
+\begin{align*}
+	\sum_{j=1}^n e^{ia\theta_j} &=\sum_{j=1}^n e^{ia\pi(j-\frac{1}{2})/n} \\
+	&=e^{-ia\pi/2n}\sum_{j=1}^n e^{iaj\pi/n} \\
+	&=e^{-ia\pi/2n}\sum_{j=1}^n (e^{ia\pi/n})^j \\
+	&=e^{-ia\pi/2n} e^{ia\pi/n}\frac{(e^{ia\pi /n})^n - 1}{e^{ia\pi/n} - 1} \\
+	&= e^{ia\pi/2n} \frac{e^{ia\pi} - 1 }{e^{ia\pi / n} - 1},
+\end{align*}
+$$
+where our assumptions on $a$ ensure that we are not dividing by $0$. Then we have, for $a$ as above,
+$$
+\begin{align*}
+	\sum_{j=1}^n e^{ia\theta_j} + e^{-ia\theta_j} &= e^{ia\pi/2n} \frac{e^{ia\pi} - 1 }{e^{ia\pi / n} - 1} + e^{-ia\pi/2n} \frac{e^{-ia\pi} - 1 }{e^{-ia\pi / n} - 1} \\
+	&= e^{ia\pi/2n} \frac{e^{ia\pi} - 1 }{e^{ia\pi / n} - 1} + e^{-ia\pi/2n} \cdot\frac{e^{ia\pi/n}}{e^{ia\pi/n}}\cdot \frac{e^{-ia\pi} - 1 }{e^{-ia\pi / n} - 1} \\
+	&= e^{ia\pi/2n} \frac{e^{ia\pi} - 1 }{e^{ia\pi / n} - 1} + e^{ia\pi/2n}\frac{e^{-ia\pi} - 1}{1 - e^{ia\pi/n}} \\
+	&=e^{ia\pi/2n} \frac{e^{ia\pi} - 1 }{e^{ia\pi / n} - 1} - e^{ia\pi/2n}\frac{e^{-ia\pi} - 1}{e^{ia\pi/n} - 1} \\
+	&= \frac{e^{ia\pi/2n}}{e^{ia\pi/n-1}}\left(e^{ia\pi} - 1 - e^{-ia\pi} + 1 \right) \\
+	&= \frac{e^{ia\pi/2n}}{e^{ia\pi/n-1}}\frac{1}{2i}\sin(a\pi),
+\end{align*}
+$$
+which is $0$ for $a$ an integer.
+
+Now, when $k = l = 0$, we have $a_{kl} = b_{kl} = 0$, and,
+$$
+\frac{1}{n}\sum_{j=1}^n \cos(k\theta_j)\cos(l\theta_j) = \frac{1}{4n}\sum_{j=1}^n (1 + 1 + 1 + 1) = 1.
+$$
+When $k = l \neq 0$, we have $0 < a_{kl} = 2k < 2n$, and $b_{kl} = 0$. Hence,
+$$
+\begin{align*}
+	\frac{1}{n}\sum_{j=1}^n \cos(k\theta_j)\cos(l\theta_j) &= \frac{1}{4n}\sum_{j=1}^n (e^{ia_{kl}\theta_j} + e^{-ia_{kl}\theta_j} + 1 + 1) \\
+	&= \frac{1}{4n}\left[ \left(\sum_{j=1}^n e^{ia_{kl}\theta_j} + e^{-ia_{kl}\theta_j}\right) +2n\right] \\
+	&= \frac{1}{2},
+\end{align*}
+$$
+since $a_{kl}$ meets the conditions for the sum considered above.
+
+When $k \neq l$, we have, $-2n < a_{kl}, b_{kl} <  2n$ and $a_{kl}, b_{kl} \neq 0$, hence,
+$$
+\begin{align*}
+	\frac{1}{n}\sum_{j=1}^n \cos(k\theta_j)\cos(l\theta_j) &= \frac{1}{4n}\sum_{j=1}^n (e^{ia_{kl}\theta_j} + e^{-ia_{kl}\theta_j} + e^{ib_{kl}\theta_j} + e^{-ib_{kl}\theta_j}) \\
+	&= \frac{1}{4n} \left[\sum_{j=1}^n (e^{ia_{kl}\theta_j} + e^{-ia_{kl}\theta_j})  + \sum_{j=1}^n (e^{ib_{kl}\theta_j} + e^{-ib_{kl}\theta_j} )\right] \\
+	&= 0.
+\end{align*}
 $$
 
-**END**
+
 
 **Problem 1.3⋆ (B)** Consider the Discrete Cosine Transform (DCT)
 $$
@@ -65,21 +159,22 @@ $$
 for $θ_j = π(j-1/2)/n$. Prove that $C_n$ is orthogonal: $C_n^⊤ C_n = C_n C_n^⊤ = I$.
 Hint: $C_n C_n^⊤ = I$ might be easier to show than $C_n^⊤ C_n = I$ using the previous problem.
 
-
-
-
 **SOLUTION**
 
-For 
+The components of $C$ without the diagonal matrix, which we may call $\hat{C}$ are
 $$
-\begin{bmatrix}
-    1 & ⋯ & 1\\
-    \cos θ_1 & ⋯ & \cos θ_n \\
-    ⋮ & ⋱ & ⋮ \\
-    \cos (n-1)θ_1 & ⋯ & \cos (n-1)θ_n
-\end{bmatrix}
+\hat{C}_{ij} = \cos((j-1)θ_{i-1}),
+$$
+where $θ_j = π(j-1/2)/n$. Recalling that the elements of matrix multiplication are given by
+$$
+(ab)_{ij} := \sum_{k=1}^n a_{ik} b_{kj}
+$$
+we find that
+$$
+(\hat{C}_n \hat{C}_n^⊤)_{ij} = \sum_{k=1}^n \cos((i-1)θ_{k-1}) \cos((k-1)θ_{j-1}).
 $$
 
+By using the previous problem and the terms on the diagonal matrices which ensure that the $1/2$ terms become $1$ we know how to compute all of these entries and find that it is the identity.
 
 Here is a computer-based demonstration:
 ```julia
@@ -96,12 +191,88 @@ converging coefficients. Plot interpolant for ${\rm sign}(θ-1/2)$.
 Conjecture where the approximation converges. (This is known as
 Gibb's phenomena.) **Note** This is non-examinable as it is computer-based.
 
+**SOLUTION**
+
+```julia
+# We can use the interpolation function defined in the lecture notes to investigate this:
+
+using Plots, LinearAlgebra
+
+
+# evaluates f_n at a point
+function finitefourier(𝐟̂ₙ, θ)
+    m = n ÷ 2 # use coefficients between -m:m
+    ret = 0.0 + 0.0im # coefficients are complex so we need complex arithmetic
+    for k = 0:m
+        ret += 𝐟̂ₙ[k+1] * exp(im*k*θ)
+    end
+    for k = -m:-1
+        ret += 𝐟̂ₙ[end+k+1] * exp(im*k*θ)
+    end
+    ret
+end
+
+f = θ -> sign(θ-1/2)
+n = 20
+θ = range(0,2π; length=n+1)[1:end-1] # θ_0, …,θ_{n-1}, dropping θ_n == 2π
+Qₙ = 1/sqrt(n) * [exp(-im*(k-1)*θ[j]) for k = 1:n, j=1:n]
+𝐟̂ₙ = 1/sqrt(n) * Qₙ * f.(θ)
+
+
+fₙ = θ -> finitefourier(𝐟̂ₙ, θ)
+
+g = range(0, 2π; length=1000) # plotting grid
+plot(g, f.(g); label="function", legend=:bottomright)
+plot!(g, real.(fₙ.(g)); label="Fourier")
+scatter!(θ, f.(θ); label="samples")
+```
+
+```julia
+n = 100
+θ = range(0,2π; length=n+1)[1:end-1] # θ_0, …,θ_{n-1}, dropping θ_n == 2π
+Qₙ = 1/sqrt(n) * [exp(-im*(k-1)*θ[j]) for k = 1:n, j=1:n]
+𝐟̂ₙ = 1/sqrt(n) * Qₙ * f.(θ)
+
+
+fₙ = θ -> finitefourier(𝐟̂ₙ, θ)
+
+g = range(0, 2π; length=2000) # plotting grid
+plot(g, f.(g); label="function", legend=:bottomright)
+plot!(g, real.(fₙ.(g)); label="Fourier")
+```
+
+It appears that adding more terms does not decrease the magnitude of the oscillations observed at the discontinuity. This is known as Gibbs phenomenon -- understanding this behavior is of critical importance not only in numerical analysis but also in applications such as signal processing.
+
+**END**
+
 ## 2. FFT 
 
 **Problem 2.1⋆ (B)** Show that $Q_{2n}$ can also be reduced to $Q_n$ applied
 to two vectors.
 
+**SOLUTION**
+We saw in the lecture notes how this works for $Q_{2n}^⋆$:
 
+$$
+\begin{align*}
+Q_{2n}^⋆ &= {1 \over \sqrt{2n}} \begin{bmatrix} 𝟏_{2n} | \vec{ω}_{2n} | \vec{ω}_{2n}^2 | ⋯ | \vec{ω}_{2n}^{2n-1} \end{bmatrix}
+= {1 \over \sqrt{2n}} P_σ^⊤ \begin{bmatrix} 𝟏_{n} &   \vec{ω}_n        & \vec{ω}_n^2          & ⋯ & \vec{ω}_n^{n-1}          & \vec{ω}_n^n  & ⋯ & \vec{ω}_n^{2n-1}  \\
+                        𝟏_{n} & ω_{2n} \vec{ω}_n & ω_{2n}^2 \vec{ω}_n^2 & ⋯ & ω_{2n}^{n-1} \vec{ω}_n^{n-1} & ω_{2n}^n \vec{ω}_n^n  & ⋯ & ω_{2n}^{2n-1} \vec{ω}_n^{2n-1}
+\end{bmatrix} \\
+&= {1 \over \sqrt{2}} P_σ^⊤ \begin{bmatrix} Q_n^⋆ & Q_n^⋆ \\
+                                     Q_n^⋆ D_n & -Q_n^⋆ D_n
+                                     \end{bmatrix} =
+                                     {1 \over \sqrt{2}}P_σ^⊤ \begin{bmatrix} Q_n^⋆ \\ &Q_n^⋆ \end{bmatrix} \begin{bmatrix} I_n & I_n \\ D_n & -D_n \end{bmatrix}
+\end{align*}
+$$
+
+A very similar chain of arguments can be made for $Q_{2n}$ but we can also infer it directly from the above, since $(Q_{2n}^⋆)^⋆ = Q_{2n}$, we find that
+
+$$
+Q_{2n} = \left({1 \over \sqrt{2}}P_σ^⊤ \begin{bmatrix} Q_n^⋆ \\ &Q_n^⋆ \end{bmatrix} \begin{bmatrix} I_n & I_n \\ D_n & -D_n \end{bmatrix}\right)^⋆ = {1 \over \sqrt{2}} \begin{bmatrix} I_n & D_n \\ I_n & -D_n \end{bmatrix} \begin{bmatrix} Q_n \\ &Q_n \end{bmatrix}  P_σ
+$$
+
+**END**
 
 ## 3. Orthogonal polynomials
 
@@ -110,7 +281,37 @@ for the weight $\sqrt{1-x^2}$ on $[-1,1]$.
 Hint: first compute $\int_{-1}^1 x^k \sqrt{1-x^2} {\rm d} x$ for $0 ≤ k ≤ 2$
 using a change-of-variables.
 
+Following the hint, we first calculate $\int_{-1}^1 x^k\sqrt{1-x^2}{\rm d}x$. By symmetry, it's zero when $k$ is odd and double the integral on $[0,1]$ when $k$ is even. 
 
+$$
+\underbrace{\int_0^1 x^k\sqrt{1-x^2}{\rm d}x}_{I_k}=_{x=\sin t}\underbrace{\int_0^{\pi/2}\sin^k(t)\cos^2(t){\rm d}t}_{I_k}=\underbrace{\int_0^{\pi/2}\sin^k t{\rm d}t}_{J_k}-\underbrace{\int_0^{\pi/2}\sin^{k+2}t{\rm d}t}_{J_{k+2}}.
+$$
+
+Meanwhile, 
+$$J_k=-\int_0^{\pi/2}\sin^{k-1}t{\rm d}(\cos t)=_{\text{integral by part}}(k-1)I_{k-2}.$$
+
+Putting the above 2 equations together, we have $I_k=(k-1)I_{k-2}-(k+1)I_k$, so $I_k=\frac{k-1}{k+2}I_{k-2}$. Since $I_0=\pi/4$, we have $I_k=\frac{(k-1)!!}{(k+2)!!}\frac{\pi}{2}$ for positive even $k$. (Note that the denominator multiplies to 4, not to 2.) Keep in mind that the integral we want is double this value when $k$ is even.
+
+【Remark】Check the [beta function](https://en.wikipedia.org/wiki/Beta_function).
+
+Let $p_0(x)=1$, then $\|p_0\|^2=2I_0=\pi/2$. We know from the 3-term recurrence that
+$$xp_0(x)=a_0p_0(x)+p_1(x)$$
+where
+$$a_0=\frac{<p_0,xp_0>}{\|p_0\|^2}=0.$$
+Thus $p_1(x)=x$ and $\|p_1\|^2=2I_2=\pi/8$.
+From
+$$xp_1(x)=c_0p_0(x)+a_1p_1(x)+p_2(x)$$
+we have
+$$c_0=\frac{<p_0,xp_1>}{\|p_0\|^2}=2I_2/2I_0=1/4$$
+$$a_1=\frac{<p_1,xp_1>}{\|p_1\|^2}=0$$
+$$p_2(x)=xp_1(x)-c_0-a_1p_1(x)=x^2-1/4$$
+$$\|p_2\|^2=2I_4-I_2+1/8I_0=\pi/32$$
+Finally, from
+$$xp_2(x)=c_1p_1(x)+a_2p_2(x)+p_3(x)$$
+we have
+$$c_1=\frac{<p_1,xp_2>}{\|p_1\|^2}=(2I_4-1/2I_2)/(\pi/8)=1/4$$
+$$a_2=\frac{<p_2,xp_2>}{\|p_2\|^2}=0$$
+$$p_3(x)=xp_2(x)-c_1p_1(x)-a_2p_2(x)=x^3-1/2x$$
 
 **Problem 3.2⋆  (C, 3-term recurrence, 1st form)**
 Show that if $\{p_n\}$ are OPs then there exist real constants $A_n ≠ 0$, $B_n$, and $C_n$
@@ -121,9 +322,32 @@ p_1(x) &= (A_0 x + B_0) p_0(x) \\
 p_{n+1}(x) &= (A_n x + B_n) p_n(x) - C_n p_{n-1}(x)
 \end{align*}
 $$
-Write this as a lower triangular linear system, given $p_0(x) = μ ∈ ℝ$:
+Write this as a lower triangular linear system, given $p_0(x) = \mu in \mathbb{R}$:
 $$
-L_x \begin{bmatrix} p_0(x) \\ \vdots \\ p_{n-1}(x) \end{bmatrix} = \begin{bmatrix} μ \\ 0 \\ ⋮ \\ 0 \end{bmatrix}
+L_x \begin{bmatrix} p_0(x) \\ \vdots \\ p_{n+1}(x) \end{bmatrix} = \begin{bmatrix} \mu \\ 0 \\ \vdots \\ 0 \end{bmatrix}
+$$
+
+**SOLUTION**
+
+The 2nd form of 3-term recurrence is
+$$xp_0(x)=a_0p_0(x)+b_0p_1(x)$$
+and
+$$xp_n(x)=c_{n-1}p_{n-1}(x)+a_np_n(x)+b_np_{n+1}(x)$$
+which is equivalent to
+$$p_1(x)=\left(\frac{1}{b_0}x-\frac{a_0}{b_0}\right)p_0(x),$$
+$$p_{n+1}(x)=\left(\frac{1}{b_n}x-\frac{a_n}{b_n}\right)p_n(x)-\frac{c_{n-1}}{b_n}p_{n-1}(x).$$
+So we have $A_n=1/b_n$, $B_n=-\frac{a_n}{b_n}$ and $C_n=\frac{c_{n-1}}{b_n}$.
+
+Writing down the recurrence for every $n$, we have a lower tridiagonal linear system
+$$
+\underbrace{\begin{bmatrix}
+1 &&&&\\
+-A_0x-B_0 & 1 &&&\\
+C_1 & -A_1x-B_1 & 1 &&\\
+& \ddots &\ddots&\ddots&\\
+&&C_{n}&-A_nx-B_n&1
+\end{bmatrix}}_{L_x}
+\underbrace{\begin{bmatrix} p_0(x) \\ \vdots \\ p_{n+1}(x) \end{bmatrix}}_{\mathbf{P}(x)} = \underbrace{\begin{bmatrix} c \\ 0 \\ \vdots \\ 0 \end{bmatrix}}_{\mu\mathbf{e}_1}
 $$
 
 
@@ -136,6 +360,16 @@ then evaluation at a point can be recast as inverting an upper triangular system
 $$
 f(x) = μ𝐞_1^⊤ U_x^{-1} {\bf c}.
 $$
+
+**SOLUTION**
+
+We know from Problem 3.2 that 3-term recurrence can be viewed as a lower tridiagonal system. For general family of polynomials, we don't have 3-term recurrence, but we can always have dense recurrence as
+$$p_{n+1}(x)=(A_nx+B_n)p_n(x)-C_np_{n-1}(x)-D_np_{n-2}(x)-\cdots$$
+which can be viewd as
+$$L_x\mathbf{P}(x)=\mu\mathbf{e}_1.$$
+where $L_x$ is lower triangular (for general polynomials) instead of lower tridiagonal (for orthogonal polynomials). Then
+$$f(x)=\mathbf{P}^\top(x)\mathbf{c}=(\mu L_x^{-1}\mathbf{e}_1)^\top\mathbf{c}=\mu\mathbf{e}_1^\top U_x^{-1}\mathbf{c}$$
+where $U_x=L_x^\top$.
 
 **Problem 3.4⋆  (B)** If $w(-x) = w(x)$ for a weight supported on $[-b,b]$ show that $a_n = 0$.
 Hint: first show that the (monic) polynomials $p_{2n}(x)$ are even and $p_{2n+1}(x)$ are odd.
@@ -154,7 +388,7 @@ is odd. We now proceed by induction. We have:
 $$
 ⟨p_{2n},x p_{2n}(x)⟩ = \int_{-b}^b x w(x) p_{2n}(x)^2 {\rm d} x = 0
 $$
-since $x w(x) p_{2n}(x)^2$ is odd$. Meanwhile. This show that if $p_{2n}$ and
+since $x w(x) p_{2n}(x)^2$ is odd. Meanwhile. This show that if $p_{2n}$ and
 $p_{2n-1}(x)$ is odd then
 $$
 p_{2n+1}(x) 
