@@ -423,7 +423,7 @@ It can be defined in terms of the standard arctan as follows:
 $$
 {\rm atan}(b,a) := \begin{cases} {\rm atan}{b \over a} & a > 0 \\
                             {\rm atan}{b \over a} + π & a < 0\hbox{ and }b >0 \\
-                            {\rm atan}{b \over a} + π & a < 0\hbox{ and }b < 0 \\
+                            {\rm atan}{b \over a} - π & a < 0\hbox{ and }b < 0 \\
                             π/2 & a = 0\hbox{ and }b >0 \\
                             -π/2 & a = 0\hbox{ and }b < 0 
                             \end{cases}
