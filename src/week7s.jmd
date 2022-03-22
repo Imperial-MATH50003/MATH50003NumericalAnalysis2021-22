@@ -450,7 +450,7 @@ are 2π-periodic and $f^{(λ)}$ is uniformly bounded?
 
 Observe that by aliasing (see corollary in lecture notes) and triangle inequality we have the following 
 
-$$ |f̂_k^n - f̂_k|  \leq \sum_{p=1}^{\infty} (|f̂_{k+pm}|+|f̂_{k-pm}|) $$
+$$ |f̂_k^n - f̂_k|  \leq \sum_{p=1}^{\infty} (|f̂_{k+pn}|+|f̂_{k-pn}|) $$
 
 Using the result from Problem 3.2 yields
 
@@ -469,3 +469,16 @@ Finally let $q = \pm \frac{k}{n}$ to achieve the rate of convergence
 $$ |f̂_k^n - f̂_k| \leq \frac{C_{\lambda}}{ n^{\lambda}} \left(  \left( \frac{1}{2} + k/n \right)^{ - \lambda + 1} + \left( \left( \frac{1}{2} - k/n \right) \right)^{- \lambda +1} \right)$$
 
 where $C_{\lambda}$ is a constant depending on $\lambda$. Note that it is indeed important to split the $n$ coefficients equally over the negative and positive coefficients as stated in the notes, due to the estatime we used above.
+
+Finally, we have (thanks to Anonymous on ed):
+$$
+\begin{align*}
+|f(\theta) - f_{-m:m}(\theta)|
+&= |\sum_{k=-m}^m {(f̂_k - f̂_k^n)z^k} + \sum_{k=m+1}^\infty {f̂_k z^k}  + \sum_{k=-\infty}^{-m-1} {f̂_k z^k} | \\
+&\le \sum_{k=-m}^m | f̂_k - f̂_k^n | + \sum_{k=m+1}^\infty |f̂_k| +  \sum_{k=-\infty}^{-m-1} |f̂_k| \\
+&\le \sum_{k=-m}^m {\frac{C_{\lambda}}{ n^{\lambda}} \left( \left( \frac{1}{2} + k/n \right)^{ - \lambda + 1} + \left( \left( \frac{1}{2} - k/n \right) \right)^{- \lambda +1} \right)} + \sum_{k=m+1}^\infty |f̂_k| +  \sum_{k=-\infty}^{-m-1} |f̂_k| \\
+&= \frac{C_{\lambda}}{n^{\lambda}} 2^{\lambda} + \sum_{k=m+1}^\infty |f̂_k| +  \sum_{k=-\infty}^{-m-1} |f̂_k|  \\
+&= O(n^{-\lambda}) + O(n^{1-\lambda} ) + O(n^{1-\lambda} ) \\
+&= O(n^{1-\lambda}) 
+\end{align*}
+$$
