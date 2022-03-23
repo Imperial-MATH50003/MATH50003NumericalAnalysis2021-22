@@ -561,8 +561,8 @@ of rotations of angle `θ[k]`, each acting on the entries `k:k+1`. That is, it r
 $$
 Q_k[k:k+1,k:k+1] = 
 \begin{bmatrix}
-cos(θ[k]) -sin(θ[k])
-sin(θ[k]) cos(θ[k])
+\cos θ[k] & -\sin θ[k]\\
+\sin θ[k] & \cos θ[k]
 \end{bmatrix}
 $$
 
