@@ -73,9 +73,9 @@ If we know a bound on $f''(x)$ then Taylor's theorem tells us a precise bound:
 **Proposition**
 The error in approximating the derivative using finite differences is
 $$
-\left|f'(x) - {f(x+h) - f(x) \over h}\right| \leq {M \over 2} h
+\left|f'(x) - {f(x+h) - f(x) \over h}\right| ≤ {M \over 2} h
 $$
-where $M = \sup_{x \leq t \leq x+h} |f''(t)|$.
+where $M = \sup_{x ≤ t ≤ x+h} |f''(t)|$.
 
 **Proof**
 Follows immediately from Taylor's theorem:
@@ -126,7 +126,7 @@ plot(nanabs.((f.(h) .- f(0)) ./ h .- 1); yscale=:log10, title="convergence of de
 plot!(abs.((g.(h) .- g(0)) ./ h .- 1/3); yscale=:log10, label = "g")
 ```
 In the case of $f$ it is a success: we approximate the true derivative _exactly_ provided we take $h = 2^{-n}$
-for $26 < n \leq 52$.
+for $26 < n ≤ 52$.
 But for $g$ it is a huge failure: the approximation starts to converge, but then diverges exponentially fast, before levelling off!
 
 It is clear that $f$ is extremely special. Most functions will behave like $g$, and had we not taken
@@ -219,20 +219,24 @@ $$
 We can bound the error using the bounds on floating point arithmetic. 
 
 **Theorem (finite-difference error bound)** Let $f$ be twice-differentiable in a neighbourhood of $x$ and assume that 
-$f^{\rm FP}(x) = f(x) + δ_x^f$ has uniform absolute accuracy in that neighbourhood, that is:
 $$
-|δ_x^f| \leq c ϵ_{\rm m}
+f^{\rm FP}(x) = f(x) + δ_x^f
 $$
-for a fixed constant $c$. Assume for simplicity $h = 2^{-n}$ where $n \leq S$ and $|x| \leq 1$. 
-Then the finite-difference approximation satisfies
+has uniform absolute accuracy in that neighbourhood, that is:
+$$
+|δ_x^f| ≤ c ϵ_{\rm m}
+$$
+for a fixed constant $c ≥ 0$. Assume for simplicity $h = 2^{-n}$ where $n ≤ S$ and $|x| ≤ 1$. 
+Assuming that all calculations result in normal floating point numbers,
+the finite-difference approximation satisfies
 $$
 (f^{\rm FP}(x + h) ⊖ f^{\rm FP}(x)) ⊘ h = f'(x) + δ_{x,h}^{\rm FD}
 $$
 where 
 $$
-|δ_{x,h}^{\rm FD}| \leq {|f'(x)| \over 2} ϵ_{\rm m} + M h +  {4c ϵ_{\rm m} \over h}
+|δ_{x,h}^{\rm FD}| ≤ {|f'(x)| \over 2} ϵ_{\rm m} + M h +  {4c ϵ_{\rm m} \over h}
 $$
-for $M = \sup_{x \leq t \leq x+h} |f''(t)|$.
+for $M = \sup_{x ≤ t ≤ x+h} |f''(t)|$.
 
 **Proof**
 
@@ -244,11 +248,11 @@ $$
 &= {f(x+h) - f(x) \over h} (1 + δ_1) + {δ^f_{x+h}- δ^f_x \over h} (1 + δ_1)
 \end{align*}
 $$
-where $|δ_1| \leq {ϵ_{\rm m} / 2}$. Applying Taylor's theorem we get 
+where $|δ_1| ≤ {ϵ_{\rm m} / 2}$. Applying Taylor's theorem we get 
 $$
 (f^{\rm FP}(x + h) ⊖ f^{\rm FP}(x)) ⊘ h = f'(x) + \underbrace{f'(x) δ_1 + {f''(t) \over 2} h (1 + \delta_1) + {δ^f_{x+h}- δ^f_x \over h} (1 + δ_1)}_{δ_{x,h}^{\rm FD}}
 $$
-The bound then follows, using the very pessimistic bound $|1 + δ_1| \leq 2$.
+The bound then follows, using the very pessimistic bound $|1 + δ_1| ≤ 2$.
 
 ∎
 
@@ -365,11 +369,17 @@ $$
 **Proof**
 For $q$ it follows immediately:
 $$
-q(a + b ϵ) = f(g(a + b ϵ)) = f(g(a) + b g'(a) ϵ) = f(g(a)) + b g'(a) f'(g(a))ϵ = q(a) + b q'(a) ϵ.
+\begin{align*}
+q(a + b ϵ) &= f(g(a + b ϵ)) = f(g(a) + b g'(a) ϵ) \\
+&= f(g(a)) + b g'(a) f'(g(a))ϵ = q(a) + b q'(a) ϵ.
+\end{align*}
 $$
 For $r$ we have
 $$
-r(a + b ϵ) = f(a+b ϵ )g(a+b ϵ )= (f(a) + b f'(a) ϵ)(g(a) + b g'(a) ϵ) = f(a)g(a) + b (f'(a)g(a) + f(a)g'(a)) ϵ = r(a) +b r'(a) ϵ.
+\begin{align*}
+r(a + b ϵ) &= f(a+b ϵ )g(a+b ϵ )= (f(a) + b f'(a) ϵ)(g(a) + b g'(a) ϵ) \\
+&= f(a)g(a) + b (f'(a)g(a) + f(a)g'(a)) ϵ = r(a) +b r'(a) ϵ.
+\end{align*}
 $$
 
 ∎
