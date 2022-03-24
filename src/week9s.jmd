@@ -237,3 +237,43 @@ plot([p cos], xlims=(-1,5))
 **Problem 4.2 (A)** Consider the re-expanding the Lagrange basis in
 monomials. Use this to construct an explicit formula for the inverse of the
 Vandermonde matrix.
+
+**SOLUTION**
+
+We use two methods to interpolate $f(x)$
+
+**Vandermonde matrix**
+
+$$p(x)=\sum_{k=1}^nc_kx^{k-1}=
+\underbrace{\begin{bmatrix}
+1&x&\cdots&x^{n-1}
+\end{bmatrix}}_{\mathbf{M}(x)}
+\underbrace{\begin{bmatrix}
+c_1\\
+\vdots\\
+c_n
+\end{bmatrix}}_{\mathbf{c}}$$
+where
+$$
+V\mathbf{c}=
+\underbrace{\begin{bmatrix}
+f(x_1)\\
+\vdots\\
+f(x_n)
+\end{bmatrix}}_{\mathbf{f}}
+$$
+
+**Lagrange interpolation**
+
+$$p(x)=\sum_{k=1}^nf(x_k)l_k(x)=
+\underbrace{\begin{bmatrix}
+l_1(x)&\cdots&l_n(x)
+\end{bmatrix}}_{\mathbf{L}(x)}\mathbf{f}$$
+
+Comparing the two results, we have
+$$\mathbf{M}(x)V^{-1}\mathbf{f}=\mathbf{L}(x)\mathbf{f},$$
+so
+$$\mathbf{M}(x)V^{-1}=\mathbf{L}(x)$$
+which means that the $(i,j)$-entry of $V^{-1}$ is the coefficient of $x^{i-1}$ in $l_j(x)$.
+
+See [here](https://proofwiki.org/wiki/Inverse_of_Vandermonde_Matrix#Theorem) for the complete explicit expression.
