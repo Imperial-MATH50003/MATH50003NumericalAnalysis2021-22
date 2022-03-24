@@ -50,18 +50,48 @@ x = range(0, 1; length=n)
 ```
 
 
-**Problem 1.2 (B)** Discretisations can also be used to solve eigenvalue equations.
+**Problem 1.2 (A)** Discretisations can also be used to solve eigenvalue problems.
 Consider the Schrödinger equation with quadratic oscillator:
 $$
 u(-L) = u(L) = 0, -u'' + x^2 u = λ u
 $$
-Approximate the eigenvalues using `eigvals(A)` (which returns the eigenvalues of a
-matrix `A`) with $L = 10$.
-Can you conjecture their exact value if $L = ∞$? (Hint: they are integers and the eigenvalues
-closest to zero are most accurate.)
+(a) Use the finite-difference approximation to discretise this equation as eigenvalues of a
+matrix. Hint: write
+$$
+\begin{align*}
+u(-L) = 0 \\
+-u'' + x^2 u - λu = 0\\
+u(L) = 0
+\end{align*}
+$$
+and discretise as before, doing row eliminations to arrive at a symmetric tridiagonal
+matrix eigenvalue problem. 
+(b) Approximate the eigenvalues using `eigvals(A)` (which returns the eigenvalues of a
+matrix `A`) with $L = 10$. 
+Can you conjecture their exact value if $L = ∞$? Hint: they are integers and the eigenvalues
+closest to zero are most accurate.
 
 **SOLUTION**
-
+We discretise on a grid $u_1,u_2,…,u_n$ for an evenly spaced grid between $[-L,L]$, with
+step size $h = 2L/(n-1)$. That is, we have the equations:
+$$
+\begin{bmatrix}
+1 \\
+-1/h^2 & 2/h^2 + x_2^2  - λ & -1/h^2 \\
+    & ⋱ & ⋱ & ⋱ \\
+    && -1/h^2 &  2/h^2 + x_{n-1}^2  - λ & -1/h^2 \\
+    &&&& 1 \end{bmatrix} 
+    \begin{bmatrix} u_1 \\ \vdots \\ u_n \end{bmatrix} = 0
+$$
+Row eliminations at the top and bottom reduce this equation to:
+$$
+\begin{bmatrix}
+ 2/h^2 + x_2^2   & -1/h^2 \\
+    & ⋱ & ⋱ & ⋱ \\
+    && -1/h^2 &  2/h^2 + x_{n-1}^2   \end{bmatrix} 
+    \begin{bmatrix} u_2 \\ \vdots \\ u_{n-1} \end{bmatrix} = λ\begin{bmatrix} u_2 \\ \vdots \\ u_{n-1} \end{bmatrix} 
+$$
+This is a standard eigenvalue problem and we can compute the eigenvalues using `eigvals`:
 ```julia
 L = 10
 n = 1000
