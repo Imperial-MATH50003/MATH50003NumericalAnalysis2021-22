@@ -85,30 +85,20 @@ $$
 
 **SOLUTION**
 
-Due to the uniqueness of orthogonal polynomials, we let $U_n(\cos θ) = {\sin(n+1) θ \over \sin θ}$ and check if the following claims hold:
+We need to verify:
+1. graded polynomials
+2. orthogonal w.r.t. $\sqrt{1-x^2}$ on $[-1,1]$, and
+3. have the leading coefficient $2^n$.
 
-- $U_0(x)=1$.
-- $U_n(\cos\theta)$ is a polynomial of $\cos\theta$ with degree $n$ and leading coefficient $2^n$.
-- $U_n(x)$ are orthogonal w.r.t. $\sqrt{1-x^2}$ on $[-1,1]$.
-
-**Claim 1**
-$$U_0(\cos\theta)=\frac{\sin\theta}{\sin\theta}=1.$$
-
-**Claim 2**
-
-$$U_n(\cos\theta)=\frac{\sin(n+1)\theta}{\sin\theta}=\frac{\sin n\theta\cos\theta+\cos n\theta\sin\theta}{\sin\theta}=\cos\theta U_{n-1}(\cos\theta)+\cos n\theta$$
-
-$$\cos n\theta=\cos\theta\cos(n-1)\theta-\sin(n-1)\theta\sin\theta=\cos\theta\cos(n-1)\theta-(1-\cos^2\theta)U_{n-2}(\cos\theta)$$
-
-Since $U_0(\cos\theta)=1$, $U_1(\cos\theta)=2\cos\theta$ and $\cos 0\theta=1$ are polynomials of $\cos\theta$ with degree 0,1 and 0 respectively, we know by induction that $U_n(\cos\theta)$ and $\cos n\theta$ are polynomials of $\cos\theta$ with degree $n$. Let their leading coefficients be $a_n$ and $b_n$ respectively, then the above two equations tell us that
-$$a_n=a_{n-1}+b_n,$$
-$$b_n=b_{n-1}+a_{n-2}.$$
-The first recurrence gives $b_n=a_n-a_{n-1}$ which we substitute into the second recurrence to get $a_n=2a_{n-1}$. Since $a_0=2^0$, we have $a_n=2^n$.
-
-**Claim 3**
-
+(2) follows under a change of variables
 $$\int_{-1}^1U_n(x)U_m(x)\sqrt{1-x^2}{\rm d}x=\int_0^{\pi}U_n(\cos\theta)U_m(\cos\theta)\sin^2\theta{\rm d}\theta=\int_0^{\pi}\sin(n+1)\theta\sin(m+1)\theta{\rm d}\theta=\frac{\pi}{2}\delta_{mn}$$
 where the last step is a result from Fourier theories.
+
+To see that they are graded we use the fact that
+$$xU_n(x)=\frac{\cos\theta\sin(n+1)\theta}{\sin\theta}=\frac{\sin (n+2)\theta+\sin n\theta}{2\sin\theta}$$
+In other words $2xU_n(x)=U_{n+1}(x)+U_{n-1}(x)$. Since each time we multiply by $2x$ and $U_0(x)=1$ we have
+$$U_n(x) = 2^n x^n + O(x^{n-1})$$
+which also proves (3).
 
 **Problem 2.4 (B)** Show that
 $$
@@ -120,16 +110,7 @@ $$
 
 **SOLUTION**
 
-The first result is trivial.
-
-To get the second result, recall that
-$$U_n(\cos\theta)=\cos\theta U_{n-1}(\cos\theta)+\cos n\theta$$
-and
-$$\cos n\theta=\cos\theta\cos(n-1)\theta-(1-\cos^2\theta)U_{n-2}(\cos\theta).$$
-
-The first equation gives $\cos n\theta$ in terms of $U_n$ and $U_{n-1}$. Substitute the result into the second equation to get
-$$U_n(x)-xU_{n-1}(x)=x(U_{n-1}(x)-xU_{n-2}(x))-(1-x^2)U_{n-2}(x)$$
-which reduces to the desired recurrence.
+The first result is trivial. See Problem 2.3 for the second result.
 
 **Problem 2.5 (C)** What is the Jacobi matrix for $U_n(x)$? What scaling
 $q_n(x) = D_n U_n(x)$ gives us orthonormal polynomials?
@@ -143,7 +124,7 @@ $$\begin{bmatrix}
  & \ddots &
 \end{bmatrix}$$
 
-Problem 2.3 - Claim 3 gives the norms $\|U_n\|=\sqrt{\pi/2}$, so $D_n=\sqrt{2}{\pi}$.
+Problem 2.3 gives the norms $\|U_n\|=\sqrt{\pi/2}$, so $D_n=\sqrt{2}{\pi}$.
 
 
 ## 3. Hermite polynomials
