@@ -1,4 +1,4 @@
-# Interpolation and Gaussian quadrature
+## Interpolation and Gaussian quadrature
 
 
 
@@ -26,7 +26,7 @@ expected.
 
 
 
-## 1. Polynomial Interpolation
+### 1. Polynomial Interpolation
 
 We already saw a special case of polynomial interpolation, where we saw that the polynomial
 $$
@@ -139,7 +139,7 @@ interpolation is inheritely ill-conditioned.
 The problem sheet asks you to explore
 this experimentally.
 
-## 2. Roots of orthogonal polynomials and truncated Jacobi matrices
+### 2. Roots of orthogonal polynomials and truncated Jacobi matrices
 
 We now consider roots (zeros) of orthogonal polynomials $q_n(x)$. This is important as we shall
 see they are useful for interpolation and quadrature. For interpolation to be well-defined we
@@ -265,7 +265,7 @@ $$
 
 
 
-## 3. Interpolatory quadrature rules
+### 3. Interpolatory quadrature rules
 
 **Definition (interpolatory quadrature rule)** Given a set of points $𝐱 = [x_1,…,x_n]$
 the interpolatory quadrature rule is:
@@ -342,7 +342,7 @@ We shall explain this miracle next.
 
 
 
-## 4. Gaussian quadrature
+### 4. Gaussian quadrature
 
 Gaussian quadrature is the interpolatory quadrature rule corresponding
 to the grid $x_j$ defined as the roots of the orthogonal polynomial $q_n(x)$.
