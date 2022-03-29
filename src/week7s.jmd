@@ -239,15 +239,23 @@ where $x_k ≤ τ_k, \sigma_k ≤ x_{k+1}$, and uniform boundedness implies that
 ##### Stability:
 The inverse does not blow up the error.
 
-$$\hat L = \underbrace{\begin{bmatrix} 1 \\ & \left({a\over 2} + {1 \over h}\right)^{-1} \\ && ⋱ \\ &&& \left({a\over 2} + {1 \over h}\right)^{-1}  \end{bmatrix}}_D \underbrace{\begin{bmatrix} 1 \\ \left({a\over 2} + {1 \over h}\right)\left({a\over 2} - {1 \over h}\right)  & 1 \\ & ⋱ & ⋱ \\ && \left({a\over 2} + {1 \over h}\right)\left({a\over 2} - {1 \over h}\right) &1 \end{bmatrix}}_{ L}$$
+$$\hat L = \underbrace{\begin{bmatrix} 1 \\ & \left({a\over 2} + {1 \over h}\right) \\ && ⋱ \\ &&& \left({a\over 2} + {1 \over h}\right)  \end{bmatrix}}_D \underbrace{\begin{bmatrix} 1 \\ \left({a\over 2} + {1 \over h}\right)^{-1}\left({a\over 2} - {1 \over h}\right)  & 1 \\ & ⋱ & ⋱ \\ && \left({a\over 2} + {1 \over h}\right)^{-1}\left({a\over 2} - {1 \over h}\right) &1 \end{bmatrix}}_{ L}$$
 
-Thus, we have $\| L^{-1}\|_{1 → ∞} ≤ \left|{a^2\over 4} - {1 \over h^2}\right|^{-(n-1)} ≤ \left|{a^2\over 4} - {n^2}\right|^{-(n-1)} \left|{4\over a^2 + 4n^2}\right|^{n-1}
- = O(1)$
- 
-Note that $\left|{a\over 2} + {1 \over h}\right|^{-1} = \left|{h \over {ah \over 2} + 1}\right|\le 2h$, as $h\to 0$ (taking $h$ small enough)
-
+Thus, we have 
+$$
+\| L^{-1}\|_{1 → ∞} ≤ \left|
+ \left({a\over 2} + {1 \over h}\right)^{-1}\left({a\over 2} - {1 \over h}\right)
+\right|^{-(n-1)} = O(1)
+$$
+Note that 
+$$
+\left|{a\over 2} + {1 \over h}\right|^{-1} = \left|{h \over {ah \over 2} + 1}\right|\le 2h
+$$
+as $h\to 0$ (taking $h$ small enough).
 Combining stability and consistency we have
-$$\|𝐮ᶠ - 𝐮\|_∞  = \|\hat L^{-1} (\hat L𝐮ᶠ - \hat L𝐮)\|_∞  = \| L^{-1} D^{-1} \begin{bmatrix} 0 \\ δ \end{bmatrix} \|_∞ ≤ 2h \| L^{-1}\|_{1 → ∞} \|δ\|_1 = O(h)$$
+$$
+\|𝐮ᶠ - 𝐮\|_∞  = \|\hat L^{-1} (\hat L𝐮ᶠ - \hat L𝐮)\|_∞  = \| L^{-1} D^{-1} \begin{bmatrix} 0 \\ δ \end{bmatrix} \|_∞ ≤ 2h \| L^{-1}\|_{1 → ∞} \|δ\|_1 = O(h).
+$$
 
 **Problem 2.2⋆ (A)** Consider the matrices
 $$
