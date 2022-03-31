@@ -83,6 +83,22 @@ $$
 U_n(\cos θ) = {\sin(n+1) θ \over \sin θ}
 $$
 
+**SOLUTION**
+
+We need to verify:
+1. graded polynomials
+2. orthogonal w.r.t. $\sqrt{1-x^2}$ on $[-1,1]$, and
+3. have the leading coefficient $2^n$.
+
+(2) follows under a change of variables
+$$\int_{-1}^1U_n(x)U_m(x)\sqrt{1-x^2}{\rm d}x=\int_0^{\pi}U_n(\cos\theta)U_m(\cos\theta)\sin^2\theta{\rm d}\theta=\int_0^{\pi}\sin(n+1)\theta\sin(m+1)\theta{\rm d}\theta=\frac{\pi}{2}\delta_{mn}$$
+where the last step is a result from Fourier theories.
+
+To see that they are graded we use the fact that
+$$xU_n(x)=\frac{\cos\theta\sin(n+1)\theta}{\sin\theta}=\frac{\sin (n+2)\theta+\sin n\theta}{2\sin\theta}$$
+In other words $2xU_n(x)=U_{n+1}(x)+U_{n-1}(x)$. Since each time we multiply by $2x$ and $U_0(x)=1$ we have
+$$U_n(x) = 2^n x^n + O(x^{n-1})$$
+which also proves (3).
 
 **Problem 2.4 (B)** Show that
 $$
@@ -92,8 +108,23 @@ x U_n(x) &= {U_{n-1}(x) \over 2} + {U_{n+1}(x) \over 2}.
 \end{align*}
 $$
 
+**SOLUTION**
+
+The first result is trivial. See Problem 2.3 for the second result.
+
 **Problem 2.5 (C)** What is the Jacobi matrix for $U_n(x)$? What scaling
 $q_n(x) = D_n U_n(x)$ gives us orthonormal polynomials?
+
+**Solution**
+
+Problem 2.4 gives the Jacobi matrix
+$$\begin{bmatrix}
+0 & 1/2 & \\
+1/2 & \ddots & \ddots \\
+ & \ddots &
+\end{bmatrix}$$
+
+Problem 2.3 gives the norms $\|U_n\|=\sqrt{\pi/2}$, so $D_n=\sqrt{2}{\pi}$.
 
 
 ## 3. Hermite polynomials
@@ -108,14 +139,51 @@ $$
 H_n(x) = (-1)^n {{\rm d}^n \over {\rm d}x^n} \exp(-x^2)
 $$
 
+**SOLUTION**
+
+We need to verify:
+1. graded polynomials
+2. orthogonal to all lower degree polynomials on $\mathbb{R}$, and
+3. have the right leading coefficient $2^n$.
+
+Comparing the Rodrigues formula for $n$ and $n-1$, we find that 
+$$(-1)^n\exp(-x^2)H_n(x)={{\rm d} \over {\rm d}x}\left((-1)^{n-1}\exp(-x^2)H_{n-1}(x)\right)$$
+which reduces to
+$$H_n(x)=2xH_{n-1}(x)-H_{n-1}'(x).$$
+
+(1) and (3) then follows from induction since $H_0(x)=1$.
+
+(2) follows by integration by parts. If $r_m$ is a degree $m<n$ polynomial we have:
+$$\int_{-\infty}^\infty H_n(x)r_m(x)\exp(-x^2){\rm d}x=\int_{-\infty}^\infty{{\rm d}^n \over {\rm d}x^n} \exp(-x^2)\exp(-x^2){\rm d}x=\cdots\text{integration by parts}\dots=(-1)^n\int_{-\infty}^\infty \exp(-x^2)r_m^{(n)}(x)=0$$
+
 **Problem 3.2 (C)** What are $k_n^{(1)}$ and $k_n^{(2)}$ such that
 $$
 H_n(x) = 2^n x^n + k_n^{(1)} x^{n-1} + k_n^{(2)} x^{n-2} + O(x^{n-3})
 $$
 
+**SOLUTION**
+
+From Problem 3.1,
+$$H_n(x)=2xH_{n-1}(x)-H_{n-1}'(x).$$
+Thus we have
+$$k_n^{(1)}=2k_{n-1}^{(1)}$$
+$$k_n^{(2)}=2k_{n-1}^{(2)}-(n-1)2^{n-1}$$
+
+Since $k_0^{(1)}=0$, we have $k_n^{(1)}=0$. For the second recurrence, divide both sides by $2^n$:
+$$2^{-n}k_n^{(2)}=2^{-(n-1)}k_{n-1}^{(2)}-\frac{n-1}{2}$$
+Since $k_0^{(2)}=0$, we have $2^{-n}k_n^{(2)}=-\frac{1+\cdots+(n-1)}{2}=-\frac{n(n-1)}{4}$, so $k_n^{(2)}=n(n-1)2^{n-2}$.
+
 **Problem 3.3 (B)** Deduce the 3-term recurrence relationship for $H_n(x)$.
 
+**SOLUTION**
 
+Our goal is to find $a_n$, $b_n$ and $c_n$ such that
+$$xH_n(x)=c_{n-1}H_{n-1}(x)+a_nH_n(x)+b_nH_{n+1}(x).$$
+Compare the 3 leading coefficients on both sides and use the results from Problem 3.1 and Problem 3.2:
+$$2^n=0+0+b_n2^{n+1}$$
+$$0=0+a_n2^n+0$$
+$$n(n-1)2^{n-2}=c_{n-1}2^{n-1}+0+b_n(n+1)n2^{n-1}$$
+Thus we have $b_n=1/2$, $a_n=0$ and $c_{n-1}=-n$.
 
 
 
@@ -125,6 +193,68 @@ $$
 interpolate the function $\cos x$ by a polynomial at the points
 $[0,2,3,4]$ and evaluate at $x = 1$. 
 
+**SOLUTION**
+
+- $l_0(x)=\frac{(x-2)(x-3)(x-4)}{(0-2)(0-3)(0-4)}=-\frac{1}{24}(x-2)(x-3)(x-4)$
+- $l_2(x)=\frac{(x-0)(x-3)(x-4)}{(2-0)(2-3)(2-4)}=\frac{1}{4}x(x-3)(x-4)$
+- $l_3(x)=\frac{(x-0)(x-2)(x-4)}{(3-0)(3-2)(3-4)}=-\frac{1}{3}x(x-2)(x-4)$
+- $l_4(x)=\frac{(x-0)(x-2)(x-3)}{(4-0)(4-2)(4-3)}=\frac{1}{8}x(x-2)(x-3)$
+
+$p(x)=\cos(0)l_0(x)+\cos(2)l_2(x)+\cos(3)l_3(x)+\cos(4)l_4(x)$
+
+$l_0(1)=1/4$, $l_2(1)=3/2$, $l_3(1)=-1$, $l_4(1)=1/4$, so $p(1)=1/4\cos(0)+3/2\cos(2)-\cos(3)+1/4\cos(4)$.
+
+```julia
+using Plots
+l0(x)=-1/24*(x-2)*(x-3)*(x-4)
+l2(x)=1/4*x*(x-3)*(x-4)
+l3(x)=-1/3*x*(x-2)*(x-4)
+l4(x)=1/8*x*(x-2)*(x-3)
+p(x)=cos(0)*l0(x)+cos(2)*l2(x)+cos(3)*l3(x)+cos(4)*l4(x)
+
+plot([p cos], xlims=(-1,5))
+```
+
 **Problem 4.2 (A)** Consider the re-expanding the Lagrange basis in
 monomials. Use this to construct an explicit formula for the inverse of the
 Vandermonde matrix.
+
+**SOLUTION**
+
+We use two methods to interpolate $f(x)$
+
+**Vandermonde matrix**
+
+$$p(x)=\sum_{k=1}^nc_kx^{k-1}=
+\underbrace{\begin{bmatrix}
+1&x&\cdots&x^{n-1}
+\end{bmatrix}}_{\mathbf{M}(x)}
+\underbrace{\begin{bmatrix}
+c_1\\
+\vdots\\
+c_n
+\end{bmatrix}}_{\mathbf{c}}$$
+where
+$$
+V\mathbf{c}=
+\underbrace{\begin{bmatrix}
+f(x_1)\\
+\vdots\\
+f(x_n)
+\end{bmatrix}}_{\mathbf{f}}
+$$
+
+**Lagrange interpolation**
+
+$$p(x)=\sum_{k=1}^nf(x_k)l_k(x)=
+\underbrace{\begin{bmatrix}
+l_1(x)&\cdots&l_n(x)
+\end{bmatrix}}_{\mathbf{L}(x)}\mathbf{f}$$
+
+Comparing the two results, we have
+$$\mathbf{M}(x)V^{-1}\mathbf{f}=\mathbf{L}(x)\mathbf{f},$$
+so
+$$\mathbf{M}(x)V^{-1}=\mathbf{L}(x)$$
+which means that the $(i,j)$-entry of $V^{-1}$ is the coefficient of $x^{i-1}$ in $l_j(x)$.
+
+See [here](https://proofwiki.org/wiki/Inverse_of_Vandermonde_Matrix#Theorem) for the complete explicit expression.
