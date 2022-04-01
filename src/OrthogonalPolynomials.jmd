@@ -67,9 +67,6 @@ Note in the above
 $$
 h_n := ⟨p_n,p_n⟩ = \|p_n\|^2 = ∫_a^b  p_n(x)^2 w(x) {\rm d} x > 0.
 $$
-The existence of orthogonal polynomials follows immediately from the Gram–Schmidt algorithm
-applied to this basis and inner product. There is additional structure (3-term recurrence) that
-will be discussed later.
 
 Multiplying any orthogonal polynomial necessarily is also an orthogonal
 polynomial. We have two standard normalisations:
@@ -77,11 +74,26 @@ polynomial. We have two standard normalisations:
 
 **Definition (orthonormal polynomials)**
 A set of orthogonal polynomials $\{q_0(x), q_1(x), … \}$
-are orthonormal if $\|q_n\| = 1$.
+are _orthonormal_ if $\|q_n\| = 1$.
 
 **Definition (monic orthogonal polynomials)**
 A set of orthogonal polynomials $\{q_0(x), q_1(x), … \}$
-are orthonormal if $k_n = 1$.
+are _monic_ if $k_n = 1$.
+
+
+**Proposition (existence)** Given a weight $w(x)$, monic orthogonal polynomials
+exist.
+
+**Proof**
+
+Existence follows immediately from the Gram–Schmidt procedure. That is,
+define $p_0(x) := 1$ and
+$$
+p_n(x) := x^n - ∑_{k=0}^{n-1} {⟨x^n,p_k⟩ \over \|p_k\|^2} p_k(x)
+$$
+
+∎
+
 
 We are primarly concerned with the usage of orthogonal polynomials in
 approximating functions. First we observe the following:
@@ -116,17 +128,31 @@ $$
 $$
 then $r = 0$.
 
+**Corollary (uniqueness)**
+Monic orthogonal polynomials are unique.
+
+**Proof**
+If $p̃_n(x)$ and $p_n(x)$ are both monic orthogonal polynomials
+then $r(x) = p̃_n(x) - p_n(x)$ is degree $n-1$ but satisfies
+$$
+⟨r, p_k⟩ = ⟨p̃_n, p_k⟩ - ⟨p_n, p_k⟩ = 0
+$$
+for $k = 0,…,{n-1}$.
+∎
+
 
 OPs are uniquely defined (up to a constant) by the
 property that they are orthogonal to all lower degree polynomials.
 
 **Proposition (orthogonal to lower degree)**
-A polynomial $p$ of precisely degree $n$ satisfies
+Given a weight $w(x)$, 
+a polynomial $p$ of precisely degree $n$ satisfies
 $$
 ⟨p,r⟩ = 0
 $$
 for all degree $m < n$ polynomials $r$ if and only if
-$p = c q_n$. Therefore an orthogonal polynomial is uniquely
+$p(x) = c p_n(x)$ where $p_n(x)$ are the monic orthogonal polynomials.
+Therefore an orthogonal polynomial is uniquely
 defined by $k_n$.
 
 **Proof**
@@ -155,6 +181,7 @@ Thus it is zero, i.e., $p(x) = c p_n(x)$.
 
 A consequence of this is that orthonormal polynomials are always a
 constant multiple of orthogonal polynomials.
+
 
 
 ### 3-term recurrence
