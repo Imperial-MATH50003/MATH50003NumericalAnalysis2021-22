@@ -328,7 +328,7 @@ thus,
 $\|T^{-1}\|_{1\to\infty} = \sup_{x\ne 0} \frac{\|T^{-1}x\|_\infty}{\|x\|_1}\le b^n$ and, in particular,
 $$\|T^{-1}\|_{1\to\infty}= b^n$$
 
-since $$\frac{|T^{-1}x|_\infty}{\|x\|_1}=b^n$$ it is obtained using 
+since $$\frac{\|T^{-1}x\|_\infty}{\|x\|_1}=b^n$$ it is obtained using 
 $$x=\begin{cases}e_1 & b=1 \\ e_n & b=a \end{cases}$$
 
 Moreover, $|a_j|\le b$, $\forall j=1,...,n$, thus,
@@ -426,9 +426,10 @@ $$
 \begin{align*}
 f̂_p^1 &= f̂_4 + f̂_{-4} = 1 \\
 f̂_{2p}^2 &= f̂_4 + f̂_{-4} = 1, f̂_{2p+1}^2 = 0 \\
-f̂_k^n &= \begin{cases} 1/2 & ±4 = k+pn  \\
-                    0 & {\rm otherwise}
-                    \end{cases}
+f̂_k^n &=
+\begin{cases} 1/2 & ±4 = k+pn  \\
+                    0 & \hbox{ otherwise}
+\end{cases}
 \end{align*}
 $$
 3. Here we have:
