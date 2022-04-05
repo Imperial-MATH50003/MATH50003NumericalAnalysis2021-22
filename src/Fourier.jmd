@@ -548,7 +548,7 @@ $$
 We can use the FFT to compute $S_n(0), …, S_n(n-1)$ in $O(n \log n)$ operations.
 Consider
 $$
-f(θ) = \exp({\rm e}^{{\rm i} θ}) = ∑_{k=0}^∞ {{\rm e}^{{\rm i} θ} \over k!}
+f(θ) = \exp({\rm e}^{{\rm i} θ}) = ∑_{k=0}^∞ {{\rm e}^{{\rm i} k θ} \over k!}
 $$
 where we know the Fourier coefficients from the Taylor series of ${\rm e}^z$. 
 The discrete Fourier coefficients satisfy for $0 ≤ k ≤ n-1$:
