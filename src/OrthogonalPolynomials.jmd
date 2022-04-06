@@ -443,7 +443,7 @@ $$
 
 **Theorem (Chebyshev T are cos)**
 $$
-T_n(x) = \cos n {\rm acos}\, x
+T_n(x) = \cos n\, {\rm acos}\, x
 $$
 In other words
 $$
@@ -461,14 +461,14 @@ We need to show that $p_n(x) := \cos n {\rm acos}\, x$ are
 Property (2) follows under a change of variables:
 $$
 \int_{-1}^1 {p_n(x) p_m(x) \over \sqrt{1-x^2}} {\rm d} x =
-\int_{-π}^π {cos(nθ) cos(mθ) \over \sqrt{1-cos^2 θ}} \sin θ {\rm d} θ =
-\int_{-π}^π cos(nθ) cos(mθ) {\rm d} x = 0
+\int_{-π}^π {\cos(nθ) \cos(mθ) \over \sqrt{1-\cos^2 θ}} \sin θ {\rm d} θ =
+\int_{-π}^π \cos(nθ) \cos(mθ) {\rm d} x = 0
 $$
 if $n ≠ m$.
 
 To see that they are graded we use the fact that
 $$
-x p_n(x) = \cos θ \cos n θ = {\cos(n-1)θ + cos(n+1)θ \over 2} = {p_{n-1}(x) + p_{n+1}(x) \over 2}
+x p_n(x) = \cos θ \cos n θ = {\cos(n-1)θ + \cos(n+1)θ \over 2} = {p_{n-1}(x) + p_{n+1}(x) \over 2}
 $$
 In other words $p_{n+1}(x) = 2x p_n(x) - p_{n-1}(x)$.
 Since each time we multiply by $2x$ and $p_0(x) = 1$ we have
@@ -542,7 +542,7 @@ $$
 We need to verify:
 1. graded polynomials
 2. orthogonal to all lower degree polynomials on $[-1,1]$, and
-3. have the right normalisation constant $k_n = {2^n (1/2)_n \over n!}$.
+3. have the right normalisation constant $k_n = {1 \over 2^n} \begin{pmatrix} 2n \\ n \end{pmatrix}$.
 
 (1) follows since its a degree $n$ polynomial (the $n$-th derivative of a degree $2n$ polynomial).
 (2) follows by integration by parts. Note that $(1-x^2)^n$ and its first $n-1$ derivatives vanish at $±1$.
