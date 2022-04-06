@@ -106,6 +106,18 @@ Additional problem sheets:
 7. [Condition Numbers](lectures/ConditionNumbers.jpg)
 7. [Indefinite Integration](lectures/IndefiniteIntegration.jpg)
 7. [Euler Method](lectures/EulerMethod.jpg)
+7. [Poisson Equation](lectures/Poisson.jpg)
+7. [Convergence of Euler Methods](lectures/Convergence.jpg)
+7. [Fourier Series](lectures/Fourier.jpg)
+7. [Trapezium Rule and Fourier Coefficients](lectures/TrapeziumRule.jpg)
+7. [Discrete Fourier Transform](lectures/DFT.jpg)
+7. [Fast Fourier Transform](lectures/FFT.jpg)
+7. [Jacobi Matrices](lectures/JacobiMatrices.jpg)
+7. [Classical Orthogonal Polynomials](lectures/ClassicalOPs.jpg)
+7. [Polynomial Interpolation](lectures/Interpolation.jpg)
+7. [Orthogonal Polynomial Roots](lectures/OPRoots.jpg)
+7. [Interpolatory Quadrature](lectures/InterpolatoryQuadrature.jpg)
+7. [Gaussian Quadrature](lectures/GaussianQuadrature.jpg)
 
 
 
