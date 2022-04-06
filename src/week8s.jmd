@@ -297,20 +297,21 @@ Putting the above 2 equations together, we have $I_k=(k-1)I_{k-2}-(k+1)I_k$, so 
 Let $p_0(x)=1$, then $\|p_0\|^2=2I_0=\pi/2$. We know from the 3-term recurrence that
 $$xp_0(x)=a_0p_0(x)+p_1(x)$$
 where
-$$a_0=\frac{<p_0,xp_0>}{\|p_0\|^2}=0.$$
+$$
+a_0=\frac{⟨ p_0,xp_0⟩}{\|p_0\|^2}=0.$$
 Thus $p_1(x)=x$ and $\|p_1\|^2=2I_2=\pi/8$.
 From
 $$xp_1(x)=c_0p_0(x)+a_1p_1(x)+p_2(x)$$
 we have
-$$c_0=\frac{<p_0,xp_1>}{\|p_0\|^2}=2I_2/2I_0=1/4$$
-$$a_1=\frac{<p_1,xp_1>}{\|p_1\|^2}=0$$
+$$c_0=\frac{⟨ p_0,xp_1⟩}{\|p_0\|^2}=2I_2/2I_0=1/4$$
+$$a_1=\frac{⟨ p_1,xp_1⟩}{\|p_1\|^2}=0$$
 $$p_2(x)=xp_1(x)-c_0-a_1p_1(x)=x^2-1/4$$
 $$\|p_2\|^2=2I_4-I_2+1/8I_0=\pi/32$$
 Finally, from
 $$xp_2(x)=c_1p_1(x)+a_2p_2(x)+p_3(x)$$
 we have
-$$c_1=\frac{<p_1,xp_2>}{\|p_1\|^2}=(2I_4-1/2I_2)/(\pi/8)=1/4$$
-$$a_2=\frac{<p_2,xp_2>}{\|p_2\|^2}=0$$
+$$c_1=\frac{⟨ p_1,xp_2⟩}{\|p_1\|^2}=(2I_4-1/2I_2)/(\pi/8)=1/4$$
+$$a_2=\frac{⟨ p_2,xp_2⟩}{\|p_2\|^2}=0$$
 $$p_3(x)=xp_2(x)-c_1p_1(x)-a_2p_2(x)=x^3-1/2x$$
 
 **Problem 3.2⋆  (C, 3-term recurrence, 1st form)**
@@ -322,7 +323,7 @@ p_1(x) &= (A_0 x + B_0) p_0(x) \\
 p_{n+1}(x) &= (A_n x + B_n) p_n(x) - C_n p_{n-1}(x)
 \end{align*}
 $$
-Write this as a lower triangular linear system, given $p_0(x) = \mu in \mathbb{R}$:
+Write this as a lower triangular linear system, given $p_0(x) = \mu \in \mathbb{R}$:
 $$
 L_x \begin{bmatrix} p_0(x) \\ \vdots \\ p_{n+1}(x) \end{bmatrix} = \begin{bmatrix} \mu \\ 0 \\ \vdots \\ 0 \end{bmatrix}
 $$
@@ -347,7 +348,7 @@ C_1 & -A_1x-B_1 & 1 &&\\
 & \ddots &\ddots&\ddots&\\
 &&C_{n}&-A_nx-B_n&1
 \end{bmatrix}}_{L_x}
-\underbrace{\begin{bmatrix} p_0(x) \\ \vdots \\ p_{n+1}(x) \end{bmatrix}}_{\mathbf{P}(x)} = \underbrace{\begin{bmatrix} c \\ 0 \\ \vdots \\ 0 \end{bmatrix}}_{\mu\mathbf{e}_1}
+\underbrace{\begin{bmatrix} p_0(x) \\ \vdots \\ p_{n+1}(x) \end{bmatrix}}_{\mathbf{P}(x)} = \underbrace{\begin{bmatrix} μ \\ 0 \\ \vdots \\ 0 \end{bmatrix}}_{\mu\mathbf{e}_1}
 $$
 
 
@@ -363,13 +364,12 @@ $$
 
 **SOLUTION**
 
-We know from Problem 3.2 that 3-term recurrence can be viewed as a lower tridiagonal system. For general family of polynomials, we don't have 3-term recurrence, but we can always have dense recurrence as
-$$p_{n+1}(x)=(A_nx+B_n)p_n(x)-C_np_{n-1}(x)-D_np_{n-2}(x)-\cdots$$
-which can be viewd as
-$$L_x\mathbf{P}(x)=\mu\mathbf{e}_1.$$
-where $L_x$ is lower triangular (for general polynomials) instead of lower tridiagonal (for orthogonal polynomials). Then
-$$f(x)=\mathbf{P}^\top(x)\mathbf{c}=(\mu L_x^{-1}\mathbf{e}_1)^\top\mathbf{c}=\mu\mathbf{e}_1^\top U_x^{-1}\mathbf{c}$$
-where $U_x=L_x^\top$.
+Using the same notation as the previous part we have:
+$$
+f,(x) = \mathbf{P}(x)^⊤ 𝐜 = (μ L_x^{-1} 𝐞_1)^⊤ 𝐜 = μ  𝐞_1^⊤ (L_x^⊤)^{-1} 𝐜
+$$
+that is $U_x = L_x^⊤$.
+
 
 **Problem 3.4⋆  (B)** If $w(-x) = w(x)$ for a weight supported on $[-b,b]$ show that $a_n = 0$.
 Hint: first show that the (monic) polynomials $p_{2n}(x)$ are even and $p_{2n+1}(x)$ are odd.
