@@ -1,8 +1,10 @@
 using Weave
 
-nkwds = (out_path = "notebooks/", jupyter_path = "$(homedir())/.julia/conda/3/bin/jupyter", nbconvert_options = "--allow-errors")
-pkwds = (out_path = "sheets/", jupyter_path = "$(homedir())/.julia/conda/3/bin/jupyter", nbconvert_options = "--allow-errors --clear-output")
-skwds = (out_path = "sheets/", jupyter_path = "$(homedir())/.julia/conda/3/bin/jupyter", nbconvert_options = "--allow-errors")
+nkwds = (out_path="notebooks/", jupyter_path="$(homedir())/.julia/conda/3/bin/jupyter", nbconvert_options="--allow-errors")
+pkwds = (out_path="sheets/", jupyter_path="$(homedir())/.julia/conda/3/bin/jupyter", nbconvert_options="--allow-errors --clear-output")
+skwds = (out_path="sheets/", jupyter_path="$(homedir())/.julia/conda/3/bin/jupyter", nbconvert_options="--allow-errors")
+ekwds = (out_path="exams/", jupyter_path="$(homedir())/.julia/conda/3/bin/jupyter", nbconvert_options="--allow-errors  --clear-output")
+eskwds = (out_path="exams/", jupyter_path="$(homedir())/.julia/conda/3/bin/jupyter", nbconvert_options="--allow-errors")
 
 ##
 # notes
@@ -63,8 +65,10 @@ notebook("src/week10s.jmd"; skwds...)
 # exams
 ##
 
-notebook("src/practice.jmd"; skwds...)
-notebook("src/practices.jmd"; skwds...)
+notebook("src/practice.jmd"; ekwds...)
+notebook("src/practices.jmd"; eskwds...)
+notebook("src/computerexam.jmd"; ekwds...)
+notebook("src/computerexams.jmd"; ekwds...)
 
 ##
 # extras

@@ -134,11 +134,11 @@ symmetric tridiagonal matrix.
 **SOLUTION**
 
 We have, with $u(x_k) = u_k$ (and using $\kappa$ instead of $k$ in the equation $u_{xx} + k^2u = f(x)$ so as to avoid confusion with the indices):
-\begin{align}
+\begin{align*}
 \frac{u_2 - u_1}{h} &= c_0, \\
 \frac{u_{k-1} - 2u_k + u_{k+1}}{h^2} + \kappa^2u_k &= f(x_k), \hspace{5mm} \textrm{ for } k=2:n-1\\
 \frac{u_n - u_{n-1}}{h} &= c_1, 
-\end{align}
+\end{align*}
 which we write in matrix form as:
 
 $$
@@ -167,7 +167,9 @@ $$
 \end{matrix}\right],
 $$
 
-## 2. Convergence
+
+
+## 2. Convergence
 
 **Problem 2.1⋆ (B)** For the equation
 $$
@@ -186,7 +188,7 @@ $$
 **SOLUTION**
 Using the approximation from PS6 we obtain
 
-$${(f(x_{k+1}) + f(x_k))\over 2} = {( u’(x_{k+1}) + u'(x_k) )\over 2} + {a(u(x_{k+1}) +  u(x_k)) \over 2}≈ {(u_{k+1} - u_k ) \over h} + {a u_{k+1}\over 2} + {a u_k \over 2}$$
+$${f(x_{k+1}) + f(x_k)\over 2} = { u'(x_{k+1}) + u'(x_k) \over 2} + {a(u(x_{k+1}) +  u(x_k)) \over 2}≈ {(u_{k+1} - u_k ) \over h} + {a u_{k+1}\over 2} + {a u_k \over 2}$$
 
 So we get
 
@@ -216,43 +218,52 @@ Now, similarly to Euler's methods convergence theorem, we study consistency and 
 ##### Consistency:
 Our discretisation approximates the true equation.
 
-$$\hat Lu = \begin{bmatrix} c_0 \\
+$$
+\begin{align*}
+L̂ u &= \begin{bmatrix} c_0 \\
 {u(x_1) - u(x_0) \over h} + {a\over2}(u(x_1) + u(x_0)) \\
-\vdots \\
+⋮ \\
 {u(x_{n-1}) - u(x_{n-2}) \over h}  + {a\over2}(u(x_{n-1}) + u(x_{n-2}))\end{bmatrix}
 = \begin{bmatrix} c_0 \\
 \frac{1}{2}\left({u(x_1) - u(x_0) \over h} +{u(x_1) - u(x_0) \over h} + {a}(u(x_1) + u(x_0))\right) \\
-\vdots \\
-\frac{1}{2}\left({u(x_{n-1}) - u(x_{n-2}) \over h} + {u(x_1) - u(x_0) \over h} + {a}(u(x_{n-1}) + u(x_{n-2}))\right)\end{bmatrix}
-= \begin{bmatrix} c_0 \\
-\frac{1}{2}\left(u'(x_0) + a u(x_0) + u''(τ_0) h + u'(x_1) + a u(x_1) + u''(\sigma_1) h \right)\\
-\vdots \\
-\frac{1}{2}\left(u'(x_{n-2}) + a u(x_{n-2}) + u''(τ_{n-2}) h + u'(x_{n-1}) + a u(x_{n-1}) + u''(\sigma_{n-1}) h \right) \end{bmatrix} = 
+⋮ \\
+\frac{1}{2}\left({u(x_{n-1}) - u(x_{n-2}) \over h} + {u(x_1) - u(x_0) \over h} + {a}(u(x_{n-1}) + u(x_{n-2}))\right)\end{bmatrix} \\
+&= \begin{bmatrix} c_0 \\
+\frac{1}{2}\left(u'(x_0) + a u(x_0) + u''(τ_0) h + u'(x_1) + a u(x_1) + u''(σ_1) h \right)\\
+⋮ \\
+\frac{1}{2}\left(u'(x_{n-2}) + a u(x_{n-2}) + u''(τ_{n-2}) h + u'(x_{n-1}) + a u(x_{n-1}) + u''(σ_{n-1}) h \right) \end{bmatrix} = 
 \begin{bmatrix} c_0 \\
-{f(x_0)+f(x_1)\over 2} + {u''(τ_0)+u''(\sigma_1)\over 2} h \\
-\vdots \\
-{f(x_{n-2})+f(x_{n-1})\over 2} + {u''(τ_{n-2})+u''(\sigma_{n-1})\over 2} h \end{bmatrix} = 
-\begin{bmatrix} c_0 \\ \hat fᶠ \end{bmatrix} + \begin{bmatrix} 0 \\ δ \end{bmatrix}$$
+{f(x_0)+f(x_1)\over 2} + {u''(τ_0)+u''(σ_1)\over 2} h \\
+⋮ \\
+{f(x_{n-2})+f(x_{n-1})\over 2} + {u''(τ_{n-2})+u''(σ_{n-1})\over 2} h \end{bmatrix} \\
+&= 
+\begin{bmatrix} c_0 \\ \hat fᶠ \end{bmatrix} + \begin{bmatrix} 0 \\ δ \end{bmatrix}
+\end{align*}
+$$
 
-where $x_k ≤ τ_k, \sigma_k ≤ x_{k+1}$, and uniform boundedness implies that $\|δ\|_∞ = O(h)$
+where $x_k ≤ τ_k, σ_k ≤ x_{k+1}$, and uniform boundedness implies that $\|δ\|_∞ = O(h)$
 
 ##### Stability:
 The inverse does not blow up the error.
 
-$$\hat L = \underbrace{\begin{bmatrix} 1 \\ & \left({a\over 2} + {1 \over h}\right) \\ && ⋱ \\ &&& \left({a\over 2} + {1 \over h}\right)  \end{bmatrix}}_D \underbrace{\begin{bmatrix} 1 \\ \left({a\over 2} + {1 \over h}\right)^{-1}\left({a\over 2} - {1 \over h}\right)  & 1 \\ & ⋱ & ⋱ \\ && \left({a\over 2} + {1 \over h}\right)^{-1}\left({a\over 2} - {1 \over h}\right) &1 \end{bmatrix}}_{ L}$$
+$$
+\hat L = \underbrace{\begin{bmatrix} 1 \\ & \left({a\over 2} + {1 \over h}\right) \\ && ⋱ \\ &&& \left({a\over 2} + {1 \over h}\right)  \end{bmatrix}}_D 
+\underbrace{\begin{bmatrix} 1 \\ \left({a\over 2} + {1 \over h}\right)^{-1}\left({a\over 2} - {1 \over h}\right)  & 1 \\ & ⋱ & ⋱ \\ && \left({a\over 2} + {1 \over h}\right)^{-1}\left({a\over 2} - {1 \over h}\right) &1 \end{bmatrix}}_{ L}
+$$
 
 Thus, we have 
 $$
 \| L^{-1}\|_{1 → ∞} ≤ \left|
  \left({a\over 2} + {1 \over h}\right)^{-1}\left({a\over 2} - {1 \over h}\right)
-\right|^{-(n-1)} = O(1)
+\right|^{n-1} = O(1)
 $$
+as $n → ∞$, where one can take logarithms and use L'Hopitals rule to show that it actually tends to a limit.
 Note that 
 $$
 \left|{a\over 2} + {1 \over h}\right|^{-1} = \left|{h \over {ah \over 2} + 1}\right|\le 2h
 $$
-as $h\to 0$ (taking $h$ small enough).
-Combining stability and consistency we have
+for sufficiently small $h$ (or large $n$).
+Combining stability and consistency we have, for sufficently small $h$,
 $$
 \|𝐮ᶠ - 𝐮\|_∞  = \|\hat L^{-1} (\hat L𝐮ᶠ - \hat L𝐮)\|_∞  = \| L^{-1} D^{-1} \begin{bmatrix} 0 \\ δ \end{bmatrix} \|_∞ ≤ 2h \| L^{-1}\|_{1 → ∞} \|δ\|_1 = O(h).
 $$

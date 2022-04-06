@@ -1,0 +1,276 @@
+# MATH50003 Numerical Analysis (2021–2022) Computer-based Exam
+
+Instructions for uploading and downloading:
+
+1. Rename the file to include your CID.
+2. You have 30 mins to download the exam beginning at 3pm on 18 March.
+2. You have 1 hour to complete the exam beginning at 3:30pm on 18 March.
+3. Deadline is 5pm on 18 March to upload the completed Jupyter notebook (`.ipynb`) to Blackboard. 
+Late submissions received before 7pm will be capped at 40%.
+5. Once uploaded, re-download the file before the final submission time to confirm it is correct.
+You are allowed to upload additional submissions but only last valid upload before 5pm will be used.
+6. If uploading via Blackboard fails you may e-mail the UG Office: maths.exams@imperial.ac.uk
+
+Instructions for the exam:
+
+1. For each problem, replace the `# TODO` to complete the question.
+The unit tests are provided to help you test your answers.
+3. Problems are marked A/B/C to indicate difficulty ("A" being most difficult).
+Partial credit will be awarded for reasonable attempts even if the tests
+are not passed. A and B questions are worth 12 marks while C questions are worth 10 marks.
+3. If you have technical queries please email s.olver@imperial.ac.uk. Any other queries
+should be sent to the UG Office: maths.exams@imperial.ac.uk
+4. You may use existing code from anywhere
+but you are **REQUIRED** to cite the source if it is not part of the module material,
+ideally by including a weblink in a comment. 
+5. You **MUST NOT** ask for help online or
+communicate with others within or outside the module.
+Failure to follow these rules will be considered misconduct.
+
+
+
+You should use the following packages:
+```julia
+using LinearAlgebra, Test
+```
+(Note `SetRounding` is not necessary.)
+
+**WARNING** It may be necessary to restart the kernel if issues arise. Remember to reload the packages
+when you do so.
+
+## 1. Numbers
+
+**Problem 1.1 (C)** 
+Implement the function `issub` that determines whether a `Float16` is a sub-normal number.
+DO NOT use the inbuilt routine `issubnormal`. 
+
+```julia
+function issub(x::Float16)
+    # TODO: return `true` if `x` is a sub-normal float. Otherwise return `false`
+end
+```
+```julia
+@test issub(Float16(0))
+@test issub(nextfloat(Float16(0)))
+@test issub(prevfloat(Float16(0)))
+@test !issub(Float16(1))
+@test !issub(reinterpret(Float16,0b0000010000000000))
+@test issub(reinterpret(Float16,0b0000001111111111))
+```
+
+
+
+## 2. Differentiation
+
+**Problem 2.1 (C)** Use second-order finite differences
+with an appropriately chosen $h$ to approximate the second derivative of
+$$
+f(x) = \cos(x^2)
+$$
+at $x = 0.1$ to 5 digits accuracy.
+```julia
+function fd2(x)
+    # TODO: implement a second-order finite-difference rule 
+    # to approximate f''(x)
+    # for f(x) = cos(x^2)
+    # with step-size h chosen to get sufficient accuracy
+end
+```
+```julia
+@test abs(fd2(0.1) + 2*sin(0.1^2) + 4*0.1^2*cos(0.1^2)) ≤ 1E-5
+```
+
+**Problem 2.2 (A)** Consider a 2nd order version of a dual number:
+$$
+a + b ϵ_1 + c ϵ_2
+$$
+such that
+$$
+\begin{align*}
+ϵ_1^2 &= ϵ_2 \\
+ϵ_2^2 &= ϵ_1 ϵ_2 =  0.
+\end{align*}
+$$
+Complete the following implementation supporting `+` and `*` (and
+assuming `a,b,c` are `Float64`). Hint: you may need to work out on paper
+how to multiply `(s.a + s.b ϵ_1 + s.c ϵ_2)*(t.a + t.b ϵ_1 + t.c ϵ_2)` using the
+relationship above.
+```julia
+import Base: *, +, ^
+struct Dual2
+    a::Float64
+    b::Float64
+    c::Float64
+end
+
+function +(s::Dual2, t::Dual2)
+    ## TODO: Implement Dual2(...) + Dual2(...), returning a Dual2
+end
+
+function +(s::Dual2, c::Real)
+    ## TODO: Implement Dual2(...) + c, returning a Dual2
+end
+
+function *(c::Number, s::Dual2)
+    ## TODO: Implement c * Dual2(...), returning a Dual2
+end
+
+function *(s::Dual2, t::Dual2)
+    ## TODO: Implement Dual2(...) * Dual2(...), returning a Dual2
+end
+```
+```julia
+f = x -> x*x*x + 2x + 1
+x = 0.1
+@test f(Dual2(x,1.,0.)) == Dual2(f(x), 3x^2+2, 6x / 2)
+
+# This has computed the first and second derivatives as
+# as f(x) + f'(x)*ϵ_1 + f''(x)/2*ϵ_2
+# == (x^3 + x) + (3x^2+1)*ϵ_1 + 6x/2*ϵ_2
+```
+
+## 3. Structured Matrices
+
+**Problem 3.1 (C)** Complete the implementation of `LowerTridiagonal` which represents a banded matrix with
+bandwidths $(l,u) = (2,0)$ by storing only its diagonal, sub-diagonal, and second-sub-diagonal as vectors.
+```julia
+import Base: getindex,  size, *
+
+struct LowerTridiagonal <: AbstractMatrix{Float64}
+    d::Vector{Float64}   # diagonal entries of length n
+    dl::Vector{Float64}  # sub-diagonal entries of length n-1
+    dl2::Vector{Float64} # second-sub-diagonal entries of length n-2
+end
+
+size(L::LowerTridiagonal) = (length(L.d),length(L.d))
+
+function getindex(L::LowerTridiagonal, k::Int, j::Int)
+    d, dl, dl2 = L.d, L.dl, L.dl2
+    # TODO: return L[k,j].
+    # If `k == j` then it should be equal to `d[k]`.
+    # If `k == j+1` then it should be equal to `dl[j]`.
+    # If `k == j+2` then it should be equal to `dl2[j]`.
+    # Otherwise, it should return 0.0
+end
+
+n = 10
+d, dl, dl2 = randn(n), randn(n-1), randn(n-2)
+@test LowerTridiagonal(d, dl, dl2) == diagm(0 => d, -1 => dl, -2 => dl2)
+```
+
+**Problem 3.2 (B)** Complete the implementation of `*` for a `LowerTridiagonal` matrix
+so that it takes $O(n)$ operations. 
+
+```julia
+function *(L::LowerTridiagonal, x::AbstractVector)
+    ## TODO: Return L*x but computed in O(n) operations
+end
+
+n = 10
+d, dl, dl2 = randn(n), randn(n-1), randn(n-2)
+x = randn(n)
+@test LowerTridiagonal(d, dl, dl2)*x ≈ diagm(0 => d, -1 => dl, -2 => dl2)*x
+```
+
+
+## 4. Decompositions
+
+**Problem 4.1 (C)** Approximate $\exp x$ by a cubic polynomial by minimising
+the least squares error when sampled at $n$ evenly spaced points in $[0,1]$,
+that is, $x_k = (k-1)/(n-1)$,
+returning the coefficients in the monomial basis.
+
+```julia
+function expfit(n)
+    ## TODO: return the coefficients [c_0,c_1,c_2,c_3] of the polynomial
+    # c_0 + c_1*x + c_2*x^2 + c_3*x^3 that minimises the L^2 error at `n`
+    # evenly spaced samples
+end
+```
+```julia
+    c₀,c₁,c₂,c₃ = expfit(1000)
+    x = 0.1
+    @test abs(c₀ + c₁*x + c₂*x^2 + c₃*x^3 - exp(x)) ≤ 1E-3
+```
+
+**Problem 4.2 (A)** Complete the function `lq(A)` that
+returns a LQ decomposition, that is, `A = LQ` where  `L` is lower triangular and `Q` is an orthogonal
+matrix. You may assume that `A`
+is a square `Matrix{Float64}`. Hint: think of how a Householder reflection
+can be constructed such that, for $𝐱 ∈ ℝ^n$,
+$$
+𝐱^⊤ Q = \|𝐱\|𝐞_1^⊤.
+$$
+
+
+```julia
+function lq(A)
+    m,n = size(A)
+    m == n || error("not square")
+    ## TODO: Create Q and L such that A = L*Q, Q'Q == I and L is lower triangular
+end
+```
+```julia
+A = [1.0 2 3; 1 4 9; 1 1 1]
+L,Q = lq(A)
+@test Q'Q ≈ I
+@test L*Q ≈ A
+@test L ≈ tril(L) # it is acceptable to have small non-zero entries in L
+```
+
+
+## 5. Singular Value Decomposition
+
+**Problem 5.1 (B)** Implement `pseudoinv` that returns the pseudo-inverse $A^+$
+for an arbitrary square matrix, assuming that any singular value less than
+$10^{-15}$ is in fact exactly zero. DO NOT use the inbuilt routine `pinv`.
+
+```julia
+function pseudoinv(A)
+    m,n = size(A)
+    m == n || error("A must be square")
+    tol = 1E-15 # threshold below which we assume a singular value is zero
+    ## TODO: construct and return the pseudo inverse of A
+end
+```
+```julia
+A = [1 2 3; 4 5 6; 7 8 9]
+A⁺ = pseudoinv(A)
+@test A⁺*A*A⁺ ≈ A⁺
+@test A*A⁺*A ≈ A
+```
+
+## 6. Differential Equations
+
+**Problem 6.1 (B)** Complete the function `mathieu(n)` that returns a length-$n$ `Vector{Float64}`
+$$
+\begin{bmatrix}
+u_1 \\
+⋮ \\
+u_n
+\end{bmatrix}
+$$
+such that $u_k$ approximates the solution to the time-evolution equation
+$$
+\begin{align*}
+u(0) &= 0 \\
+u'(0) &= 1 \\
+u''(t) &= cos(t) u(t)
+\end{align*}
+$$
+at the point $t_k = (k-1)/(n-1)$ using the Forward Euler method, by first recasting the problem
+as a vector ODE.
+
+```julia
+function mathieu(n)
+    # TODO: return a Vector{Float64} approximating the solution to the ODE
+    # at n evenly spaced points between 0 and 1.
+end
+```
+```julia
+u = mathieu(100_000)
+@test u isa Vector
+@test abs(u[1]) ≤ 1E-15
+# this compares against the exact formula
+@test abs(u[end] - 1.148783704310448) ≤ 2E-5
+```
