@@ -151,13 +151,13 @@ first need to guarantee that the roots are distinct.
 
 Suppose $x_1, …,x_j$ are the roots where $q_n(x)$ changes sign, that is,
 $$
-q_n(x) = c_j (x-x_j) + O((x-x_j)^2)
+q_n(x) = c_k (x-x_k)^{2p+1} + O((x-x_k)^{2p+2})
 $$
-for $c_j ≠ 0$. Then
+for $c_k ≠ 0$ and $k = 1,…,j$ and $p ∈ ℤ$, as$x → x_k$. Then
 $$
 q_n(x) (x-x_1) ⋯(x-x_j)
 $$
-does not change sign.
+does not change signs: it behaves like $c_k (x-x_k)^{2p+2} + O(x-x_k)^{2p+3}$ as $x → x_k$.
 In other words:
 $$
 ⟨q_n,(x-x_1) ⋯(x-x_j) ⟩ = \int_a^b q_n(x) (x-x_1) ⋯(x-x_j) w(x) {\rm d} x ≠ 0.
