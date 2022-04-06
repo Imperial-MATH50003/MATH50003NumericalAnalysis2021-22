@@ -598,7 +598,7 @@ Multiplying through by ${1 \over 2^n (n!)}$ completes the derivation.
 **Theorem (Legendre 3-term recurrence)**
 $$
 \begin{align*}
-xP_0(x) &= P_{n+1}(x) \\
+xP_0(x) &= P_1(x) \\
 (2n+1) xP_n(x) &= nP_{n-1}(x) + (n+1)P_{n+1}(x)
 \end{align*}
 $$
