@@ -413,7 +413,7 @@ H_n(x) = 2^n x^n + O(x^{n-1}).
 $$
 Prove the Rodrigues formula
 $$
-H_n(x) = (-1)^n {{\rm d}^n \over {\rm d}x^n} \exp(-x^2)
+H_n(x) = (-1)^n \exp(x^2) {{\rm d}^n \over {\rm d}x^n} \exp(-x^2)
 $$
 
 **SOLUTION**
@@ -424,7 +424,9 @@ We need to verify:
 3. have the right leading coefficient $2^n$.
 
 Comparing the Rodrigues formula for $n$ and $n-1$, we find that 
-$$(-1)^n\exp(-x^2)H_n(x)={{\rm d} \over {\rm d}x}\left((-1)^{n-1}\exp(-x^2)H_{n-1}(x)\right)$$
+$$
+(-1)^n\exp(-x^2)H_n(x)={{\rm d} \over {\rm d}x}\left((-1)^{n-1}\exp(-x^2)H_{n-1}(x)\right)
+$$
 which reduces to
 $$H_n(x)=2xH_{n-1}(x)-H_{n-1}'(x).$$
 

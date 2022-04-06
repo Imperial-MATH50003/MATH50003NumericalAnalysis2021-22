@@ -88,7 +88,7 @@ H_n(x) = 2^n x^n + O(x^{n-1}).
 $$
 Prove the Rodrigues formula
 $$
-H_n(x) = (-1)^n {{\rm d}^n \over {\rm d}x^n} \exp(-x^2)
+H_n(x) = (-1)^n \exp(x^2) {{\rm d}^n \over {\rm d}x^n} \exp(-x^2)
 $$
 
 **Problem 3.2 (C)** What are $k_n^{(1)}$ and $k_n^{(2)}$ such that
