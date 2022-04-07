@@ -338,7 +338,7 @@ For $n\ge3$ we have
 $$c_n=\frac{1}{4*(n-2)!}+\frac{1}{2*n!}+\frac{1}{4*(n+2)!}+1$$
 
 **Problem 2.3 (B)**
-Consider orthogonal polynomials with respect to $\sqrt{1-x^2}$ on $[0,1]$ with the
+Consider orthogonal polynomials with respect to $\sqrt{1-x^2}$ on $[-1,1]$ with the
 normalisation
 $$
 U_n(x) = 2^n x^n + O(x^{n-1})
