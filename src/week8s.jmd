@@ -376,23 +376,40 @@ Hint: first show that the (monic) polynomials $p_{2n}(x)$ are even and $p_{2n+1}
 
 **SOLUTION**
 
-Note that $p_0(x)$ is even. $a_0$ is zero:
+An integral is zero if its integrand is odd. 
+Moreover an even function times an odd function is odd and
+an odd function times an odd fuction is even.
+Note that $p_0(x)$ and $w(x)$ are even and $x$ is odd. 
+
+We see that $a_0$ is zero:
 $$
 ⟨p_0,x p_0(x)⟩ = \int_{-b}^b x w(x) {\rm d} x = 0
 $$
+since $xw(x)$ is odd,
 which shows that
 $$
 p_1(x) = xp_0(x)
 $$
-is odd. We now proceed by induction. We have:
+is odd. We now proceed by induction. Assume that $p_{2n}$ is even and $p_{2n-1}$ is odd.
+We have:
 $$
 ⟨p_{2n},x p_{2n}(x)⟩ = \int_{-b}^b x w(x) p_{2n}(x)^2 {\rm d} x = 0
 $$
-since $x w(x) p_{2n}(x)^2$ is odd. Meanwhile. This show that if $p_{2n}$ and
-$p_{2n-1}(x)$ is odd then
+since $x w(x) p_{2n}(x)^2$ is odd, therefore $a_{2n} = 0$.
+Thus from
 $$
-p_{2n+1}(x) 
+p_{2n+1}(x) = (x p_{2n}(x)- c_{2n-1} p_{2n-1}(x)) / b_{2n} 
 $$
+we see that $p_{2n+1}$ is odd. Then
+$$
+⟨p_{2n+1},x p_{2n+1}(x)⟩ = \int_{-b}^b x w(x) p_{2n+1}(x)^2 {\rm d} x = 0
+$$
+since $x w(x) p_{2n+1}(x)^2$ is odd, therefore $a_{2n+1} = 0$.
+and hence
+$$
+p_{2n+2}(x) = (x p_{2n+1}(x)- c_{2n} p_{2n}(x)) / b_{2n+1} 
+$$
+is even.
 
 
 
