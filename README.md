@@ -66,7 +66,7 @@ Two point boundary value problems, convergence, and Fourier series
 Discrete Fourier Transform (DFT), Fast Fourier Transform (FFT), and Orthogonal Polynomials.
 5. [Week 9](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week9.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week9s.ipynb)): 
 Jacobi matrices, classical orthogonal polynomials, and interpolation.
-5. [Week 10](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week10.ipynb): 
+5. [Week 10](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week10.ipynb)  ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week10s.ipynb)): 
 Orthogonal polynomial roots, interpolatory quadrature, and Gaussian quadrature.
 
 
