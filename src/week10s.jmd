@@ -11,6 +11,64 @@ Problems are denoted A/B/C to indicate their difficulty.
 to $w(x) = 1$ on $[-1,1]$, by computing the eigenvalues of a $3 × 3$ truncation
 of the Jacobi matrix.
 
+**SOLUTION**
+
+We have, $P_0(x) = 1$. Though recall that in order to use Lemma (zeros), the Jacobi matrix must be symmetric and hence the polynomials orthonormal. So Take $Q_0(x) = 1/||P_0(x)|| = \frac{1}{\sqrt{2}}$. Then we have, by the three term recurrence relationship,
+$$
+xQ_0(x) = a_0Q_0(x) + b_0Q_1(x),
+$$
+and taking the inner product of both sides with $Q_0(x)$ we get, 
+$$a_0 = \langle xQ_0(x), Q_0(x) \rangle = \int_{-1}^1 x/2 dx = 0.$$
+Next recall that $P_1(x) =  x$ and so $Q_1(x) = x/||P_1(x)||=\sqrt{\frac{3}{2}} x$. We then have, taking the innner product of the first equation above with $Q_ 1(x)$,
+$$
+b_0 = \langle xQ_0(x), Q_1(x)\rangle = \int_{-1}^1 \frac{\sqrt{3}}{2}x^2 dx = \frac{1}{\sqrt{3}},
+$$
+and also $b_0 = c_0$ by the Corollary (orthonormal 3-term recurrence). We have,
+$$
+a_1 = \langle xQ_1(x), Q_1(x)\rangle = \int_{-1}^1 \frac{3}{2}x^3 dx = 0.
+$$
+Recall that $P_2(x) = \frac{1}{2}(3x^2 - 1)$, so that $Q_2(x) = P_2(x)/||P_2(x)|| = \sqrt{\frac{5}{8}}(3x^2 - 1)$, and that,
+$$
+xQ_1(x) = c_0Q_0(x) + a_1Q_1(x) + b_1Q_2(x).
+$$
+Taking inner the inner product of both sides with $Q_2(x)$, we see that,
+$$
+c_1 = b_1 = \langle xQ_1(x), Q_2(x)\rangle = \int_{-1}^1 \sqrt{\frac{5}{8}} \cdot \sqrt{\frac{3}{2}}(3x^2 - 1)\cdot x \cdot xdx =\frac{2}{\sqrt{15}}.
+$$
+Finally,
+$$
+a_2 = \langle Q_2(x), xQ_2(x) \rangle = \frac{5}{8}\int_{-1}^1 (3x^2 - 1)^2 x dx = 0.
+$$
+This gives us the truncated Jacobi matrix,
+$$
+X_3 = \left[\begin{matrix}
+a_0 & b_0	& 0 \\
+b_0 & a_1 & b_1 \\
+0&b_1 & a_2
+\end{matrix}
+ \right] = \left[\begin{matrix}
+0 & \frac{1}{\sqrt{3}}	& 0 \\
+\frac{1}{\sqrt{3}} & 0 & \frac{2}{\sqrt{15}} \\
+0& \frac{2}{\sqrt{15}} & 0
+\end{matrix}
+ \right],
+$$
+whose eigenvalues are the zeros of $Q_3(x)$, and hence the zeros of $P_3(x)$ since they are the same up to a constant. To work out the eigenvalues, we have,
+$$
+\begin{align*}
+	|X_3 - \lambda I| = \left| \begin{matrix}
+		-\lambda & \frac{1}{\sqrt{3}} & 0\\ 
+		\frac{1}{\sqrt{3}} & -\lambda & \frac{2}{\sqrt{15}}\\
+		0 & \frac{2}{\sqrt{15}} & -\lambda 
+	\end{matrix}\right| &= 0 \\
+	\Leftrightarrow -\lambda(\lambda^2 - \frac{4}{15}) - \frac{1}{\sqrt{3}}\cdot \frac{-\lambda}{\sqrt{3}} &=0 \\
+	\Leftrightarrow -\lambda^3 + \frac{3}{5}\lambda &= 0,
+\end{align*}
+$$
+which has solutions $\lambda = 0, \pm \sqrt{\frac{3}{5}}$
+
+**END**
+
 **Problem 1.2 (B)** Give an explicit diagonalisation of
 $$
 X_n = \begin{bmatrix} 0 & 1/2 \\ 
@@ -21,6 +79,96 @@ X_n = \begin{bmatrix} 0 & 1/2 \\
 $$
 for all $n$ by relating it to the Jacobi matrix for $U_n(x)$.
 
+**SOLUTION**
+
+Recall the three term recurrence for the Chebyshev Polynomials $U_n$,
+$$
+\begin{align*}
+	xU_0(x) &= \frac{1}{2} U_1(x), \\
+	xU_n(x) &= \frac{U_{n-1}(x)}{2} + \frac{U_{n+1}(x)}{2},
+\end{align*}
+$$
+and hence, we can see that,
+$$
+X_n = \left[\begin{matrix}
+	0 & 1/2 \\
+	1/2 & 0 & \ddots \\
+	&\ddots & \ddots & 1/2 \\ 
+	&&1/2 & 0
+\end{matrix} \right],
+$$
+is the $n \times n$ truncation of the Jacobi matrix. If $x_1,\dots, x_n$ are the zeros of $U_n(x)$, by Lemma (zeros) we have that,
+$$
+X_nQ_n = Q_n \left[\begin{matrix}
+x_1 \\
+&x_2 \\
+&&\ddots \\
+&&&x_n	
+\end{matrix}
+ \right],
+$$
+for,
+$$
+Q_n = \left[\begin{matrix}
+	U_0(x_1) & \cdots & U_0(x_n) \\
+	\vdots & \ddots & \vdots \\
+	U_{n-1}(x_1) & \cdots & U_{n-1}(x_n)
+\end{matrix} \right]\cdot D' = Q_n'\cdot D'
+$$
+where $D'$ is a diagonal matrix which does not actually matter here.
+Recall that if $x = \cos \theta$ then $U_n(x) = \frac{\sin(n+1)\theta}{\sin\theta}$, so in particular the roots of $U_n(x)$ are $x_k = \cos\left(\frac{k\pi}{n+1} \right)$ for $k = 1,\dots,n$, (where $\sin \left(\frac{k\pi}{n+1}\right) \neq 0$). Hence, we have,
+\begin{align*}
+	X_n &= Q_n\left[\begin{matrix}
+x_1 \\
+&x_2 \\
+&&\ddots \\
+&&&x_n	
+\end{matrix}
+ \right]Q_n^{-1} \\
+ &=Q_n' D' \left[\begin{matrix}
+x_1 \\
+&x_2 \\
+&&\ddots \\
+&&&x_n	
+\end{matrix}
+ \right] D'^{-1}Q_n'^{-1} \\
+ &= Q_n'\left[\begin{matrix}
+x_1 \\
+&x_2 \\
+&&\ddots \\
+&&&x_n	
+\end{matrix}
+ \right] D' D'^{-1}Q_n'^{-1} \\
+ &=Q_n'\left[\begin{matrix}
+\cos\left(\frac{\pi}{n+1}\right) \\
+&\cos\left(\frac{2\pi}{n+1}\right) \\
+&&\ddots \\
+&&&\cos\left(\frac{n\pi}{n+1}\right)
+\end{matrix}
+ \right]Q_n'^{-1} \\
+ &= Q_n'D_nQ_n'^{-1},
+\end{align*} 
+where, 
+$$
+Q_n' = \left[\begin{matrix}
+	1 & \cdots & 1\\
+	\frac{\sin\left(2\cdot \frac{2\pi}{n+1} \right)}{\sin\left(\frac{2\pi}{n+1}\right)} & \cdots & \frac{\sin\left(2\cdot \frac{n\pi}{n+1} \right)}{\sin\left(\frac{n\pi}{n+1}\right)} \\
+	\vdots & & \vdots \\
+	\frac{\sin\left(n\cdot \frac{2\pi}{n+1} \right)}{\sin\left(\frac{2\pi}{n+1}\right)} & \cdots & \frac{\sin\left( n\cdot \frac{n\pi}{n+1} \right)}{\sin\left(\frac{n\pi}{n+1}\right)}
+\end{matrix} \right],
+$$
+and,
+$$
+D_n = \left[\begin{matrix}
+\cos\left(\frac{\pi}{n+1}\right) \\
+&\cos\left(\frac{2\pi}{n+1}\right) \\
+&&\ddots \\
+&&&\cos\left(\frac{n\pi}{n+1}\right)
+\end{matrix}
+ \right]
+$$
+
+**END**
 
 **Problem 1.3 (A)** Give an explicit solution to heat on a graph
 $$
@@ -40,6 +188,37 @@ $$
 $$
 (which corresponds to Dirichlet conditions.) Hint: use Problem 1.2 to diagonalise the problem.
 
+**SOLUTION**
+
+
+We have,
+\begin{align*}
+\mathbf{u}_t &= \Delta \mathbf{u} \\	
+&= 2(X_n - I),
+\end{align*}
+with $X_n$ defined as above. Observe, for $Q_n'$ and $D_n$ defined as above
+\begin{align*}
+	2(X_n - I) &= 2(Q_n'DQ_n'^{-1} - I) \\
+	&=Q_n' (2(D - I))Q_n'^{-1} \\
+	&= Q_n' \left[\begin{matrix}
+2\left(\cos\left(\frac{\pi}{n+1}\right) - 1\right) \\
+&2\left(\cos\left(\frac{2\pi}{n+1}\right) - 1\right) \\
+&&\ddots \\
+&&&2\left(\cos\left(\frac{n\pi}{n+1}\right) - 1\right)Q_n'^{-1}
+\end{matrix}
+ \right]
+\end{align*}
+We then have, from vector differential equation theory, that,
+$$
+\mathbf{u}(t) = Q_n'^{-1}\left[\begin{matrix}
+	c_1 e^{2\left(\cos(\frac{\pi}{n+1}) - 1\right)t} \\
+	c_2 e^{2\left(\cos(\frac{2\pi}{n+1}) - 1\right)t} \\
+	\vdots \\
+	c_ne^{2\left(\cos(\frac{n\pi}{n+1}) - 1\right)t}
+\end{matrix}\right]
+$$
+
+**END**
 
 
 ## 2. Interpolatory quadrature
@@ -48,17 +227,158 @@ $$
 **Problem 2.1 (C)** Compute the interpolatory quadrature rule for
 $w(x) = \sqrt{1-x^2}$ with the points $[-1,1/2,1]$.
 
+**SOLUTION**
+
+For the points $\mathbf{x} = \{-1, 1/2, 1\}$ we have the Lagrange polynomials:
+$$
+\ell_1(x) = \left(\frac{x - 1/2}{-1 - 1/2}\right)\cdot\left(\frac{x - 1}{-1 - 1}\right) = \frac{1}{3}\left(x^2 - \frac{3}{2}x + \frac{1}{2}\right),
+$$
+and
+$$
+\ell_2(x) = -\frac{4}{3}x^2 + \frac{4}{3}, \ell_3(x) =x^2 + \frac{1}{2}x - \frac{1}{2},
+$$
+similarly. We can then compute the weights,
+$$
+w_j = \int_{-1}^1 l_j(x)w(x)dx,
+$$
+using,
+$$
+\int_{-1}^1 x^k \sqrt{1-x^2}dx = \begin{cases}
+ \frac{\pi}{2} &	k=0 \\
+ 0 & k=1 \\
+\frac{\pi}{8} & k=2
+ \end{cases}
+$$
+to find,
+$$
+w_j = \begin{cases}
+ 	\frac{\pi}{8} & j = 1 \\
+ 	\frac{\pi}{2} & j = 2 \\
+ 	-\frac{\pi}{8} & j = 3,
+ \end{cases}
+$$
+so that the interpolatory quadrature rule is:
+$$
+\Sigma_3^{w,\mathbf{x}}(f) = \frac{\pi}{6}\left(\frac{1}{4}f(-1) + f(1/2) -\frac{1}{4}f(1) \right)
+$$
+
+**END**
 
 **Problem 2.2 (C)** Compute the 2-point 
 interpolatory quadrature rule associated with roots of orthogonal polynomials for the weights $\sqrt{1-x^2}$, $1$, 
 and $1-x$ on $[-1,1]$ by integrating the Lagrange bases.
 
+**SOLUTION**
+For $w(x) = \sqrt{1-x}^2$ the orthogonal polynomial of degree 2 is $U_2(x) = 4x^2 -1$, with roots $\mathbf{x} = \{x = \pm \frac{1}{2}\}$. The Lagrange polynomials corresponding to these roots are,
+\begin{align*}
+\ell_1(x) &= \frac{x - 1/2}{-1/2 - 1/2} = \frac{1}{2} - x, \\
+\ell_2(x) &= \frac{x + 1/2}{1/2 + 1/2} = x + \frac{1}{2}
+\end{align*}
+We again work out the weights
+$$
+w_j = \int_{-1}^1 l_j(x)w(x)dx,
+$$
+to find,
+$$
+w_1 = w_2 = {\pi \over 4},
+$$
+and thus the interpolatory quadrature rule is,
+$$
+\Sigma_2^{w,\mathbf{x}}(f) = \frac{\pi}{8}(f(-1/2) + f(1/2)).
+$$
 
+For $w(x) = 1$, the orthogonal polynomial of degree 2 is, using Legendre Rodriguez formula:
+$$
+P_2(x) = \frac{1}{(-2)^22!} \frac{d^2}{dx^2}\left(1 - x^2\right)^2 = -\frac{1}{2} + \frac{3}{2}x^2.
+$$
+This has roots $\mathbf{x} = \left\{\pm \frac{1}{\sqrt{3}}\right\}$. We then have,
+\begin{align*}
+	\ell_1(x) &= -\frac{\sqrt{3}}{2}x + \frac{1}{2} \\
+	\ell_2(x) &= \frac{3}{2}x + \frac{1}{2},
+\end{align*}
+from which we can compute the weights,
+$$
+w_1 = w_2 = 1,
+$$
+which give the quadrature rule:
+$$
+\Sigma_2^{w,\mathbf{x}}(f) = \frac{1}{2} \left[f\left(-\frac{1}{\sqrt{3}}\right) + f\left(\frac{1}{\sqrt{3}}\right)\right]
+$$
+
+Finally, with $w(x) = 1 - x$, the orthogonal polynomial of degree 2 is, using a more general version of Rodriguez formula or otherwise,
+\begin{align*}
+P_2(x) &= \frac{1}{(-2)^22!}(1-x)^{-1} \frac{d^2}{dx^2}\left[(1-x)(1-x^2)^2\right]	\\
+&= \frac{5}{2}x^2 + x - \frac{1}{2},
+\end{align*}
+which has roots, $\mathbf{x} = \left\{-\frac{1}{5} \pm \frac{\sqrt{6}}{5} \right\}$. The Legendre polynomials are then,
+\begin{align*}
+	\ell_1(x) &= \frac{x - (-\frac{1}{5} + \frac{\sqrt{6}}{5} )}{-\frac{1}{5} - \frac{\sqrt{6}}{5} - (-\frac{1}{5} + \frac{\sqrt{6}}{5}) } \\
+	&= \frac{x - (-\frac{1}{5} + \frac{\sqrt{6}}{5} )}{-\frac{2\sqrt{6}}{5}} \\
+	&=-\frac{5}{2\sqrt{6}}x - \frac{1}{2\sqrt{6}} + \frac{1}{2} \\
+	\ell_2(x) &= \frac{x - (-\frac{1}{5} - \frac{\sqrt{6}}{5} )}{\frac{2\sqrt{6}}{5}} \\
+	&= \frac{5}{2\sqrt{6}}x + \frac{1}{2\sqrt{6}} + \frac{1}{2}
+\end{align*}
+From which we can compute the weights,
+\begin{align*}
+	w_1 &= 1 + \frac{\sqrt{6}}{9}, \\
+	w_2 &= 1 - \frac{\sqrt{6}}{9},
+\end{align*}
+giving the quadrature rule,
+$$
+\Sigma_2^{w,\mathbf{x}}(f) = \frac{1}{2}\left[\left(1 + \frac{\sqrt{6}}{9} \right)f\left(-\frac{1}{5} - \frac{\sqrt{6}}{5} \right) + \left(1 - \frac{\sqrt{6}}{9} \right)f\left(-\frac{1}{5} + \frac{\sqrt{6}}{5} \right) \right]
+$$
+**END**
 
 ## 3. Gaussian quadrature
 
 
 **Problem 3.1 (C)** Compute the 2-point and 3-point Gaussian quadrature rules associated with $w(x) = 1$ on $[-1,1]$. 
+
+**SOLUTION**
+
+For the weights $w(x) = 1$, the orthogonal polynomials of degree $\leq 3$ are the Legendre polynomials,
+\begin{align*}
+	q_0(x) = 1, \\
+	q_1(x) = x, \\
+	q_2(x) = \frac{1}{2}(3x^2  - 1), \\
+	q_3(x) = \frac{1}{2}(5x^3 - 3x).
+\end{align*}
+We can normalise each to get $q'_j(x) = q_j(x)/||q_j||$, with $||q_j||^2 = \int_{-1}^1 q_j^2 dx$. This gives,
+\begin{align*}
+	q'_0(x) = \frac{1}{\sqrt{2}}, \\
+	q'_1(x) = \sqrt{\frac{3}{2}}x, \\
+	q'_2(x) = \sqrt{\frac{5}{8}}(3x^2  - 1), \\
+	q'_3(x) = \sqrt{\frac{7}{8}}(5x^3 - 3x).
+\end{align*}
+For the first part we use the roots of $q_2(x)$ which are $\mathbf{x} = \left\{\pm \frac{1}{\sqrt{3}}\right\}$. The weights are,
+$$
+w_j = \frac{1}{\alpha_j^2} = \frac{1}{q'_0(x_j)^2 + q'_1(x_j)^2} = \frac{1}{\frac{1}{2}+\frac{3}{2}x_j^2},
+$$
+so that,
+$$
+w_1 = w_2 = 1,
+$$
+and the Gaussian Quadrature rule is,
+$$
+\Sigma_2^w[f] = f\left(-\frac{1}{\sqrt{3}}\right) + f\left(\frac{1}{\sqrt{3}}\right)
+$$
+For the second part, we use the roots of $q_3(x)$ which are $\mathbf{x} = \left\{0, \pm \sqrt{\frac{3}{5}} \right\}$. The weights are then,
+$$
+w_j = \frac{1}{\alpha_j^2} = \frac{1}{q'_0(x_j)^2 + q'_1(x_j)^2 + q'_2(x_j)^2} = \frac{1}{\frac{9}{8} -\frac{9}{4}x_j^2 + \frac{45}{8}x_j^4 }
+$$
+Giving us,
+$$
+\begin{align*}
+	w_1 = w_3 = \frac{1}{\frac{9}{8} - \frac{9}{4}\frac{3}{5} + \frac{45}{8}\frac{9}{25}} &= \frac{5}{9} \\
+	w_2 &= \frac{8}{9}
+\end{align*}
+$$
+Then the Gaussian Quadrature rule is,
+$$
+\Sigma_3^w[f] = \frac{1}{9} \left[5f\left(-\sqrt\frac{3}{5}\right) +8f(0) + 5f\left(\sqrt\frac{3}{5}\right) \right]
+$$
+
+**END**
 
 **Problem 3.2 (A)** Show for $w(x) = 1/\sqrt{1-x^2}$ that the Gaussian quadrature rule is
 $$
@@ -66,5 +386,64 @@ $$
 $$
 where $x_j = (j-1/2)π/n$ for all $n$.
 
+**SOLUTION**
+
+For $w(x) = \frac{1}{\sqrt{1-x^2}}$, the orthogonal polynomials are the Chebyshev polynomials $T_n(x) = \cos(n\arccos(x))$. To make them orthonormal, we have,
+\begin{align*}
+	T'_0(x) &= \frac{1}{\sqrt{\pi}}, \\
+	T'_n(x) &= \frac{2}{\pi}\cos(n\arccos(x)), \hspace{5mm} (n > 0)
+\end{align*}
+We have,
+\begin{align*}
+	T'_n(x) = 0 &\Leftrightarrow \cos(n\arccos(x)) = 0 \\
+	&\Leftrightarrow n\arccos(x) = j\pi - \frac{\pi}{2}, \hspace{5mm} (j \in \mathbb{Z}) \\
+	&\Leftrightarrow x = \cos\left(\frac{(j-\frac{1}{2})\pi}{n} \right), \hspace{5mm} (j \in \mathbb{Z}),
+\end{align*}
+which has unique solutions $\left\{x_j = \cos\left(\frac{(j-\frac{1}{2})\pi}{n} \right) : j = 1, \dots, n\right\}$. We then have,
+$$
+w_j = \frac{1}{\alpha_j^2} = \frac{1}{T'_0(x_j)^2 + T'_1(x_j)^2 + \dots T'_{n-1}(x_j)^2}
+$$
+Consider, writing $\theta_j = \frac{(j-\frac{1}{2})\pi}{n} $
+\begin{align*}
+	\alpha_j^2 &= \sum_{k=0}^{n-1}T'_k(x_j)^2 \\
+	&= \frac{1}{\pi} + \frac{2}{\pi}\sum_{k=1}^{n-1}\cos^2(k\theta_j) \\
+	&= \frac{1}{\pi} + \frac{1}{2\pi}\sum_{k=1}^{n-1}(e^{ik\theta_j} + e^{-ik\theta_j})^2 \\
+	&= \frac{1}{\pi} + \frac{1}{2\pi} \sum_{k=1}^{n-1}( e^{2ik\theta_j} + e^{-2ik\theta_j} + 2) \\
+	&= \frac{n}{\pi} + \frac{1}{2\pi} \sum_{k=1}^{n-1}(e^{2ik\theta_j} + e^{-2ik\theta_j})
+\end{align*}
+Using a geometric sum (in essentially the same way as the solution of Problem 1.2 in Problem Sheet 8) we can show that the second term is 0 and thus $w_j = \frac{1}{\alpha_j^2} = \frac{\pi}{n}$.
+
+**END**
+
 **Problem 3.3 (B)** Solve Problem 1.2 from PS8 using **Lemma (discrete orthogonality)** with
 $w(x) = 1/\sqrt{1-x^2}$ on $[-1,1]$.
+
+**SOLUTION**
+
+
+By the Lemma (Discrete Orthogonality), we have,
+\begin{align*}
+	\Sigma_{n}^w[q_lq_m] = \frac{\pi}{n}\sum_{j=1}^n q_l(x_j)q_m(x_j) = \delta_{lm}, \\
+	\sum_{j=1}^n q_l(x_j)q_m(x_j) = \frac{n}{\pi}\delta_{lm},
+\end{align*}
+By the previous question, for the weight $w(x) = \frac{1}{\sqrt{1-x^2}}$ we have $q_0(x_j) = \frac{1}{\sqrt{\pi}}$, $q_k(x_j) = \sqrt{\frac{2}{\pi}}\cos(k\theta_j).$
+For $l = m = 0$ then we have,
+\begin{align*}
+	\frac{1}{\pi}\sum_{j=1}^n \cos(l\theta_j)\cos(m\theta_j) =\sum_{j=1}^nq_l(x_j)q_m(x_j) =  \frac{n}{\pi}\delta_{lm} = \frac{n}{\pi} \\
+	\Rightarrow \frac{1}{n}\sum_{j=1}^n \cos(l\theta_j)\cos(m\theta_j) = 1\
+\end{align*}
+Now, for $l = m \neq 0$, we have,
+\begin{align*}
+	\frac{2}{\pi}\sum_{j=1}^n \cos(l\theta_j)\cos(m\theta_j) =\sum_{j=1}^nq_l(x_j)q_m(x_j) =  \frac{n}{\pi}\delta_{lm} = \frac{n}{\pi} \\
+	\Rightarrow \frac{1}{n}\sum_{j=1}^n \cos(l\theta_j)\cos(m\theta_j) = \frac{1}{2}\
+\end{align*}
+Finally, for $l \neq m$, we have,
+$$
+C_{lm}\sum_{j=1}^n\cos(l\theta_j)\cos(m\theta_j) = \sum_{j=1}^nq_l(x_j )q_m(x_j) = \frac{n}{\pi}\delta_{lm} = 0,
+$$
+for some constant $C_{lm} \neq 0$ which is $\frac{1}{\pi}$ if $l = 0$ or $m = 0$ and $\frac{2}{\pi}$ otherwise (it doesn't matter what it is so long as it is not 0). Therefore, for $l \neq m$ we have,
+$$
+\frac{1}{n}\sum_{j=1}^n \cos(l\theta_j)\cos(m\theta_j) = 0
+$$
+
+**END**
