@@ -125,11 +125,10 @@ that also interpolates $f$.
 **Example** We can interpolate $\exp(x)$ at the points $0,1,2$:
 $$
 \begin{align*}
-p(x) &= ℓ_1(x) + {\rm e} ℓ_2(x) + {\rm e}^2 ℓ_3(x) = 
-{(x - 1) (x-2) \over (-1)(-2)} + {\rm e} {x (x-2) \over (-1)} + 
+p(x) &= ℓ_1(x) + {\rm e} ℓ_2(x) + {\rm e}^2 ℓ_3(x) =
+{(x - 1) (x-2) \over (-1)(-2)} + {\rm e} {x (x-2) \over (-1)} +
 {\rm e}^2 {x (x-1) \over 2} \\
-&= (1/2 - {\rm e} +{\rm e}^2/2)x^2
-+  (-3/2 + 2 {\rm e}  - {\rm e}^2 /2)  x + 1
+&= (1/2 - {\rm e} +{\rm e}^2/2)x^2 + (-3/2 + 2 {\rm e}  - {\rm e}^2 /2) x + 1
 \end{align*}
 $$
 

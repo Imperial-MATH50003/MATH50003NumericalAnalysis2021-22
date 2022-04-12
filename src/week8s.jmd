@@ -269,7 +269,8 @@ $$
 A very similar chain of arguments can be made for $Q_{2n}$ but we can also infer it directly from the above, since $(Q_{2n}^⋆)^⋆ = Q_{2n}$, we find that
 
 $$
-Q_{2n} = \left({1 \over \sqrt{2}}P_σ^⊤ \begin{bmatrix} Q_n^⋆ \\ &Q_n^⋆ \end{bmatrix} \begin{bmatrix} I_n & I_n \\ D_n & -D_n \end{bmatrix}\right)^⋆ = {1 \over \sqrt{2}} \begin{bmatrix} I_n & D_n \\ I_n & -D_n \end{bmatrix} \begin{bmatrix} Q_n \\ &Q_n \end{bmatrix}  P_σ
+Q_{2n} = \left({1 \over \sqrt{2}}P_σ^⊤ \begin{bmatrix} Q_n^⋆ \\ &Q_n^⋆ \end{bmatrix} \begin{bmatrix} I_n & I_n \\ D_n & -D_n \end{bmatrix}\right)^⋆ 
+= {1 \over \sqrt{2}} \begin{bmatrix} I_n & D̄_n \\ I_n & -D̄_n \end{bmatrix} \begin{bmatrix} Q_n \\ &Q_n \end{bmatrix}  P_σ
 $$
 
 **END**
