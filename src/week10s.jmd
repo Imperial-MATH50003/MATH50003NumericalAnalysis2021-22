@@ -259,7 +259,7 @@ w_j = \begin{cases}
 $$
 so that the interpolatory quadrature rule is:
 $$
-\Sigma_3^{w,\mathbf{x}}(f) = \frac{\pi}{6}\left(\frac{1}{4}f(-1) + f(1/2) -\frac{1}{4}f(1) \right)
+\Sigma_3^{w,\mathbf{x}}(f) = \frac{\pi}{2}\left(\frac{1}{4}f(-1) + f(1/2) -\frac{1}{4}f(1) \right)
 $$
 
 **END**
