@@ -433,10 +433,16 @@ Since $k_0^{(2)}=0$, we have $2^{-n}k_n^{(2)}=-\frac{1+\cdots+(n-1)}{2}=-\frac{n
 Our goal is to find $a_n$, $b_n$ and $c_n$ such that
 $$xH_n(x)=c_{n-1}H_{n-1}(x)+a_nH_n(x)+b_nH_{n+1}(x).$$
 Compare the 3 leading coefficients on both sides and use the results from Problem 3.1 and Problem 3.2:
-$$2^n=0+0+b_n2^{n+1}$$
-$$0=0+a_n2^n+0$$
-$$n(n-1)2^{n-2}=c_{n-1}2^{n-1}+0+b_n(n+1)n2^{n-1}$$
-Thus we have $b_n=1/2$, $a_n=0$ and $c_{n-1}=-n$.
+$$
+2^n=0+0+b_n2^{n+1}
+$$
+$$
+0=0+a_n2^n+0
+$$
+$$
+n(n-1)2^{n-2}=c_{n-1}2^{n-1}+0+b_n(n+1)n2^{n-1}
+$$
+Thus we have $b_n=1/2$, $a_n=0$ and $c_{n-1}=n$.
 
 
 
