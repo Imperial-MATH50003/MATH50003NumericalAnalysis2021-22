@@ -23,156 +23,123 @@ We know that for monic ($b_n=1$) orthogonal polynomials we can write the upper 3
 
 $$X = \begin{bmatrix} a_0 & c_0 & 0 \\ 1 & a_1 & c_1 \\ 0 & 1 & a_2 \end{bmatrix}$$
 
-Note that for non-orthonormal polynomials the Jacobi matrix is technically the tranpose, i.e. $X^T$.
 
 1. $w(x) = 1-x$
 
-Take $p_0(x) = k_0 = 1$ (monic), then $p_1(x) = x + k_1^{(0)}$
-
-For the recurrence formula
-
-$$xp_0(x) = a_0p_0(x) + p_1(x)$$
-
-i.e. $x = a_0 + x + k_1^{(0)}$, that gives $k_1^{(0)}=-a_0$
-
-and for orthogonality, using recurrence formula and multiplying it by $p_0$ (inner product), we have
-
-$$a_0= \frac{\langle p_0, xp_0\rangle}{\|p_0\|^2}= \frac{\int_{-1}^1 x(1-x) dx}{2}=-\frac{1}{3}$$
-
-and $k_1^{(0)}=\frac{1}{3}$
-
-For $p_2(x) = x^2 + k_2^{(1)}x+k_2^{(0)}$ we obtain
-
-$$xp_1(x)= c_0p_0(x)+a_1p_1(x)+p_2(x)$$
-
-i.e. $x^2 +\frac{1}{3}x= c_0 + a_1x+ \frac{1}{3}a_1 + x^2 + k_2^{(1)}x+k_2^{(0)}$, that gives $a_1+k_2^{(1)} = \frac{1}{3}$ and $c_0+\frac{1}{3}a_1+k_2^{(0)}=0$
-
-As before we then find
-
-$$c_0=\frac{\langle p_0, xp_1\rangle}{\|p_0\|^2} = \frac{\int_{-1}^1 (x+\frac{1}{3}) x(1-x) dx}{2}= \frac{2}{9}$$
-
+Take $p_0(x) = 1$ (monic) and note
+$$
+\| p_0 \|^2 = \int_{-1}^1 (1-x) {\rm d}x = 2
+$$
+From
+$$
+xp_0(x) = a_0p_0(x) + p_1(x)
+$$
+we deduce
+$$
+a_0 = ⟨x p_0, p_0⟩/\|p_0\|^2 =  {\int_{-1}^1 (1-x) x {\rm d}x \over 2} =  -{1 \over 3}
+$$
+i.e.
+$$
+p_1(x) = (x-a_0) p_0(x) = x + 1/3.
+$$
+and note that
+$$
+\|p_1\|^2 = \int_{-1}^1 (1-x) (x+1/3)^2 {\rm d} x = 4/9.
+$$
+From
+$$
+xp_1(x) = c_0 p_0(x) + a_1 p_1(x) + p_2(x)
+$$
+we deduce
+$$
+c_0 = ⟨x p_1, p_0⟩/\|p_0\|^2 =  {\int_{-1}^1 (1-x) x (x+1/3) {\rm d}x \over 2} =  {2 \over 9}
+$$
 and
-
-$$a_1 = \frac{\langle p_1, xp_1\rangle}{\|p_1\|^2} = \frac{\int_{-1}^1 (x+\frac{1}{3})^2 x(1-x) dx}{\int_{-1}^1 (x+\frac{1}{3})^2 (1-x) dx}= -\frac{1}{15}$$
-
-Thus, $k_2^{(0)}= -\frac{1}{5}$ and $k_2^{(1)}=\frac{2}{5}$.
-
-Now
-
-$$xp_2(x)= c_1p_1(x)+a_2p_2(x)+p_3(x)$$
-
+$$
+a_1 = ⟨x p_1, p_1⟩/\|p_1\|^2 =  {9 \over 4} {\int_{-1}^1 (1-x) x (x+1/3)^2 {\rm d}x} =  -{1 \over 15}
+$$
+Thus
+$$
+p_2(x) = (x - a_1) p_1(x) - c_0 p_0(x) = (x+1/15) (x+1/3) - 2/9 = x^2 + 2x/5 -1/5.
+$$
 And once again as before:
-
-$$c_1=\frac{\langle p_1, xp_2\rangle}{\|p_1\|^2}= \frac{\int_{-1}^1 (x+\frac{1}{3})(x^2+\frac{1}{9}x- \frac{1}{5}) x(1-x) dx}{\int_{-1}^1 (x+\frac{1}{3})^2 (1-x) dx}= \frac{16}{45}$$
-
+$$
+c_1=\frac{\langle p_1, xp_2\rangle}{\|p_1\|^2}= \frac{\int_{-1}^1 (x+\frac{1}{3})(x^2+\frac{1}{9}x- \frac{1}{5}) x(1-x) dx}{\int_{-1}^1 (x+\frac{1}{3})^2 (1-x) dx}= \frac{16}{45}$$
 and
-
-$$a_2 = \frac{\langle p_2, xp_2\rangle}{\|p_2\|^2} = \frac{\int_{-1}^1 (x^2+\frac{1}{9}x- \frac{1}{5})^2 x(1-x) dx}{\int_{-1}^1 (x^2+\frac{1}{9}x- \frac{1}{5})^2 (1-x) dx}= \frac{2085}{3451}$$
+$$
+a_2 = \frac{\langle p_2, xp_2\rangle}{\|p_2\|^2} = \frac{\int_{-1}^1 (x^2+\frac{1}{9}x- \frac{1}{5})^2 x(1-x) dx}{\int_{-1}^1 (x^2+\frac{1}{9}x- \frac{1}{5})^2 (1-x) dx}= \frac{2085}{3451}
+$$
 
 
 2. $w(x)=\sqrt{1-x^2}$
 
-Take $p_0(x) = k_0 = 1$ (monic), then $p_1(x) = x + k_1^{(0)}$
-
-From the recurrence we have
-
-$$xp_0(x) = a_0p_0(x) + p_1(x)$$
-
-i.e. $x = a_0 + x + k_1^{(0)}$, which gives $k_1^{(0)}=-a_0$.
-
-We then proceed as before to obtain
-
-$$a_0= \frac{\langle p_0, xp_0\rangle}{\|p_0\|^2}= \frac{\int_{-1}^1 x\sqrt{1-x^2} dx}{\pi/2}=0$$
-
-and $k_1^{(0)}=0$
-
-Likewise for $p_2(x) = x^2 + k_2^{(1)}x+k_2^{(0)}$:
-
-$$xp_1(x)= c_0p_0(x)+a_1p_1(x)+p_2(x)$$
-
-i.e. $x^2 = c_0 + a_1x + x^2 + k_2^{(1)}x+k_2^{(0)}$, which gives $a_1+k_2^{(1)} = 0$ and $c_0+k_2^{(0)}=0$
-
-Proceeding as before once again we obtain:
-
-$$c_0=\frac{\langle p_0, xp_1\rangle}{\|p_0\|^2} \frac{\int_{-1}^1 x^2\sqrt{1-x^2} dx}{\pi/2}=\frac{\pi/8}{\pi/2}= \frac{1}{4}$$
-
-and
-
-$$a_1 = \frac{\langle p_1, xp_1\rangle}{\|p_1\|^2} = \frac{\int_{-1}^1 x^3\sqrt{1-x^2} dx}{\int_{-1}^1 x^2 \sqrt{1-x^2} dx}= 0$$
-
-Thus, $k_2^{(0)}= -\frac{1}{4}$ and $k_2^{(1)}=0$.
-
+Take $p_0(x) = k_0 = 1$ (monic) so that
+$$
+\|p_0\|^2 = \int_{-1}^1 \sqrt{1-x^2} = {π \over 2}.
+$$
+From PS8, Problem 3.4 we know that $a_k = 0$. Thus
+from the recurrence we have
+$$
+xp_0(x) =  p_1(x)
+$$
+and hence
+$$
+p_1(x) = x p_0(x) = x.
+$$
+Likewise for
+$$
+xp_1(x)= c_0p_0(x)+p_2(x)
+$$
+we have
+$$
+c_0=\frac{\langle p_0, xp_1\rangle}{\|p_0\|^2} \frac{\int_{-1}^1 x^2\sqrt{1-x^2} dx}{\pi/2}=\frac{\pi/8}{\pi/2}= \frac{1}{4}
+$$
+i.e.
+$$
+p_2(x) = xp_1(x) - c_0 = x^2 - {1 \over 4}.
+$$
 Finally:
-
-$$xp_2(x)= c_1p_1(x)+a_2p_2(x)+p_3(x)$$
-
+$$
+xp_2(x)= c_1p_1(x)p_3(x)
+$$
 and thus
-
-$$c_1=\frac{\langle p_1, xp_2\rangle}{\|p_1\|^2}= \frac{\int_{-1}^1 (x^2- \frac{1}{4}) x^2\sqrt{1-x^2} dx}{\int_{-1}^1 x^2 \sqrt{1-x^2} dx}= \frac{\pi/32}{\pi/8}=\frac{1}{4}$$
-
-and
-
-$$a_2 = \frac{\langle p_2, xp_2\rangle}{\|p_2\|^2} = \frac{\int_{-1}^1 (x^2- \frac{1}{4})^2 x\sqrt{1-x^2} dx}{\int_{-1}^1 (x^2- \frac{1}{4})^2 \sqrt{1-x^2} dx}= 0$$.
-
-
+$$
+c_1=\frac{\langle p_1, xp_2\rangle}{\|p_1\|^2}= \frac{\int_{-1}^1 (x^2- \frac{1}{4}) x^2\sqrt{1-x^2} dx}{\int_{-1}^1 x^2 \sqrt{1-x^2} dx}= \frac{\pi/32}{\pi/8}=\frac{1}{4}
+$$
 
 
 3. $w(x)=1-x^2$
 
-Take $p_0(x) = k_0 = 1$ (monic), then $p_1(x) = x + k_1^{(0)}$
-
-From recurrence we have
-
-$$xp_0(x) = a_0p_0(x) + p_1(x)$$
-
-i.e. $x = a_0 + x + k_1^{(0)}$, which gives $k_1^{(0)}=-a_0$
-
-The rest works as before:
-
-$$a_0= \frac{\langle p_0, xp_0\rangle}{\|p_0\|^2}= \frac{\int_{-1}^1 x(1-x^2) dx}{4/3}=0$$
-
-and $k_1^{(0)}=0$
-
+Take $p_0(x) = k_0 = 1$ (monic). Again due to $w(x) = w(-x)$
+from recurrence we have
+$$
+xp_0(x) = p_1(x)
+$$
 Then from
-
-$$xp_1(x)= c_0p_0(x)+a_1p_1(x)+p_2(x)$$
-
-i.e. $x^2 = c_0 + a_1x + x^2 + k_2^{(1)}x+k_2^{(0)}$, which gives $a_1+k_2^{(1)} = 0$ and $c_0+k_2^{(0)}=0$
-
+$$xp_1(x)= c_0p_0(x)+p_2(x)$$
 we find
-
 $$c_0=\frac{\langle p_0, xp_1\rangle}{\|p_0\|^2} \frac{\int_{-1}^1 x^2(1-x^2) dx}{4/15}=\frac{4/15}{4/3}= \frac{1}{5}$$
-
-and
-
-$$a_1 = \frac{\langle p_1, xp_1\rangle}{\|p_1\|^2} = \frac{\int_{-1}^1 x^3(1-x^2) dx}{\int_{-1}^1 x^2 (1-x^2) dx}= 0$$
-
-i.e. $k_2^{(0)}= -\frac{1}{5}$ and $k_2^{(1)}=0$.
-
 Finally,
-
-$$xp_2(x)= c_1p_1(x)+a_2p_2(x)+p_3(x)$$
-
+$$xp_2(x)= c_1p_1(x)+p_3(x)$$
 and thus
-
 $$c_1=\frac{\langle p_1, xp_2\rangle}{\|p_1\|^2}= \frac{\int_{-1}^1 (x^2- \frac{1}{5}) x^2(1-x^2) dx}{\int_{-1}^1 x^2 (1-x^2) dx}= \frac{32/525}{4/15}=\frac{8}{35}$$
-
-and
-
-$$a_2 = \frac{\langle p_2, xp_2\rangle}{\|p_2\|^2} = \frac{\int_{-1}^1 (x^2- \frac{1}{4})^2 x(1-x^2) dx}{\int_{-1}^1 (x^2- \frac{1}{4})^2 (1-x^2) dx}= 0$$
-
 
 
 
 
 ##### Orthonormal
 
-We know that for orthonormal ($b_n=c_n$) polynomials we can write the upper 3x3 block of the Jacobi matrix in the form
+We know that for orthonormal ($b_n=c_n$) polynomials we can write the upper 3x3 block of the Jacobi matrix in the
+form
 
 $$X = \begin{bmatrix} a_0 & b_0 & 0 \\ b_0 & a_1 & b_1 \\ 0 & b_1 & a_2 \end{bmatrix}$$
 
-We could proceed step by step as above to find the entries of the recurrences but we may also take a short-cut since we already know the monic recurrence. Given any recurrence relationship coefficients $a_n, b_n, c_n$ for orthogonal polynomials for a given weight, the(symmetric) Jacobi matrix corresponding to the orthonormal polynomials for the same weight has entries $\hat
-{b}_n = \sqrt{c_n b_n}$ and $\hat{a} _n = a_n$. Using this the $3 \times 3$ blocks of the Jacobi matrices belonging to the orthonormal polynomials are straightforwardly computed from the above.
+We could proceed step by step as above to find the entries of the recurrences but we may also
+take a short-cut since we already know the monic recurrence. Given any recurrence relationship
+coefficients $a_n, b_n, c_n$ for orthogonal polynomials for a given weight, the(symmetric)
+Jacobi matrix corresponding to the orthonormal polynomials for the same weight has entries $\hat
+{b}_n = \sqrt{c_n b_n}$ and $\hat{a} _n = a_n$. Using this the $3 \times 3$ blocks of the
+Jacobi matrices belonging to the orthonormal polynomials are straightforwardly computed from the above.
 
 **Problem 1.2 (B)** Consider the _truncated Jacobi matrix_ associated
 with orthonormal polynomials $q_n(x)$:
