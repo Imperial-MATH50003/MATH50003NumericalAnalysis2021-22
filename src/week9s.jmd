@@ -424,7 +424,7 @@ $$k_n^{(2)}=2k_{n-1}^{(2)}-(n-1)2^{n-1}$$
 
 Since $k_0^{(1)}=0$, we have $k_n^{(1)}=0$. For the second recurrence, divide both sides by $2^n$:
 $$2^{-n}k_n^{(2)}=2^{-(n-1)}k_{n-1}^{(2)}-\frac{n-1}{2}$$
-Since $k_0^{(2)}=0$, we have $2^{-n}k_n^{(2)}=-\frac{1+\cdots+(n-1)}{2}=-\frac{n(n-1)}{4}$, so $k_n^{(2)}=n(n-1)2^{n-2}$.
+Since $k_0^{(2)}=0$, we have $2^{-n}k_n^{(2)}=-\frac{1+\cdots+(n-1)}{2}=-\frac{n(n-1)}{4}$, so $k_n^{(2)}=-n(n-1)2^{n-2}$.
 
 **Problem 3.3 (B)** Deduce the 3-term recurrence relationship for $H_n(x)$.
 
