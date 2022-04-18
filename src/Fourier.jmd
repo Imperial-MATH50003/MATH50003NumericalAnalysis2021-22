@@ -175,7 +175,7 @@ $$
 **Proof**
 $$
 \begin{align*}
-f̂_k^n &= Σ_n[f(θ) {\rm e}^{-i k θ}] = ∑_{j=-∞}^∞ f̂_j Σ_n[f(θ) {\rm e}^{i (j-k) θ}] \\
+f̂_k^n &= Σ_n[f(θ) {\rm e}^{-i k θ}] = ∑_{j=-∞}^∞ f̂_j Σ_n[{\rm e}^{i (j-k) θ}] \\
 &= ∑_{j=-∞}^∞ f̂_j \begin{cases} 1 & j-k = \ldots,-2n,-n,0,n,2n,\ldots  \cr
 0 & \hbox{otherwise}
 \end{cases}
