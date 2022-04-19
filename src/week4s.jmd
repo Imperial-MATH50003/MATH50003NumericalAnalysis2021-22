@@ -53,7 +53,8 @@ Make sure to include the case of more columns than rows.
 
 **SOLUTION**
 
-Beginning with the square case, a square matrix $A=QR$ with square orthogonal $Q$ and square upper triangular $R$ can always be rewritten in the form $A=QD^{-1}DR$ where $D$ is a diagonal matrix with $sign(R[j,j])$ on the diagonal. As a result, $DR$ is an upper triangular matrix with positive diagonal. It remains to check that $QD^{-1}=-QD$ is still orthogonal - this is easy to check since $$-QD(-QD)^T = QDDQ^T = QQ^T = I.$$
+Beginning with the square case, a square matrix $A=QR$ with square orthogonal $Q$ and square upper triangular $R$ can always be rewritten in the form $A=QD^{-1}DR$ where $D$ is a diagonal matrix with $sign(R[j,j])$ on the diagonal. As a result, $DR$ is an upper triangular matrix with positive diagonal. 
+It remains to check that $QD^{-1}=QD$ is still orthogonal - this is easy to check since $$QD(QD)^T = QDDQ^T = QQ^T = I.$$
 Note we have made use of the fact that the inverse of a diagonal matrix is diagonal, that any diagonal matrix satisfies $D^{T} = D$ and that $DD=I$ since $\text{sign}(R[j,j])^2 = 1$.
 
 The same argument works for the non-square cases as long as we take care to consider the appropriate dimensions and pad with the identity matrix. Note that $Q$ is always a square matrix in the $QR$ decomposition. Assume the $R$ factor has more columns $m$ than rows $n$. Then a square $n \times n$ diagonal matrix with its $n$ diagonal entries being $\text{sign}(R[j,j]), j=1..n$ works with the same argument as above.
