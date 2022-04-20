@@ -210,46 +210,65 @@ $L_n$ is lower triangular and $U_n$ is upper triangular.
 
 **SOLUTION**
 
-We first prove that $L_n$ is lower bidiagonal by induction. Let $A$ be a tridiagonal SPD matrix:
+Consider the first step of the Cholesky decomposition:
+$$
+Δ_n = \begin{bmatrix} 2 & -𝐞_1^⊤ \\
+                    -𝐞_1 & Δ_{n-1} \end{bmatrix} = 
+                    \underbrace{\begin{bmatrix} \sqrt{2} \\
+                                    {-𝐞_1 \over \sqrt{2}} & I
+                                        \end{bmatrix}}_{L_1}
+                    \begin{bmatrix}1 \\ & Δ_{n-1} - {𝐞_1 𝐞_1^⊤ \over 2} \end{bmatrix}
+                    \underbrace{\begin{bmatrix} \sqrt{2} & {-𝐞_1^⊤ \over \sqrt{2}} \\
+                                                            & I
+                                        \end{bmatrix}}_{L_1^⊤}
+$$
+The bottom right is merely $Δ_{n-1}$ but with a different $(1,1)$ entry! This hints at a strategy
+of proving by induction. 
 
-$$A=\left[\begin{array}{c|ccc}
-\alpha & \beta & 0 & \cdots \\\hline
-\beta  &       &   &        \\
-0      &       & K &        \\
-\vdots &       &   &        \\
-\end{array}\right]$$
-where $K$ is again tridiagonal. Denote the Cholesky decomposition of $A$ by $A=LL^\top$. Recalling the proof of the *Theorem (Cholesky & SPD)* from the lecture, we can write
+Assuming $α > 0$ write
+$$
+K_n^α := \begin{bmatrix}
+α & -1 \\
+-1 & 2 & -1 \\
+& -1 & 2 & ⋱ \\
+&& ⋱ & ⋱ & -1 \\
+&&& -1 & 2
+\end{bmatrix} =
+                    \underbrace{\begin{bmatrix} \sqrt{α} \\
+                                    {-𝐞_1 \over \sqrt{α}} & I
+                                        \end{bmatrix}}
+                    \begin{bmatrix}1 \\ & K_{n-1}^{2 - 1/α} \end{bmatrix}
+                    \underbrace{\begin{bmatrix} \sqrt{α} & {-𝐞_1^⊤ \over \sqrt{α}} \\
+                                                            & I
+                                        \end{bmatrix}}
+$$
+Note if $α > 1$ then $2 - 1/α > 1$. Hence by induction and the fact that $Δ_n = K_n^2$
+we conclude that $Δ_n$ has a Cholesky decomposition and hence is symmetric positive definite.
 
-$$L=\left[\begin{array}{c|ccc}
-\sqrt{\alpha}               & & 0         & \\\hline
-\frac{\beta}{\sqrt{\alpha}} & &           &        \\
-0                           & & \tilde{L} &        \\
-\vdots                      & &           &         
-\end{array}\right]$$
-where $\tilde{L}$ satisfies $\tilde{L}\tilde{L}^\top=K-\begin{bmatrix} \beta^2/\alpha & \mathbf{0} \\ \mathbf{0} & \mathbf{0} \end{bmatrix}$ which is a tridiagonal matrix smaller than $A$. Since $L$ is lower bidiagonal when $A$ is $1\times 1$, we know by induction that $L$ is lower bidiagonal for $A$ of any size.
-
-Once we know that $L_n$ is lower bidiagonal, we can write it as
-$$L_n=\begin{bmatrix}
-a_1 & \\
-b_1 & \ddots & \\
-    & \ddots & \ddots  & \\
-    &        & b_{n-1} & a_n
-\end{bmatrix}$$
-which we substitute into $\Delta_n=L_nL_n^\top$ to get
-$$\left\{\begin{array}{l}
-a_1=\sqrt{2}\\
-a_kb_k=-1\\
-b_{k}^2+a_{k+1}^2=2
-\end{array}\right.$$
-for $k=1,\dots,n-1$.
-
-Now we solve the recurrence. Substituting the second equation into the third one:
-$$\frac{1}{a_k^2}+a_{k+1}^2=2.$$
-Let $c_k=a_k^2$:
-$$\frac{1}{c_k}+c_{k+1}=2.$$
-Consider the fixing point of this recurrence: $\frac{1}{x}+x=2\Longrightarrow(x-1)^2=0$ has the double root $x=1$ which hints us to consider $\frac{1}{c_k-1}$. In fact, the recurrence is equivalent to
-$$\frac{1}{c_{k+1}-1}=\frac{1}{c_k-1}+1.$$
-Recalling that $c_1=2$, we know that $\frac{1}{c_k-1}=k$. As a result, $c_k=(k+1)/k$, $a_k=\sqrt{(k+1)/k}$ and $b_k=-\sqrt{k/(k+1)}$, hence we know $L_n$.
+We can further write down the factors explicitly: define $α_1 := 2$ and
+$$
+α_{k+1} = 2- 1/α_k.
+$$
+Let's try out the first few:
+$$
+α_1 = 2, α_2 = 3/2, α_3 = 4/3, α_4 = 5/4, …
+$$
+The pattern is clear and one can show by induction that $α_k = (k+1)/k$. Thus we have the Cholesky decomposition
+$$
+Δ _n = \underbrace{\begin{bmatrix}
+\sqrt{2} \\
+-1/\sqrt{2} & \sqrt{3/2} \\
+& -\sqrt{2/3} & \sqrt{4/3} \\
+    && ⋱ & ⋱ \\
+    &&& -\sqrt{(n-1)/n} & \sqrt{(n+1)/n}
+    \end{bmatrix}}_{L_n} \underbrace{\begin{bmatrix}
+\sqrt{2} & -1/\sqrt{2} \\
+ & \sqrt{3/2} & -\sqrt{2/3} \\
+    && ⋱ & ⋱ \\
+    &&& \sqrt{n/(n-1)} & -\sqrt{(n-1)/n} \\
+    &&&& \sqrt{(n+1)/n}
+    \end{bmatrix}}_{L_n^⊤} 
+$$
 
 We can apply the same process to $U_n$, but this is a special case since flipping $\Delta_n$ horizontally and vertically gives itself: $P\Delta_nP^\top=\Delta_n$ where
 $$
@@ -272,7 +291,7 @@ $$
                     \begin{bmatrix} Δ_{n-1} - {𝐞_n 𝐞_n^⊤ \over 2}  & \\
                      & 1 \end{bmatrix}
                      \underbrace{\begin{bmatrix} I \\
-                      {𝐯^⊤ \over \sqrt{α}} & \sqrt{α}
+                      {𝐯^⊤ \over \sqrt{2}} & \sqrt{2}
                                         \end{bmatrix}}_{U_1^⊤}
 $$
 Continuing proceeds as above.
