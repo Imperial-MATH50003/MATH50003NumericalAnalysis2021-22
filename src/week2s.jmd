@@ -100,20 +100,24 @@ plot!(nanabs.(centraldifferror.(x, h, g, gp)), yaxis=:log10, label="g")
 
 
 To compute the errors of the central difference approximation of $f'(x)$ we compute
-
-$$\left| \frac{f(x+h)-f(x-h)}{2h} - f'(x) \right|=$$
-$$ =\left| \frac{1 + (x+h) + (x+h)^2 - 1 - (x-h) - (x-h)^2}{2h} - (1+2x)\right|=$$
-$$ =\left| \frac{2h + 4hx}{2h} - 1 -2x\right| = 0.$$
-
+$$
+\begin{align*}
+\left| \frac{f(x+h)-f(x-h)}{2h} - f'(x) \right|
+&=\left| \frac{1 + (x+h) + (x+h)^2 - 1 - (x-h) - (x-h)^2}{2h} - (1+2x)\right| \\
+&=\left| \frac{2h + 4hx}{2h} - 1 -2x\right| = 0.
+\end{align*}
+$$
 As we can see, in this case the central difference approximation is exact. The errors we start observing for small step sizes are thus numerical in nature. The values of the function at $f(x+h)$ and $f(x-h)$ eventually become numerically indistinguishable and thus this finite difference approximation to the derivative incorrectly results in $0$.
 
 
 To compute the errors of the central difference approximation of $g'(x)$ we compute
 
-$$\left| \frac{g(x+h)-g(x-h)}{2h} - g'(x) \right|=$$
-$$ =\left| \frac{1 + \frac{(x+h)}{3} + (x+h)^2 - 1 - \frac{(x-h)}{3} - (x-h)^2}{2h} - \left(\frac{1}{3}+2x \right)\right|=$$
-$$ =\left| \frac{1}{3} + 2x - \frac{1}{3} - 2x\right| = 0.$$
-
+$$
+\begin{align*}
+\left| \frac{g(x+h)-g(x-h)}{2h} - g'(x) \right|&= \left| \frac{1 + \frac{(x+h)}{3} + (x+h)^2 - 1 - \frac{(x-h)}{3} - (x-h)^2}{2h} - \left(\frac{1}{3}+2x \right)\right| \\
+&=\left| \frac{1}{3} + 2x - \frac{1}{3} - 2x\right| = 0.
+\end{align*}
+$$
 
 
 **Problem 1.3 (A)⋆** Use Taylor's theorem to derive an error bound on the second-order derivative approximation
@@ -142,15 +146,20 @@ Thus,
 $$f''(x) = \frac{f(x+h) - 2f(x) + f(x-h)}{h^2} + \frac{f'''(z_2) - f'''(z_1)}{6}h.$$
 
 Hence, the error is 
-$$\left|f''(x) - \frac{f(x+h) - 2f(x) + f(x-h)}{h^2}\right| = \left|\frac{f'''(z_2) - f'''(z_1)}{6}h\right|\le 2Ch ,$$
+$$
+\left|f''(x) - \frac{f(x+h) - 2f(x) + f(x-h)}{h^2}\right| = \left|\frac{f'''(z_2) - f'''(z_1)}{6}h\right|≤ 2Ch ,
+$$
 where again
-$$C = \max_{y\in[x-h,x+h]}\left|\frac{f'''(y)}{6}\right|.$$
+$$C = \max_{y∈[x-h,x+h]}\left|\frac{f'''(y)}{6}\right|.$$
 
 In floating point arithmetic, the error is
-$$\left|f''^{FP}(x) - f''(x) \right|=  
-\left|\frac{f^{FP}(x+h) - 2f^{FP}(x) + f^{FP}(x-h)}{h^2} - \frac{f(x+h) - 2f(x) + f(x-h)}{h^2} - \frac{f'''(z_2) - f'''(z_1)}{6}h\right|$$
-$$\le \left|\frac{(f^{FP}(x+h) - f(x+h)) - 2(f^{FP}(x)  - f(x)) + (f^{FP}(x-h) - f(x-h))}{h^2}\right| + \left|\frac{f'''(z_2) - f'''(z_1)}{6}h\right|$$
-$$\le \left|\frac{\delta_{x+h} - 2\delta_x + \delta_{x-h}}{h^2}\right| + 2Ch \le \frac{4cϵ_m}{h^2} + 2Ch.$$
+$$
+\begin{align*}
+\left|f''^{FP}(x) - f''(x) \right|&=  \left|\frac{f^{FP}(x+h) - 2f^{FP}(x) + f^{FP}(x-h)}{h^2} - \frac{f(x+h) - 2f(x) + f(x-h)}{h^2} - \frac{f'''(z_2) - f'''(z_1)}{6}h\right| \\
+&≤ \left|\frac{(f^{FP}(x+h) - f(x+h)) - 2(f^{FP}(x)  - f(x)) + (f^{FP}(x-h) - f(x-h))}{h^2}\right| + \left|\frac{f'''(z_2) - f'''(z_1)}{6}h\right| \\
+&≤ \left|\frac{\delta_{x+h} - 2\delta_x + \delta_{x-h}}{h^2}\right| + 2Ch ≤ \frac{4cϵ_m}{h^2} + 2Ch.
+\end{align*}
+$$
 
 
 **Problem 1.4 (B)** Use finite-differences, central differences, and second-order finite-differences to approximate to 5-digits the first and second 
@@ -323,36 +332,50 @@ $$
 **SOLUTION**
 
 As with complex numbers, division is easiest to understand by first multiplying with the conjugate, that is:
-$$\frac{a+bϵ}{c+dϵ} = \frac{(a+bϵ)(c-dϵ)}{(c+dϵ)(c-dϵ)}.$$
+$$
+\frac{a+bϵ}{c+dϵ} = \frac{(a+bϵ)(c-dϵ)}{(c+dϵ)(c-dϵ)}.
+$$
 Expanding the products and dropping terms with $ϵ^2$ then leaves us with the definition of division for dual numbers (where the denominator must have non-zero real part):
-$$\frac{a}{c} + \frac{bc - ad}{c^2}ϵ.$$ Thus we have $s = \frac{a}{c}$ and $t = \frac{bc - ad}{c^2}$.
+$$
+\frac{a}{c} + \frac{bc - ad}{c^2}ϵ.
+$$ 
+Thus we have $s = \frac{a}{c}$ and $t = \frac{bc - ad}{c^2}$.
 
-We saw in the lectures that we have
+We now compute the derivatives of the three functions by evaluating for $x = 0.1 + ϵ$.
+
+For the first function we have:
 $$
-\exp(a+b ϵ) = \exp(a)+b \exp(a) ϵ,
+\begin{align*}
+\exp(\exp(0.1 + ϵ)\cos(0.1+ϵ) + \sin(0.1+ϵ)) &=
+\exp((\exp(0.1) + ϵ\exp(0.1))(\cos(0.1)-\sin(0.1)ϵ) + \sin(0.1)+\cos(0.1)ϵ) \\
+&= \exp(\exp(0.1)\cos(0.1)+ \sin(0.1) + (\exp(0.1)(\cos(0.1)-\sin(0.1))+\cos(0.1))ϵ) \\
+&= \exp(\exp(0.1)\cos(0.1)+ \sin(0.1)) + \exp(\exp(0.1)\cos(0.1)+ \sin(0.1))\exp(0.1)(\cos(0.1)-\sin(0.1))+\cos(0.1))ϵ 
+\end{align*}
 $$
+therefore the derivative is the dual part
 $$
-\sin(a+b ϵ) = \sin(a)+b \cos(a) ϵ,
+\exp(\exp(0.1)\cos(0.1)+ \sin(0.1))(\exp(0.1)(\cos(0.1)-\sin(0.1))+\cos(0.1))
 $$
-and
+
+For the second function we have:
 $$
-\cos(a+b ϵ) = \cos(a)-b \sin(a) ϵ.
+\begin{align*}
+ \left(0.1+ϵ-1\right) \left({0.1 + ϵ \over 2}-1\right)\left({0.1 + ϵ \over 3}-1\right)
+ &=\left(-0.9+ϵ\right) \left(-0.95 + ϵ/2\right)\left(-29/30 + ϵ/3\right) \\
+&=\left(171/200 -1.4ϵ\right)\left(-29/30 + ϵ/3\right)  \\
+&= -1653/2000 + 983ϵ/600
+\end{align*}
 $$
-Using these, we find that evaluating $\exp(\exp x \cos x + \sin x)$ at $a+b ϵ$ yields
+Thus the derivative is $983/600$.
+
+For the third function we have:
 $$
-\exp ( (\exp (a) +b \exp (a) ϵ ) (\cos(a)-b \sin(a) ϵ) + \sin(a)+b \cos(a) ϵ)
+\begin{align*}
+{1 + {0.1+ϵ - 1 \over 2 + {0.1+ϵ-1 \over 2}}} &=  {1 + {-0.9+ϵ \over 1.55 + ϵ/2}}\\
+&= 1 -18/31 + 2ϵ/1.55^2
+\end{align*}
 $$
-$$
-= \exp ( \exp (a) \cos (a) + ( \cos (a) \exp (a) - \sin(a) \exp (a)) b ϵ + \sin(a)+b \cos(a) ϵ) = \exp ( (\exp (a) \cos (a) + \sin(a)) + b ( \cos (a) \exp (a) - \sin(a) \exp (a) + \cos(a)) ϵ )
-$$
-which means $\exp(\exp x \cos x + \sin x)$ evaluated at $a+b ϵ $ is
-$$
-\exp( (\exp (a) \cos (a) + \sin(a)) ) + b ( \cos (a) \exp (a) - \sin(a) \exp (a) + \cos(a)) \exp( (\exp (a) \cos (a) + \sin(a)) ) ϵ.
-$$
-Setting $b=1$ the derivative at point $a$ is thus given by the dual part, i.e.:
-$$
-( \cos (a) \exp (a) - \sin(a) \exp (a) + \cos(a)) \exp( (\exp (a) \cos (a) + \sin(a)) ).
-$$
+Thus the derivative is $2/1.55^2$.
 
 **Problem 2.5 (C)** Add support for `cos`, `sin`, and `/` to the type `Dual`:
 ```julia
