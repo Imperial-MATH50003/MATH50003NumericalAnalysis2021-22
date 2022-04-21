@@ -323,32 +323,13 @@ a^3 & a^2 & a & 1 & 0 & ... & 0\\
 a^{n-1} & a^{n-2} & ... & ... & a^2 & a & 1 
 \end{bmatrix}$$
 
-Then, $\forall x$
+From PS5 Q2.1 we have
+$$
+\|T^{-1}\|_{1 → ∞} = \| {\rm vec}(T^{-1})\|_∞ = \max(1,a)^{n-1}
+$$
+Since $a_k ≤ a$ we have $\prod_{i=1}^{n-1}|a_i|≤ a^{n-1}$ hence
 
-$$\|T^{-1}x\|_{\infty}=\max_i|(T^{-1}x)_i|= \max_i \left|x_i +\sum_{j=1}^{i-1}a^{i-j}x_j \right| = \begin{cases} 
-1 & if \ a\in[0,1] \\
-a^{n-1} & if \ a\ge 1
-\end{cases}$$
-
-since, given $b=\max\{1,a\}$,
-
-$$\max_i \left|x_i +\sum_{j=1}^{i-1}a^{i-j}x_j \right|\le \max_i \left(|x_i| +\sum_{j=1}^{i-1}\left|a^{i-j}x_j \right| \right) \le b^n\sum_{j=1}^n |x_j| = b^n\|x\|_1$$
-
-thus,
-
-$\|T^{-1}\|_{1\to\infty} = \sup_{x\ne 0} \frac{\|T^{-1}x\|_\infty}{\|x\|_1}\le b^n$ and, in particular,
-$$\|T^{-1}\|_{1\to\infty}= b^n$$
-
-since $$\frac{\|T^{-1}x\|_\infty}{\|x\|_1}=b^n$$ it is obtained using 
-$$x=\begin{cases}e_1 & b=1 \\ e_n & b=a \end{cases}$$
-
-Moreover, $|a_j|\le b$, $\forall j=1,...,n$, thus,
-
-$$\|L^{-1}x\|_{\infty}=\max_i|(L^{-1}x)_i|= \max_i \left|x_i +\sum_{j=1}^{i-1}a_{j}...a_{i-1}x_j \right| \le \max_i |x_i| +\sum_{j=1}^{i-1}|a_{j}...a_{i-1}x_j | \le b^n\|x\|_1$$
-
-Hence,
-
-$$\|L^{-1}\|_{1\to \infty}=\sup_{x} \frac{\|L^{-1}x\|_{\infty}}{\|x\|_{1}} \le b^n = \|T^{-1}\|_{1 \to \infty}$$
+$$\|L^{-1}\|_{1\to \infty} ≤ \max(1,a)^n = \|T^{-1}\|_{1 \to \infty}.$$
 
 
 Now we prove convergence for the forward Euler method as $n → ∞$ for
