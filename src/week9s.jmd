@@ -257,18 +257,18 @@ $$D_n= \sqrt{\frac{2}{\pi}}$$
 
 **Problem 2.2 (B)** Consider the function
 $$
-f(x) = \sum_{k=0}^\infty {T_k(x) \over k!}
+f(x) = \sum_{k=0}^∞ {T_k(x) \over k!}
 $$
 For what coefficients $c_k$ does
 $$
-(x^2+1) f(x) = \sum_{k=0}^\infty c_k T_k(x)?
+(x^2+1) f(x) = \sum_{k=0}^∞ c_k T_k(x)?
 $$
 
 **SOLUTION**
 
 We need 
 
-$$(x^2+1)\sum_{k=0}^\infty {T_k(x) \over k!} = \sum_{k=0}^\infty c_k T_k(x)$$
+$$(x^2+1)\sum_{k=0}^∞ {T_k(x) \over k!} = \sum_{k=0}^∞ c_k T_k(x)$$
 
 We can use the following to rewrite the LHS
 $$xT_0(x)=T_1(x)$$
@@ -277,17 +277,17 @@ $$xT_n(x)=\frac{T_{n-1}(x)+T_{n+1}(x)}{2}$$
 
 Indeed,
 
-$$(x^2+1)\sum_{k=0}^\infty {T_k(x) \over k!} = \sum_{k=0}^\infty {x^2T_k(x) \over k!} + \sum_{k=0}^\infty {T_k(x) \over k!} = xT_1(x)+\sum_{k=1}^\infty {x\frac{T_{k-1}(x)+T_{k+1}(x)}{2 k!}} + \sum_{k=0}^\infty {T_k(x) \over k!} = $$
+$$(x^2+1)\sum_{k=0}^∞ {T_k(x) \over k!} = \sum_{k=0}^∞ {x^2T_k(x) \over k!} + \sum_{k=0}^∞ {T_k(x) \over k!} = xT_1(x)+\sum_{k=1}^∞ {x\frac{T_{k-1}(x)+T_{k+1}(x)}{2 k!}} + \sum_{k=0}^∞ {T_k(x) \over k!} = $$
 
 Using
 $$x\frac{T_{0}(x)+T_{2}(x)}{2* 1!}= \frac{T_1(x)}{2} + \frac{T_{1}(x)+T_{3}(x)}{4}$$
 and
-$$\sum_{k=2}^\infty {x\frac{T_{k-1}(x)+T_{k+1}(x)}{2 k!}}= \sum_{k=2}^\infty \left(\frac{T_{k-2}(x)+T_{k}(x)}{4k!} + \frac{T_{k}(x)+T_{k+2}(x)}{4k!}\right)$$
+$$\sum_{k=2}^∞ {x\frac{T_{k-1}(x)+T_{k+1}(x)}{2 k!}}= \sum_{k=2}^∞ \left(\frac{T_{k-2}(x)+T_{k}(x)}{4k!} + \frac{T_{k}(x)+T_{k+2}(x)}{4k!}\right)$$
 
 
 we obtain
 
-$$= \frac{T_{0}(x)+T_{2}(x)}{2} + \frac{T_1(x)}{2} + \frac{T_{1}(x)+T_{3}(x)}{4}+\sum_{k=2}^\infty \left(\frac{T_{k-2}(x)+T_{k}(x)}{4k!} + \frac{T_{k}(x)+T_{k+2}(x)}{4k!}\right) + \sum_{k=0}^\infty {T_k(x) \over k!}$$
+$$= \frac{T_{0}(x)+T_{2}(x)}{2} + \frac{T_1(x)}{2} + \frac{T_{1}(x)+T_{3}(x)}{4}+\sum_{k=2}^∞ \left(\frac{T_{k-2}(x)+T_{k}(x)}{4k!} + \frac{T_{k}(x)+T_{k+2}(x)}{4k!}\right) + \sum_{k=0}^∞ {T_k(x) \over k!}$$
 
 So, we have 
 
@@ -404,9 +404,12 @@ $$p_n(x)=2xp_{n-1}(x)-p_{n-1}'(x).$$
 
 (1) and (3) then follows from induction since $p_0(x)=1$.
 
-(2) follows by integration by parts. If $r_m$ is a degree $m<n$ polynomial we have:
+(2) follows by integration by parts. If $r_m$ is any degree $m<n$ polynomial we have:
 $$
-\int_{-\infty}^\infty p_n(x)r_m(x)\exp(-x^2){\rm d}x=\int_{-\infty}^\infty{{\rm d}^n \over {\rm d}x^n} \exp(-x^2)\exp(-x^2){\rm d}x=\cdots\text{integration by parts}\dots=(-1)^n\int_{-\infty}^\infty \exp(-x^2)r_m^{(n)}(x)=0
+\begin{align*}
+\int_{-∞}^∞ p_n(x)r_m(x)\exp(-x^2){\rm d}x&=\int_{-∞}^∞{{\rm d}^n \over {\rm d}x^n} \exp(-x^2)r(x){\rm d}x = -\int_{-∞}^∞{{\rm d}^{n-1} \over {\rm d}x^{n-1}} \exp(-x^2)r'(x){\rm d}x\\
+&=⋯\text{integration by parts $n$ times}…=(-1)^n\int_{-∞}^∞ \exp(-x^2)r_m^{(n)}(x)=0
+\end{align*}
 $$
 Thus $p_n(x) = H_n(x)$ by uniqueness.
 
