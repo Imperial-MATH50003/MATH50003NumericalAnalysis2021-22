@@ -140,28 +140,29 @@ this experimentally.
 
 ## 2. Roots of orthogonal polynomials and truncated Jacobi matrices
 
-We now consider roots (zeros) of orthogonal polynomials $q_n(x)$. This is important as we shall
+We now consider roots (zeros) of orthogonal polynomials $p_n(x)$. This is important as we shall
 see they are useful for interpolation and quadrature. For interpolation to be well-defined we
 first need to guarantee that the roots are distinct.
 
-**Lemma** $q_n(x)$ has exactly $n$ distinct roots.
+**Lemma** An orthogonal polynomial $p_n(x)$ has exactly $n$ distinct roots.
 
 **Proof**
 
 Suppose $x_1, …,x_j$ are the roots where $q_n(x)$ changes sign, that is,
 $$
-q_n(x) = c_k (x-x_k)^{2p+1} + O((x-x_k)^{2p+2})
+p_n(x) = c_k (x-x_k)^{2p+1} + O((x-x_k)^{2p+2})
 $$
 for $c_k ≠ 0$ and $k = 1,…,j$ and $p ∈ ℤ$, as$x → x_k$. Then
 $$
-q_n(x) (x-x_1) ⋯(x-x_j)
+p_n(x) (x-x_1) ⋯(x-x_j)
 $$
 does not change signs: it behaves like $c_k (x-x_k)^{2p+2} + O(x-x_k)^{2p+3}$ as $x → x_k$.
 In other words:
 $$
-⟨q_n,(x-x_1) ⋯(x-x_j) ⟩ = \int_a^b q_n(x) (x-x_1) ⋯(x-x_j) w(x) {\rm d} x ≠ 0.
+⟨p_n,(x-x_1) ⋯(x-x_j) ⟩ = \int_a^b p_n(x) (x-x_1) ⋯(x-x_j) w(x) {\rm d} x ≠ 0.
 $$
-This is only possible if $j = n$ as $q_n(x)$ is orthogonal w.r.t. all lower degree
+where $w(x)$ is the weight of orthogonality.
+This is only possible if $j = n$ as $p_n(x)$ is orthogonal w.r.t. all lower degree
 polynomials.
 
 ∎
@@ -178,7 +179,8 @@ $$
 
 
 
-**Lemma (zeros)** The zeros $x_1, …,x_n$ of $q_n(x)$ are the eigenvalues of the truncated Jacobi matrix $X_n$.
+**Lemma (zeros)** The zeros $x_1, …,x_n$ of an orthonormal polynomial $q_n(x)$
+are the eigenvalues of the truncated Jacobi matrix $X_n$.
 More precisely,
 $$
 X_n Q_n = Q_n \begin{bmatrix} x_1 \\ & ⋱ \\ && x_n \end{bmatrix}
@@ -344,7 +346,7 @@ We shall explain this miracle next.
 ## 4. Gaussian quadrature
 
 Gaussian quadrature is the interpolatory quadrature rule corresponding
-to the grid $x_j$ defined as the roots of the orthogonal polynomial $q_n(x)$.
+to the grid $x_j$ defined as the roots of the orthonormal polynomial $q_n(x)$.
 We shall see that it is exact for polynomials up to degree $2n-1$, i.e., double
 the degree of other interpolatory quadrature rules from other grids.
 
@@ -354,7 +356,7 @@ the degree of other interpolatory quadrature rules from other grids.
 $$
 ∫_a^b f(x)w(x) {\rm d}x ≈ \underbrace{∑_{j=1}^n w_j f(x_j)}_{Σ_n^w[f]}
 $$
-where $x_1,…,x_n$ are the roots of $q_n(x)$ and 
+where $x_1,…,x_n$ are the roots of the orthonormal polynomials $q_n(x)$ and 
 $$
 w_j := {1 \over α_j^2} = {1 \over q_0(x_j)^2 + ⋯ + q_{n-1}(x_j)^2}.
 $$
@@ -368,7 +370,7 @@ In analogy to how Fourier series are orthogonal with respect to Trapezium rule,
 Orthogonal polynomials are orthogonal with respect to Gaussian quadrature:
 
 **Lemma (Discrete orthogonality)**
-For $0 ≤ ℓ,m ≤ n-1$,
+For $0 ≤ ℓ,m ≤ n-1$, the orthonormal polynomials $q_n(x)$ satisfy
 $$
 Σ_n^w[q_ℓ q_m] = δ_{ℓm}
 $$
@@ -389,6 +391,7 @@ Just as approximating Fourier coefficients using Trapezium rule gives a way of
 interpolating at the grid, so does Gaussian quadrature:
 
 **Theorem (interpolation via quadrature)**
+For the orthonormal polynomials $q_n(x)$,
 $$
 f_n(x) = ∑_{k=0}^{n-1} c_k^n q_k(x)\hbox{ for } c_k^n := Σ_n^w[f q_k]
 $$
@@ -465,7 +468,7 @@ Using polynomial division algorithm (e.g. by matching terms) we can write
 $$
 p(x) = q_n(x) s(x) + r(x)
 $$
-where $s$ and $r$ are degree $n-1$. Then we have:
+where $s$ and $r$ are degree $n-1$ and $q_n(x)$ is the degree $n$ orthonormal polynomial. Then we have:
 $$
 \begin{align*}
 Σ_n^w[p] &= \underbrace{Σ_n^w[q_n s]}_{\hbox{$0$ since evaluating $q_n$ at zeros}} + Σ_n^w[r] = ∫_a^b r(x) w(x) {\rm d}x
