@@ -105,7 +105,8 @@ $$
 We can use these to construct the interpolatory polynomial:
 
 **Theorem (Lagrange interpolation)**
-The unique  polynomial of degree at most $n-1$ that interpolates $f$ at $x_j$ is:
+The unique  polynomial of degree at most $n-1$ that interpolates $f$ at $n$ distinct
+points $x_j$ is:
 $$
 p(x) = f(x_1) ℓ_1(x) + ⋯ + f(x_n) ℓ_n(x)
 $$
@@ -117,7 +118,8 @@ p(x_j) = ∑_{j=1}^n f(x_j) ℓ_k(x_j) = f(x_j)
 $$
 so we just need to show it is unique. Suppose $p̃(x)$ is a  polynomial
 of degree at most $n-1$
-that also interpolates $f$.
+that also interpolates $f$. Then $p̃ - p$ vanishes at $n$ distinct points.
+Thus by the fundamental theorem of algebra it must be zero.
 
 
 ∎
