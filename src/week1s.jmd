@@ -373,7 +373,7 @@ $$
 $$
 Finally,
 $$
-(2.62 + δ_6)(1+δ_5) = 2.62 + \underbrace{δ_6 + 2.62δ_5 + δ_6 δ_5}_{δ_8}
+(2.62 + δ_7)(1+δ_5) = 2.62 + \underbrace{δ_7 + 2.62δ_5 + δ_7 δ_5}_{δ_8}
 $$
 where
 $$
@@ -409,7 +409,7 @@ $$
 $$
 where
 $$
-|δ_7| ≤ 17 ϵ_{\rm m}
+|δ_7| ≤ 12 ϵ_{\rm m}
 $$
 Then we get 
 $$
@@ -417,7 +417,7 @@ $$
 $$
 and the error is bounded by:
 $$
-(17 + 2 + 34) ϵ_{\rm m} = 53 ϵ_{\rm m}
+(12 + 2 + 34) ϵ_{\rm m} = 48 ϵ_{\rm m}
 $$
 This is quite pessimistic but still captures that we are on the order of $ϵ_{\rm m}$.
 
