@@ -229,13 +229,13 @@ L̂ u &= \begin{bmatrix} c_0 \\
 ⋮ \\
 \frac{1}{2}\left({u(x_{n-1}) - u(x_{n-2}) \over h} + {u(x_1) - u(x_0) \over h} + {a}(u(x_{n-1}) + u(x_{n-2}))\right)\end{bmatrix} \\
 &= \begin{bmatrix} c_0 \\
-\frac{1}{2}\left(u'(x_0) + a u(x_0) + u''(τ_0) h + u'(x_1) + a u(x_1) + u''(σ_1) h \right)\\
+\frac{1}{2}\left(u'(x_0) + a u(x_0) + u''(τ_0) h/2 + u'(x_1) + a u(x_1) + u''(σ_1) h/2 \right)\\
 ⋮ \\
-\frac{1}{2}\left(u'(x_{n-2}) + a u(x_{n-2}) + u''(τ_{n-2}) h + u'(x_{n-1}) + a u(x_{n-1}) + u''(σ_{n-1}) h \right) \end{bmatrix} = 
+\frac{1}{2}\left(u'(x_{n-2}) + a u(x_{n-2}) + u''(τ_{n-2}) h/2 + u'(x_{n-1}) + a u(x_{n-1}) + u''(σ_{n-1}) h/2 \right) \end{bmatrix} = 
 \begin{bmatrix} c_0 \\
-{f(x_0)+f(x_1)\over 2} + {u''(τ_0)+u''(σ_1)\over 2} h \\
+{f(x_0)+f(x_1)\over 2} + {u''(τ_0)+u''(σ_1)\over 4} h \\
 ⋮ \\
-{f(x_{n-2})+f(x_{n-1})\over 2} + {u''(τ_{n-2})+u''(σ_{n-1})\over 2} h \end{bmatrix} \\
+{f(x_{n-2})+f(x_{n-1})\over 2} + {u''(τ_{n-2})+u''(σ_{n-1})\over 4} h \end{bmatrix} \\
 &= 
 \begin{bmatrix} c_0 \\ \hat fᶠ \end{bmatrix} + \begin{bmatrix} 0 \\ δ \end{bmatrix}
 \end{align*}
