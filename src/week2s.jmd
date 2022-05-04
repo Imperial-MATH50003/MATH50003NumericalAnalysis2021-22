@@ -147,20 +147,28 @@ $$f''(x) = \frac{f(x+h) - 2f(x) + f(x-h)}{h^2} + \frac{f'''(z_2) - f'''(z_1)}{6}
 
 Hence, the error is 
 $$
-\left|f''(x) - \frac{f(x+h) - 2f(x) + f(x-h)}{h^2}\right| = \left|\frac{f'''(z_2) - f'''(z_1)}{6}h\right|≤ 2Ch ,
+\left|f''(x) - \right| = \left|\frac{f'''(z_2) - f'''(z_1)}{6}h\right|≤ 2Ch ,
 $$
 where again
 $$C = \max_{y∈[x-h,x+h]}\left|\frac{f'''(y)}{6}\right|.$$
 
-In floating point arithmetic, the error is
+In floating point arithmetic we assume $x + h = x ⊕ h$, $h$ is a power of $2$ and all computations are normal. 
+Then we have:
 $$
-\begin{align*}
-\left|f''^{FP}(x) - f''(x) \right|&=  \left|\frac{f^{FP}(x+h) - 2f^{FP}(x) + f^{FP}(x-h)}{h^2} - \frac{f(x+h) - 2f(x) + f(x-h)}{h^2} - \frac{f'''(z_2) - f'''(z_1)}{6}h\right| \\
-&≤ \left|\frac{(f^{FP}(x+h) - f(x+h)) - 2(f^{FP}(x)  - f(x)) + (f^{FP}(x-h) - f(x-h))}{h^2}\right| + \left|\frac{f'''(z_2) - f'''(z_1)}{6}h\right| \\
-&≤ \left|\frac{\delta_{x+h} - 2\delta_x + \delta_{x-h}}{h^2}\right| + 2Ch ≤ \frac{4cϵ_m}{h^2} + 2Ch.
-\end{align*}
+f^{\rm FP}(x + h) ⊖ 2f^{\rm FP}(x) = (f(x+h) + δ_{x+h} - 2f(x) -2δ_x)(1+δ^1) = f(x+h) - 2f(x) + \underbrace{(f(x+h) - 2f(x))δ^1 + (δ_{x+h} - 2 δ_x)(1+δ^1)}_{δ^2}
 $$
-
+where $|δ^2| ≤ (3/2F + 4c) ϵ_m$, where $F = \sup_{x-h ≤ t ≤ x+h} |f(t)|$. Therefore
+$$
+(f^{\rm FP}(x + h) ⊖ 2f^{\rm FP}(x)) ⊕ f^{\rm FP}(x - h) = ((f(x+h) - 2f(x) + δ^2) + f(x-h) + δ_{x-h})(1+δ^3) = f(x+h) - 2f(x) + f(x-h) + \underbrace{(f(x+h) - 2f(x) + f(x-h)) δ^3 + (δ^2 + δ_{x-h})(1+δ^3)}_{δ^4}
+$$
+where $|δ^4| ≤ (5F + 10c)ϵ_{\rm m}$. Putting everything together we have
+$$
+{(f^{\rm FP}(x + h) ⊖ 2f^{\rm FP}(x)) ⊕ f^{\rm FP}(x - h) \over h} = {f(x+h) - 2f(x) + f(x-h) \over h^2} + {δ^4 \over h^2} = f''(x) + \frac{f'''(z_2) - f'''(z_1)}{6}h +  {δ^4 \over h^2} 
+$$
+that is the error is bounded by
+$$
+2Ch + (5F + 10c){ϵ_{\rm m} \over h^2}
+$$
 
 **Problem 1.4 (B)** Use finite-differences, central differences, and second-order finite-differences to approximate to 5-digits the first and second 
 derivatives to the following functions
