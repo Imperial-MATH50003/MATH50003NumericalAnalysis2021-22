@@ -599,7 +599,7 @@ $$
 \begin{align*}
 u(0) = 1 \\
 u(1) = \cos 1 \\
-u''(x) = -4x^2*cos(x^2) - 2sin(x^2)
+u''(x) = -4x^2*\cos(x^2) - 2\sin(x^2)
 \end{align*}
 $$
 We observe uniform ($∞$-norm) convergence:
@@ -650,7 +650,7 @@ $$
 **Theorem (Forward/Backward Euler convergence)**
 Consider the equation
 $$
-u(0) = c, u'(t) + a u(t) = f(t)
+u(0) = c, u'(t) - a u(t) = f(t)
 $$
 Denote
 $$
@@ -672,17 +672,17 @@ _Consistency_ means our discretisation approximates the
 true equation, that is:
 $$
 L𝐮 = \begin{bmatrix} c \\
-        {u(t_2) - u(t_1) \over h} + a u(t_1) \\
+        {u(t_2) - u(t_1) \over h} - a u(t_1) \\
         ⋮ \\
-        {u(t_n) - u(t_{n-1}) \over h} + a u(t_{n-1}) 
+        {u(t_n) - u(t_{n-1}) \over h} - a u(t_{n-1}) 
 \end{bmatrix} = \begin{bmatrix} c \\
-        u'(t_1) + a u(t_1) + u''(τ_1) h \\
+        u'(t_1) - a u(t_1) + u''(τ_1) h/2 \\
         ⋮ \\
-        u'(t_{n-1}) + a u(t_{n-1}) + u''(τ_{n-1}) h
+        u'(t_{n-1}) - a u(t_{n-1}) + u''(τ_{n-1}) h/2
 \end{bmatrix} = \begin{bmatrix} c \\
-        f(t_1) + u''(τ_1) h \\
+        f(t_1) + u''(τ_1) h/2 \\
         ⋮ \\
-        f(t_{n-1}) + u''(τ_{n-1}) h
+        f(t_{n-1}) + u''(τ_{n-1}) h/2
 \end{bmatrix} = \begin{bmatrix} c \\ 𝐟ᶠ \end{bmatrix} + \begin{bmatrix} 0 \\ δ \end{bmatrix}
 $$
 where $t_k ≤ τ_k ≤ t_{k+1}$, and uniform boundedness
@@ -699,11 +699,12 @@ L = \underbrace{\begin{bmatrix} 1 \\ & h^{-1} \\ && ⋱ \\ &&& h^{-1} \end{bmatr
 $$
 Stability in this case is the statement that
 $$
-\|L̃^{-1}\|_{1 → ∞} ≤ (1 +  |a|/n)^{n-1} = O(1)
+\|L̃^{-1}\|_{1 → ∞} ≤ (1 +  |a|/(n-1))^{n-1} = O(1)
 $$
-using the fact (which likely you have seen in first year) that
+using the fact (which likely you have seen in first year but can be proved by
+taking logarithms and using L'Hopital's rule) that
 $$
-\lim_{n → ∞}  (1 +  |a|/n)^{n-1} = \exp|a|.
+\lim_{n → ∞}  (1 +  |a|/(n-1))^{n-1} = \exp|a|.
 $$
 
 
