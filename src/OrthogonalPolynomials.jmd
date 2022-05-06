@@ -137,7 +137,11 @@ then $r(x) = p̃_n(x) - p_n(x)$ is degree $n-1$ but satisfies
 $$
 ⟨r, p_k⟩ = ⟨p̃_n, p_k⟩ - ⟨p_n, p_k⟩ = 0
 $$
-for $k = 0,…,{n-1}$.
+for $k = 0,…,{n-1}$. Note $⟨p̃_n, p_k⟩ = 0$ can be seen by
+expanding
+$$
+p_k(x) = ∑_{j=0}^k c_j p̃_j(x).
+$$
 ∎
 
 
