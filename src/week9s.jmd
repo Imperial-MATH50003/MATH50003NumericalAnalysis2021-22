@@ -367,10 +367,9 @@ $$\begin{bmatrix}
 \end{bmatrix}$$
 From Problem 2.3 we know
 $$
-\|U_n\|=\int_{-1}^1U_n(x)^2 \sqrt{1-x^2}{\rm d}x=\int_0^{\pi}\sin^2(n+1)\theta\theta{\rm d}\theta=\frac{\pi}{2}
+\|U_n\|^2=\int_{-1}^1U_n(x)^2 \sqrt{1-x^2}{\rm d}x=\int_0^{\pi}\sin^2(n+1)θ {\rm d}θ=\frac{π}{2}
 $$
-so $D_n=\sqrt{2}{\pi}$.
-
+so $D_n={\sqrt{2} \over π}$.
 
 ## 3. Hermite polynomials
 
