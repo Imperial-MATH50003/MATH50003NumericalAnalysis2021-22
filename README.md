@@ -200,3 +200,11 @@ To run Julia in a Jupyter notebook on your own machine:
 using IJulia
 notebook()
 ```
+
+## Downloading course material (using the GitHub GUI)
+
+You can download the whole course repository at once by clicking on Code on the main repository page and then Download zip:
+![gittutorial](https://user-images.githubusercontent.com/34382069/153593948-00e59be0-cc80-4f5a-b92d-d734e8834cda.jpg)
+
+To download individual files instead, navigate to the file you want, right-click the Raw button and use "Save Link as":
+![gittutorial2](https://user-images.githubusercontent.com/34382069/153593971-3243565d-6b5a-4942-9dc4-a7156fdb1884.jpg)
