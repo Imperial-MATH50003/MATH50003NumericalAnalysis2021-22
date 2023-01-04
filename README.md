@@ -1,5 +1,5 @@
-# MATH50003NumericalAnalysis
-Notes and course material for MATH50003 Numerical Analysis
+# MATH50003NumericalAnalysis (2021–2022)
+Notes and course material for MATH50003 Numerical Analysis (2021–2022)
 
 Lecturer: [Dr Sheehan Olver](https://www.ma.imperial.ac.uk/~solver/)
 
