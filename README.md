@@ -15,64 +15,64 @@ Q&A: 9:50–10:30 Mondays, 10:40–11:20 Tuesdays on Teams
 
 **Background material**
 
-1. [Introduction to Julia](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/Julia.ipynb): we introduce  the basic features of the Julia language.
-2. [Asymptotics and Computational Cost](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/Asymptotics.ipynb): we review Big-O, little-o and asymptotic to notation,
+1. [Introduction to Julia](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/notebooks/Julia.ipynb): we introduce  the basic features of the Julia language.
+2. [Asymptotics and Computational Cost](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/notebooks/Asymptotics.ipynb): we review Big-O, little-o and asymptotic to notation,
 and their usage in describing computational cost.
 
 **Part I: Computing with numbers**
 
-1. [Numbers](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/Numbers.ipynb): we discuss how computers represent integers and real numbers, as well as their arithmetic operations.
-2. [Differentiation](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/Differentiation.ipynb): we discuss ways of approximating derivatives, including automatic differentiation, 
+1. [Numbers](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/notebooks/Numbers.ipynb): we discuss how computers represent integers and real numbers, as well as their arithmetic operations.
+2. [Differentiation](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/notebooks/Differentiation.ipynb): we discuss ways of approximating derivatives, including automatic differentiation, 
 which is essential to  machine learning.
 
 **Part II: Computing with matrices**
 
-1. [Structured Matrices](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/StructuredMatrices.ipynb): we discuss types of structured matrices (permutations, orthogonal matrices, triangular, banded).
-3. [Decompositions](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/Decompositions.ipynb): we discuss algorithms for computing matrix decompositions (QR and PLU decompositions) and their use in solving linear systems.
-3. [Singular values and condition numbers](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/SingularValues.ipynb): we discuss vector and
+1. [Structured Matrices](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/notebooks/StructuredMatrices.ipynb): we discuss types of structured matrices (permutations, orthogonal matrices, triangular, banded).
+3. [Decompositions](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/notebooks/Decompositions.ipynb): we discuss algorithms for computing matrix decompositions (QR and PLU decompositions) and their use in solving linear systems.
+3. [Singular values and condition numbers](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/notebooks/SingularValues.ipynb): we discuss vector and
 matrix norms, and condition numbers for matrices, and the singular value decomposition.
-7. [Differential Equations](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/DifferentialEquations.ipynb): we discuss the numerical solution of linear differential equations, 
+7. [Differential Equations](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/notebooks/DifferentialEquations.ipynb): we discuss the numerical solution of linear differential equations, 
 including both time-dependent ordinary differential equations and boundary value problems, by reduction to linear systems.
 
 
 **Part III: Computing with functions**
 
-1. [Fourier series](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/Fourier.ipynb): we discuss Fourier series and their usage in numerical computations
+1. [Fourier series](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/notebooks/Fourier.ipynb): we discuss Fourier series and their usage in numerical computations
 via the fast Fourier transform.
-2. [Orthogonal Polynomials](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/OrthogonalPolynomials.ipynb): we discuss orthogonal polynomials—polynomials orthogonal 
+2. [Orthogonal Polynomials](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/notebooks/OrthogonalPolynomials.ipynb): we discuss orthogonal polynomials—polynomials orthogonal 
 with respect to a prescribed weight.
-2. [Interpolation and Gaussian quadrature](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/notebooks/Quadrature.ipynb): we discuss polynomial interpolation,
+2. [Interpolation and Gaussian quadrature](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/notebooks/Quadrature.ipynb): we discuss polynomial interpolation,
  Gaussian quadrature, and expansions in orthogonal polynomials.
 
 ## Assessment
 
-1. [Practice computer-based exam](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/exams/practice.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/exams/practices.ipynb))
-2. [Computer-based exam](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/exams/computerexam.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/exams/computerexams.ipynb))
-3. [Practice final exam](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/exams/practicefinal.pdf) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/exams/practicefinals.pdf))
+1. [Practice computer-based exam](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/exams/practice.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/exams/practices.ipynb))
+2. [Computer-based exam](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/exams/computerexam.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/exams/computerexams.ipynb))
+3. [Practice final exam](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/exams/practicefinal.pdf) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/exams/practicefinals.pdf))
 3. Final exam (pen-and-paper): 9 May 2022, 9:00–12:00
 
 ## Problem sheets
 
-1. [Week 1](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week1.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week1s.ipynb)): Binary representation, integers, floating point numbers, and interval arithmetic
-2. [Week 2](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week2.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week2s.ipynb)): Finite-differences, dual numbers, and Newton iteration
-3. [Week 3](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week3.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week3s.ipynb)): dense, triangular, banded, permutation, rotation and reflection matrices
-4. [Week 4](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week4.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week4s.ipynb)): least squares, QR and PLU decompositions
-4. [Week 5](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week5.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week5s.ipynb)): positive definite matrices, Cholesky, and SVD
-4. [Week 6](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week6.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week6s.ipynb)): 
+1. [Week 1](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week1.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week1s.ipynb)): Binary representation, integers, floating point numbers, and interval arithmetic
+2. [Week 2](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week2.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week2s.ipynb)): Finite-differences, dual numbers, and Newton iteration
+3. [Week 3](https://nbviewer.org/github/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week3.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week3s.ipynb)): dense, triangular, banded, permutation, rotation and reflection matrices
+4. [Week 4](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week4.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week4s.ipynb)): least squares, QR and PLU decompositions
+4. [Week 5](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week5.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week5s.ipynb)): positive definite matrices, Cholesky, and SVD
+4. [Week 6](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week6.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week6s.ipynb)): 
 Condition numbers, indefinite integration, and Euler methods
-5. [Week 7](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week7.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week7s.ipynb)): 
+5. [Week 7](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week7.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week7s.ipynb)): 
 Two point boundary value problems, convergence, and Fourier series
-5. [Week 8](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week8.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week8s.ipynb)): 
+5. [Week 8](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week8.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week8s.ipynb)): 
 Discrete Fourier Transform (DFT), Fast Fourier Transform (FFT), and Orthogonal Polynomials.
-5. [Week 9](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week9.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week9s.ipynb)): 
+5. [Week 9](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week9.ipynb) ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week9s.ipynb)): 
 Jacobi matrices, classical orthogonal polynomials, and interpolation.
-5. [Week 10](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week10.ipynb)  ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/week10s.ipynb)): 
+5. [Week 10](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week10.ipynb)  ([Solutions](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/week10s.ipynb)): 
 Orthogonal polynomial roots, interpolatory quadrature, and Gaussian quadrature.
 
 
 Additional problem sheets:
 
-1. [Julia Problem Sheet](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis/blob/main/sheets/juliasheet.ipynb)
+1. [Julia Problem Sheet](https://github.com/Imperial-MATH50003/MATH50003NumericalAnalysis2021-22/blob/main/sheets/juliasheet.ipynb)
 
 
 ## Reading List
